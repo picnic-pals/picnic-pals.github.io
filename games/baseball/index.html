@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: data:; font-src 'self'; connect-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Blob Baseball · Blob Arcade</title>
+<link rel="icon" type="image/svg+xml" href="../../img/icon.svg">
+<link rel="apple-touch-icon" href="../../img/icon-192.png">
+<link rel="stylesheet" href="../../css/core.css">
+<link rel="stylesheet" href="baseball.css">
+</head>
+<body>
+<section class="screen" id="menu">
+  <div class="mhead"><button class="iconbtn" id="menuHome" aria-label="Back to the arcade" data-nav>⌂</button>
+    <div class="mlogo"><span class="mav" id="menuAv"></span><span><b>Blob Baseball</b><small id="menuHi"></small></span></div>
+    <button class="chipbtn gold" id="menuScores" data-nav>🏆 High scores <kbd>H</kbd></button><button class="iconbtn music" id="menuMusic" aria-label="Music on/off (M)">🎵</button></div>
+  <h2 class="mq" id="menuQ"></h2><div class="mtiles" id="menuTiles"></div>
+  <div class="keys mk"><span class="grp"><kbd>←</kbd><kbd>→</kbd> choose</span><span class="grp"><kbd class="wide">Space</kbd> pick</span><span class="grp"><kbd>Esc</kbd> back</span></div>
+  <div id="menuSeats"></div><div id="menuPadKeys"></div>
+</section>
+<section class="screen" id="game">
+  <div class="top">
+    <button class="iconbtn" id="homeBtn" aria-label="Back to the arcade"><svg viewBox="0 0 24 24"><path d="M3.5 11.2 12 4l8.5 7.2" fill="none" stroke="#7a6a99" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10.5V19a1 1 0 0 0 1 1h3.5v-5h3v5H17a1 1 0 0 0 1-1v-8.5" fill="#ffd6e3" stroke="#7a6a99" stroke-width="2.2" stroke-linejoin="round"/></svg></button>
+    <div class="turn" id="turn"></div>
+    <div class="sign" id="sign" aria-live="polite">
+      <div class="qrow"><div class="qtxt" id="qTxt"></div><div class="qpic" id="qPic"></div><button class="speak" id="speakBtn" aria-label="Hear the question again (R)"><svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#5aa9f0"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="#5aa9f0" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></button><span class="shot" id="shot" aria-label="Shot clock"></span></div>
+      <div class="swingtag" id="swingTag" aria-live="polite"></div>
+    </div>
+    <button class="iconbtn music" id="musicBtn" aria-label="Music is on (M)"><svg viewBox="0 0 24 24"><path d="M9 17.5V6.2l10-2.2v11.3" fill="none" stroke="#7a6a99" stroke-width="2.2" stroke-linejoin="round"/><ellipse cx="6.6" cy="17.6" rx="2.8" ry="2.2" fill="#c9b2ff" stroke="#7a6a99" stroke-width="1.6"/><ellipse cx="16.6" cy="15.5" rx="2.8" ry="2.2" fill="#9fd2ff" stroke="#7a6a99" stroke-width="1.6"/><path class="slash" d="M4 4l16 16" stroke="#ff6b8b" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+    <div class="tally" aria-label="Stars"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg><span id="starCount">0</span></div>
+  </div>
+  <div id="parkWrap"><div id="park"><div class="sboard" id="sboard"></div><div id="banner" aria-live="assertive"></div><div id="fx"></div></div></div>
+  <div class="cards" id="cards" role="group" aria-label="Answer choices"></div>
+  <div class="keys" id="keys"><span class="grp"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> pick a swing / answer</span><span class="grp"><kbd>←</kbd><kbd>→</kbd> + <kbd class="wide">Space</kbd></span><span class="grp"><kbd>R</kbd> hear again</span><span class="grp"><kbd>M</kbd> music</span></div>
+</section>
+
+<script src="../../audio/voice/manifest.js"></script>
+<script src="../../audio/voice-tts/manifest.js"></script>
+<script src="../../js/core/util.js"></script>
+<script src="../../js/core/storage.js"></script>
+<script src="../../js/core/sightwords.js"></script>
+<script src="../../js/core/bonus-questions.js"></script>
+<script src="../../js/core/story.js"></script>
+<script src="../../js/core/early-words.js"></script>
+<script src="../../js/core/room-catalog.js"></script>
+<script src="../../js/core/friends.js"></script>
+<script src="../../js/core/voice-lines.js"></script>
+<script src="../../js/core/curriculum-math.js"></script>
+<script src="../../js/core/questions.js"></script>
+<script src="../../js/core/skills-early.js"></script>
+<script src="../../js/core/blobs.js"></script>
+<script src="../../js/core/audio.js"></script>
+<script src="../../js/core/music.js"></script>
+<script src="../../js/core/zip.js"></script>
+<script src="../../js/core/rewards.js"></script>
+<script src="../../js/core/ui.js"></script>
+<script src="../../js/core/gamepad.js"></script>
+<script src="../../js/core/parent.js"></script>
+<script src="baseball.js"></script>
+</body>
+</html>

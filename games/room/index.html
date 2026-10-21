@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: data:; font-src 'self'; connect-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>My Room · Blob Arcade</title>
+<link rel="icon" type="image/svg+xml" href="../../img/icon.svg">
+<link rel="apple-touch-icon" href="../../img/icon-192.png">
+<link rel="stylesheet" href="../../css/core.css">
+<link rel="stylesheet" href="room.css">
+</head>
+<body>
+<section class="screen on" id="room">
+  <div class="rtop">
+    <button class="iconbtn" id="homeBtn" data-nav aria-label="Back to the arcade"><svg viewBox="0 0 24 24"><path d="M3.5 11.2 12 4l8.5 7.2" fill="none" stroke="#7a6a99" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10.5V19a1 1 0 0 0 1 1h3.5v-5h3v5H17a1 1 0 0 0 1-1v-8.5" fill="#ffd6e3" stroke="#7a6a99" stroke-width="2.2" stroke-linejoin="round"/></svg></button>
+    <div class="rtitle"><span class="rav" id="rAv"></span><span><b id="rName">My Room</b><small id="rSub"></small></span></div>
+    <div class="bits" id="bits" aria-live="polite" title="Star bits: earn 1 for every star in any game"><span class="bi">✦</span><b id="bitCount">0</b><small>star bits</small></div>
+    <span class="saved" id="saved" aria-hidden="true">✓ Saved</span>
+    <button class="iconbtn music" id="musicBtn" aria-label="Music on/off (M)">🎵</button>
+  </div>
+  <div id="roomWrap"><div id="roomBox" tabindex="0" aria-label="Your room"><svg id="roomSvg" viewBox="0 0 1200 760" preserveAspectRatio="none" aria-hidden="true"></svg><div id="things"></div><div id="friendsL"></div><div id="dark"></div><div id="glows"></div><div id="season"></div></div></div>
+  <div class="rbar" id="mainBar">
+    <button class="rbtn shop" id="shopBtn" data-nav><span class="ri">🛍️</span>Shop</button>
+    <button class="rbtn deco" id="decoBtn" data-nav><span class="ri">🎨</span>Decorate</button>
+    <button class="rbtn troph" id="trophyBtn" data-nav><span class="ri">🏆</span>Trophies</button>
+    <button class="rbtn frnd" id="friendBtn" data-nav><span class="ri">💗</span>Friends</button>
+  </div>
+  <div class="rbar deco" id="decoBar">
+    <div class="tray scroll" id="tray" role="listbox" aria-label="Your things"></div>
+    <div class="dacts">
+      <button class="dbtn" id="flipBtn" data-nav title="Flip (R)">↔<small>Flip</small></button>
+      <button class="dbtn" id="awayBtn" data-nav title="Put away (Delete)">📦<small>Put away</small></button>
+      <button class="dbtn" id="undoBtn" data-nav title="Undo (Z)">↶<small>Undo</small></button>
+      <button class="dbtn done" id="doneBtn" data-nav title="Done (Esc)">✓<small>Done</small></button>
+    </div>
+  </div>
+  <div class="keys" id="keysMain"><span class="grp"><kbd>←</kbd><kbd>→</kbd> choose</span><span class="grp"><kbd class="wide">Space</kbd> pick</span><span class="grp"><kbd>S</kbd> shop</span><span class="grp"><kbd>D</kbd> decorate</span><span class="grp"><kbd>Esc</kbd> back</span></div>
+  <div class="keys" id="keysDeco"><span class="grp"><kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> move</span><span class="grp"><kbd class="wide">Space</kbd> place / pick up</span><span class="grp"><kbd>R</kbd> flip</span><span class="grp"><kbd class="wide">Delete</kbd> put away</span><span class="grp"><kbd>Z</kbd> undo</span><span class="grp"><kbd>Tab</kbd> your things</span><span class="grp"><kbd>Esc</kbd> done</span></div>
+  <div id="padKeys"></div>
+</section>
+<script src="../../audio/voice/manifest.js"></script>
+<script src="../../audio/voice-tts/manifest.js"></script>
+<script src="../../js/core/util.js"></script>
+<script src="../../js/core/storage.js"></script>
+<script src="../../js/core/sightwords.js"></script>
+<script src="../../js/core/bonus-questions.js"></script>
+<script src="../../js/core/story.js"></script>
+<script src="../../js/core/early-words.js"></script>
+<script src="../../js/core/room-catalog.js"></script>
+<script src="../../js/core/friends.js"></script>
+<script src="../../js/core/voice-lines.js"></script>
+<script src="../../js/core/curriculum-math.js"></script>
+<script src="../../js/core/questions.js"></script>
+<script src="../../js/core/skills-early.js"></script>
+<script src="../../js/core/blobs.js"></script>
+<script src="../../js/core/audio.js"></script>
+<script src="../../js/core/music.js"></script>
+<script src="../../js/core/zip.js"></script>
+<script src="../../js/core/rewards.js"></script>
+<script src="../../js/core/ui.js"></script>
+<script src="../../js/core/gamepad.js"></script>
+<script src="../../js/core/parent.js"></script>
+<script src="items-art.js"></script>
+<script src="room.js"></script>
+</body>
+</html>
