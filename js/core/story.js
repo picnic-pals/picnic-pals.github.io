@@ -1,4 +1,4 @@
-/* Blob Arcade — Mochi Munch story mode: "Blob Island" journey data, scoring and high scores (no DOM here).
+/* Picnic Pals — Mochi Munch story mode: "Picnic Island" journey data, scoring and high scores (no DOM here).
    The island has one themed area per math skill (in curriculum order) and two stops per area (skill level 1, level 2),
    so a full journey visits every level. Two paths keep it fair for different ages:
      Big Steps    — each stop plays its own level (level 1 then level 2).
@@ -9,29 +9,31 @@
 (function (A) {
   'use strict';
   var AREAS = [
-    { id: 'meadow', skill: 'count10', name: 'Counting Meadow', emoji: '🌼', friend: 'poppy', bg: '#bff0b0', x: 12, y: 74,
-      beat: "Hi, I'm Poppy! The star-snacks landed in my flowers. Let's count and find them!" },
-    { id: 'cliffs', skill: 'compare', name: 'Compare Cliffs', emoji: '⛰️', friend: 'clem', bg: '#e8d6c0', x: 24, y: 50,
-      beat: 'Clem here! Up on the cliffs, big and small numbers are hiding. Which one is bigger?' },
-    { id: 'beach', skill: 'add10', name: 'Adding Beach', emoji: '🏖️', friend: 'dewdrop', bg: '#ffe9a8', x: 18, y: 24,
-      beat: "Splash! I'm Dewdrop. The waves washed snacks onto the sand. Let's add them up!" },
-    { id: 'woods', skill: 'sub10', name: 'Take-Away Woods', emoji: '🌲', friend: 'pickle', bg: '#a8dca0', x: 38, y: 14,
-      beat: "Hee hee! I'm Pickle. The squirrels nibbled some snacks. Take away and see what's left!" },
-    { id: 'grove', skill: 'make10', name: 'Ten Tree Grove', emoji: '🌳', friend: 'nova', bg: '#c9f0c0', x: 52, y: 34,
-      beat: "I'm Nova. The ten tree only opens for numbers that make ten together!" },
-    { id: 'town', skill: 'teen', name: 'Teen Town', emoji: '🏘️', friend: 'clem', bg: '#ffd9c7', x: 48, y: 62,
-      beat: 'Welcome to Teen Town! Every number here is ten and some more.' },
-    { id: 'caves', skill: 'missing', name: 'Mystery Caves', emoji: '🕳️', friend: 'dewdrop', bg: '#d6cdea', x: 64, y: 80,
-      beat: 'Ooh, spooky caves! A number is missing. Can you find the hidden one?' },
-    { id: 'bay', skill: 'add20', name: 'Big Sum Bay', emoji: '⛵', friend: 'poppy', bg: '#b8e2ff', x: 80, y: 66,
-      beat: 'The boats in the bay carry lots of snacks. Time for bigger adding!' },
-    { id: 'volcano', skill: 'sub20', name: 'Volcano Valley', emoji: '🌋', friend: 'pickle', bg: '#ffc9b0', x: 76, y: 38,
-      beat: 'Hot, hot, hot! Take away big numbers to cool down the sleepy volcano.' },
-    { id: 'lighthouse', skill: 'evenodd', name: 'Even-Odd Lighthouse', emoji: '🗼', friend: 'nova', bg: '#e3dcff', x: 88, y: 14,
-      beat: 'The lighthouse blinks even, odd, even, odd. This is the last area!' }
+    { id: 'meadow', skill: 'count10', name: 'Counting Cornfield', emoji: '🌽', friend: 'strawberry', bg: '#bff0b0', x: 12, y: 74,
+      beat: "Hi, I'm Jammy! The star-snacks landed in the corn. Let's count and find them!" },
+    { id: 'cliffs', skill: 'compare', name: 'Compare Berry Beach', emoji: '🏖️', friend: 'carrot', bg: '#e8d6c0', x: 24, y: 50,
+      beat: 'Crunch here! On Berry Beach, big and small numbers are hiding in the sand. Which one is bigger?' },
+    { id: 'beach', skill: 'add10', name: 'Add-Up Broccoli Woods', emoji: '🥦', friend: 'blueberry', bg: '#ffe9a8', x: 18, y: 24,
+      beat: "Boing! I'm Bloop. The wind blew snacks under the broccoli trees. Let's add them up!" },
+    { id: 'woods', skill: 'sub10', name: 'Take-Away Muffin Town', emoji: '🧁', friend: 'corn', bg: '#a8dca0', x: 38, y: 14,
+      beat: "Hee hee! I'm Niblet. The squirrels nibbled some snacks. Take away and see what's left!" },
+    { id: 'grove', skill: 'make10', name: 'Make-Ten Pancake Peaks', emoji: '🥞', friend: 'grapes', bg: '#c9f0c0', x: 52, y: 34,
+      beat: "I'm Vinnie. The pancake gate only opens for numbers that make ten together!" },
+    { id: 'town', skill: 'teen', name: 'Teen Cocoa Volcano', emoji: '🌋', friend: 'carrot', bg: '#ffd9c7', x: 48, y: 62,
+      beat: 'Welcome to the cocoa volcano! Every number here is ten and some more.' },
+    { id: 'caves', skill: 'missing', name: 'Mystery Melon Bay', emoji: '🍉', friend: 'blueberry', bg: '#d6cdea', x: 64, y: 80,
+      beat: 'Ooh, a mystery at Melon Bay! A number is missing. Can you find the hidden one?' },
+    { id: 'bay', skill: 'add20', name: 'Big Sum Lolly Lighthouse', emoji: '🍭', friend: 'strawberry', bg: '#b8e2ff', x: 80, y: 66,
+      beat: 'The lolly lighthouse keeps lots of snacks. Time for bigger adding!' },
+    { id: 'volcano', skill: 'sub20', name: 'Take-Away Apple Grove', emoji: '🍎', friend: 'corn', bg: '#ffc9b0', x: 76, y: 38,
+      beat: 'So many apples! Take away big numbers to help the apple trees rest.' },
+    { id: 'lighthouse', skill: 'evenodd', name: 'Even-Odd Cookie Caves', emoji: '🍪', friend: 'grapes', bg: '#e3dcff', x: 88, y: 14,
+      beat: 'The cookie caves echo even, odd, even, odd. This is the last area!' }
   ];
-  var PROLOGUE = 'Oh no! A big wind blew the star-snacks all over Blob Island. Help Mochi find them before the Blob Festival tonight!';
-  var FINALE = 'You found every star-snack! The Blob Festival can begin. Hooray for you!';
+  // World / place names (placeholders from art/theme/README.md; change them here). The map and menus read these.
+  var WORLD = 'Picnic Island', FESTIVAL = 'Picnic Party';
+  var PROLOGUE = 'Oh no! A big wind blew the star-snacks all over ' + WORLD + '. Help Jammy and friends find them before the ' + FESTIVAL + ' tonight!';
+  var FINALE = 'You found every star-snack! Jammy, Crisp, Niblet and Bloop say thank you. The ' + FESTIVAL + ' can begin. Hooray for you!';
   var STOPS = [];
   AREAS.forEach(function (a, ai) { [0, 1].forEach(function (lv) { STOPS.push({ i: STOPS.length, area: a, ai: ai, lv: lv, n: STOPS.length + 1 }); }); });
   // Plug-in point: add an area (one skill, two stops) before games/munch/map.js loads, e.g. for a new subject skill.
@@ -63,11 +65,12 @@
      The challenge opens once both stops of its area are passed (on either path). Win = munch every snack before the clock
      runs out with at most 1 oops. Target time is tuned per skill (≈60% of the normal per-snack time) and scaled like the
      normal timer: Little Steps uses the easier level + fewer snacks, and the timer pace (Relaxed for age 5 and under) applies. */
+  // the four challenge friends are the first four friends in the unlock ladder (art/foods/cast.json), as the old Clem, Dewdrop, Pickle, Nova were
   var CH = [
-    { area: 'cliffs', blob: 'clem', hi: "Hey hey! I'm Clem! Ready, set, go! Let's run and munch together!" },
-    { area: 'beach', blob: 'dewdrop', hi: "Hi! I'm Dewdrop! Ooh, why is the sea so splashy? Let's find out together!" },
-    { area: 'woods', blob: 'pickle', hi: "Hee hee! I'm Pickle! Knock knock! Who's there? Me, your new friend!" },
-    { area: 'grove', blob: 'nova', hi: "Hello, I'm Nova. I love the stars, and now I have a new friend. Twinkle twinkle!" }
+    { area: 'cliffs', blob: 'mochi', hi: "Hi hi! I'm Dora Dumpling! Squishy hugs for everyone! Let's munch some snacks together!" },
+    { area: 'beach', blob: 'banana', hi: "Woo hoo! I'm Peel! Let's go bananas and munch together!" },
+    { area: 'woods', blob: 'pear', hi: "Hello, I'm Petey Pear. We make a great pair! Let's be friends." },
+    { area: 'grove', blob: 'carrot', hi: "Crunch time! I'm Crunch! Ready, set, go! Let's run and munch together!" }
   ];
   var CH_PER = { count10: [9, 10], compare: [10, 11], add10: [11, 12], sub10: [12, 13], make10: [12, 13], teen: [10, 11], missing: [13, 14], add20: [13, 14], sub20: [14, 15], evenodd: [9, 10] };
   var PACE = { relaxed: 1.4, normal: 1, speedy: 0.75 };
@@ -79,14 +82,16 @@
     var secs = (8 + CH_PER[sid][lv] * .6 * nOk) * PACE[paceOf(p)] * (p.age != null && p.age <= 4 ? 1.15 : 1);
     return { k: k, ch: c, skill: sid, level: lv, nOk: nOk, target: Math.max(25, Math.round(secs / 5) * 5), maxWrong: 1 };
   }
-  function chOpen(p, k) { var c = CH[k], s = data(p); return [c.ai * 2, c.ai * 2 + 1].every(function (i) { return ['big', 'little'].some(function (pa) { var r = s.stops[pa + ':' + i]; return r && r.passed; }); }); }
+  function chOpen(p, k) { var c = CH[k], s = data(p); return [c.ai * 2, c.ai * 2 + 1].every(function (i) { return ['big', 'little'].some(function (pa) { var r = s.stops[pa + ':' + i]; return r && r.passed && !r.placed; }); }); }
   function chHint(p, blob) { var c = chFor(blob); if (!c) return ''; var cfg = chConfig(p, CH.indexOf(c)); return 'Beat the ' + c.a.name + ' challenge in under ' + cfg.target + ' seconds!'; }
   // record a challenge try; returns {won, firstWin, secs, newBest}
   function chRecord(p, k, r) {
     var c = CH[k], s = data(p), x = s.challenges[c.area] || (s.challenges[c.area] = { tries: 0, wins: 0, best: 0 }), cfg = chConfig(p, k);
     x.tries++; var won = !!(r.finished && r.wrong <= cfg.maxWrong && r.secs <= cfg.target), out = { won: won, secs: r.secs, target: cfg.target };
     if (won) { x.wins++; if (!x.best || r.secs < x.best) { out.newBest = !!x.best; x.best = Math.round(r.secs * 10) / 10; }
-      var b = p.unlocks.blobs || (p.unlocks.blobs = {}); if (!b[c.blob]) { b[c.blob] = Date.now(); out.firstWin = true; } }
+      if (!r.wrong) { x.perfect = (x.perfect || 0) + 1; out.perfect = true; }
+      // friends are earned by MASTERING skills (js/core/rewards.js CONFIG.characters); a win here earns badges, not the friend
+      var b = p.unlocks.blobs || (p.unlocks.blobs = {}); if (!A.Rewards && !b[c.blob]) { b[c.blob] = Date.now(); out.firstWin = true; } }
     return out;
   }
   function unlockAll(p) { var b = p.unlocks.blobs || (p.unlocks.blobs = {}); A.Blobs.CAST.forEach(function (c) { if (!b[c.id]) b[c.id] = Date.now(); }); }
@@ -118,7 +123,7 @@
     var s = data(p), key = path(p) + ':' + i, info = s.stops[key] || (s.stops[key] = { best: 0, stars: 0, passed: false, fails: 0, plays: 0 });
     var pts = scoreFor(r), passed = !!(r.finished || (r.frac >= .75 && !r.gaveUp)), out = { pts: pts, passed: passed };
     info.plays++; out.firstPass = passed && !info.passed;
-    if (passed) { info.passed = true; info.fails = 0; } else info.fails = (info.fails || 0) + 1;
+    if (passed) { info.passed = true; info.fails = 0; delete info.placed; } else info.fails = (info.fails || 0) + 1;
     if (pts.total > info.best) { out.newBestStop = info.best > 0; info.best = pts.total; }
     info.stars = Math.max(info.stars || 0, r.stars || 0);
     var R = run(p), st = STOPS[i];
@@ -130,12 +135,32 @@
     }
     return out;
   }
+  // start the story at the player's level: main stops whose skill comes before the player's current math skill (or is
+  // mastered / placed) are marked passed as "placed" (no stars, no score), so the trail opens at their level. Only before the
+  // first stop on this path is played. Idempotent.
+  function placeAtLevel(p) {
+    var C = A.Curriculum; if (!C || !C.current || !C.list) return 0;
+    var list = C.list('math').map(function (k) { return k.id; }), cur = null; try { cur = C.current(p, 'math'); } catch (e) {}
+    var curIx = cur ? list.indexOf(cur.id) : list.length, s = data(p), R = run(p), n = 0, M = mainCount();
+    var pre = path(p) + ':', played = Object.keys(s.stops).some(function (k) { return k.indexOf(pre) === 0 && (s.stops[k].plays > 0 || (s.stops[k].passed && !s.stops[k].placed)); });
+    if (played || R.done) return 0;   // only a journey that hasn't started yet is moved to the player's level (saved progress is never changed)
+    for (var i = 0; i < M; i++) {
+      var st = STOPS[i], key = path(p) + ':' + i, info = s.stops[key], ix = list.indexOf(st.area.skill), sst = p.skills && p.skills[st.area.skill];
+      var ahead = ix >= 0 && (ix < curIx || (sst && sst.status === 'mastered'));
+      if (!ahead) break;
+      if (info && info.passed) continue;
+      if (R.stop > i) continue;
+      s.stops[key] = Object.assign(info || { best: 0, stars: 0, fails: 0, plays: 0 }, { passed: true, placed: true });
+      if (R.stop === i) R.stop = i + 1; n++;
+    }
+    return n;
+  }
   // family board: each player's best journey (all profiles on this device)
   function board(profiles) {
     return profiles.map(function (p) { var s = data(p); return { p: p, score: s.bestRun || 0, stops: s.bestRunStops || 0, path: s.bestRunPath || path(p), finished: s.finished || 0 }; })
       .sort(function (a, b) { return b.score - a.score || b.stops - a.stops || a.p.name.localeCompare(b.p.name); });
   }
-  A.Story = { addArea: addArea, mainCount: mainCount, isSide: isSide, playable: playable, AREAS: AREAS, STOPS: STOPS, PATHS: PATHS, PROLOGUE: PROLOGUE, FINALE: FINALE, data: data, path: path, defaultPath: defaultPath, setPath: setPath,
+  A.Story = { placeAtLevel: placeAtLevel, WORLD: WORLD, FESTIVAL: FESTIVAL, addArea: addArea, mainCount: mainCount, isSide: isSide, playable: playable, AREAS: AREAS, STOPS: STOPS, PATHS: PATHS, PROLOGUE: PROLOGUE, FINALE: FINALE, data: data, path: path, defaultPath: defaultPath, setPath: setPath,
     CH: CH, chFor: chFor, chConfig: chConfig, chOpen: chOpen, chHint: chHint, chRecord: chRecord, unlockAll: unlockAll,
     stopInfo: stopInfo, unlockedTo: unlockedTo, run: run, newRun: newRun, config: config, scoreFor: scoreFor, record: record, board: board };
 })(window.Arcade);

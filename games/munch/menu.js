@@ -14,7 +14,7 @@
 
   function build() {
     sec = A.el('<section class="screen" id="menu"><div class="mhead"><button class="iconbtn" id="menuHome" aria-label="Back to the arcade" data-nav>⌂</button>' +
-      '<div class="mlogo"><span class="mav" id="menuAv"></span><span><b>Mochi Munch</b><small id="menuHi"></small></span></div>' +
+      '<div class="mlogo"><span class="mav" id="menuAv"></span><span><b>' + A.TITLES.munch + '</b><small id="menuHi"></small></span></div>' +
       '<button class="chipbtn gold" id="menuScores" data-nav>🏆 High scores</button><button class="iconbtn music" id="menuMusic" aria-label="Music on/off (M)">🎵</button></div>' +
       '<h2 class="mq" id="menuQ"></h2><div class="mtiles" id="menuTiles"></div><div id="menuSeats"></div><div class="keys mk"><span class="grp"><kbd>←</kbd><kbd>→</kbd> choose</span><span class="grp"><kbd class="wide">Space</kbd> pick</span><span class="grp"><kbd>Esc</kbd> back</span></div><div id="menuPadKeys"></div></section>');
     document.body.insertBefore(sec, document.body.firstChild);
@@ -37,16 +37,16 @@
     step = s; var box = $('#menuTiles'), q = $('#menuQ'), R = A.Story.run(P), st = A.Story.data(P);
     if (s === 'main') {
       q.textContent = 'What do you want to play?';
-      box.innerHTML = tile('story', 'Story', 'Blob Island adventure' + (R.stop || st.bestRun ? '<br><b>Stop ' + Math.min(R.stop + 1, 20) + ' of 20</b> · best ' + (st.bestRun || 0) : ''), ISLAND, 'story') +
+      box.innerHTML = tile('story', 'Story', A.Story.WORLD + ' adventure' + (R.stop || st.bestRun ? '<br><b>Stop ' + Math.min(R.stop + 1, 20) + ' of 20</b> · best ' + (st.bestRun || 0) : ''), ISLAND, 'story') +
         tile('free', 'Free Play', 'Munch at your own level', GRID, 'free') +
-        tile('two', '2 Players', 'Team or race, one keyboard', '<span class="pair">' + B.forProfile(P, { expr: 'happy' }) + B.svg({ blob: P.blob === 'clem' ? 'pickle' : 'clem', expr: 'happy' }) + '</span>', 'two');
+        tile('two', '2 Players', 'Team or race, one keyboard', '<span class="pair">' + B.forProfile(P, { expr: 'happy' }) + B.svg({ blob: P.blob === 'apple' ? 'blueberry' : 'apple', expr: 'happy' }) + '</span>', 'two');
       wire({ story: function () { go('mode=story'); }, free: function () { go('mode=free'); }, two: function () { V.say(['hub_pick_friend']); render('partner'); } });
     } else if (s === 'partner') {
       q.textContent = 'Who is playing with ' + P.name + '?';
       var others = A.Store.profiles().filter(function (p) { return p.id !== P.id; }), h = '', fns = {};
       others.forEach(function (p) { h += tile('p:' + p.id, p.name, '⭐ ' + p.stars, '<span class="one">' + B.forProfile(p, { expr: 'happy' }) + '</span>', 'kidt'); fns['p:' + p.id] = function () { partner = { id: p.id, p: p }; V.say([nameParts(p), 'hub_team_or_race']); render('mode'); }; });
       [['easy', 'Guest · Easy', 'Counting'], ['medium', 'Guest · Medium', 'Adding to 10'], ['hard', 'Guest · Hard', 'Adding to 20']].forEach(function (g) {
-        h += tile('g:' + g[0], g[1], g[2], '<span class="one">' + B.svg({ blob: 'clem', color: 'sky', expr: 'happy' }) + '</span>', 'guest'); fns['g:' + g[0]] = function () { partner = { id: 'guest-' + g[0], p: { name: 'Guest', guest: true } }; V.say(['name_guest', 'hub_team_or_race']); render('mode'); };
+        h += tile('g:' + g[0], g[1], g[2], '<span class="one">' + B.svg({ blob: 'corn', color: 'sky', expr: 'happy' }) + '</span>', 'guest'); fns['g:' + g[0]] = function () { partner = { id: 'guest-' + g[0], p: { name: 'Guest', guest: true } }; V.say(['name_guest', 'hub_team_or_race']); render('mode'); };
       });
       box.innerHTML = h + '<button class="mtile backt" data-nav data-id="back"><span class="mt">◀ Back</span></button>'; fns.back = back; wire(fns);
     } else {

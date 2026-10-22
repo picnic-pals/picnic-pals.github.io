@@ -114,8 +114,8 @@
   Object.keys(PICS).forEach(function (w) { var l = lineFor(w); if (/^pw_/.test(l) && !seen[l]) { seen[l] = 1; V.push([l, w]); } });
   E.VOICE = V;
 
-  /* ---------- Story mode: Letter Lagoon (a side trip on Blob Island, one stop per skill, open from the start) ---------- */
-  if (A.Story && A.Story.addArea) A.Story.addArea({ id: 'lagoon', name: 'Letter Lagoon', emoji: '🏝️', friend: 'dewdrop', bg: '#a8e4f0', x: 44, y: 86, side: true,
+  /* ---------- Story mode: Letter Lagoon (a side trip on Picnic Island, one stop per skill, open from the start) ---------- */
+  if (A.Story && A.Story.addArea) A.Story.addArea({ id: 'lagoon', name: 'Letter Lemonade Lagoon', emoji: '🍋', friend: 'blueberry', bg: '#a8e4f0', x: 44, y: 86, side: true,
     stops: words('colors shapes letters begsound rhymes sight'), skill: 'colors',
-    beat: "Splish splash! Welcome to Letter Lagoon. Colors, shapes, letters and words are floating in the water. Let's munch them!" });
+    beat: "Splish splash! Welcome to Letter Lemonade Lagoon. Colors, shapes, letters and words are floating in the lemonade. Let's munch them!" });
 })(window.Arcade);

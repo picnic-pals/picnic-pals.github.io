@@ -2,560 +2,525 @@
 "line:hub_whos_playing": {
 "file": "hub_whos_playing.mp3",
 "text": "Who's playing today?",
-"sig": "1d29bafcc42e",
+"sig": "fe4ce1d8545a",
 "sec": 1.415,
 "lufs_raw": -22.6
 },
 "line:hub_hi": {
 "file": "hub_hi.mp3",
 "text": "Hi,",
-"sig": "daa3b65e2185",
+"sig": "d33bcb1b7c35",
 "sec": 0.695,
 "lufs_raw": -23.5
 },
 "line:hub_pick_game": {
 "file": "hub_pick_game.mp3",
 "text": "What do you want to play?",
-"sig": "0ed392c9ea0d",
+"sig": "36a9c6398e7f",
 "sec": 1.335,
 "lufs_raw": -22.3
 },
 "line:hub_coming_soon": {
 "file": "hub_coming_soon.mp3",
 "text": "That game is coming soon!",
-"sig": "3ab309e31b0a",
+"sig": "2122e16d02b9",
 "sec": 1.566,
 "lufs_raw": -23.1
 },
 "line:hub_stickers": {
 "file": "hub_stickers.mp3",
 "text": "Here is your sticker book!",
-"sig": "081d9c6ced98",
+"sig": "e4cc47280513",
 "sec": 1.495,
 "lufs_raw": -22.6
 },
 "line:hub_closet": {
 "file": "hub_closet.mp3",
-"text": "Dress-up time! Pick your blob, a color, and an outfit.",
-"sig": "f838d016a630",
-"sec": 3.485,
+"text": "Dress-up time! Pick your friend, a backdrop color, a hat, and something to hold.",
+"sig": "ab1ec2db6b05",
+"sec": 5.035,
 "lufs_raw": -24.0
 },
 "line:hub_im": {
 "file": "hub_im.mp3",
 "text": "Hi, I'm",
-"sig": "779fdc8a6444",
+"sig": "882c8a7a1cd1",
 "sec": 0.975,
 "lufs_raw": -23.0
 },
 "line:hub_looking_good": {
 "file": "hub_looking_good.mp3",
 "text": "Looking good!",
-"sig": "35143447fabb",
+"sig": "217bce4f5f2f",
 "sec": 1.035,
 "lufs_raw": -22.3
 },
 "line:hub_locked": {
 "file": "hub_locked.mp3",
 "text": "Keep earning stars to unlock that one!",
-"sig": "822989d8d978",
+"sig": "a3a108d3f9db",
 "sec": 2.458,
 "lufs_raw": -22.9
 },
 "line:hub_new_sticker": {
 "file": "hub_new_sticker.mp3",
 "text": "You got a new sticker!",
-"sig": "71ea9c481662",
+"sig": "d875f706ebbf",
 "sec": 1.335,
 "lufs_raw": -21.9
 },
 "line:hub_new_outfit": {
 "file": "hub_new_outfit.mp3",
 "text": "You unlocked a new outfit!",
-"sig": "90a9c4f18bc3",
+"sig": "01c6b88ce7ea",
 "sec": 1.715,
 "lufs_raw": -23.4
 },
 "line:hub_new_color": {
 "file": "hub_new_color.mp3",
 "text": "You unlocked a new color!",
-"sig": "7b74a8f7ff64",
+"sig": "19e497d6c8f3",
 "sec": 1.585,
 "lufs_raw": -23.0
 },
 "line:hub_grownups": {
 "file": "hub_grownups.mp3",
 "text": "That button is for grown-ups.",
-"sig": "f9dbe2f65c55",
+"sig": "e53142e2b78c",
 "sec": 1.765,
 "lufs_raw": -24.0
 },
 "line:hub_lets_go": {
 "file": "hub_lets_go.mp3",
 "text": "Let's go!",
-"sig": "fce214a7218a",
+"sig": "ccbe67ea0799",
 "sec": 0.965,
 "lufs_raw": -21.2
 },
 "line:blob_mochi": {
 "file": "blob_mochi.mp3",
-"text": "Mochi!",
-"sig": "facfa17cb496",
-"sec": 0.885,
-"lufs_raw": -20.5
-},
-"line:blob_poppy": {
-"file": "blob_poppy.mp3",
-"text": "Poppy!",
-"sig": "8c9dadfc3d29",
-"sec": 0.825,
-"lufs_raw": -22.0
-},
-"line:blob_dewdrop": {
-"file": "blob_dewdrop.mp3",
-"text": "Dewdrop!",
-"sig": "7a2ca5ad8614",
-"sec": 0.915,
+"text": "Dora Dumpling!",
+"sig": "ad7f76450713",
+"sec": 1.185,
 "lufs_raw": -22.2
-},
-"line:blob_pickle": {
-"file": "blob_pickle.mp3",
-"text": "Pickle!",
-"sig": "faba943f9f37",
-"sec": 0.735,
-"lufs_raw": -22.3
-},
-"line:blob_nova": {
-"file": "blob_nova.mp3",
-"text": "Nova!",
-"sig": "4c38d656c774",
-"sec": 0.775,
-"lufs_raw": -21.8
-},
-"line:blob_clem": {
-"file": "blob_clem.mp3",
-"text": "Clem!",
-"sig": "28051b17a336",
-"sec": 0.735,
-"lufs_raw": -21.0
 },
 "line:munch_title": {
 "file": "munch_title.mp3",
-"text": "Mochi Munch!",
-"sig": "cccbcee73107",
-"sec": 1.195,
-"lufs_raw": -22.6
+"text": "Picnic Munch!",
+"sig": "0751b29d4013",
+"sec": 1.085,
+"lufs_raw": -21.8
 },
 "line:munch_ready": {
 "file": "munch_ready.mp3",
 "text": "Ready? Press the space bar, or tap Play!",
-"sig": "28ac94ee832e",
+"sig": "9d70f90d317e",
 "sec": 2.672,
 "lufs_raw": -23.4
 },
 "line:munch_intro": {
 "file": "munch_intro.mp3",
 "text": "Help me munch the right ones!",
-"sig": "bcceedf8fa80",
+"sig": "91a08f06d690",
 "sec": 1.685,
 "lufs_raw": -23.1
 },
 "line:munch_how_keys": {
 "file": "munch_how_keys.mp3",
 "text": "Use the arrow keys to move. Press space, to munch!",
-"sig": "c0c201a6c0ee",
+"sig": "ce5332c7a2f5",
 "sec": 3.275,
 "lufs_raw": -22.7
 },
 "line:munch_how_touch": {
 "file": "munch_how_touch.mp3",
 "text": "Tap a square to walk there. Tap me to munch!",
-"sig": "6b1a0b1ae634",
+"sig": "2b44419b27b8",
 "sec": 2.815,
 "lufs_raw": -22.8
 },
 "line:munch_rule_number": {
 "file": "munch_rule_number.mp3",
 "text": "Munch the number",
-"sig": "774a3dcf11a1",
+"sig": "35aa431e30d2",
 "sec": 1.125,
 "lufs_raw": -21.5
 },
 "line:munch_rule_bigger": {
 "file": "munch_rule_bigger.mp3",
 "text": "Munch the numbers bigger than",
-"sig": "656f70d091d4",
+"sig": "38ac90b690c7",
 "sec": 1.705,
 "lufs_raw": -22.5
 },
 "line:munch_rule_make": {
 "file": "munch_rule_make.mp3",
 "text": "Munch the ones that make",
-"sig": "d4af41430613",
+"sig": "c6893896ca4d",
 "sec": 1.471,
 "lufs_raw": -22.1
 },
 "line:munch_rule_make10": {
 "file": "munch_rule_make10.mp3",
 "text": "Make ten! Munch the pairs that make ten!",
-"sig": "596ded5cff94",
+"sig": "0d7959034a38",
 "sec": 2.438,
 "lufs_raw": -23.6
 },
 "line:munch_rule_missing": {
 "file": "munch_rule_missing.mp3",
 "text": "Munch the ones where the missing number is",
-"sig": "121bb3795488",
+"sig": "69ddc25cd341",
 "sec": 2.395,
 "lufs_raw": -23.8
 },
 "line:munch_rule_even": {
 "file": "munch_rule_even.mp3",
 "text": "Munch the even numbers!",
-"sig": "5e4bb6feb57f",
+"sig": "1b2fa4e5c4ce",
 "sec": 1.639,
 "lufs_raw": -23.5
 },
 "line:munch_rule_odd": {
 "file": "munch_rule_odd.mp3",
 "text": "Munch the odd numbers!",
-"sig": "576adc6b729c",
+"sig": "8bfed06de3e4",
 "sec": 1.481,
 "lufs_raw": -23.5
 },
 "line:munch_already": {
 "file": "munch_already.mp3",
 "text": "Already munched! Find another one.",
-"sig": "70ae7648df05",
+"sig": "4137dc37132e",
 "sec": 2.325,
 "lufs_raw": -23.0
 },
 "line:munch_snack": {
 "file": "munch_snack.mp3",
 "text": "That's okay! Let's have a snack break, and try again!",
-"sig": "8865f975b1d5",
+"sig": "0d4c9c19aa4d",
 "sec": 3.026,
 "lufs_raw": -23.4
 },
 "line:munch_boing": {
 "file": "munch_boing.mp3",
 "text": "Boing! Grumbly bumped me back to the corner!",
-"sig": "7557dc984f23",
+"sig": "b6cd7d3fdbec",
 "sec": 2.612,
 "lufs_raw": -23.5
 },
 "line:w_plus": {
 "file": "w_plus.mp3",
 "text": "plus",
-"sig": "d7d0a76a681a",
+"sig": "c4043363031a",
 "sec": 0.725,
 "lufs_raw": -21.5
 },
 "line:w_minus": {
 "file": "w_minus.mp3",
 "text": "minus",
-"sig": "96de91b4cd90",
+"sig": "1f609339b7a5",
 "sec": 0.835,
 "lufs_raw": -20.9
 },
 "line:w_is": {
 "file": "w_is.mp3",
 "text": "is",
-"sig": "204800c96f58",
+"sig": "aeb5c7b70ca4",
 "sec": 0.605,
 "lufs_raw": -23.3
 },
 "line:w_thats": {
 "file": "w_thats.mp3",
 "text": "That's",
-"sig": "63708f588628",
+"sig": "ec78c56ef67e",
 "sec": 0.745,
 "lufs_raw": -21.5
 },
 "line:w_not": {
 "file": "w_not.mp3",
 "text": "not",
-"sig": "b8cd43c897d2",
+"sig": "b0e11b12778a",
 "sec": 0.725,
 "lufs_raw": -21.0
 },
 "line:w_bigger_than": {
 "file": "w_bigger_than.mp3",
 "text": "is bigger than",
-"sig": "a5ed2a44774f",
+"sig": "f98e323ba479",
 "sec": 1.005,
 "lufs_raw": -22.0
 },
 "line:w_smaller_than": {
 "file": "w_smaller_than.mp3",
 "text": "is smaller than",
-"sig": "be5af250fa3e",
+"sig": "94d767e78e01",
 "sec": 0.905,
 "lufs_raw": -21.3
 },
 "line:w_same_as": {
 "file": "w_same_as.mp3",
 "text": "is the same as",
-"sig": "9116d35b58d9",
+"sig": "24aa5dc7c4ef",
 "sec": 1.175,
 "lufs_raw": -23.4
 },
 "line:w_is_even": {
 "file": "w_is_even.mp3",
 "text": "is even",
-"sig": "81b2131221a4",
+"sig": "31a04742685e",
 "sec": 0.835,
 "lufs_raw": -22.5
 },
 "line:w_is_odd": {
 "file": "w_is_odd.mp3",
 "text": "is odd",
-"sig": "e04d0bb694b1",
+"sig": "ab2fc5f61da0",
 "sec": 0.835,
 "lufs_raw": -21.7
 },
 "line:w_so_box_is": {
 "file": "w_so_box_is.mp3",
 "text": "so the box is",
-"sig": "fe69ed08b46d",
+"sig": "731121e144a5",
 "sec": 1.225,
 "lufs_raw": -22.6
 },
 "line:fb_yum": {
 "file": "fb_yum.mp3",
 "text": "Yum!",
-"sig": "61a31d4ab765",
+"sig": "eaab7bfc2e16",
 "sec": 0.705,
 "lufs_raw": -23.0
 },
 "line:fb_nom": {
 "file": "fb_nom.mp3",
 "text": "Nom nom nom!",
-"sig": "60a9b3567b8d",
+"sig": "ce1fc84ba68f",
 "sec": 1.245,
 "lufs_raw": -22.9
 },
 "line:fb_yummy": {
 "file": "fb_yummy.mp3",
 "text": "Yummy!",
-"sig": "117016997647",
+"sig": "bede5aeb22d3",
 "sec": 0.715,
 "lufs_raw": -21.4
 },
 "line:fb_great_job": {
 "file": "fb_great_job.mp3",
 "text": "Great job!",
-"sig": "ac11cd1b8101",
+"sig": "93233fe0a7fd",
 "sec": 1.055,
 "lufs_raw": -23.8
 },
 "line:fb_you_got_it": {
 "file": "fb_you_got_it.mp3",
 "text": "You got it!",
-"sig": "d7d96908fb64",
+"sig": "43d1e5c6fbf9",
 "sec": 0.965,
 "lufs_raw": -21.7
 },
 "line:fb_delicious": {
 "file": "fb_delicious.mp3",
 "text": "Delicious!",
-"sig": "522b4cef90b2",
+"sig": "8f888803c444",
 "sec": 0.915,
 "lufs_raw": -22.1
 },
 "line:fb_super": {
 "file": "fb_super.mp3",
 "text": "Super!",
-"sig": "affdcba3a776",
+"sig": "72737f1657f8",
 "sec": 0.795,
 "lufs_raw": -22.1
 },
 "line:fb_wow": {
 "file": "fb_wow.mp3",
 "text": "Wow!",
-"sig": "2f35121c1642",
+"sig": "b0c70c78a562",
 "sec": 0.695,
 "lufs_raw": -22.5
 },
 "line:fb_oops": {
 "file": "fb_oops.mp3",
 "text": "Oops!",
-"sig": "cd8aa081ca8f",
+"sig": "5b1461a97046",
 "sec": 0.745,
 "lufs_raw": -21.3
 },
 "line:fb_so_close": {
 "file": "fb_so_close.mp3",
 "text": "So close!",
-"sig": "e6641858bd6d",
+"sig": "e5ce82f31195",
 "sec": 0.975,
 "lufs_raw": -22.5
 },
 "line:fb_hooray": {
 "file": "fb_hooray.mp3",
 "text": "Hooray!",
-"sig": "be29f0d193d3",
+"sig": "488230fab29a",
 "sec": 0.795,
 "lufs_raw": -22.4
 },
 "line:fb_you_got": {
 "file": "fb_you_got.mp3",
 "text": "You got",
-"sig": "947dd16acadc",
+"sig": "7174329fc60c",
 "sec": 0.855,
 "lufs_raw": -22.3
 },
 "line:fb_star": {
 "file": "fb_star.mp3",
 "text": "star!",
-"sig": "92f08355efd0",
+"sig": "d8ea70c30d8c",
 "sec": 0.755,
 "lufs_raw": -21.4
 },
 "line:fb_stars": {
 "file": "fb_stars.mp3",
 "text": "stars!",
-"sig": "e5326c504397",
+"sig": "32ccae3f1de5",
 "sec": 0.855,
 "lufs_raw": -21.2
 },
 "line:fb_perfect": {
 "file": "fb_perfect.mp3",
 "text": "Perfect! No mistakes!",
-"sig": "4ea7cad19094",
+"sig": "1c9d3d31b959",
 "sec": 1.629,
 "lufs_raw": -22.8
 },
 "line:fb_level_up": {
 "file": "fb_level_up.mp3",
 "text": "Level up!",
-"sig": "7c3594692eb6",
+"sig": "2c57c9b40a95",
 "sec": 0.945,
 "lufs_raw": -22.2
 },
 "line:fb_trickier": {
 "file": "fb_trickier.mp3",
 "text": "The next one is a little trickier!",
-"sig": "970c28cc911f",
+"sig": "186feb9ce94e",
 "sec": 1.845,
 "lufs_raw": -22.5
 },
 "line:fb_one_more": {
 "file": "fb_one_more.mp3",
 "text": "Awesome! One more round like that and you have got it!",
-"sig": "20a476c3c0fa",
+"sig": "df07a8c004ec",
 "sec": 2.94,
 "lufs_raw": -23.3
 },
 "line:fb_mastered": {
 "file": "fb_mastered.mp3",
 "text": "You mastered it! Time for something new!",
-"sig": "5acfa0eef7be",
+"sig": "329e3ce13fdf",
 "sec": 2.496,
 "lufs_raw": -23.3
 },
 "line:fb_champion": {
 "file": "fb_champion.mp3",
 "text": "You're a math champion!",
-"sig": "d83bcdb72a48",
+"sig": "ff067b91b533",
 "sec": 1.405,
 "lufs_raw": -21.8
 },
 "line:fb_practice_again": {
 "file": "fb_practice_again.mp3",
 "text": "Let's practice this one more time!",
-"sig": "2fbdb78d5365",
+"sig": "39731f76833c",
 "sec": 1.965,
 "lufs_raw": -23.5
 },
 "line:fb_practice_more": {
 "file": "fb_practice_more.mp3",
 "text": "Let's practice some more. You can do it!",
-"sig": "99614a9d41e5",
+"sig": "a3c9697c3f4a",
 "sec": 2.475,
 "lufs_raw": -23.1
 },
 "line:fb_easier": {
 "file": "fb_easier.mp3",
 "text": "Let's try some easier ones!",
-"sig": "8c599849c974",
+"sig": "29dc79cfdc6c",
 "sec": 1.885,
 "lufs_raw": -25.0
 },
 "line:fb_detour": {
 "file": "fb_detour.mp3",
 "text": "Let's play one you know, then come back to this one!",
-"sig": "de504d30937e",
+"sig": "a6f58a98f7b7",
 "sec": 2.955,
 "lufs_raw": -23.3
 },
 "line:fb_back_now": {
 "file": "fb_back_now.mp3",
 "text": "Nice! Now let's go back to the new one!",
-"sig": "f5b4ec52fb6e",
+"sig": "6cc208c32310",
 "sec": 2.415,
 "lufs_raw": -22.9
 },
 "line:fb_review_good": {
 "file": "fb_review_good.mp3",
 "text": "You still remember it! Great!",
-"sig": "f6551f9ec829",
+"sig": "a24907e8f4e9",
 "sec": 2.002,
 "lufs_raw": -22.7
 },
 "line:fb_keep_going": {
 "file": "fb_keep_going.mp3",
 "text": "Keep going!",
-"sig": "9421207ca861",
+"sig": "f1018e199ec4",
 "sec": 1.005,
 "lufs_raw": -22.0
 },
 "line:fb_new_skill": {
 "file": "fb_new_skill.mp3",
 "text": "New skill!",
-"sig": "6f4997496687",
+"sig": "d86d251b00ee",
 "sec": 0.935,
 "lufs_raw": -20.8
 },
 "line:fb_try_again": {
 "file": "fb_try_again.mp3",
 "text": "Try again!",
-"sig": "d0e4a4474b86",
+"sig": "e909c2d0e358",
 "sec": 0.975,
 "lufs_raw": -23.2
 },
 "line:skill_count10": {
 "file": "skill_count10.mp3",
 "text": "Find the number! Look for the number, or count the dots.",
-"sig": "eafcc608959b",
+"sig": "5c4e1d676718",
 "sec": 3.29,
 "lufs_raw": -23.5
 },
 "line:skill_compare": {
 "file": "skill_compare.mp3",
 "text": "Bigger and smaller! Which numbers are more? Which are less?",
-"sig": "0e8a2043355c",
+"sig": "366f94325382",
 "sec": 3.655,
 "lufs_raw": -23.1
 },
 "line:skill_add10": {
 "file": "skill_add10.mp3",
 "text": "Adding! Put the numbers together to see how many.",
-"sig": "84b601bdb6e8",
+"sig": "9773044a8025",
 "sec": 2.875,
 "lufs_raw": -23.3
 },
 "line:skill_sub10": {
 "file": "skill_sub10.mp3",
 "text": "Take away! Start with the big number and take some away.",
-"sig": "612cb634b944",
+"sig": "c6a8412c5653",
 "sec": 3.502,
 "lufs_raw": -23.4
 },
 "line:skill_make10": {
 "file": "skill_make10.mp3",
 "text": "Make ten! Find two numbers that make ten together.",
-"sig": "6c794a8f9d0b",
+"sig": "d20163a66a0b",
 "sec": 3.146,
 "lufs_raw": -23.0
 },
@@ -1569,10 +1534,10 @@
 },
 "line:bb_title": {
 "file": "bb_title.mp3",
-"text": "Blob Baseball!",
-"sig": "83e369956018",
-"sec": 1.205,
-"lufs_raw": -22.8
+"text": "Snack Slugger!",
+"sig": "e936da541201",
+"sec": 1.135,
+"lufs_raw": -21.6
 },
 "line:bb_batter_up": {
 "file": "bb_batter_up.mp3",
@@ -7307,59 +7272,17 @@
 "sec": 1.515,
 "lufs_raw": -23.0
 },
-"phrase:hub_im.blob_mochi": {
-"file": "phrases/hub_im.blob_mochi.mp3",
-"text": "Hi, I'm Mochi!",
-"sig": "cdfbd6618fb3",
-"sec": 1.345,
-"lufs_raw": -21.9
-},
-"phrase:hub_im.blob_poppy": {
-"file": "phrases/hub_im.blob_poppy.mp3",
-"text": "Hi, I'm Poppy!",
-"sig": "4ea2943eb472",
-"sec": 1.325,
-"lufs_raw": -21.8
-},
-"phrase:hub_im.blob_dewdrop": {
-"file": "phrases/hub_im.blob_dewdrop.mp3",
-"text": "Hi, I'm Dewdrop!",
-"sig": "7eb93bdbb793",
-"sec": 1.395,
-"lufs_raw": -22.2
-},
-"phrase:hub_im.blob_pickle": {
-"file": "phrases/hub_im.blob_pickle.mp3",
-"text": "Hi, I'm Pickle!",
-"sig": "1dfce8bff125",
-"sec": 1.255,
-"lufs_raw": -24.4
-},
-"phrase:hub_im.blob_nova": {
-"file": "phrases/hub_im.blob_nova.mp3",
-"text": "Hi, I'm Nova!",
-"sig": "8a4f1b06bd4f",
-"sec": 1.235,
-"lufs_raw": -22.2
-},
-"phrase:hub_im.blob_clem": {
-"file": "phrases/hub_im.blob_clem.mp3",
-"text": "Hi, I'm Clem!",
-"sig": "13e00adb3b1e",
-"sec": 1.195,
-"lufs_raw": -22.8
-},
 "line:munch_rule_smaller": {
 "file": "munch_rule_smaller.mp3",
 "text": "Munch the numbers, smaller than",
-"sig": "0a4800fef96a",
+"sig": "09e148dba341",
 "sec": 1.995,
 "lufs_raw": -23.1
 },
 "line:w_makes": {
 "file": "w_makes.mp3",
 "text": "makes",
-"sig": "744677fee2f1",
+"sig": "034009ec6b6a",
 "sec": 0.785,
 "lufs_raw": -21.9
 },
@@ -7869,10 +7792,10 @@
 },
 "line:hub_pick_blob": {
 "file": "hub_pick_blob.mp3",
-"text": "Pick your blob!",
-"sig": "97f71a741c60",
-"sec": 1.145,
-"lufs_raw": -22.7
+"text": "Pick your friend!",
+"sig": "c6b4ee06afb6",
+"sec": 1.095,
+"lufs_raw": -22.6
 },
 "line:hub_pick_color": {
 "file": "hub_pick_color.mp3",
@@ -7897,164 +7820,164 @@
 },
 "line:story_title": {
 "file": "story_title.mp3",
-"text": "Blob Island!",
-"sig": "3389d1b24e0c",
-"sec": 1.095,
-"lufs_raw": -22.5
+"text": "Picnic Island!",
+"sig": "1e232deb15a6",
+"sec": 1.155,
+"lufs_raw": -22.6
 },
 "line:story_prologue": {
 "file": "story_prologue.mp3",
-"text": "Oh no! A big wind blew the star-snacks all over Blob Island. Help Mochi find them before the Blob Festival tonight!",
-"sig": "ac6516e7b339",
-"sec": 7.89,
-"lufs_raw": -23.5
+"text": "Oh no! A big wind blew the star-snacks all over Picnic Island. Help Jammy and friends find them before the Picnic Party tonight!",
+"sig": "5b5da1aed2df",
+"sec": 8.745,
+"lufs_raw": -23.4
 },
 "line:story_finale": {
 "file": "story_finale.mp3",
-"text": "You found every star-snack! The Blob Festival can begin. Hooray for you!",
-"sig": "62593f5bb426",
-"sec": 4.855,
+"text": "You found every star-snack! Jammy, Crisp, Niblet and Bloop say thank you. The Picnic Party can begin. Hooray for you!",
+"sig": "b709ba36a7f5",
+"sec": 8.015,
 "lufs_raw": -22.8
 },
 "line:area_meadow": {
 "file": "area_meadow.mp3",
-"text": "Counting Meadow!",
-"sig": "3616e4d89c38",
-"sec": 1.205,
-"lufs_raw": -22.6
+"text": "Counting Cornfield!",
+"sig": "687bf3890838",
+"sec": 1.465,
+"lufs_raw": -24.3
 },
 "line:area_cliffs": {
 "file": "area_cliffs.mp3",
-"text": "Compare Cliffs!",
-"sig": "85e2636921e5",
-"sec": 1.127,
-"lufs_raw": -21.9
+"text": "Compare Berry Beach!",
+"sig": "6c2a4556ee8f",
+"sec": 1.405,
+"lufs_raw": -23.3
 },
 "line:area_beach": {
 "file": "area_beach.mp3",
-"text": "Adding Beach!",
-"sig": "436222c352ff",
-"sec": 1.075,
-"lufs_raw": -22.1
+"text": "Add-Up Broccoli Woods!",
+"sig": "b2f6d422f015",
+"sec": 1.595,
+"lufs_raw": -23.5
 },
 "line:area_woods": {
 "file": "area_woods.mp3",
-"text": "Take-Away Woods!",
-"sig": "1d5a92ec544f",
-"sec": 1.325,
-"lufs_raw": -22.6
+"text": "Take-Away Muffin Town!",
+"sig": "16ade4d85fe1",
+"sec": 1.695,
+"lufs_raw": -23.1
 },
 "line:area_grove": {
 "file": "area_grove.mp3",
-"text": "Ten Tree Grove!",
-"sig": "8b82472fee36",
-"sec": 1.265,
-"lufs_raw": -23.6
+"text": "Make-Ten Pancake Peaks!",
+"sig": "ec82df6955d4",
+"sec": 1.805,
+"lufs_raw": -24.3
 },
 "line:area_town": {
 "file": "area_town.mp3",
-"text": "Teen Town!",
-"sig": "f540e1f8e08c",
-"sec": 1.035,
-"lufs_raw": -21.9
+"text": "Teen Cocoa Volcano!",
+"sig": "765fa4f479f1",
+"sec": 1.645,
+"lufs_raw": -23.4
 },
 "line:area_caves": {
 "file": "area_caves.mp3",
-"text": "Mystery Caves!",
-"sig": "c12a5e0724db",
-"sec": 1.107,
-"lufs_raw": -22.7
+"text": "Mystery Melon Bay!",
+"sig": "0f515112e840",
+"sec": 1.443,
+"lufs_raw": -22.5
 },
 "line:area_bay": {
 "file": "area_bay.mp3",
-"text": "Big Sum Bay!",
-"sig": "28cc26b167ce",
-"sec": 1.125,
-"lufs_raw": -22.5
+"text": "Big Sum Lolly Lighthouse!",
+"sig": "d839d73259f7",
+"sec": 1.725,
+"lufs_raw": -24.3
 },
 "line:area_volcano": {
 "file": "area_volcano.mp3",
-"text": "Volcano Valley!",
-"sig": "88f7b59326bd",
-"sec": 1.285,
-"lufs_raw": -22.7
+"text": "Take-Away Apple Grove!",
+"sig": "65eddf4a5552",
+"sec": 1.775,
+"lufs_raw": -23.3
 },
 "line:area_lighthouse": {
 "file": "area_lighthouse.mp3",
-"text": "Even-Odd Lighthouse!",
-"sig": "ee945a0a2d44",
-"sec": 1.453,
-"lufs_raw": -22.9
+"text": "Even-Odd Cookie Caves!",
+"sig": "386e7a88a120",
+"sec": 1.606,
+"lufs_raw": -22.5
 },
 "line:beat_meadow": {
 "file": "beat_meadow.mp3",
-"text": "Hi, I'm Poppy! The star-snacks landed in my flowers. Let's count and find them!",
-"sig": "de2841d1b583",
-"sec": 5.345,
-"lufs_raw": -23.9
+"text": "Hi, I'm Jammy! The star-snacks landed in the corn. Let's count and find them!",
+"sig": "58c85874fbad",
+"sec": 5.225,
+"lufs_raw": -23.5
 },
 "line:beat_cliffs": {
 "file": "beat_cliffs.mp3",
-"text": "Clem here! Up on the cliffs, big and small numbers are hiding. Which one is bigger?",
-"sig": "001aa8660f5f",
-"sec": 5.125,
-"lufs_raw": -22.9
+"text": "Crunch here! On Berry Beach, big and small numbers are hiding in the sand. Which one is bigger?",
+"sig": "b903971884ef",
+"sec": 6.115,
+"lufs_raw": -22.8
 },
 "line:beat_beach": {
 "file": "beat_beach.mp3",
-"text": "Splash! I'm Dewdrop. The waves washed snacks onto the sand. Let's add them up!",
-"sig": "426920c003cf",
-"sec": 5.243,
+"text": "Boing! I'm Bloop. The wind blew snacks under the broccoli trees. Let's add them up!",
+"sig": "a92bcf7e11dc",
+"sec": 5.355,
 "lufs_raw": -23.2
 },
 "line:beat_woods": {
 "file": "beat_woods.mp3",
-"text": "Hee hee! I'm Pickle. The squirrels nibbled some snacks. Take away and see what's left!",
-"sig": "bf7df5178472",
-"sec": 5.405,
-"lufs_raw": -23.3
+"text": "Hee hee! I'm Niblet. The squirrels nibbled some snacks. Take away and see what's left!",
+"sig": "dca2f661cf09",
+"sec": 5.415,
+"lufs_raw": -23.2
 },
 "line:beat_grove": {
 "file": "beat_grove.mp3",
-"text": "I'm Nova. The ten tree only opens for numbers that make ten together!",
-"sig": "a7c95e9462c1",
-"sec": 4.615,
-"lufs_raw": -23.8
+"text": "I'm Vinnie. The pancake gate only opens for numbers that make ten together!",
+"sig": "566f318af50e",
+"sec": 4.999,
+"lufs_raw": -23.7
 },
 "line:beat_town": {
 "file": "beat_town.mp3",
-"text": "Welcome to Teen Town! Every number here is ten and some more.",
-"sig": "60f164ba7c45",
-"sec": 4.075,
-"lufs_raw": -23.4
+"text": "Welcome to the cocoa volcano! Every number here is ten and some more.",
+"sig": "6385f86c5244",
+"sec": 4.795,
+"lufs_raw": -23.6
 },
 "line:beat_caves": {
 "file": "beat_caves.mp3",
-"text": "Ooh, spooky caves! A number is missing. Can you find the hidden one?",
-"sig": "bd55f3411fbb",
-"sec": 4.2,
-"lufs_raw": -22.7
+"text": "Ooh, a mystery at Melon Bay! A number is missing. Can you find the hidden one?",
+"sig": "166710af31af",
+"sec": 5.035,
+"lufs_raw": -22.8
 },
 "line:beat_bay": {
 "file": "beat_bay.mp3",
-"text": "The boats in the bay carry lots of snacks. Time for bigger adding!",
-"sig": "26a0131a6ea7",
-"sec": 4.071,
-"lufs_raw": -23.6
+"text": "The lolly lighthouse keeps lots of snacks. Time for bigger adding!",
+"sig": "024ca27de2ed",
+"sec": 4.235,
+"lufs_raw": -24.0
 },
 "line:beat_volcano": {
 "file": "beat_volcano.mp3",
-"text": "Hot, hot, hot! Take away big numbers to cool down the sleepy volcano.",
-"sig": "9fcbd837e1a3",
-"sec": 5.047,
-"lufs_raw": -23.2
+"text": "So many apples! Take away big numbers to help the apple trees rest.",
+"sig": "082903dc4dcb",
+"sec": 4.333,
+"lufs_raw": -23.3
 },
 "line:beat_lighthouse": {
 "file": "beat_lighthouse.mp3",
-"text": "The lighthouse blinks even, odd, even, odd. This is the last area!",
-"sig": "8760c1e31fb6",
-"sec": 4.785,
-"lufs_raw": -23.2
+"text": "The cookie caves echo even, odd, even, odd. This is the last area!",
+"sig": "699cf9b9bab9",
+"sec": 4.903,
+"lufs_raw": -23.4
 },
 "line:q_notplanet": {
 "file": "q_notplanet.mp3",
@@ -9060,7 +8983,7 @@
 "line:c_moon": {
 "file": "c_moon.mp3",
 "text": "Moon.",
-"sig": "cef700fc6fa2",
+"sig": "143e2d797335",
 "sec": 0.735,
 "lufs_raw": -21.7
 },
@@ -9193,14 +9116,14 @@
 "line:c_dog": {
 "file": "c_dog.mp3",
 "text": "Dog.",
-"sig": "130dfceb8502",
+"sig": "0561ed10fef8",
 "sec": 0.765,
 "lufs_raw": -22.9
 },
 "line:c_cat": {
 "file": "c_cat.mp3",
 "text": "Cat.",
-"sig": "546090f6a89b",
+"sig": "83812ffed330",
 "sec": 0.705,
 "lufs_raw": -23.1
 },
@@ -9221,21 +9144,21 @@
 "line:c_frog": {
 "file": "c_frog.mp3",
 "text": "Frog.",
-"sig": "c19a88cc8887",
+"sig": "87ab646d84d4",
 "sec": 0.825,
 "lufs_raw": -21.7
 },
 "line:c_fish": {
 "file": "c_fish.mp3",
 "text": "Fish.",
-"sig": "a309fdd15c36",
+"sig": "be994cc866b1",
 "sec": 0.735,
 "lufs_raw": -21.5
 },
 "line:c_duck": {
 "file": "c_duck.mp3",
 "text": "Duck.",
-"sig": "0fb0ea42413c",
+"sig": "56b2e7a92834",
 "sec": 0.745,
 "lufs_raw": -22.2
 },
@@ -9340,14 +9263,14 @@
 "line:c_green": {
 "file": "c_green.mp3",
 "text": "Green.",
-"sig": "08fd1108c4fd",
+"sig": "741518c27b26",
 "sec": 0.775,
 "lufs_raw": -22.3
 },
 "line:c_red": {
 "file": "c_red.mp3",
 "text": "Red.",
-"sig": "17309e5a1549",
+"sig": "4df0b8f9235e",
 "sec": 0.695,
 "lufs_raw": -22.1
 },
@@ -9417,14 +9340,14 @@
 "line:c_three": {
 "file": "c_three.mp3",
 "text": "Three.",
-"sig": "eca1b017dedb",
+"sig": "b2a5b042e9c4",
 "sec": 0.755,
 "lufs_raw": -21.9
 },
 "line:c_six": {
 "file": "c_six.mp3",
 "text": "Six.",
-"sig": "669b658bdb2d",
+"sig": "667c465e1eb8",
 "sec": 0.785,
 "lufs_raw": -23.3
 },
@@ -9606,14 +9529,14 @@
 "line:c_five": {
 "file": "c_five.mp3",
 "text": "Five.",
-"sig": "34b68cf7854b",
+"sig": "3b68bf887dd6",
 "sec": 0.795,
 "lufs_raw": -21.5
 },
 "line:c_ten": {
 "file": "c_ten.mp3",
 "text": "Ten.",
-"sig": "0b0d8d98b0aa",
+"sig": "4b9d974210f9",
 "sec": 0.715,
 "lufs_raw": -22.7
 },
@@ -9725,7 +9648,7 @@
 "line:c_soup": {
 "file": "c_soup.mp3",
 "text": "Soup.",
-"sig": "992844a0bc7b",
+"sig": "6e8ffbeec72d",
 "sec": 0.755,
 "lufs_raw": -23.3
 },
@@ -9746,7 +9669,7 @@
 "line:c_cheese": {
 "file": "c_cheese.mp3",
 "text": "Cheese.",
-"sig": "1f4621e98ead",
+"sig": "772d6dc8d99e",
 "sec": 0.835,
 "lufs_raw": -22.9
 },
@@ -9802,7 +9725,7 @@
 "line:c_cold": {
 "file": "c_cold.mp3",
 "text": "Cold.",
-"sig": "6ab6dd40fdd8",
+"sig": "a05aa5394cf4",
 "sec": 0.785,
 "lufs_raw": -24.1
 },
@@ -9816,14 +9739,14 @@
 "line:c_loud": {
 "file": "c_loud.mp3",
 "text": "Loud.",
-"sig": "9ac326cfccae",
+"sig": "86ab1669c605",
 "sec": 0.775,
 "lufs_raw": -22.8
 },
 "line:c_small": {
 "file": "c_small.mp3",
 "text": "Small.",
-"sig": "5bf83b77bee6",
+"sig": "a860fb794cb5",
 "sec": 0.765,
 "lufs_raw": -20.9
 },
@@ -9837,35 +9760,35 @@
 "line:c_fast": {
 "file": "c_fast.mp3",
 "text": "Fast.",
-"sig": "43a2927db93a",
+"sig": "99501b0f5865",
 "sec": 0.795,
 "lufs_raw": -23.0
 },
 "line:c_down": {
 "file": "c_down.mp3",
 "text": "Down.",
-"sig": "d91932ec6924",
+"sig": "7773be3263f5",
 "sec": 0.755,
 "lufs_raw": -23.1
 },
 "line:c_left": {
 "file": "c_left.mp3",
 "text": "Left.",
-"sig": "4dac164b9919",
+"sig": "43811539fc96",
 "sec": 0.735,
 "lufs_raw": -21.1
 },
 "line:c_right": {
 "file": "c_right.mp3",
 "text": "Right.",
-"sig": "3bf161b09dc6",
+"sig": "fcf2d256c883",
 "sec": 0.745,
 "lufs_raw": -21.0
 },
 "line:c_night": {
 "file": "c_night.mp3",
 "text": "Night.",
-"sig": "1e1b3a976a63",
+"sig": "79fedc8820ad",
 "sec": 0.755,
 "lufs_raw": -21.9
 },
@@ -9886,7 +9809,7 @@
 "line:c_sad": {
 "file": "c_sad.mp3",
 "text": "Sad.",
-"sig": "2425759c41cb",
+"sig": "d93c52dee8e7",
 "sec": 0.725,
 "lufs_raw": -23.0
 },
@@ -9907,28 +9830,28 @@
 "line:c_slow": {
 "file": "c_slow.mp3",
 "text": "Slow.",
-"sig": "f87951535107",
+"sig": "acbff96e42a9",
 "sec": 0.765,
 "lufs_raw": -21.5
 },
 "line:c_closed": {
 "file": "c_closed.mp3",
 "text": "Closed.",
-"sig": "1352248af28a",
+"sig": "3be058b0815b",
 "sec": 0.825,
 "lufs_raw": -21.1
 },
 "line:c_dry": {
 "file": "c_dry.mp3",
 "text": "Dry.",
-"sig": "ed15e97833a1",
+"sig": "0f964f807d23",
 "sec": 0.775,
 "lufs_raw": -23.4
 },
 "line:c_quiet": {
 "file": "c_quiet.mp3",
 "text": "Quiet.",
-"sig": "fb84a0f09c6b",
+"sig": "f28b135cc480",
 "sec": 0.795,
 "lufs_raw": -21.3
 },
@@ -10159,28 +10082,28 @@
 "line:c_hat": {
 "file": "c_hat.mp3",
 "text": "Hat.",
-"sig": "d70eb58c1943",
+"sig": "6addce70736e",
 "sec": 0.685,
 "lufs_raw": -23.7
 },
 "line:c_sun": {
 "file": "c_sun.mp3",
 "text": "Sun.",
-"sig": "d69cacca6867",
+"sig": "0f26fa420fa3",
 "sec": 0.715,
 "lufs_raw": -21.8
 },
 "line:c_tree": {
 "file": "c_tree.mp3",
 "text": "Tree.",
-"sig": "76daa49e2d08",
+"sig": "c7ca920572d6",
 "sec": 0.745,
 "lufs_raw": -23.3
 },
 "line:c_bus": {
 "file": "c_bus.mp3",
 "text": "Bus.",
-"sig": "3a6421a6d7e5",
+"sig": "fa2558afec19",
 "sec": 0.745,
 "lufs_raw": -21.6
 },
@@ -10201,7 +10124,7 @@
 "line:c_apple": {
 "file": "c_apple.mp3",
 "text": "Apple.",
-"sig": "83e65be3af40",
+"sig": "6ee603e1748d",
 "sec": 0.795,
 "lufs_raw": -23.0
 },
@@ -10215,42 +10138,42 @@
 "line:c_boat": {
 "file": "c_boat.mp3",
 "text": "Boat.",
-"sig": "2d93a81638b8",
+"sig": "af68f0874fea",
 "sec": 0.765,
 "lufs_raw": -21.7
 },
 "line:c_sheep": {
 "file": "c_sheep.mp3",
 "text": "Sheep.",
-"sig": "4ead5f5093dc",
+"sig": "d03ffd5cc70c",
 "sec": 0.775,
 "lufs_raw": -25.4
 },
 "line:c_chair": {
 "file": "c_chair.mp3",
 "text": "Chair.",
-"sig": "521762500bed",
+"sig": "204b3872a614",
 "sec": 0.725,
 "lufs_raw": -23.5
 },
 "line:c_bed": {
 "file": "c_bed.mp3",
 "text": "Bed.",
-"sig": "c090063c531e",
+"sig": "8cffc32e8988",
 "sec": 0.705,
 "lufs_raw": -22.5
 },
 "line:c_shoe": {
 "file": "c_shoe.mp3",
 "text": "Shoe.",
-"sig": "17600b933bcc",
+"sig": "da070e978adb",
 "sec": 0.715,
 "lufs_raw": -23.3
 },
 "line:c_house": {
 "file": "c_house.mp3",
 "text": "House.",
-"sig": "07f2681ff3da",
+"sig": "14c67af2dfd6",
 "sec": 0.765,
 "lufs_raw": -23.0
 },
@@ -10299,7 +10222,7 @@
 "line:c_cup": {
 "file": "c_cup.mp3",
 "text": "Cup.",
-"sig": "f7cff5b65450",
+"sig": "c383e56d90f7",
 "sec": 0.695,
 "lufs_raw": -23.2
 },
@@ -10397,7 +10320,7 @@
 "line:c_car": {
 "file": "c_car.mp3",
 "text": "Car.",
-"sig": "d59035c01a8e",
+"sig": "e471e30a8945",
 "sec": 0.735,
 "lufs_raw": -23.0
 },
@@ -10530,14 +10453,14 @@
 "line:c_ball": {
 "file": "c_ball.mp3",
 "text": "Ball.",
-"sig": "bd70c12862d6",
+"sig": "862dfbe9106e",
 "sec": 0.735,
 "lufs_raw": -21.7
 },
 "line:c_box": {
 "file": "c_box.mp3",
 "text": "Box.",
-"sig": "c389f56449aa",
+"sig": "fe8e024ec016",
 "sec": 0.825,
 "lufs_raw": -22.5
 },
@@ -10565,7 +10488,7 @@
 "line:c_hot": {
 "file": "c_hot.mp3",
 "text": "Hot.",
-"sig": "e9e7974cbe0a",
+"sig": "43968ded1d7d",
 "sec": 0.745,
 "lufs_raw": -21.1
 },
@@ -11726,10 +11649,10 @@
 },
 "line:hub_locked_blob": {
 "file": "hub_locked_blob.mp3",
-"text": "That friend is waiting on Blob Island. Win the challenge in Story mode!",
-"sig": "8f6afa67ab47",
-"sec": 4.605,
-"lufs_raw": -22.9
+"text": "That friend is still on the way. Keep learning to meet them!",
+"sig": "950e985ef082",
+"sec": 3.375,
+"lufs_raw": -23.1
 },
 "line:unlock_clem": {
 "file": "unlock_clem.mp3",
@@ -14652,17 +14575,17 @@
 },
 "line:rm_title": {
 "file": "rm_title.mp3",
-"text": "My Room!",
-"sig": "08f1f37d8532",
-"sec": 0.855,
-"lufs_raw": -21.4
+"text": "My Picnic Spot!",
+"sig": "29aa9e65459f",
+"sec": 1.385,
+"lufs_raw": -22.8
 },
 "line:rm_welcome": {
 "file": "rm_welcome.mp3",
-"text": "Welcome to your very own room!",
-"sig": "a34f5f9f4057",
-"sec": 1.868,
-"lufs_raw": -23.5
+"text": "Welcome to your very own picnic spot!",
+"sig": "39cd6fdcedc7",
+"sec": 2.425,
+"lufs_raw": -23.8
 },
 "line:rm_welcome_back": {
 "file": "rm_welcome_back.mp3",
@@ -14778,10 +14701,10 @@
 },
 "line:rm_friends": {
 "file": "rm_friends.mp3",
-"text": "Here are your blob friends!",
-"sig": "61bbcd2e09fc",
-"sec": 1.635,
-"lufs_raw": -24.2
+"text": "Here are your picnic friends!",
+"sig": "797916ef9371",
+"sec": 1.705,
+"lufs_raw": -23.9
 },
 "line:rm_locked_friend": {
 "file": "rm_locked_friend.mp3",
@@ -14901,62 +14824,6 @@
 "sig": "d018a20c088e",
 "sec": 1.175,
 "lufs_raw": -23.0
-},
-"line:fr_mochi_hi": {
-"file": "fr_mochi_hi.mp3",
-"text": "This is Mochi! Mochi is sweet, cheerful, and always a little bit hungry.",
-"sig": "ab4aaf89cba4",
-"sec": 4.76,
-"lufs_raw": -23.3
-},
-"line:fr_mochi_likes": {
-"file": "fr_mochi_likes.mp3",
-"text": "Mochi likes snacks, sunshine, and giving big squishy hugs.",
-"sig": "21d2184d7e0a",
-"sec": 4.013,
-"lufs_raw": -24.5
-},
-"line:fr_mochi_dislikes": {
-"file": "fr_mochi_dislikes.mp3",
-"text": "Mochi doesn't like rainy days with no snacks.",
-"sig": "cb97e8b38e4e",
-"sec": 2.912,
-"lufs_raw": -23.7
-},
-"line:fr_mochi_food": {
-"file": "fr_mochi_food.mp3",
-"text": "Mochi's favorite food is a warm, sticky rice bun.",
-"sig": "57b0e5e506c0",
-"sec": 3.587,
-"lufs_raw": -23.2
-},
-"line:fr_mochi_tap1": {
-"file": "fr_mochi_tap1.mp3",
-"text": "Hee hee, that tickles!",
-"sig": "ace29c6e10d5",
-"sec": 1.415,
-"lufs_raw": -23.1
-},
-"line:fr_mochi_tap2": {
-"file": "fr_mochi_tap2.mp3",
-"text": "Is it snack time yet?",
-"sig": "c26a1c46e4f1",
-"sec": 1.453,
-"lufs_raw": -23.6
-},
-"line:fr_mochi_tap3": {
-"file": "fr_mochi_tap3.mp3",
-"text": "You're my best buddy!",
-"sig": "4541fc14d40c",
-"sec": 1.325,
-"lufs_raw": -21.8
-},
-"line:fr_mochi_nap": {
-"file": "fr_mochi_nap.mp3",
-"text": "Mmm... dreaming of dumplings...",
-"sig": "8715a7e863a6",
-"sec": 2.322,
-"lufs_raw": -23.3
 },
 "line:fr_poppy_hi": {
 "file": "fr_poppy_hi.mp3",
@@ -15261,38 +15128,38 @@
 },
 "line:it_beanbag_pink": {
 "file": "it_beanbag_pink.mp3",
-"text": "Pink beanbag!",
-"sig": "68dad090d79a",
-"sec": 1.175,
-"lufs_raw": -22.5
+"text": "Pink cushion!",
+"sig": "c0f13196022e",
+"sec": 1.075,
+"lufs_raw": -23.0
 },
 "line:it_beanbag_blue": {
 "file": "it_beanbag_blue.mp3",
-"text": "Blue beanbag!",
-"sig": "893a5b4e8c1c",
-"sec": 1.085,
-"lufs_raw": -23.0
+"text": "Mint cushion!",
+"sig": "c664f3174f2a",
+"sec": 1.055,
+"lufs_raw": -22.2
 },
 "line:it_chair": {
 "file": "it_chair.mp3",
-"text": "Little chair!",
-"sig": "46130658f8f1",
-"sec": 0.985,
-"lufs_raw": -22.1
+"text": "Stump stool!",
+"sig": "f1b4bff3b501",
+"sec": 1.055,
+"lufs_raw": -21.4
 },
 "line:it_tent": {
 "file": "it_tent.mp3",
-"text": "Play tent!",
-"sig": "f0f0a70d8eb2",
-"sec": 0.975,
-"lufs_raw": -22.0
+"text": "Parasol!",
+"sig": "1a102700c360",
+"sec": 0.895,
+"lufs_raw": -22.4
 },
 "line:it_table_round": {
 "file": "it_table_round.mp3",
-"text": "Round table!",
-"sig": "416ede8b3459",
-"sec": 1.005,
-"lufs_raw": -20.8
+"text": "Picnic table!",
+"sig": "7e64ea00b312",
+"sec": 1.115,
+"lufs_raw": -22.0
 },
 "line:it_desk": {
 "file": "it_desk.mp3",
@@ -15324,10 +15191,10 @@
 },
 "line:it_snackcart": {
 "file": "it_snackcart.mp3",
-"text": "Snack cart!",
-"sig": "a1a69399a19c",
-"sec": 1.117,
-"lufs_raw": -22.2
+"text": "Cupcake stand!",
+"sig": "c0344e70fb03",
+"sec": 1.255,
+"lufs_raw": -23.1
 },
 "line:it_fishtank": {
 "file": "it_fishtank.mp3",
@@ -15380,10 +15247,10 @@
 },
 "line:it_lamp_floor": {
 "file": "it_lamp_floor.mp3",
-"text": "Floor lamp!",
-"sig": "e4d5bb1b67cb",
-"sec": 0.995,
-"lufs_raw": -21.7
+"text": "Lantern!",
+"sig": "43304e2b29bc",
+"sec": 0.895,
+"lufs_raw": -20.6
 },
 "line:it_lamp_star": {
 "file": "it_lamp_star.mp3",
@@ -15401,10 +15268,10 @@
 },
 "line:it_toybox": {
 "file": "it_toybox.mp3",
-"text": "Toy box!",
-"sig": "88d0a0649686",
-"sec": 1.015,
-"lufs_raw": -21.4
+"text": "Picnic basket!",
+"sig": "b8df97fd2912",
+"sec": 1.285,
+"lufs_raw": -21.6
 },
 "line:it_blocks": {
 "file": "it_blocks.mp3",
@@ -15485,10 +15352,10 @@
 },
 "line:it_rug_round": {
 "file": "it_rug_round.mp3",
-"text": "Round rug!",
-"sig": "1b8f4959a31f",
-"sec": 0.935,
-"lufs_raw": -21.4
+"text": "Picnic blanket!",
+"sig": "3c6da52b5a33",
+"sec": 1.275,
+"lufs_raw": -22.5
 },
 "line:it_rug_rainbow": {
 "file": "it_rug_rainbow.mp3",
@@ -15520,10 +15387,10 @@
 },
 "line:it_poster_mochi": {
 "file": "it_poster_mochi.mp3",
-"text": "Mochi poster!",
-"sig": "143af2caad8d",
-"sec": 1.309,
-"lufs_raw": -22.5
+"text": "Dora Dumpling poster!",
+"sig": "463d105d65d3",
+"sec": 1.645,
+"lufs_raw": -23.3
 },
 "line:it_poster_baseball": {
 "file": "it_poster_baseball.mp3",
@@ -15534,10 +15401,10 @@
 },
 "line:it_frame_sun": {
 "file": "it_frame_sun.mp3",
-"text": "Sunny painting!",
-"sig": "f99e4ba5109c",
-"sec": 1.165,
-"lufs_raw": -22.0
+"text": "Strawberry picture!",
+"sig": "cb08040de73e",
+"sec": 1.335,
+"lufs_raw": -22.4
 },
 "line:it_clock": {
 "file": "it_clock.mp3",
@@ -15562,10 +15429,10 @@
 },
 "line:it_pennant": {
 "file": "it_pennant.mp3",
-"text": "Pennant!",
-"sig": "d6821af19058",
-"sec": 0.785,
-"lufs_raw": -21.6
+"text": "Bunting!",
+"sig": "954bc0dab571",
+"sec": 0.855,
+"lufs_raw": -20.8
 },
 "line:it_mirror": {
 "file": "it_mirror.mp3",
@@ -16906,36 +16773,36 @@
 },
 "line:area_lagoon": {
 "file": "area_lagoon.mp3",
-"text": "Letter Lagoon!",
-"sig": "be4052df695a",
-"sec": 1.125,
-"lufs_raw": -22.2
+"text": "Letter Lemonade Lagoon!",
+"sig": "0c770d615313",
+"sec": 1.619,
+"lufs_raw": -23.5
 },
 "line:beat_lagoon": {
 "file": "beat_lagoon.mp3",
-"text": "Splish splash! Welcome to Letter Lagoon. Colors, shapes, letters and words are floating in the water. Let's munch them!",
-"sig": "a8587e9c0b3a",
-"sec": 7.613,
-"lufs_raw": -23.1
+"text": "Splish splash! Welcome to Letter Lemonade Lagoon. Colors, shapes, letters and words are floating in the lemonade. Let's munch them!",
+"sig": "a561c5502226",
+"sec": 8.848,
+"lufs_raw": -23.2
 },
 "line:hub_welcome_back": {
 "file": "hub_welcome_back.mp3",
 "text": "Welcome back!",
-"sig": "7d8a639845fc",
+"sig": "cd27c5de49bb",
 "sec": 1.107,
 "lufs_raw": -21.9
 },
 "line:pl_one": {
 "file": "pl_one.mp3",
 "text": "Player one!",
-"sig": "efabf4e2417a",
+"sig": "2a4eb6f66e8d",
 "sec": 0.955,
 "lufs_raw": -22.1
 },
 "line:pl_two": {
 "file": "pl_two.mp3",
 "text": "Player two!",
-"sig": "125428cde870",
+"sig": "5f2989c2bde1",
 "sec": 0.945,
 "lufs_raw": -21.3
 },
@@ -17001,5 +16868,5710 @@
 "sig": "9a7f716f9df4",
 "sec": 1.695,
 "lufs_raw": -23.0
+},
+"line:skill_cvc": {
+"file": "skill_cvc.mp3",
+"text": "Short vowel words! Cat, dog, sun. Say each sound, then read the word.",
+"sig": "d56cac62df9a",
+"sec": 4.785,
+"lufs_raw": -24.1
+},
+"line:skill_digraph": {
+"file": "skill_digraph.mp3",
+"text": "Two letters, one sound! S H says shh, C H says ch, and T H says th.",
+"sig": "a9d786497555",
+"sec": 6.335,
+"lufs_raw": -23.6
+},
+"line:skill_sight2": {
+"file": "skill_sight2.mp3",
+"text": "More sight words! Read them fast, like a big kid.",
+"sig": "60496de738b0",
+"sec": 3.375,
+"lufs_raw": -23.3
+},
+"line:skill_opposites": {
+"file": "skill_opposites.mp3",
+"text": "Opposites! Hot and cold. Big and small. Up and down.",
+"sig": "9a988f2fee00",
+"sec": 3.705,
+"lufs_raw": -22.9
+},
+"line:skill_nounverb": {
+"file": "skill_nounverb.mp3",
+"text": "Action words! An action word is something you can do, like run or jump.",
+"sig": "42a21284672e",
+"sec": 5.019,
+"lufs_raw": -23.9
+},
+"line:rule_cvc_word": {
+"file": "rule_cvc_word.mp3",
+"text": "Munch the word",
+"sig": "54d18ad3b31b",
+"sec": 1.095,
+"lufs_raw": -21.1
+},
+"line:rule_cvc_pic": {
+"file": "rule_cvc_pic.mp3",
+"text": "Read the word. Then munch its picture!",
+"sig": "fb4fc8271a4f",
+"sec": 2.435,
+"lufs_raw": -22.9
+},
+"line:q_cvc_word": {
+"file": "q_cvc_word.mp3",
+"text": "Which word goes with the picture?",
+"sig": "977cccac3c4f",
+"sec": 1.905,
+"lufs_raw": -23.9
+},
+"line:q_cvc_pic": {
+"file": "q_cvc_pic.mp3",
+"text": "Read the word. Which picture is it?",
+"sig": "e1fdee516187",
+"sec": 2.195,
+"lufs_raw": -23.7
+},
+"line:rule_dig_sh": {
+"file": "rule_dig_sh.mp3",
+"text": "Munch the things that start like ship and shoe!",
+"sig": "d4e0873744c9",
+"sec": 2.455,
+"lufs_raw": -23.3
+},
+"line:rule_dig_ch": {
+"file": "rule_dig_ch.mp3",
+"text": "Munch the things that start like chair and cheese!",
+"sig": "a7cdd580ae59",
+"sec": 2.655,
+"lufs_raw": -24.1
+},
+"line:rule_dig_th": {
+"file": "rule_dig_th.mp3",
+"text": "Munch the things that start like thumb and three!",
+"sig": "0686015da05c",
+"sec": 2.625,
+"lufs_raw": -23.2
+},
+"line:rule_digw_sh": {
+"file": "rule_digw_sh.mp3",
+"text": "Munch the words that start like ship!",
+"sig": "0d68bb245848",
+"sec": 2.075,
+"lufs_raw": -23.2
+},
+"line:rule_digw_ch": {
+"file": "rule_digw_ch.mp3",
+"text": "Munch the words that start like chair!",
+"sig": "4a0730ef7e01",
+"sec": 2.105,
+"lufs_raw": -23.3
+},
+"line:rule_digw_th": {
+"file": "rule_digw_th.mp3",
+"text": "Munch the words that start like thumb!",
+"sig": "4eaa4db25538",
+"sec": 2.141,
+"lufs_raw": -22.9
+},
+"line:q_dig_sh": {
+"file": "q_dig_sh.mp3",
+"text": "Which one starts like ship?",
+"sig": "0463a351c2c0",
+"sec": 1.667,
+"lufs_raw": -22.7
+},
+"line:q_dig_ch": {
+"file": "q_dig_ch.mp3",
+"text": "Which one starts like chair?",
+"sig": "e51a81349d80",
+"sec": 1.715,
+"lufs_raw": -22.6
+},
+"line:q_dig_th": {
+"file": "q_dig_th.mp3",
+"text": "Which one starts like thumb?",
+"sig": "2cbd8f4b3f90",
+"sec": 1.705,
+"lufs_raw": -22.2
+},
+"line:w_starts_like": {
+"file": "w_starts_like.mp3",
+"text": "starts like",
+"sig": "54d7414cbc17",
+"sec": 1.005,
+"lufs_raw": -21.4
+},
+"line:w_not_like": {
+"file": "w_not_like.mp3",
+"text": "does not start like",
+"sig": "0e7b3c51717f",
+"sec": 1.289,
+"lufs_raw": -21.7
+},
+"line:rule_opposite": {
+"file": "rule_opposite.mp3",
+"text": "Munch the opposite of",
+"sig": "a5a2b7429e9d",
+"sec": 1.481,
+"lufs_raw": -23.5
+},
+"line:q_opposite": {
+"file": "q_opposite.mp3",
+"text": "What is the opposite of",
+"sig": "02084390af31",
+"sec": 1.615,
+"lufs_raw": -23.1
+},
+"line:w_opposite_of": {
+"file": "w_opposite_of.mp3",
+"text": "is the opposite of",
+"sig": "72248daf5b79",
+"sec": 1.271,
+"lufs_raw": -22.1
+},
+"line:w_not_opposite": {
+"file": "w_not_opposite.mp3",
+"text": "is not the opposite of",
+"sig": "0cf4e55ca8b9",
+"sec": 1.453,
+"lufs_raw": -23.0
+},
+"line:rule_verbs": {
+"file": "rule_verbs.mp3",
+"text": "Munch the action words! Things you can do.",
+"sig": "5cdf135c795a",
+"sec": 2.682,
+"lufs_raw": -23.2
+},
+"line:rule_nouns": {
+"file": "rule_nouns.mp3",
+"text": "Munch the naming words! People, animals and things.",
+"sig": "0ee1d562ffb4",
+"sec": 3.386,
+"lufs_raw": -23.6
+},
+"line:q_verb": {
+"file": "q_verb.mp3",
+"text": "Which one is an action word?",
+"sig": "0fc579ec4ff9",
+"sec": 1.763,
+"lufs_raw": -22.8
+},
+"line:q_noun": {
+"file": "q_noun.mp3",
+"text": "Which one is a naming word?",
+"sig": "c08455711690",
+"sec": 1.775,
+"lufs_raw": -23.0
+},
+"line:w_is_action": {
+"file": "w_is_action.mp3",
+"text": "is an action word",
+"sig": "ce0b22837f2f",
+"sec": 1.275,
+"lufs_raw": -22.7
+},
+"line:w_is_naming": {
+"file": "w_is_naming.mp3",
+"text": "is a naming word",
+"sig": "19e8311b6169",
+"sec": 1.245,
+"lufs_raw": -22.3
+},
+"line:pw_van": {
+"file": "pw_van.mp3",
+"text": "Van.",
+"sig": "03b92926a23f",
+"sec": 0.715,
+"lufs_raw": -23.0
+},
+"line:pw_can": {
+"file": "pw_can.mp3",
+"text": "Can.",
+"sig": "05e79b5e47e5",
+"sec": 0.705,
+"lufs_raw": -23.5
+},
+"line:pw_pen": {
+"file": "pw_pen.mp3",
+"text": "Pen.",
+"sig": "0911027641d0",
+"sec": 0.705,
+"lufs_raw": -24.0
+},
+"line:pw_leg": {
+"file": "pw_leg.mp3",
+"text": "Leg.",
+"sig": "06fbb5086ffd",
+"sec": 0.705,
+"lufs_raw": -22.0
+},
+"line:pw_pin": {
+"file": "pw_pin.mp3",
+"text": "Pin.",
+"sig": "d789b75d8ed7",
+"sec": 0.705,
+"lufs_raw": -23.7
+},
+"line:pw_log": {
+"file": "pw_log.mp3",
+"text": "Log.",
+"sig": "1a58ed019599",
+"sec": 0.715,
+"lufs_raw": -22.2
+},
+"line:pw_bug": {
+"file": "pw_bug.mp3",
+"text": "Bug.",
+"sig": "677eb653f51e",
+"sec": 0.695,
+"lufs_raw": -22.0
+},
+"line:pw_cot": {
+"file": "pw_cot.mp3",
+"text": "Cot.",
+"sig": "04fe853b6813",
+"sec": 0.745,
+"lufs_raw": -21.7
+},
+"line:pw_cut": {
+"file": "pw_cut.mp3",
+"text": "Cut.",
+"sig": "3eac6e66f1b0",
+"sec": 0.715,
+"lufs_raw": -23.6
+},
+"line:pw_bit": {
+"file": "pw_bit.mp3",
+"text": "Bit.",
+"sig": "6c9b72ff2edd",
+"sec": 0.705,
+"lufs_raw": -23.1
+},
+"line:pw_but": {
+"file": "pw_but.mp3",
+"text": "But.",
+"sig": "5f8d4003d63b",
+"sec": 0.685,
+"lufs_raw": -21.9
+},
+"line:pw_bag": {
+"file": "pw_bag.mp3",
+"text": "Bag.",
+"sig": "3fd18c559cf0",
+"sec": 0.735,
+"lufs_raw": -22.7
+},
+"line:pw_hit": {
+"file": "pw_hit.mp3",
+"text": "Hit.",
+"sig": "a317b60afcac",
+"sec": 0.705,
+"lufs_raw": -23.9
+},
+"line:pw_ham": {
+"file": "pw_ham.mp3",
+"text": "Ham.",
+"sig": "9ebd6f2c989b",
+"sec": 0.705,
+"lufs_raw": -23.2
+},
+"line:pw_mop": {
+"file": "pw_mop.mp3",
+"text": "Mop.",
+"sig": "ba54a8539fad",
+"sec": 0.735,
+"lufs_raw": -21.3
+},
+"line:pw_mat": {
+"file": "pw_mat.mp3",
+"text": "Mat.",
+"sig": "53871acfc25a",
+"sec": 0.715,
+"lufs_raw": -21.5
+},
+"line:pw_man": {
+"file": "pw_man.mp3",
+"text": "Man.",
+"sig": "5e72001a5e09",
+"sec": 0.715,
+"lufs_raw": -22.6
+},
+"line:pw_vet": {
+"file": "pw_vet.mp3",
+"text": "Vet.",
+"sig": "3a3387221e2f",
+"sec": 0.695,
+"lufs_raw": -22.0
+},
+"line:pw_fan": {
+"file": "pw_fan.mp3",
+"text": "Fan.",
+"sig": "834e4f07e0c9",
+"sec": 0.715,
+"lufs_raw": -23.7
+},
+"line:pw_ran": {
+"file": "pw_ran.mp3",
+"text": "Ran.",
+"sig": "ae4e1b8653e5",
+"sec": 0.735,
+"lufs_raw": -22.1
+},
+"line:pw_bad": {
+"file": "pw_bad.mp3",
+"text": "Bad.",
+"sig": "4434bf7699d2",
+"sec": 0.695,
+"lufs_raw": -22.8
+},
+"line:pw_bid": {
+"file": "pw_bid.mp3",
+"text": "Bid.",
+"sig": "0f0b638932b0",
+"sec": 0.685,
+"lufs_raw": -23.6
+},
+"line:pw_pan": {
+"file": "pw_pan.mp3",
+"text": "Pan.",
+"sig": "c1df6ac550fb",
+"sec": 0.715,
+"lufs_raw": -23.6
+},
+"line:pw_tan": {
+"file": "pw_tan.mp3",
+"text": "Tan.",
+"sig": "8a31db879f6d",
+"sec": 0.725,
+"lufs_raw": -23.3
+},
+"line:pw_tin": {
+"file": "pw_tin.mp3",
+"text": "Tin.",
+"sig": "4e7ac4f45d9a",
+"sec": 0.705,
+"lufs_raw": -23.5
+},
+"line:pw_lag": {
+"file": "pw_lag.mp3",
+"text": "Lag.",
+"sig": "a3834e004e31",
+"sec": 0.725,
+"lufs_raw": -22.2
+},
+"line:pw_beg": {
+"file": "pw_beg.mp3",
+"text": "Beg.",
+"sig": "ef6a13d2cb2c",
+"sec": 0.735,
+"lufs_raw": -22.6
+},
+"line:pw_peg": {
+"file": "pw_peg.mp3",
+"text": "Peg.",
+"sig": "80eb0327950e",
+"sec": 0.715,
+"lufs_raw": -23.1
+},
+"line:pw_big": {
+"file": "pw_big.mp3",
+"text": "Big.",
+"sig": "f7183b567f1c",
+"sec": 0.705,
+"lufs_raw": -23.2
+},
+"line:pw_dig": {
+"file": "pw_dig.mp3",
+"text": "Dig.",
+"sig": "dfef7c976fa3",
+"sec": 0.705,
+"lufs_raw": -23.2
+},
+"line:pw_pit": {
+"file": "pw_pit.mp3",
+"text": "Pit.",
+"sig": "eeb1e696fe26",
+"sec": 0.705,
+"lufs_raw": -22.5
+},
+"line:pw_sit": {
+"file": "pw_sit.mp3",
+"text": "Sit.",
+"sig": "bcc645212d3b",
+"sec": 0.715,
+"lufs_raw": -24.3
+},
+"line:pw_fix": {
+"file": "pw_fix.mp3",
+"text": "Fix.",
+"sig": "a16c8539e5c3",
+"sec": 0.765,
+"lufs_raw": -24.0
+},
+"line:pw_fog": {
+"file": "pw_fog.mp3",
+"text": "Fog.",
+"sig": "5928380fb0ea",
+"sec": 0.775,
+"lufs_raw": -23.3
+},
+"line:pw_dug": {
+"file": "pw_dug.mp3",
+"text": "Dug.",
+"sig": "6d5b8ff2eb9a",
+"sec": 0.715,
+"lufs_raw": -22.6
+},
+"line:pw_sum": {
+"file": "pw_sum.mp3",
+"text": "Sum.",
+"sig": "b32998a8bc00",
+"sec": 0.715,
+"lufs_raw": -22.6
+},
+"line:pw_bun": {
+"file": "pw_bun.mp3",
+"text": "Bun.",
+"sig": "55b374bf0d38",
+"sec": 0.695,
+"lufs_raw": -23.0
+},
+"line:pw_rug": {
+"file": "pw_rug.mp3",
+"text": "Rug.",
+"sig": "81fb99f8ce94",
+"sec": 0.705,
+"lufs_raw": -21.4
+},
+"line:pw_pup": {
+"file": "pw_pup.mp3",
+"text": "Pup.",
+"sig": "5cfd17b457bf",
+"sec": 0.705,
+"lufs_raw": -23.0
+},
+"line:pw_mud": {
+"file": "pw_mud.mp3",
+"text": "Mud.",
+"sig": "a6dadf1f5899",
+"sec": 0.705,
+"lufs_raw": -21.4
+},
+"line:pw_hop": {
+"file": "pw_hop.mp3",
+"text": "Hop.",
+"sig": "093bdcf7381a",
+"sec": 0.715,
+"lufs_raw": -23.5
+},
+"line:pw_ship": {
+"file": "pw_ship.mp3",
+"text": "Ship.",
+"sig": "cc3b93825181",
+"sec": 0.725,
+"lufs_raw": -22.0
+},
+"line:pw_shark": {
+"file": "pw_shark.mp3",
+"text": "Shark.",
+"sig": "7a2bebbed091",
+"sec": 0.785,
+"lufs_raw": -21.8
+},
+"line:pw_shirt": {
+"file": "pw_shirt.mp3",
+"text": "Shirt.",
+"sig": "84ccdc6d98ee",
+"sec": 0.765,
+"lufs_raw": -23.4
+},
+"line:pw_shop": {
+"file": "pw_shop.mp3",
+"text": "Shop.",
+"sig": "8d62f94602c7",
+"sec": 0.765,
+"lufs_raw": -22.8
+},
+"line:pw_shed": {
+"file": "pw_shed.mp3",
+"text": "Shed.",
+"sig": "f222f2078466",
+"sec": 0.725,
+"lufs_raw": -22.4
+},
+"line:pw_shin": {
+"file": "pw_shin.mp3",
+"text": "Shin.",
+"sig": "9d1dcddece25",
+"sec": 0.705,
+"lufs_raw": -23.3
+},
+"line:pw_shut": {
+"file": "pw_shut.mp3",
+"text": "Shut.",
+"sig": "cdd0655d7d6a",
+"sec": 0.735,
+"lufs_raw": -22.5
+},
+"line:pw_chocolate": {
+"file": "pw_chocolate.mp3",
+"text": "Chocolate.",
+"sig": "bb4be9074533",
+"sec": 0.925,
+"lufs_raw": -23.2
+},
+"line:pw_chip": {
+"file": "pw_chip.mp3",
+"text": "Chip.",
+"sig": "4f0bfa374dc7",
+"sec": 0.755,
+"lufs_raw": -23.7
+},
+"line:pw_chin": {
+"file": "pw_chin.mp3",
+"text": "Chin.",
+"sig": "324d453a6148",
+"sec": 0.715,
+"lufs_raw": -23.0
+},
+"line:pw_chop": {
+"file": "pw_chop.mp3",
+"text": "Chop.",
+"sig": "0c2d4f012127",
+"sec": 0.785,
+"lufs_raw": -23.5
+},
+"line:pw_chat": {
+"file": "pw_chat.mp3",
+"text": "Chat.",
+"sig": "b84a8f1f18e0",
+"sec": 0.775,
+"lufs_raw": -24.8
+},
+"line:pw_chest": {
+"file": "pw_chest.mp3",
+"text": "Chest.",
+"sig": "fa7c15efeacb",
+"sec": 0.805,
+"lufs_raw": -23.1
+},
+"line:pw_thumb": {
+"file": "pw_thumb.mp3",
+"text": "Thumb.",
+"sig": "6bbfa70f03b0",
+"sec": 0.705,
+"lufs_raw": -23.2
+},
+"line:pw_thread": {
+"file": "pw_thread.mp3",
+"text": "Thread.",
+"sig": "9b372062bb1d",
+"sec": 0.775,
+"lufs_raw": -21.6
+},
+"line:pw_thermometer": {
+"file": "pw_thermometer.mp3",
+"text": "Thermometer.",
+"sig": "ade592d86eb5",
+"sec": 0.975,
+"lufs_raw": -21.0
+},
+"line:pw_thin": {
+"file": "pw_thin.mp3",
+"text": "Thin.",
+"sig": "090d6e3ad38a",
+"sec": 0.705,
+"lufs_raw": -21.5
+},
+"line:pw_thick": {
+"file": "pw_thick.mp3",
+"text": "Thick.",
+"sig": "49697cce3496",
+"sec": 0.725,
+"lufs_raw": -23.1
+},
+"line:pw_this": {
+"file": "pw_this.mp3",
+"text": "This.",
+"sig": "730bbaaca596",
+"sec": 0.715,
+"lufs_raw": -22.7
+},
+"line:pw_that": {
+"file": "pw_that.mp3",
+"text": "That.",
+"sig": "c75b52014d03",
+"sec": 0.695,
+"lufs_raw": -23.0
+},
+"line:pw_them": {
+"file": "pw_them.mp3",
+"text": "Them.",
+"sig": "e02929fb6b6e",
+"sec": 0.655,
+"lufs_raw": -22.2
+},
+"line:pw_then": {
+"file": "pw_then.mp3",
+"text": "Then.",
+"sig": "9c4e2efaae7b",
+"sec": 0.675,
+"lufs_raw": -22.2
+},
+"line:pw_sip": {
+"file": "pw_sip.mp3",
+"text": "Sip.",
+"sig": "305674db1664",
+"sec": 0.735,
+"lufs_raw": -23.4
+},
+"line:pw_hip": {
+"file": "pw_hip.mp3",
+"text": "Hip.",
+"sig": "cf233ade7b36",
+"sec": 0.705,
+"lufs_raw": -24.0
+},
+"line:pw_cop": {
+"file": "pw_cop.mp3",
+"text": "Cop.",
+"sig": "876413e9757d",
+"sec": 0.745,
+"lufs_raw": -21.9
+},
+"line:pw_tip": {
+"file": "pw_tip.mp3",
+"text": "Tip.",
+"sig": "2bc3e714c602",
+"sec": 0.725,
+"lufs_raw": -23.6
+},
+"line:pw_tap": {
+"file": "pw_tap.mp3",
+"text": "Tap.",
+"sig": "13b621931902",
+"sec": 0.695,
+"lufs_raw": -23.6
+},
+"line:pw_top": {
+"file": "pw_top.mp3",
+"text": "Top.",
+"sig": "0bea76b7bf8e",
+"sec": 0.745,
+"lufs_raw": -21.9
+},
+"line:pw_tick": {
+"file": "pw_tick.mp3",
+"text": "Tick.",
+"sig": "68bd5b058fb5",
+"sec": 0.725,
+"lufs_raw": -24.3
+},
+"line:pw_hen": {
+"file": "pw_hen.mp3",
+"text": "Hen.",
+"sig": "90d8fd346018",
+"sec": 0.705,
+"lufs_raw": -23.5
+},
+"line:pw_day": {
+"file": "pw_day.mp3",
+"text": "Day.",
+"sig": "296d5fd56cc9",
+"sec": 0.695,
+"lufs_raw": -21.9
+},
+"line:pw_up": {
+"file": "pw_up.mp3",
+"text": "Up.",
+"sig": "c25c0c109a68",
+"sec": 0.643,
+"lufs_raw": -22.5
+},
+"line:pw_happy": {
+"file": "pw_happy.mp3",
+"text": "Happy.",
+"sig": "bc4199bbadd3",
+"sec": 0.795,
+"lufs_raw": -22.7
+},
+"line:pw_open": {
+"file": "pw_open.mp3",
+"text": "Open.",
+"sig": "77337d555f92",
+"sec": 0.805,
+"lufs_raw": -22.7
+},
+"line:pw_stop": {
+"file": "pw_stop.mp3",
+"text": "Stop.",
+"sig": "330b99dc103d",
+"sec": 0.795,
+"lufs_raw": -21.2
+},
+"line:pw_go": {
+"file": "pw_go.mp3",
+"text": "Go.",
+"sig": "8763da2bbe2c",
+"sec": 0.715,
+"lufs_raw": -23.3
+},
+"line:pw_yes": {
+"file": "pw_yes.mp3",
+"text": "Yes.",
+"sig": "4f3d956118b5",
+"sec": 0.735,
+"lufs_raw": -21.8
+},
+"line:pw_no": {
+"file": "pw_no.mp3",
+"text": "No.",
+"sig": "eff0da231d26",
+"sec": 0.695,
+"lufs_raw": -21.9
+},
+"line:pw_old": {
+"file": "pw_old.mp3",
+"text": "Old.",
+"sig": "466047e46dc3",
+"sec": 0.735,
+"lufs_raw": -22.5
+},
+"line:pw_new": {
+"file": "pw_new.mp3",
+"text": "New.",
+"sig": "f13997de0a71",
+"sec": 0.685,
+"lufs_raw": -22.0
+},
+"line:pw_in": {
+"file": "pw_in.mp3",
+"text": "In.",
+"sig": "19e86f9aebee",
+"sec": 0.675,
+"lufs_raw": -23.3
+},
+"line:pw_out": {
+"file": "pw_out.mp3",
+"text": "Out.",
+"sig": "72450e85917c",
+"sec": 0.735,
+"lufs_raw": -22.4
+},
+"line:pw_on": {
+"file": "pw_on.mp3",
+"text": "On.",
+"sig": "95aa5fbd6a41",
+"sec": 0.675,
+"lufs_raw": -22.3
+},
+"line:pw_off": {
+"file": "pw_off.mp3",
+"text": "Off.",
+"sig": "ec6f2e75325e",
+"sec": 0.675,
+"lufs_raw": -23.1
+},
+"line:pw_bottom": {
+"file": "pw_bottom.mp3",
+"text": "Bottom.",
+"sig": "ac7ffce4dc7d",
+"sec": 0.785,
+"lufs_raw": -22.5
+},
+"line:pw_push": {
+"file": "pw_push.mp3",
+"text": "Push.",
+"sig": "bd1a9a0bf695",
+"sec": 0.775,
+"lufs_raw": -23.8
+},
+"line:pw_pull": {
+"file": "pw_pull.mp3",
+"text": "Pull.",
+"sig": "9c95603718db",
+"sec": 0.725,
+"lufs_raw": -24.0
+},
+"line:pw_wet": {
+"file": "pw_wet.mp3",
+"text": "Wet.",
+"sig": "2d6f4865306a",
+"sec": 0.695,
+"lufs_raw": -21.2
+},
+"line:pw_full": {
+"file": "pw_full.mp3",
+"text": "Full.",
+"sig": "ef804a45140a",
+"sec": 0.705,
+"lufs_raw": -22.1
+},
+"line:pw_empty": {
+"file": "pw_empty.mp3",
+"text": "Empty.",
+"sig": "eb237b3604a8",
+"sec": 0.845,
+"lufs_raw": -22.0
+},
+"line:pw_long": {
+"file": "pw_long.mp3",
+"text": "Long.",
+"sig": "9e3ce038e022",
+"sec": 0.725,
+"lufs_raw": -20.9
+},
+"line:pw_short": {
+"file": "pw_short.mp3",
+"text": "Short.",
+"sig": "5fe1e55bbced",
+"sec": 0.795,
+"lufs_raw": -22.6
+},
+"line:pw_hard": {
+"file": "pw_hard.mp3",
+"text": "Hard.",
+"sig": "1a4930cf9ef7",
+"sec": 0.735,
+"lufs_raw": -21.6
+},
+"line:pw_soft": {
+"file": "pw_soft.mp3",
+"text": "Soft.",
+"sig": "0d6bb1919741",
+"sec": 0.785,
+"lufs_raw": -21.1
+},
+"line:pw_first": {
+"file": "pw_first.mp3",
+"text": "First.",
+"sig": "3cd5ba96baff",
+"sec": 0.785,
+"lufs_raw": -21.8
+},
+"line:pw_last": {
+"file": "pw_last.mp3",
+"text": "Last.",
+"sig": "bc3bca22d392",
+"sec": 0.815,
+"lufs_raw": -21.3
+},
+"line:pw_give": {
+"file": "pw_give.mp3",
+"text": "Give.",
+"sig": "1ac6e53e1d17",
+"sec": 0.725,
+"lufs_raw": -23.5
+},
+"line:pw_take": {
+"file": "pw_take.mp3",
+"text": "Take.",
+"sig": "da798ec98555",
+"sec": 0.775,
+"lufs_raw": -25.1
+},
+"line:pw_run": {
+"file": "pw_run.mp3",
+"text": "Run.",
+"sig": "b7b33c74facd",
+"sec": 0.685,
+"lufs_raw": -21.2
+},
+"line:pw_swim": {
+"file": "pw_swim.mp3",
+"text": "Swim.",
+"sig": "c06546e11b99",
+"sec": 0.745,
+"lufs_raw": -20.3
+},
+"line:pw_sing": {
+"file": "pw_sing.mp3",
+"text": "Sing.",
+"sig": "8c39a294806e",
+"sec": 0.735,
+"lufs_raw": -22.6
+},
+"line:pw_eat": {
+"file": "pw_eat.mp3",
+"text": "Eat.",
+"sig": "f9a2ed4c159c",
+"sec": 0.705,
+"lufs_raw": -23.6
+},
+"line:pw_sleep": {
+"file": "pw_sleep.mp3",
+"text": "Sleep.",
+"sig": "45fbac748ee6",
+"sec": 0.795,
+"lufs_raw": -21.6
+},
+"line:pw_clap": {
+"file": "pw_clap.mp3",
+"text": "Clap.",
+"sig": "46eeea7961f9",
+"sec": 0.735,
+"lufs_raw": -21.6
+},
+"line:pw_jump": {
+"file": "pw_jump.mp3",
+"text": "Jump.",
+"sig": "994a43b990ec",
+"sec": 0.755,
+"lufs_raw": -23.1
+},
+"line:pw_write": {
+"file": "pw_write.mp3",
+"text": "Write.",
+"sig": "06b70e5b8728",
+"sec": 0.745,
+"lufs_raw": -21.0
+},
+"line:pw_read": {
+"file": "pw_read.mp3",
+"text": "Read.",
+"sig": "67ea0b336828",
+"sec": 0.755,
+"lufs_raw": -22.9
+},
+"line:pw_kiss": {
+"file": "pw_kiss.mp3",
+"text": "Kiss.",
+"sig": "d8c1a82f973b",
+"sec": 0.765,
+"lufs_raw": -22.5
+},
+"line:pw_walk": {
+"file": "pw_walk.mp3",
+"text": "Walk.",
+"sig": "bd0f16eeb41c",
+"sec": 0.755,
+"lufs_raw": -21.0
+},
+"line:pw_cry": {
+"file": "pw_cry.mp3",
+"text": "Cry.",
+"sig": "0d10ef6a9b6a",
+"sec": 0.755,
+"lufs_raw": -23.8
+},
+"line:pw_laugh": {
+"file": "pw_laugh.mp3",
+"text": "Laugh.",
+"sig": "46e6476d410b",
+"sec": 0.745,
+"lufs_raw": -21.7
+},
+"line:pw_throw": {
+"file": "pw_throw.mp3",
+"text": "Throw.",
+"sig": "ad4471ab2a9e",
+"sec": 0.765,
+"lufs_raw": -20.8
+},
+"line:pw_catch": {
+"file": "pw_catch.mp3",
+"text": "Catch.",
+"sig": "2bc3d7757f0a",
+"sec": 0.765,
+"lufs_raw": -23.0
+},
+"line:pw_climb": {
+"file": "pw_climb.mp3",
+"text": "Climb.",
+"sig": "35a884468234",
+"sec": 0.785,
+"lufs_raw": -22.0
+},
+"line:pw_bake": {
+"file": "pw_bake.mp3",
+"text": "Bake.",
+"sig": "682eabd6b5c8",
+"sec": 0.755,
+"lufs_raw": -22.1
+},
+"line:pw_egg": {
+"file": "pw_egg.mp3",
+"text": "Egg.",
+"sig": "579f168371b3",
+"sec": 0.655,
+"lufs_raw": -23.5
+},
+"line:pw_rock": {
+"file": "pw_rock.mp3",
+"text": "Rock.",
+"sig": "75f62eda7be1",
+"sec": 0.755,
+"lufs_raw": -21.2
+},
+"line:word_after": {
+"file": "word_after.mp3",
+"text": "after.",
+"sig": "b645ae5f0edd",
+"sec": 0.825,
+"lufs_raw": -23.0
+},
+"line:word_again": {
+"file": "word_again.mp3",
+"text": "again.",
+"sig": "6630fabebb46",
+"sec": 0.805,
+"lufs_raw": -22.3
+},
+"line:word_an": {
+"file": "word_an.mp3",
+"text": "an.",
+"sig": "5b3da69912a2",
+"sec": 0.625,
+"lufs_raw": -22.3
+},
+"line:word_any": {
+"file": "word_any.mp3",
+"text": "any.",
+"sig": "957eacb8f35e",
+"sec": 0.725,
+"lufs_raw": -22.0
+},
+"line:word_as": {
+"file": "word_as.mp3",
+"text": "as.",
+"sig": "b3bb52d2f52c",
+"sec": 0.635,
+"lufs_raw": -21.8
+},
+"line:word_ask": {
+"file": "word_ask.mp3",
+"text": "ask.",
+"sig": "7006061614ae",
+"sec": 0.745,
+"lufs_raw": -22.7
+},
+"line:word_by": {
+"file": "word_by.mp3",
+"text": "by.",
+"sig": "b2cf157dde72",
+"sec": 0.745,
+"lufs_raw": -22.1
+},
+"line:word_could": {
+"file": "word_could.mp3",
+"text": "could.",
+"sig": "2aacb343648e",
+"sec": 0.715,
+"lufs_raw": -22.6
+},
+"line:word_every": {
+"file": "word_every.mp3",
+"text": "every.",
+"sig": "43c7f8a68939",
+"sec": 0.775,
+"lufs_raw": -23.8
+},
+"line:word_fly": {
+"file": "word_fly.mp3",
+"text": "fly.",
+"sig": "9f08cfd77a3c",
+"sec": 0.795,
+"lufs_raw": -21.6
+},
+"line:word_from": {
+"file": "word_from.mp3",
+"text": "from.",
+"sig": "229b554e9943",
+"sec": 0.685,
+"lufs_raw": -22.7
+},
+"line:word_give": {
+"file": "word_give.mp3",
+"text": "give.",
+"sig": "bc1cc26ae09d",
+"sec": 0.745,
+"lufs_raw": -23.1
+},
+"line:word_going": {
+"file": "word_going.mp3",
+"text": "going.",
+"sig": "478253c23204",
+"sec": 0.835,
+"lufs_raw": -22.3
+},
+"line:word_had": {
+"file": "word_had.mp3",
+"text": "had.",
+"sig": "1bf49f4f23d8",
+"sec": 0.695,
+"lufs_raw": -23.3
+},
+"line:word_has": {
+"file": "word_has.mp3",
+"text": "has.",
+"sig": "e1b15d66bc1d",
+"sec": 0.775,
+"lufs_raw": -24.0
+},
+"line:word_her": {
+"file": "word_her.mp3",
+"text": "her.",
+"sig": "d7a34c9472fe",
+"sec": 0.665,
+"lufs_raw": -23.4
+},
+"line:word_him": {
+"file": "word_him.mp3",
+"text": "him.",
+"sig": "ecd13e9053c0",
+"sec": 0.685,
+"lufs_raw": -24.0
+},
+"line:word_his": {
+"file": "word_his.mp3",
+"text": "his.",
+"sig": "0c57fae85072",
+"sec": 0.735,
+"lufs_raw": -21.3
+},
+"line:word_how": {
+"file": "word_how.mp3",
+"text": "how.",
+"sig": "4181534a835f",
+"sec": 0.705,
+"lufs_raw": -22.7
+},
+"line:word_just": {
+"file": "word_just.mp3",
+"text": "just.",
+"sig": "3af78b868206",
+"sec": 0.755,
+"lufs_raw": -21.7
+},
+"line:word_know": {
+"file": "word_know.mp3",
+"text": "know.",
+"sig": "10395c781313",
+"sec": 0.705,
+"lufs_raw": -21.5
+},
+"line:word_let": {
+"file": "word_let.mp3",
+"text": "let.",
+"sig": "140d6f06efec",
+"sec": 0.695,
+"lufs_raw": -21.3
+},
+"line:word_live": {
+"file": "word_live.mp3",
+"text": "live.",
+"sig": "b2c4f3c9c659",
+"sec": 0.815,
+"lufs_raw": -22.1
+},
+"line:word_may": {
+"file": "word_may.mp3",
+"text": "may.",
+"sig": "3619e0615fed",
+"sec": 0.715,
+"lufs_raw": -22.4
+},
+"line:word_of": {
+"file": "word_of.mp3",
+"text": "of.",
+"sig": "8685787c5b13",
+"sec": 0.635,
+"lufs_raw": -22.5
+},
+"line:word_old": {
+"file": "word_old.mp3",
+"text": "old.",
+"sig": "2d463a570292",
+"sec": 0.755,
+"lufs_raw": -23.4
+},
+"line:word_once": {
+"file": "word_once.mp3",
+"text": "once.",
+"sig": "dc6fc3c9bff9",
+"sec": 0.785,
+"lufs_raw": -20.6
+},
+"line:word_open": {
+"file": "word_open.mp3",
+"text": "open.",
+"sig": "04a3b708847d",
+"sec": 0.835,
+"lufs_raw": -23.2
+},
+"line:word_over": {
+"file": "word_over.mp3",
+"text": "over.",
+"sig": "e46579e124d6",
+"sec": 0.775,
+"lufs_raw": -22.9
+},
+"line:word_put": {
+"file": "word_put.mp3",
+"text": "put.",
+"sig": "129c252f8624",
+"sec": 0.725,
+"lufs_raw": -23.0
+},
+"line:word_round": {
+"file": "word_round.mp3",
+"text": "round.",
+"sig": "048a5daf0e9e",
+"sec": 0.805,
+"lufs_raw": -21.2
+},
+"line:word_some": {
+"file": "word_some.mp3",
+"text": "some.",
+"sig": "b24b2b6e6030",
+"sec": 0.715,
+"lufs_raw": -22.9
+},
+"line:word_stop": {
+"file": "word_stop.mp3",
+"text": "stop.",
+"sig": "06a61f40a800",
+"sec": 0.825,
+"lufs_raw": -21.3
+},
+"line:word_take": {
+"file": "word_take.mp3",
+"text": "take.",
+"sig": "45b769cf9006",
+"sec": 0.785,
+"lufs_raw": -22.6
+},
+"line:word_thank": {
+"file": "word_thank.mp3",
+"text": "thank.",
+"sig": "ec796d20b55f",
+"sec": 0.755,
+"lufs_raw": -22.2
+},
+"line:word_them": {
+"file": "word_them.mp3",
+"text": "them.",
+"sig": "e9f4577ac5d6",
+"sec": 0.685,
+"lufs_raw": -23.5
+},
+"line:word_then": {
+"file": "word_then.mp3",
+"text": "then.",
+"sig": "ba6942c6029d",
+"sec": 0.695,
+"lufs_raw": -22.1
+},
+"line:word_think": {
+"file": "word_think.mp3",
+"text": "think.",
+"sig": "d41958676ff5",
+"sec": 0.775,
+"lufs_raw": -24.4
+},
+"line:word_walk": {
+"file": "word_walk.mp3",
+"text": "walk.",
+"sig": "be848af53511",
+"sec": 0.785,
+"lufs_raw": -20.8
+},
+"line:word_were": {
+"file": "word_were.mp3",
+"text": "were.",
+"sig": "b3ffb4ec3702",
+"sec": 0.685,
+"lufs_raw": -22.4
+},
+"line:word_when": {
+"file": "word_when.mp3",
+"text": "when.",
+"sig": "3fbaea0ab887",
+"sec": 0.665,
+"lufs_raw": -22.2
+},
+"line:area_wordwoods": {
+"file": "area_wordwoods.mp3",
+"text": "Word Waffle Woods!",
+"sig": "211640356214",
+"sec": 1.395,
+"lufs_raw": -23.3
+},
+"line:beat_wordwoods": {
+"file": "beat_wordwoods.mp3",
+"text": "Hello, reader! Welcome to Word Waffle Woods. Every waffle tree here has a word on it. Let's read them and munch them!",
+"sig": "65f008038dc9",
+"sec": 8.035,
+"lufs_raw": -23.6
+},
+"line:skill_longvowel": {
+"file": "skill_longvowel.mp3",
+"text": "Long vowels! A silent e at the end makes the vowel say its name: cap, cape. Two vowels can team up too: rain, tree, boat.",
+"sig": "9de3e2d42989",
+"sec": 9.115,
+"lufs_raw": -23.2
+},
+"line:skill_sight3": {
+"file": "skill_sight3.mp3",
+"text": "Big kid sight words! Second and third grade words.",
+"sig": "08990c52ef2f",
+"sec": 3.545,
+"lufs_raw": -24.2
+},
+"line:skill_homophones": {
+"file": "skill_homophones.mp3",
+"text": "Homophones! Words that sound the same but are spelled differently, like to, two and too.",
+"sig": "ec6bb9871206",
+"sec": 5.669,
+"lufs_raw": -23.8
+},
+"line:skill_affixes": {
+"file": "skill_affixes.mp3",
+"text": "Word parts! Un means not. Re means again. Ful means full of. Less means without.",
+"sig": "57af86e923b0",
+"sec": 5.473,
+"lufs_raw": -22.4
+},
+"line:skill_comprehension": {
+"file": "skill_comprehension.mp3",
+"text": "Reading stories! Read the story, then answer the question.",
+"sig": "47de8430d269",
+"sec": 3.585,
+"lufs_raw": -23.1
+},
+"line:rule_find_word": {
+"file": "rule_find_word.mp3",
+"text": "Munch the word",
+"sig": "54d18ad3b31b",
+"sec": 1.095,
+"lufs_raw": -21.1
+},
+"line:q_which_word": {
+"file": "q_which_word.mp3",
+"text": "Which word is",
+"sig": "a4061e343077",
+"sec": 1.125,
+"lufs_raw": -23.2
+},
+"line:rule_homophone": {
+"file": "rule_homophone.mp3",
+"text": "Munch the word that fits the sentence!",
+"sig": "db7a7f87a5be",
+"sec": 2.141,
+"lufs_raw": -23.2
+},
+"line:rule_comprehension": {
+"file": "rule_comprehension.mp3",
+"text": "Read the story. Munch the answer!",
+"sig": "d2caec038f6a",
+"sec": 2.295,
+"lufs_raw": -23.1
+},
+"line:hom_0": {
+"file": "hom_0.mp3",
+"text": "I have two dogs.",
+"sig": "d12f0e5d1da5",
+"sec": 1.365,
+"lufs_raw": -24.3
+},
+"line:hom_1": {
+"file": "hom_1.mp3",
+"text": "We walk to school.",
+"sig": "2798f30a3030",
+"sec": 1.245,
+"lufs_raw": -21.3
+},
+"line:hom_2": {
+"file": "hom_2.mp3",
+"text": "Can I come too?",
+"sig": "46599cbb17d0",
+"sec": 1.223,
+"lufs_raw": -22.6
+},
+"line:hom_3": {
+"file": "hom_3.mp3",
+"text": "The cat is over there.",
+"sig": "176d56daf928",
+"sec": 1.471,
+"lufs_raw": -22.8
+},
+"line:hom_4": {
+"file": "hom_4.mp3",
+"text": "They lost their ball.",
+"sig": "d432668b3220",
+"sec": 1.265,
+"lufs_raw": -22.6
+},
+"line:hom_5": {
+"file": "hom_5.mp3",
+"text": "I think they're late.",
+"sig": "0d958eaa4443",
+"sec": 1.347,
+"lufs_raw": -23.1
+},
+"line:hom_6": {
+"file": "hom_6.mp3",
+"text": "Fish swim in the sea.",
+"sig": "61fe2124bc21",
+"sec": 1.385,
+"lufs_raw": -21.7
+},
+"line:hom_7": {
+"file": "hom_7.mp3",
+"text": "I can see the moon.",
+"sig": "383a81f9e8f6",
+"sec": 1.355,
+"lufs_raw": -22.7
+},
+"line:hom_8": {
+"file": "hom_8.mp3",
+"text": "She ate a big apple.",
+"sig": "da20cb8f3668",
+"sec": 1.425,
+"lufs_raw": -22.9
+},
+"line:hom_9": {
+"file": "hom_9.mp3",
+"text": "A spider has eight legs.",
+"sig": "3fda2a7c5ce1",
+"sec": 1.745,
+"lufs_raw": -23.5
+},
+"line:hom_10": {
+"file": "hom_10.mp3",
+"text": "Can you write your name?",
+"sig": "26c4a1b08c60",
+"sec": 1.345,
+"lufs_raw": -22.1
+},
+"line:hom_11": {
+"file": "hom_11.mp3",
+"text": "Turn right at the tree.",
+"sig": "0765ffb2e941",
+"sec": 1.453,
+"lufs_raw": -22.6
+},
+"line:hom_12": {
+"file": "hom_12.mp3",
+"text": "The wind blew hard.",
+"sig": "b8d053fb6c96",
+"sec": 1.518,
+"lufs_raw": -22.9
+},
+"line:hom_13": {
+"file": "hom_13.mp3",
+"text": "The sky is blue.",
+"sig": "d046cd4c37c2",
+"sec": 1.285,
+"lufs_raw": -22.0
+},
+"line:hom_14": {
+"file": "hom_14.mp3",
+"text": "Our team won the game.",
+"sig": "fde247506c1e",
+"sec": 1.385,
+"lufs_raw": -22.9
+},
+"line:hom_15": {
+"file": "hom_15.mp3",
+"text": "I have one nose.",
+"sig": "29e991cc3223",
+"sec": 1.345,
+"lufs_raw": -22.4
+},
+"line:hom_16": {
+"file": "hom_16.mp3",
+"text": "This gift is for you.",
+"sig": "66cf34a4227c",
+"sec": 1.443,
+"lufs_raw": -23.5
+},
+"line:hom_17": {
+"file": "hom_17.mp3",
+"text": "A dog has four legs.",
+"sig": "d3f1ed4b6555",
+"sec": 1.485,
+"lufs_raw": -23.5
+},
+"line:hom_18": {
+"file": "hom_18.mp3",
+"text": "Dad will buy some milk.",
+"sig": "1f38fcd71189",
+"sec": 1.475,
+"lufs_raw": -22.5
+},
+"line:hom_19": {
+"file": "hom_19.mp3",
+"text": "Come here and sit.",
+"sig": "87b64825ccf6",
+"sec": 1.255,
+"lufs_raw": -22.7
+},
+"line:hom_20": {
+"file": "hom_20.mp3",
+"text": "I can hear the bird sing.",
+"sig": "6ed742d51544",
+"sec": 1.565,
+"lufs_raw": -22.5
+},
+"line:hom_21": {
+"file": "hom_21.mp3",
+"text": "I know the answer.",
+"sig": "bfc10abbb52d",
+"sec": 1.225,
+"lufs_raw": -22.5
+},
+"line:hom_22": {
+"file": "hom_22.mp3",
+"text": "Nice to meet you.",
+"sig": "040fd9130aa1",
+"sec": 1.245,
+"lufs_raw": -21.4
+},
+"line:hom_23": {
+"file": "hom_23.mp3",
+"text": "We had meat for dinner.",
+"sig": "b656a70bcea2",
+"sec": 1.405,
+"lufs_raw": -23.6
+},
+"line:aff_unhappy": {
+"file": "aff_unhappy.mp3",
+"text": "Which word means not happy?",
+"sig": "f3b0ead8a021",
+"sec": 1.735,
+"lufs_raw": -22.2
+},
+"line:aff_unkind": {
+"file": "aff_unkind.mp3",
+"text": "Which word means not kind?",
+"sig": "d0fde07b51fa",
+"sec": 1.725,
+"lufs_raw": -22.2
+},
+"line:aff_unfair": {
+"file": "aff_unfair.mp3",
+"text": "Which word means not fair?",
+"sig": "d792405e3cf2",
+"sec": 1.625,
+"lufs_raw": -21.8
+},
+"line:aff_unlock": {
+"file": "aff_unlock.mp3",
+"text": "Which word means to open a lock?",
+"sig": "6c3b57cc56da",
+"sec": 1.995,
+"lufs_raw": -22.7
+},
+"line:aff_unsafe": {
+"file": "aff_unsafe.mp3",
+"text": "Which word means not safe?",
+"sig": "85e499980241",
+"sec": 1.715,
+"lufs_raw": -22.5
+},
+"line:aff_redo": {
+"file": "aff_redo.mp3",
+"text": "Which word means do again?",
+"sig": "aa2f67288356",
+"sec": 1.589,
+"lufs_raw": -22.0
+},
+"line:aff_reread": {
+"file": "aff_reread.mp3",
+"text": "Which word means read again?",
+"sig": "bf4b67af3e0b",
+"sec": 1.619,
+"lufs_raw": -22.4
+},
+"line:aff_refill": {
+"file": "aff_refill.mp3",
+"text": "Which word means fill again?",
+"sig": "60ed3ea32fc2",
+"sec": 1.585,
+"lufs_raw": -22.0
+},
+"line:aff_replay": {
+"file": "aff_replay.mp3",
+"text": "Which word means play again?",
+"sig": "7d5b120d05bb",
+"sec": 1.715,
+"lufs_raw": -21.9
+},
+"line:aff_rebuild": {
+"file": "aff_rebuild.mp3",
+"text": "Which word means build again?",
+"sig": "c33268c15654",
+"sec": 1.685,
+"lufs_raw": -22.2
+},
+"line:aff_helpful": {
+"file": "aff_helpful.mp3",
+"text": "Which word means full of help?",
+"sig": "54cd372fc96b",
+"sec": 1.609,
+"lufs_raw": -22.3
+},
+"line:aff_helpless": {
+"file": "aff_helpless.mp3",
+"text": "Which word means without help?",
+"sig": "374819520d39",
+"sec": 1.715,
+"lufs_raw": -22.2
+},
+"line:aff_careful": {
+"file": "aff_careful.mp3",
+"text": "Which word means full of care?",
+"sig": "a6960e3033ed",
+"sec": 1.685,
+"lufs_raw": -22.0
+},
+"line:aff_careless": {
+"file": "aff_careless.mp3",
+"text": "Which word means without care?",
+"sig": "3b8ee0129472",
+"sec": 1.735,
+"lufs_raw": -22.3
+},
+"line:aff_joyful": {
+"file": "aff_joyful.mp3",
+"text": "Which word means full of joy?",
+"sig": "75160e8b64a6",
+"sec": 1.735,
+"lufs_raw": -22.5
+},
+"line:aff_colorful": {
+"file": "aff_colorful.mp3",
+"text": "Which word means full of color?",
+"sig": "8456be9dc0c8",
+"sec": 1.735,
+"lufs_raw": -22.6
+},
+"line:aff_fearless": {
+"file": "aff_fearless.mp3",
+"text": "Which word means without fear?",
+"sig": "dcb44d6bb702",
+"sec": 1.849,
+"lufs_raw": -21.9
+},
+"line:aff_endless": {
+"file": "aff_endless.mp3",
+"text": "Which word means without an end?",
+"sig": "97a50f60d910",
+"sec": 1.849,
+"lufs_raw": -22.5
+},
+"line:aff_painless": {
+"file": "aff_painless.mp3",
+"text": "Which word means without pain?",
+"sig": "8f6f2695b116",
+"sec": 1.795,
+"lufs_raw": -22.3
+},
+"line:aff_playful": {
+"file": "aff_playful.mp3",
+"text": "Which word means full of play?",
+"sig": "55cca651f146",
+"sec": 1.685,
+"lufs_raw": -22.1
+},
+"line:rc_0_0": {
+"file": "rc_0_0.mp3",
+"text": "Jammy has a red kite and a blue ball. Jammy flies the kite at the beach. What color is the kite?",
+"sig": "f516df60febe",
+"sec": 6.459,
+"lufs_raw": -23.5
+},
+"line:rc_0_1": {
+"file": "rc_0_1.mp3",
+"text": "Peel has a little dog and a big cat. The dog likes to dig. The cat likes to nap. What does the dog like to do?",
+"sig": "538060d77442",
+"sec": 7.555,
+"lufs_raw": -23.2
+},
+"line:rc_0_2": {
+"file": "rc_0_2.mp3",
+"text": "Crunch ate a green grape. Then he gave a red grape to Bloop. Who got the red grape?",
+"sig": "9796bffa77f5",
+"sec": 5.405,
+"lufs_raw": -22.8
+},
+"line:rc_0_3": {
+"file": "rc_0_3.mp3",
+"text": "Bloop was sad and tired. Then she got a new puppy! She smiled and hugged it. How did Bloop feel at the end?",
+"sig": "bc4b445687f3",
+"sec": 6.904,
+"lufs_raw": -22.8
+},
+"line:rc_0_4": {
+"file": "rc_0_4.mp3",
+"text": "Dora was sleepy, but Crunch was not. His kite got stuck in a tall tree. He frowned and kicked a rock. How did Crunch feel?",
+"sig": "8b9d5268fb3c",
+"sec": 8.134,
+"lufs_raw": -23.3
+},
+"line:rc_0_5": {
+"file": "rc_0_5.mp3",
+"text": "Gray clouds filled the sky. Niblet put on his boots and took his umbrella. What will happen next?",
+"sig": "e26e2a003666",
+"sec": 6.062,
+"lufs_raw": -23.1
+},
+"line:rc_0_6": {
+"file": "rc_0_6.mp3",
+"text": "The cat hid under the bed when it heard the loud thunder. Why did the cat hide?",
+"sig": "67af21167c47",
+"sec": 4.429,
+"lufs_raw": -23.8
+},
+"line:rc_0_7": {
+"file": "rc_0_7.mp3",
+"text": "Dora and Jammy baked a cake for the picnic. They put on pink frosting. What did they bake?",
+"sig": "91007f178fe1",
+"sec": 5.885,
+"lufs_raw": -23.2
+},
+"line:rc_1_0": {
+"file": "rc_1_0.mp3",
+"text": "The wind was strong, so Bloop held her hat with both hands. She walked home slowly. Why did Bloop hold her hat?",
+"sig": "17ba53267dbd",
+"sec": 7.34,
+"lufs_raw": -23.5
+},
+"line:rc_1_1": {
+"file": "rc_1_1.mp3",
+"text": "Petey found a shiny shell on the sand. He put it in his pocket to show his friends. Where did Petey put the shell?",
+"sig": "bd73ac57601a",
+"sec": 7.015,
+"lufs_raw": -23.1
+},
+"line:rc_1_2": {
+"file": "rc_1_2.mp3",
+"text": "After school, Peel fed the fish. Then she did her homework at the kitchen table. What did Peel do first?",
+"sig": "29e6634284b7",
+"sec": 6.635,
+"lufs_raw": -23.6
+},
+"line:rc_1_3": {
+"file": "rc_1_3.mp3",
+"text": "Crunch was nervous and a little sleepy before the show. He sang his song, and everyone clapped and cheered. How did Crunch feel after the show?",
+"sig": "78fc8d3dae94",
+"sec": 9.049,
+"lufs_raw": -23.1
+},
+"line:rc_1_4": {
+"file": "rc_1_4.mp3",
+"text": "Bloop packed a towel, sunscreen and a shovel. She did not pack her school bag. Then she ran to the car. Where is Bloop probably going?",
+"sig": "64e3caef4247",
+"sec": 8.965,
+"lufs_raw": -23.4
+},
+"line:rc_1_5": {
+"file": "rc_1_5.mp3",
+"text": "First Crisp mixed the flour. Next he cracked two eggs. Last he put the pan in the oven. What did Crisp do after mixing the flour?",
+"sig": "6e0671e68b21",
+"sec": 8.876,
+"lufs_raw": -23.3
+},
+"line:rc_1_6": {
+"file": "rc_1_6.mp3",
+"text": "Dora's plant was brown and dry. She gave it water every day. Soon it had green leaves. Why did the plant get green leaves?",
+"sig": "49981b140dc0",
+"sec": 8.422,
+"lufs_raw": -23.3
+},
+"line:rc_1_7": {
+"file": "rc_1_7.mp3",
+"text": "Jammy heard a knock at the door. Jammy opened it and saw Grandma holding a big gift with a bow. What will Jammy do next?",
+"sig": "f298cc59232e",
+"sec": 8.096,
+"lufs_raw": -23.6
+},
+"line:pw_cape": {
+"file": "pw_cape.mp3",
+"text": "Cape.",
+"sig": "e0a2231a94b6",
+"sec": 0.745,
+"lufs_raw": -23.9
+},
+"line:pw_cope": {
+"file": "pw_cope.mp3",
+"text": "Cope.",
+"sig": "daf821ff8dfb",
+"sec": 0.735,
+"lufs_raw": -22.7
+},
+"line:pw_tape": {
+"file": "pw_tape.mp3",
+"text": "Tape.",
+"sig": "624604b652b9",
+"sec": 0.745,
+"lufs_raw": -21.7
+},
+"line:pw_type": {
+"file": "pw_type.mp3",
+"text": "Type.",
+"sig": "8a47e9c29cc7",
+"sec": 0.745,
+"lufs_raw": -21.3
+},
+"line:pw_made": {
+"file": "pw_made.mp3",
+"text": "Made.",
+"sig": "4b48f1f3cbfe",
+"sec": 0.735,
+"lufs_raw": -21.9
+},
+"line:pw_mad": {
+"file": "pw_mad.mp3",
+"text": "Mad.",
+"sig": "62a82fbd8dd9",
+"sec": 0.765,
+"lufs_raw": -22.6
+},
+"line:pw_make": {
+"file": "pw_make.mp3",
+"text": "Make.",
+"sig": "41262882ba80",
+"sec": 0.765,
+"lufs_raw": -21.5
+},
+"line:pw_cane": {
+"file": "pw_cane.mp3",
+"text": "Cane.",
+"sig": "c29b567840e5",
+"sec": 0.755,
+"lufs_raw": -24.3
+},
+"line:pw_cone": {
+"file": "pw_cone.mp3",
+"text": "Cone.",
+"sig": "d4c04df8093a",
+"sec": 0.745,
+"lufs_raw": -22.7
+},
+"line:pw_hope": {
+"file": "pw_hope.mp3",
+"text": "Hope.",
+"sig": "03e3e09eb7cf",
+"sec": 0.735,
+"lufs_raw": -22.2
+},
+"line:pw_hose": {
+"file": "pw_hose.mp3",
+"text": "Hose.",
+"sig": "19fdad1479cf",
+"sec": 0.815,
+"lufs_raw": -22.9
+},
+"line:pw_home": {
+"file": "pw_home.mp3",
+"text": "Home.",
+"sig": "5066e3dc4da0",
+"sec": 0.755,
+"lufs_raw": -23.1
+},
+"line:pw_note": {
+"file": "pw_note.mp3",
+"text": "Note.",
+"sig": "efc7f19217f1",
+"sec": 0.755,
+"lufs_raw": -21.5
+},
+"line:pw_not": {
+"file": "pw_not.mp3",
+"text": "Not.",
+"sig": "3e0854af923a",
+"sec": 0.745,
+"lufs_raw": -21.2
+},
+"line:pw_net": {
+"file": "pw_net.mp3",
+"text": "Net.",
+"sig": "8e8564c5486f",
+"sec": 0.725,
+"lufs_raw": -21.4
+},
+"line:pw_robe": {
+"file": "pw_robe.mp3",
+"text": "Robe.",
+"sig": "bc1e59b6fb9c",
+"sec": 0.755,
+"lufs_raw": -21.8
+},
+"line:pw_rob": {
+"file": "pw_rob.mp3",
+"text": "Rob.",
+"sig": "25c20f1a748d",
+"sec": 0.735,
+"lufs_raw": -21.8
+},
+"line:pw_rope": {
+"file": "pw_rope.mp3",
+"text": "Rope.",
+"sig": "ce48e04a4e41",
+"sec": 0.745,
+"lufs_raw": -21.0
+},
+"line:pw_ride": {
+"file": "pw_ride.mp3",
+"text": "Ride.",
+"sig": "f57774c3ca64",
+"sec": 0.765,
+"lufs_raw": -22.4
+},
+"line:pw_cube": {
+"file": "pw_cube.mp3",
+"text": "Cube.",
+"sig": "cae7fdb3ddb6",
+"sec": 0.785,
+"lufs_raw": -23.0
+},
+"line:pw_cub": {
+"file": "pw_cub.mp3",
+"text": "Cub.",
+"sig": "b503249c12a4",
+"sec": 0.705,
+"lufs_raw": -22.2
+},
+"line:pw_cute": {
+"file": "pw_cute.mp3",
+"text": "Cute.",
+"sig": "a0c1c5a4c927",
+"sec": 0.765,
+"lufs_raw": -26.0
+},
+"line:pw_tube": {
+"file": "pw_tube.mp3",
+"text": "Tube.",
+"sig": "48310345b067",
+"sec": 0.765,
+"lufs_raw": -23.1
+},
+"line:pw_tub": {
+"file": "pw_tub.mp3",
+"text": "Tub.",
+"sig": "ed127b68a120",
+"sec": 0.705,
+"lufs_raw": -21.1
+},
+"line:pw_tune": {
+"file": "pw_tune.mp3",
+"text": "Tune.",
+"sig": "d4cd7974466b",
+"sec": 0.755,
+"lufs_raw": -24.1
+},
+"line:pw_kit": {
+"file": "pw_kit.mp3",
+"text": "Kit.",
+"sig": "93d089db8ac3",
+"sec": 0.715,
+"lufs_raw": -22.3
+},
+"line:pw_bite": {
+"file": "pw_bite.mp3",
+"text": "Bite.",
+"sig": "e8e5b55ab39a",
+"sec": 0.735,
+"lufs_raw": -20.9
+},
+"line:pw_kick": {
+"file": "pw_kick.mp3",
+"text": "Kick.",
+"sig": "140518236a95",
+"sec": 0.725,
+"lufs_raw": -23.8
+},
+"line:pw_pine": {
+"file": "pw_pine.mp3",
+"text": "Pine.",
+"sig": "ec365cac3548",
+"sec": 0.755,
+"lufs_raw": -22.3
+},
+"line:pw_pane": {
+"file": "pw_pane.mp3",
+"text": "Pane.",
+"sig": "61a083e0c3ea",
+"sec": 0.775,
+"lufs_raw": -24.6
+},
+"line:pw_line": {
+"file": "pw_line.mp3",
+"text": "Line.",
+"sig": "b458175e5fc0",
+"sec": 0.755,
+"lufs_raw": -21.9
+},
+"line:pw_rid": {
+"file": "pw_rid.mp3",
+"text": "Rid.",
+"sig": "9f941d54ba43",
+"sec": 0.695,
+"lufs_raw": -22.2
+},
+"line:pw_rode": {
+"file": "pw_rode.mp3",
+"text": "Rode.",
+"sig": "4f10bb86dd68",
+"sec": 0.765,
+"lufs_raw": -22.1
+},
+"line:pw_hide": {
+"file": "pw_hide.mp3",
+"text": "Hide.",
+"sig": "8476cfd44866",
+"sec": 0.735,
+"lufs_raw": -21.6
+},
+"line:pw_hid": {
+"file": "pw_hid.mp3",
+"text": "Hid.",
+"sig": "81e43b4837f5",
+"sec": 0.695,
+"lufs_raw": -23.9
+},
+"line:pw_side": {
+"file": "pw_side.mp3",
+"text": "Side.",
+"sig": "8be31b2efbae",
+"sec": 0.795,
+"lufs_raw": -22.5
+},
+"line:pw_fine": {
+"file": "pw_fine.mp3",
+"text": "Fine.",
+"sig": "9707c8f1bc00",
+"sec": 0.745,
+"lufs_raw": -20.2
+},
+"line:pw_fin": {
+"file": "pw_fin.mp3",
+"text": "Fin.",
+"sig": "6b5fe5887899",
+"sec": 0.715,
+"lufs_raw": -23.9
+},
+"line:pw_bike": {
+"file": "pw_bike.mp3",
+"text": "Bike.",
+"sig": "15855fc79e39",
+"sec": 0.745,
+"lufs_raw": -21.1
+},
+"line:pw_like": {
+"file": "pw_like.mp3",
+"text": "Like.",
+"sig": "bdb9ab95a451",
+"sec": 0.735,
+"lufs_raw": -21.2
+},
+"line:pw_plane": {
+"file": "pw_plane.mp3",
+"text": "Plane.",
+"sig": "aad1b4c6fdce",
+"sec": 0.775,
+"lufs_raw": -21.7
+},
+"line:pw_plan": {
+"file": "pw_plan.mp3",
+"text": "Plan.",
+"sig": "8f6082a5d5c4",
+"sec": 0.755,
+"lufs_raw": -22.6
+},
+"line:pw_plate": {
+"file": "pw_plate.mp3",
+"text": "Plate.",
+"sig": "bbf73b175bbf",
+"sec": 0.765,
+"lufs_raw": -21.8
+},
+"line:pw_planet": {
+"file": "pw_planet.mp3",
+"text": "Planet.",
+"sig": "5824c8f0fdec",
+"sec": 0.805,
+"lufs_raw": -21.0
+},
+"line:pw_slide": {
+"file": "pw_slide.mp3",
+"text": "Slide.",
+"sig": "8829e4f779f1",
+"sec": 0.855,
+"lufs_raw": -21.3
+},
+"line:pw_slid": {
+"file": "pw_slid.mp3",
+"text": "Slid.",
+"sig": "83176b8287c5",
+"sec": 0.765,
+"lufs_raw": -21.5
+},
+"line:pw_smile": {
+"file": "pw_smile.mp3",
+"text": "Smile.",
+"sig": "82ef1a416d97",
+"sec": 0.835,
+"lufs_raw": -20.5
+},
+"line:pw_hum": {
+"file": "pw_hum.mp3",
+"text": "Hum.",
+"sig": "c07a547fee3f",
+"sec": 0.685,
+"lufs_raw": -22.8
+},
+"line:pw_hole": {
+"file": "pw_hole.mp3",
+"text": "Hole.",
+"sig": "5e5bab6fc639",
+"sec": 0.725,
+"lufs_raw": -23.2
+},
+"line:pw_bone": {
+"file": "pw_bone.mp3",
+"text": "Bone.",
+"sig": "39356b0d7ce1",
+"sec": 0.745,
+"lufs_raw": -21.3
+},
+"line:pw_bane": {
+"file": "pw_bane.mp3",
+"text": "Bane.",
+"sig": "d82e803f6103",
+"sec": 0.745,
+"lufs_raw": -22.3
+},
+"line:pw_rail": {
+"file": "pw_rail.mp3",
+"text": "Rail.",
+"sig": "38bbdc210e05",
+"sec": 0.725,
+"lufs_raw": -21.7
+},
+"line:pw_main": {
+"file": "pw_main.mp3",
+"text": "Main.",
+"sig": "77dd49ee2311",
+"sec": 0.755,
+"lufs_raw": -22.9
+},
+"line:pw_paint": {
+"file": "pw_paint.mp3",
+"text": "Paint.",
+"sig": "48e861d24a1f",
+"sec": 0.775,
+"lufs_raw": -25.2
+},
+"line:pw_pant": {
+"file": "pw_pant.mp3",
+"text": "Pant.",
+"sig": "068e8ac01b84",
+"sec": 0.775,
+"lufs_raw": -22.7
+},
+"line:pw_print": {
+"file": "pw_print.mp3",
+"text": "Print.",
+"sig": "be67b4f7aa75",
+"sec": 0.765,
+"lufs_raw": -21.9
+},
+"line:pw_pain": {
+"file": "pw_pain.mp3",
+"text": "Pain.",
+"sig": "4e888c6225ac",
+"sec": 0.775,
+"lufs_raw": -24.6
+},
+"line:pw_trail": {
+"file": "pw_trail.mp3",
+"text": "Trail.",
+"sig": "e3f56d647247",
+"sec": 0.785,
+"lufs_raw": -23.5
+},
+"line:pw_tray": {
+"file": "pw_tray.mp3",
+"text": "Tray.",
+"sig": "5dd68a62408e",
+"sec": 0.735,
+"lufs_raw": -21.7
+},
+"line:pw_wait": {
+"file": "pw_wait.mp3",
+"text": "Wait.",
+"sig": "3603362f6920",
+"sec": 0.755,
+"lufs_raw": -21.6
+},
+"line:pw_wit": {
+"file": "pw_wit.mp3",
+"text": "Wit.",
+"sig": "97885b752e3b",
+"sec": 0.705,
+"lufs_raw": -21.1
+},
+"line:pw_what": {
+"file": "pw_what.mp3",
+"text": "What.",
+"sig": "d6ea8c027446",
+"sec": 0.695,
+"lufs_raw": -20.9
+},
+"line:pw_free": {
+"file": "pw_free.mp3",
+"text": "Free.",
+"sig": "171154e554aa",
+"sec": 0.755,
+"lufs_raw": -23.4
+},
+"line:pw_try": {
+"file": "pw_try.mp3",
+"text": "Try.",
+"sig": "6f49d04882a0",
+"sec": 0.765,
+"lufs_raw": -23.0
+},
+"line:pw_feet": {
+"file": "pw_feet.mp3",
+"text": "Feet.",
+"sig": "c51a98def263",
+"sec": 0.755,
+"lufs_raw": -24.8
+},
+"line:pw_fat": {
+"file": "pw_fat.mp3",
+"text": "Fat.",
+"sig": "b60e1089cd8c",
+"sec": 0.715,
+"lufs_raw": -23.5
+},
+"line:pw_fit": {
+"file": "pw_fit.mp3",
+"text": "Fit.",
+"sig": "badbc2794dc0",
+"sec": 0.705,
+"lufs_raw": -23.6
+},
+"line:pw_feel": {
+"file": "pw_feel.mp3",
+"text": "Feel.",
+"sig": "4da544180f16",
+"sec": 0.755,
+"lufs_raw": -23.1
+},
+"line:pw_grin": {
+"file": "pw_grin.mp3",
+"text": "Grin.",
+"sig": "aeb4af70c084",
+"sec": 0.735,
+"lufs_raw": -21.9
+},
+"line:pw_grain": {
+"file": "pw_grain.mp3",
+"text": "Grain.",
+"sig": "2ebd0bd8b0e8",
+"sec": 0.785,
+"lufs_raw": -23.1
+},
+"line:pw_greet": {
+"file": "pw_greet.mp3",
+"text": "Greet.",
+"sig": "48f43fd6ef62",
+"sec": 0.785,
+"lufs_raw": -21.8
+},
+"line:pw_slip": {
+"file": "pw_slip.mp3",
+"text": "Slip.",
+"sig": "95edea3da659",
+"sec": 0.755,
+"lufs_raw": -20.7
+},
+"line:pw_slap": {
+"file": "pw_slap.mp3",
+"text": "Slap.",
+"sig": "a1c76a514aba",
+"sec": 0.755,
+"lufs_raw": -20.7
+},
+"line:pw_beat": {
+"file": "pw_beat.mp3",
+"text": "Beat.",
+"sig": "5861b8ae5072",
+"sec": 0.725,
+"lufs_raw": -22.4
+},
+"line:pw_bolt": {
+"file": "pw_bolt.mp3",
+"text": "Bolt.",
+"sig": "9bcfed71d71f",
+"sec": 0.775,
+"lufs_raw": -21.6
+},
+"line:pw_cost": {
+"file": "pw_cost.mp3",
+"text": "Cost.",
+"sig": "2330ecbd2ea9",
+"sec": 0.795,
+"lufs_raw": -22.5
+},
+"line:pw_sop": {
+"file": "pw_sop.mp3",
+"text": "Sop.",
+"sig": "4fb084ee5637",
+"sec": 0.745,
+"lufs_raw": -22.8
+},
+"line:pw_snap": {
+"file": "pw_snap.mp3",
+"text": "Snap.",
+"sig": "8290d614ff0f",
+"sec": 0.765,
+"lufs_raw": -21.7
+},
+"line:pw_got": {
+"file": "pw_got.mp3",
+"text": "Got.",
+"sig": "e22149be0687",
+"sec": 0.755,
+"lufs_raw": -22.4
+},
+"line:pw_gate": {
+"file": "pw_gate.mp3",
+"text": "Gate.",
+"sig": "d72f8da6cbd7",
+"sec": 0.775,
+"lufs_raw": -22.7
+},
+"line:pw_goal": {
+"file": "pw_goal.mp3",
+"text": "Goal.",
+"sig": "8a50f619b1f6",
+"sec": 0.745,
+"lufs_raw": -22.9
+},
+"line:pw_seat": {
+"file": "pw_seat.mp3",
+"text": "Seat.",
+"sig": "388919709bb2",
+"sec": 0.745,
+"lufs_raw": -23.6
+},
+"line:pw_set": {
+"file": "pw_set.mp3",
+"text": "Set.",
+"sig": "c6bc59b8e637",
+"sec": 0.705,
+"lufs_raw": -22.6
+},
+"line:pw_sat": {
+"file": "pw_sat.mp3",
+"text": "Sat.",
+"sig": "6c7ae77e3521",
+"sec": 0.715,
+"lufs_raw": -23.1
+},
+"line:pw_sent": {
+"file": "pw_sent.mp3",
+"text": "Sent.",
+"sig": "25364193f691",
+"sec": 0.765,
+"lufs_raw": -22.2
+},
+"line:pw_team": {
+"file": "pw_team.mp3",
+"text": "Team.",
+"sig": "5b768ada8d84",
+"sec": 0.725,
+"lufs_raw": -21.9
+},
+"line:pw_tame": {
+"file": "pw_tame.mp3",
+"text": "Tame.",
+"sig": "daf6cd810689",
+"sec": 0.725,
+"lufs_raw": -23.7
+},
+"line:pw_tea": {
+"file": "pw_tea.mp3",
+"text": "Tea.",
+"sig": "d514ebe90a49",
+"sec": 0.715,
+"lufs_raw": -24.6
+},
+"line:pw_beach": {
+"file": "pw_beach.mp3",
+"text": "Beach.",
+"sig": "44fa9ac7315c",
+"sec": 0.775,
+"lufs_raw": -23.1
+},
+"line:pw_bench": {
+"file": "pw_bench.mp3",
+"text": "Bench.",
+"sig": "02d507f229e9",
+"sec": 0.765,
+"lufs_raw": -23.0
+},
+"line:pw_each": {
+"file": "pw_each.mp3",
+"text": "Each.",
+"sig": "f879dbaa5bc4",
+"sec": 0.735,
+"lufs_raw": -23.6
+},
+"line:pw_loaf": {
+"file": "pw_loaf.mp3",
+"text": "Loaf.",
+"sig": "5ae080093db0",
+"sec": 0.775,
+"lufs_raw": -21.0
+},
+"line:pw_lean": {
+"file": "pw_lean.mp3",
+"text": "Lean.",
+"sig": "bd4786bff820",
+"sec": 0.725,
+"lufs_raw": -22.2
+},
+"line:pw_deaf": {
+"file": "pw_deaf.mp3",
+"text": "Deaf.",
+"sig": "4b3815d86c9c",
+"sec": 0.735,
+"lufs_raw": -22.2
+},
+"line:pw_float": {
+"file": "pw_float.mp3",
+"text": "Float.",
+"sig": "147bf4968247",
+"sec": 0.815,
+"lufs_raw": -20.8
+},
+"line:pw_flat": {
+"file": "pw_flat.mp3",
+"text": "Flat.",
+"sig": "784d7558d3f0",
+"sec": 0.735,
+"lufs_raw": -21.2
+},
+"line:pw_flute": {
+"file": "pw_flute.mp3",
+"text": "Flute.",
+"sig": "ec94b3fd657e",
+"sec": 0.795,
+"lufs_raw": -21.5
+},
+"line:pw_street": {
+"file": "pw_street.mp3",
+"text": "Street.",
+"sig": "b5d9eaa2804a",
+"sec": 0.845,
+"lufs_raw": -21.5
+},
+"line:pw_stretch": {
+"file": "pw_stretch.mp3",
+"text": "Stretch.",
+"sig": "b6b41469bf66",
+"sec": 0.855,
+"lufs_raw": -20.9
+},
+"line:pw_strut": {
+"file": "pw_strut.mp3",
+"text": "Strut.",
+"sig": "c0cdc4954de8",
+"sec": 0.805,
+"lufs_raw": -21.1
+},
+"line:pw_sweet": {
+"file": "pw_sweet.mp3",
+"text": "Sweet.",
+"sig": "a90f835c59d0",
+"sec": 0.805,
+"lufs_raw": -21.6
+},
+"line:word_always": {
+"file": "word_always.mp3",
+"text": "always.",
+"sig": "e7aa1973bd9f",
+"sec": 0.945,
+"lufs_raw": -21.6
+},
+"line:word_around": {
+"file": "word_around.mp3",
+"text": "around.",
+"sig": "00e810cf7f6f",
+"sec": 0.855,
+"lufs_raw": -22.0
+},
+"line:word_because": {
+"file": "word_because.mp3",
+"text": "because.",
+"sig": "b9d66472e1e0",
+"sec": 0.855,
+"lufs_raw": -22.4
+},
+"line:word_been": {
+"file": "word_been.mp3",
+"text": "been.",
+"sig": "95a7a2cc47d1",
+"sec": 0.695,
+"lufs_raw": -22.1
+},
+"line:word_before": {
+"file": "word_before.mp3",
+"text": "before.",
+"sig": "06eab2aa46c8",
+"sec": 0.845,
+"lufs_raw": -22.2
+},
+"line:word_best": {
+"file": "word_best.mp3",
+"text": "best.",
+"sig": "24252f9f81c6",
+"sec": 0.765,
+"lufs_raw": -21.8
+},
+"line:word_both": {
+"file": "word_both.mp3",
+"text": "both.",
+"sig": "87f7104a12ce",
+"sec": 0.775,
+"lufs_raw": -21.7
+},
+"line:word_buy": {
+"file": "word_buy.mp3",
+"text": "buy.",
+"sig": "48ee40fee7e1",
+"sec": 0.745,
+"lufs_raw": -22.1
+},
+"line:word_call": {
+"file": "word_call.mp3",
+"text": "call.",
+"sig": "acce01918fad",
+"sec": 0.765,
+"lufs_raw": -22.8
+},
+"line:word_cold": {
+"file": "word_cold.mp3",
+"text": "cold.",
+"sig": "d09047cde176",
+"sec": 0.805,
+"lufs_raw": -22.8
+},
+"line:word_does": {
+"file": "word_does.mp3",
+"text": "does.",
+"sig": "6c79b3884ab3",
+"sec": 0.815,
+"lufs_raw": -22.6
+},
+"line:word_dont": {
+"file": "word_dont.mp3",
+"text": "don't.",
+"sig": "98f57981d605",
+"sec": 0.785,
+"lufs_raw": -22.4
+},
+"line:word_fast": {
+"file": "word_fast.mp3",
+"text": "fast.",
+"sig": "5c9a6f3159af",
+"sec": 0.825,
+"lufs_raw": -22.5
+},
+"line:word_first": {
+"file": "word_first.mp3",
+"text": "first.",
+"sig": "1835bd042d72",
+"sec": 0.805,
+"lufs_raw": -21.9
+},
+"line:word_five": {
+"file": "word_five.mp3",
+"text": "five.",
+"sig": "3151e943be4d",
+"sec": 0.815,
+"lufs_raw": -21.7
+},
+"line:word_found": {
+"file": "word_found.mp3",
+"text": "found.",
+"sig": "745227e10e66",
+"sec": 0.815,
+"lufs_raw": -21.6
+},
+"line:word_gave": {
+"file": "word_gave.mp3",
+"text": "gave.",
+"sig": "b40342459fcf",
+"sec": 0.805,
+"lufs_raw": -24.7
+},
+"line:word_goes": {
+"file": "word_goes.mp3",
+"text": "goes.",
+"sig": "56ce99791fed",
+"sec": 0.845,
+"lufs_raw": -22.1
+},
+"line:word_green": {
+"file": "word_green.mp3",
+"text": "green.",
+"sig": "6255b5b2eb8c",
+"sec": 0.805,
+"lufs_raw": -25.1
+},
+"line:word_its": {
+"file": "word_its.mp3",
+"text": "its.",
+"sig": "e8aa7ea765b1",
+"sec": 0.621,
+"lufs_raw": -23.3
+},
+"line:word_made": {
+"file": "word_made.mp3",
+"text": "made.",
+"sig": "e3e777c066aa",
+"sec": 0.765,
+"lufs_raw": -22.5
+},
+"line:word_many": {
+"file": "word_many.mp3",
+"text": "many.",
+"sig": "8628e40a7baa",
+"sec": 0.795,
+"lufs_raw": -21.3
+},
+"line:word_off": {
+"file": "word_off.mp3",
+"text": "off.",
+"sig": "4edf1a372a61",
+"sec": 0.695,
+"lufs_raw": -23.0
+},
+"line:word_or": {
+"file": "word_or.mp3",
+"text": "or.",
+"sig": "058c4d860007",
+"sec": 0.665,
+"lufs_raw": -22.2
+},
+"line:word_pull": {
+"file": "word_pull.mp3",
+"text": "pull.",
+"sig": "70a050866987",
+"sec": 0.735,
+"lufs_raw": -23.5
+},
+"line:word_read": {
+"file": "word_read.mp3",
+"text": "read.",
+"sig": "3657915db93f",
+"sec": 0.775,
+"lufs_raw": -22.4
+},
+"line:word_right": {
+"file": "word_right.mp3",
+"text": "right.",
+"sig": "97e50357c406",
+"sec": 0.765,
+"lufs_raw": -21.8
+},
+"line:word_sing": {
+"file": "word_sing.mp3",
+"text": "sing.",
+"sig": "d4edff9d132a",
+"sec": 0.755,
+"lufs_raw": -22.2
+},
+"line:word_sit": {
+"file": "word_sit.mp3",
+"text": "sit.",
+"sig": "d7f5c0275a41",
+"sec": 0.735,
+"lufs_raw": -23.4
+},
+"line:word_sleep": {
+"file": "word_sleep.mp3",
+"text": "sleep.",
+"sig": "2816f0ebee19",
+"sec": 0.815,
+"lufs_raw": -21.5
+},
+"line:word_tell": {
+"file": "word_tell.mp3",
+"text": "tell.",
+"sig": "dcde6e679ba8",
+"sec": 0.705,
+"lufs_raw": -22.9
+},
+"line:word_their": {
+"file": "word_their.mp3",
+"text": "their.",
+"sig": "676e6a8ef9e2",
+"sec": 0.685,
+"lufs_raw": -23.8
+},
+"line:word_these": {
+"file": "word_these.mp3",
+"text": "these.",
+"sig": "7172428da038",
+"sec": 0.815,
+"lufs_raw": -22.7
+},
+"line:word_those": {
+"file": "word_those.mp3",
+"text": "those.",
+"sig": "7bf9ee181b85",
+"sec": 0.835,
+"lufs_raw": -21.2
+},
+"line:word_upon": {
+"file": "word_upon.mp3",
+"text": "upon.",
+"sig": "e3aafaa1ece4",
+"sec": 0.835,
+"lufs_raw": -22.7
+},
+"line:word_us": {
+"file": "word_us.mp3",
+"text": "us.",
+"sig": "d6b2fcec20c0",
+"sec": 0.695,
+"lufs_raw": -22.8
+},
+"line:word_use": {
+"file": "word_use.mp3",
+"text": "use.",
+"sig": "2c7f138ab084",
+"sec": 0.765,
+"lufs_raw": -22.5
+},
+"line:word_very": {
+"file": "word_very.mp3",
+"text": "very.",
+"sig": "0322779f570c",
+"sec": 0.755,
+"lufs_raw": -22.6
+},
+"line:word_wash": {
+"file": "word_wash.mp3",
+"text": "wash.",
+"sig": "49f4ab3987a0",
+"sec": 0.795,
+"lufs_raw": -21.7
+},
+"line:word_which": {
+"file": "word_which.mp3",
+"text": "which.",
+"sig": "03eeea41edfb",
+"sec": 0.785,
+"lufs_raw": -21.7
+},
+"line:word_why": {
+"file": "word_why.mp3",
+"text": "why.",
+"sig": "9f46d8b793ac",
+"sec": 0.715,
+"lufs_raw": -22.2
+},
+"line:word_wish": {
+"file": "word_wish.mp3",
+"text": "wish.",
+"sig": "73d5db762814",
+"sec": 0.745,
+"lufs_raw": -21.2
+},
+"line:word_work": {
+"file": "word_work.mp3",
+"text": "work.",
+"sig": "5fa653f7a9ee",
+"sec": 0.755,
+"lufs_raw": -20.8
+},
+"line:word_would": {
+"file": "word_would.mp3",
+"text": "would.",
+"sig": "3cc1e204605c",
+"sec": 0.715,
+"lufs_raw": -21.4
+},
+"line:word_write": {
+"file": "word_write.mp3",
+"text": "write.",
+"sig": "ef2ced1c2c11",
+"sec": 0.765,
+"lufs_raw": -21.8
+},
+"line:word_your": {
+"file": "word_your.mp3",
+"text": "your.",
+"sig": "b451d40a79a6",
+"sec": 0.675,
+"lufs_raw": -23.2
+},
+"line:word_about": {
+"file": "word_about.mp3",
+"text": "about.",
+"sig": "e56e9dd5de03",
+"sec": 0.825,
+"lufs_raw": -22.1
+},
+"line:word_better": {
+"file": "word_better.mp3",
+"text": "better.",
+"sig": "cb5a4b2da172",
+"sec": 0.785,
+"lufs_raw": -22.8
+},
+"line:word_bring": {
+"file": "word_bring.mp3",
+"text": "bring.",
+"sig": "e6db23f877f3",
+"sec": 0.765,
+"lufs_raw": -23.6
+},
+"line:word_carry": {
+"file": "word_carry.mp3",
+"text": "carry.",
+"sig": "5eae6e1476d4",
+"sec": 0.755,
+"lufs_raw": -23.4
+},
+"line:word_clean": {
+"file": "word_clean.mp3",
+"text": "clean.",
+"sig": "2191f228af0e",
+"sec": 0.795,
+"lufs_raw": -22.0
+},
+"line:word_cut": {
+"file": "word_cut.mp3",
+"text": "cut.",
+"sig": "d32687f033cc",
+"sec": 0.735,
+"lufs_raw": -22.7
+},
+"line:word_done": {
+"file": "word_done.mp3",
+"text": "done.",
+"sig": "3b7f8a66fe14",
+"sec": 0.715,
+"lufs_raw": -22.5
+},
+"line:word_draw": {
+"file": "word_draw.mp3",
+"text": "draw.",
+"sig": "272ff44c8427",
+"sec": 0.725,
+"lufs_raw": -23.0
+},
+"line:word_drink": {
+"file": "word_drink.mp3",
+"text": "drink.",
+"sig": "6950777dede7",
+"sec": 0.835,
+"lufs_raw": -22.0
+},
+"line:word_eight": {
+"file": "word_eight.mp3",
+"text": "eight.",
+"sig": "ac1d2139a3ca",
+"sec": 0.745,
+"lufs_raw": -22.9
+},
+"line:word_fall": {
+"file": "word_fall.mp3",
+"text": "fall.",
+"sig": "b97d6b6c36b9",
+"sec": 0.735,
+"lufs_raw": -21.5
+},
+"line:word_far": {
+"file": "word_far.mp3",
+"text": "far.",
+"sig": "6cb19c896f1c",
+"sec": 0.755,
+"lufs_raw": -22.7
+},
+"line:word_full": {
+"file": "word_full.mp3",
+"text": "full.",
+"sig": "7c761d16136a",
+"sec": 0.725,
+"lufs_raw": -21.2
+},
+"line:word_got": {
+"file": "word_got.mp3",
+"text": "got.",
+"sig": "d8195432b435",
+"sec": 0.775,
+"lufs_raw": -22.2
+},
+"line:word_grow": {
+"file": "word_grow.mp3",
+"text": "grow.",
+"sig": "802bdc46a708",
+"sec": 0.755,
+"lufs_raw": -22.8
+},
+"line:word_hold": {
+"file": "word_hold.mp3",
+"text": "hold.",
+"sig": "bc1864ff7daa",
+"sec": 0.795,
+"lufs_raw": -22.5
+},
+"line:word_hot": {
+"file": "word_hot.mp3",
+"text": "hot.",
+"sig": "3d407e1a71f7",
+"sec": 0.765,
+"lufs_raw": -22.5
+},
+"line:word_hurt": {
+"file": "word_hurt.mp3",
+"text": "hurt.",
+"sig": "80c6b90fb1b8",
+"sec": 0.765,
+"lufs_raw": -22.7
+},
+"line:word_if": {
+"file": "word_if.mp3",
+"text": "if.",
+"sig": "55c867c71b42",
+"sec": 0.575,
+"lufs_raw": -24.4
+},
+"line:word_keep": {
+"file": "word_keep.mp3",
+"text": "keep.",
+"sig": "3fa2db64f61c",
+"sec": 0.775,
+"lufs_raw": -23.6
+},
+"line:word_kind": {
+"file": "word_kind.mp3",
+"text": "kind.",
+"sig": "61d5d3a7ae74",
+"sec": 0.825,
+"lufs_raw": -21.8
+},
+"line:word_laugh": {
+"file": "word_laugh.mp3",
+"text": "laugh.",
+"sig": "99206fa20e3a",
+"sec": 0.775,
+"lufs_raw": -21.6
+},
+"line:word_light": {
+"file": "word_light.mp3",
+"text": "light.",
+"sig": "1e9db0001bff",
+"sec": 0.775,
+"lufs_raw": -21.5
+},
+"line:word_long": {
+"file": "word_long.mp3",
+"text": "long.",
+"sig": "8bd42ebd3e21",
+"sec": 0.755,
+"lufs_raw": -21.6
+},
+"line:word_much": {
+"file": "word_much.mp3",
+"text": "much.",
+"sig": "c58f26ffe4cf",
+"sec": 0.795,
+"lufs_raw": -21.8
+},
+"line:word_myself": {
+"file": "word_myself.mp3",
+"text": "myself.",
+"sig": "2fa881676cea",
+"sec": 0.945,
+"lufs_raw": -20.4
+},
+"line:word_never": {
+"file": "word_never.mp3",
+"text": "never.",
+"sig": "9d372a0de22c",
+"sec": 0.755,
+"lufs_raw": -22.2
+},
+"line:word_only": {
+"file": "word_only.mp3",
+"text": "only.",
+"sig": "f5cb17930033",
+"sec": 0.795,
+"lufs_raw": -22.5
+},
+"line:word_own": {
+"file": "word_own.mp3",
+"text": "own.",
+"sig": "0de920c8bbb5",
+"sec": 0.755,
+"lufs_raw": -23.1
+},
+"line:word_pick": {
+"file": "word_pick.mp3",
+"text": "pick.",
+"sig": "556bd2ddac48",
+"sec": 0.755,
+"lufs_raw": -24.3
+},
+"line:word_seven": {
+"file": "word_seven.mp3",
+"text": "seven.",
+"sig": "0829b0ec2dc1",
+"sec": 0.785,
+"lufs_raw": -22.3
+},
+"line:word_shall": {
+"file": "word_shall.mp3",
+"text": "shall.",
+"sig": "e9b52895ada4",
+"sec": 0.765,
+"lufs_raw": -23.7
+},
+"line:word_show": {
+"file": "word_show.mp3",
+"text": "show.",
+"sig": "7e3fef39f8be",
+"sec": 0.745,
+"lufs_raw": -22.2
+},
+"line:word_six": {
+"file": "word_six.mp3",
+"text": "six.",
+"sig": "54cb34c0cab7",
+"sec": 0.815,
+"lufs_raw": -23.5
+},
+"line:word_small": {
+"file": "word_small.mp3",
+"text": "small.",
+"sig": "40dc80f3bc54",
+"sec": 0.785,
+"lufs_raw": -20.7
+},
+"line:word_start": {
+"file": "word_start.mp3",
+"text": "start.",
+"sig": "5691fdf0e798",
+"sec": 0.825,
+"lufs_raw": -21.3
+},
+"line:word_ten": {
+"file": "word_ten.mp3",
+"text": "ten.",
+"sig": "c8f5f82bad27",
+"sec": 0.735,
+"lufs_raw": -22.5
+},
+"line:word_today": {
+"file": "word_today.mp3",
+"text": "today.",
+"sig": "da0104dca6e2",
+"sec": 0.775,
+"lufs_raw": -21.9
+},
+"line:word_together": {
+"file": "word_together.mp3",
+"text": "together.",
+"sig": "6c09c9b53f96",
+"sec": 0.855,
+"lufs_raw": -22.5
+},
+"line:word_try": {
+"file": "word_try.mp3",
+"text": "try.",
+"sig": "a26fb436a205",
+"sec": 0.785,
+"lufs_raw": -22.8
+},
+"line:word_warm": {
+"file": "word_warm.mp3",
+"text": "warm.",
+"sig": "fdd8169d4854",
+"sec": 0.785,
+"lufs_raw": -21.7
+},
+"line:pw_bore": {
+"file": "pw_bore.mp3",
+"text": "Bore.",
+"sig": "1b175f4a352f",
+"sec": 0.735,
+"lufs_raw": -20.7
+},
+"line:pw_step": {
+"file": "pw_step.mp3",
+"text": "Step.",
+"sig": "83c5cf3d8c0e",
+"sec": 0.755,
+"lufs_raw": -20.8
+},
+"line:hom_24": {
+"file": "hom_24.mp3",
+"text": "Wave and say bye to Grandma.",
+"sig": "7d383bd62b40",
+"sec": 2.06,
+"lufs_raw": -23.8
+},
+"line:hom_25": {
+"file": "hom_25.mp3",
+"text": "The bus went by my house.",
+"sig": "833f7ec4445c",
+"sec": 1.657,
+"lufs_raw": -23.9
+},
+"line:hom_26": {
+"file": "hom_26.mp3",
+"text": "I said no, thank you.",
+"sig": "98e3d1f09f42",
+"sec": 1.515,
+"lufs_raw": -22.6
+},
+"line:hom_27": {
+"file": "hom_27.mp3",
+"text": "The sun is hot today.",
+"sig": "f7eb2223c735",
+"sec": 1.575,
+"lufs_raw": -23.4
+},
+"line:hom_28": {
+"file": "hom_28.mp3",
+"text": "Mom and her son went to the park.",
+"sig": "0f078d795f9f",
+"sec": 2.015,
+"lufs_raw": -23.6
+},
+"line:rcq_0_0": {
+"file": "rcq_0_0.mp3",
+"text": "What color is the kite?",
+"sig": "b18b9f88e610",
+"sec": 1.515,
+"lufs_raw": -23.2
+},
+"line:rcq_0_1": {
+"file": "rcq_0_1.mp3",
+"text": "What does the dog like to do?",
+"sig": "2a938ece2b33",
+"sec": 1.715,
+"lufs_raw": -22.6
+},
+"line:rcq_0_2": {
+"file": "rcq_0_2.mp3",
+"text": "Who got the red grape?",
+"sig": "5d392fe1715a",
+"sec": 1.505,
+"lufs_raw": -22.6
+},
+"line:rcq_0_3": {
+"file": "rcq_0_3.mp3",
+"text": "How did Bloop feel at the end?",
+"sig": "7b67ed0ff97c",
+"sec": 1.785,
+"lufs_raw": -24.2
+},
+"line:rcq_0_4": {
+"file": "rcq_0_4.mp3",
+"text": "How did Crunch feel?",
+"sig": "9c1db70c17d0",
+"sec": 1.395,
+"lufs_raw": -23.5
+},
+"line:rcq_0_5": {
+"file": "rcq_0_5.mp3",
+"text": "What will happen next?",
+"sig": "67b6c9c09f87",
+"sec": 1.385,
+"lufs_raw": -23.1
+},
+"line:rcq_0_6": {
+"file": "rcq_0_6.mp3",
+"text": "Why did the cat hide?",
+"sig": "ffc3e0668065",
+"sec": 1.443,
+"lufs_raw": -24.2
+},
+"line:rcq_0_7": {
+"file": "rcq_0_7.mp3",
+"text": "What did they bake?",
+"sig": "bb39067fa09a",
+"sec": 1.255,
+"lufs_raw": -21.8
+},
+"line:rcq_1_0": {
+"file": "rcq_1_0.mp3",
+"text": "Why did Bloop hold her hat?",
+"sig": "a91b5e58611c",
+"sec": 1.715,
+"lufs_raw": -24.2
+},
+"line:rcq_1_1": {
+"file": "rcq_1_1.mp3",
+"text": "Where did Petey put the shell?",
+"sig": "e501073300f9",
+"sec": 1.596,
+"lufs_raw": -23.6
+},
+"line:rcq_1_2": {
+"file": "rcq_1_2.mp3",
+"text": "What did Peel do first?",
+"sig": "bca75c08348b",
+"sec": 1.655,
+"lufs_raw": -24.0
+},
+"line:rcq_1_3": {
+"file": "rcq_1_3.mp3",
+"text": "How did Crunch feel after the show?",
+"sig": "4503eb421d22",
+"sec": 2.035,
+"lufs_raw": -23.0
+},
+"line:rcq_1_4": {
+"file": "rcq_1_4.mp3",
+"text": "Where is Bloop probably going?",
+"sig": "249b1de643c3",
+"sec": 1.875,
+"lufs_raw": -23.2
+},
+"line:rcq_1_5": {
+"file": "rcq_1_5.mp3",
+"text": "What did Crisp do after mixing the flour?",
+"sig": "35826d41e6ff",
+"sec": 2.495,
+"lufs_raw": -23.8
+},
+"line:rcq_1_6": {
+"file": "rcq_1_6.mp3",
+"text": "Why did the plant get green leaves?",
+"sig": "6f6d229e42bd",
+"sec": 2.075,
+"lufs_raw": -23.6
+},
+"line:rcq_1_7": {
+"file": "rcq_1_7.mp3",
+"text": "What will Jammy do next?",
+"sig": "eda76f11ca02",
+"sec": 1.609,
+"lufs_raw": -23.4
+},
+"line:rc_1_8": {
+"file": "rc_1_8.mp3",
+"text": "The class went to the zoo. A lion was sleeping on a rock, but the monkeys were swinging and playing. Who was sleeping on the rock?",
+"sig": "4d0d26429fae",
+"sec": 7.986,
+"lufs_raw": -22.7
+},
+"line:rcq_1_8": {
+"file": "rcq_1_8.mp3",
+"text": "Who was sleeping on the rock?",
+"sig": "e322ec27d770",
+"sec": 1.647,
+"lufs_raw": -22.3
+},
+"line:coach_streak5": {
+"file": "coach_streak5.mp3",
+"text": "Five in a row! Super streak!",
+"sig": "81948e9a5055",
+"sec": 2.083,
+"lufs_raw": -23.0
+},
+"line:coach_streak10": {
+"file": "coach_streak10.mp3",
+"text": "Ten in a row! You are amazing!",
+"sig": "3148e796b91c",
+"sec": 2.065,
+"lufs_raw": -23.1
+},
+"line:coach_watch_me": {
+"file": "coach_watch_me.mp3",
+"text": "Let's do one together. Watch me!",
+"sig": "283a9a2ed6f0",
+"sec": 2.209,
+"lufs_raw": -22.1
+},
+"line:coach_easy_one": {
+"file": "coach_easy_one.mp3",
+"text": "Let's try an easy one. You can do it!",
+"sig": "c3c03803ba85",
+"sec": 2.438,
+"lufs_raw": -23.3
+},
+"line:coach_test_out": {
+"file": "coach_test_out.mp3",
+"text": "You are so speedy! Next round is a quick test to skip ahead!",
+"sig": "1b519f02a887",
+"sec": 3.835,
+"lufs_raw": -23.6
+},
+"line:hub_continue": {
+"file": "hub_continue.mp3",
+"text": "Let's keep playing!",
+"sig": "57a77c976bfc",
+"sec": 1.345,
+"lufs_raw": -22.7
+},
+"line:rw_session_prizes": {
+"file": "rw_session_prizes.mp3",
+"text": "Look at the prizes you earned today!",
+"sig": "94e0050ee98e",
+"sec": 1.925,
+"lufs_raw": -23.1
+},
+"line:rw_new_friend": {
+"file": "rw_new_friend.mp3",
+"text": "You made a new friend!",
+"sig": "54159bc87885",
+"sec": 1.365,
+"lufs_raw": -22.6
+},
+"line:rw_you_learned": {
+"file": "rw_you_learned.mp3",
+"text": "You learned something new. Hooray for you!",
+"sig": "b9a0e36c8fbe",
+"sec": 2.435,
+"lufs_raw": -22.3
+},
+"line:rw_more_next_time": {
+"file": "rw_more_next_time.mp3",
+"text": "More prizes are waiting for next time!",
+"sig": "aaf1f22694c0",
+"sec": 2.352,
+"lufs_raw": -23.4
+},
+"line:rw_saved": {
+"file": "rw_saved.mp3",
+"text": "All saved!",
+"sig": "43a92b8c20f0",
+"sec": 1.005,
+"lufs_raw": -22.1
+},
+"line:rw_next_goal": {
+"file": "rw_next_goal.mp3",
+"text": "Here's your next goal!",
+"sig": "a40f0a766cf6",
+"sec": 1.345,
+"lufs_raw": -22.7
+},
+"line:skill_wordprob": {
+"file": "skill_wordprob.mp3",
+"text": "Story problems! Listen to the picnic story, then find how many.",
+"sig": "57c8bebfa40a",
+"sec": 4.375,
+"lufs_raw": -23.3
+},
+"line:place_intro": {
+"file": "place_intro.mp3",
+"text": "Let's see what you already know!",
+"sig": "6201b7966794",
+"sec": 1.635,
+"lufs_raw": -23.0
+},
+"line:place_skip": {
+"file": "place_skip.mp3",
+"text": "Wow! You already know this one. Let's skip ahead!",
+"sig": "965e29614ec9",
+"sec": 2.864,
+"lufs_raw": -23.7
+},
+"line:place_higher": {
+"file": "place_higher.mp3",
+"text": "Great job! Let's start a little higher.",
+"sig": "c71e1d9a220b",
+"sec": 2.458,
+"lufs_raw": -22.9
+},
+"line:place_normal": {
+"file": "place_normal.mp3",
+"text": "Thanks! Let's learn it together.",
+"sig": "96670c67fd0e",
+"sec": 1.815,
+"lufs_raw": -23.1
+},
+"line:err_teen": {
+"file": "err_teen.mp3",
+"text": "Teen numbers start with one ten. Tens first, then ones.",
+"sig": "492e9b5f5485",
+"sec": 3.915,
+"lufs_raw": -23.6
+},
+"line:err_count_on": {
+"file": "err_count_on.mp3",
+"text": "Start from the number, then count up.",
+"sig": "52c93f59baf6",
+"sec": 2.175,
+"lufs_raw": -23.4
+},
+"line:err_bed": {
+"file": "err_bed.mp3",
+"text": "Make a bed with your hands. B comes first, d comes last.",
+"sig": "30d9b766a62d",
+"sec": 3.812,
+"lufs_raw": -23.6
+},
+"line:err_story": {
+"file": "err_story.mp3",
+"text": "Let's picture the story. Are we putting together, or taking away?",
+"sig": "c243954f238d",
+"sec": 4.085,
+"lufs_raw": -23.1
+},
+"line:err_first_letter": {
+"file": "err_first_letter.mp3",
+"text": "Look at the first letter.",
+"sig": "e4c2a868db7f",
+"sec": 1.465,
+"lufs_raw": -23.2
+},
+"line:pet_biscuit": {
+"file": "pet_biscuit.mp3",
+"text": "Biscuit",
+"sig": "8d7ebf207fe3",
+"sec": 0.855,
+"lufs_raw": -21.2
+},
+"line:wp_your_pet": {
+"file": "wp_your_pet.mp3",
+"text": "Your pet",
+"sig": "35043e6f6e0a",
+"sec": 0.885,
+"lufs_raw": -22.1
+},
+"line:wp_found": {
+"file": "wp_found.mp3",
+"text": "found",
+"sig": "75fb5619d70e",
+"sec": 0.765,
+"lufs_raw": -21.8
+},
+"line:wp_f_apples": {
+"file": "wp_f_apples.mp3",
+"text": "apples",
+"sig": "d3fc885845b6",
+"sec": 0.825,
+"lufs_raw": -22.0
+},
+"line:wp_f_strawberries": {
+"file": "wp_f_strawberries.mp3",
+"text": "strawberries",
+"sig": "b587fd55f24d",
+"sec": 1.025,
+"lufs_raw": -21.0
+},
+"line:wp_f_blueberries": {
+"file": "wp_f_blueberries.mp3",
+"text": "blueberries",
+"sig": "92ecc18c8a64",
+"sec": 0.885,
+"lufs_raw": -21.8
+},
+"line:wp_f_carrots": {
+"file": "wp_f_carrots.mp3",
+"text": "carrots",
+"sig": "ab333a70204e",
+"sec": 0.805,
+"lufs_raw": -22.1
+},
+"line:wp_in_basket_and": {
+"file": "wp_in_basket_and.mp3",
+"text": "in the picnic basket, and",
+"sig": "1b493ff63567",
+"sec": 1.815,
+"lufs_raw": -22.9
+},
+"line:wp_more_blanket": {
+"file": "wp_more_blanket.mp3",
+"text": "more under the blanket.",
+"sig": "759d04198413",
+"sec": 1.485,
+"lufs_raw": -23.5
+},
+"line:wp_how_many": {
+"file": "wp_how_many.mp3",
+"text": "How many",
+"sig": "c18bfa097991",
+"sec": 0.855,
+"lufs_raw": -21.0
+},
+"line:wp_friends_sat": {
+"file": "wp_friends_sat.mp3",
+"text": "food friends sat on the picnic blanket.",
+"sig": "37bcbd368015",
+"sec": 2.515,
+"lufs_raw": -24.3
+},
+"line:wp_more_came": {
+"file": "wp_more_came.mp3",
+"text": "more came to the picnic.",
+"sig": "b22037814bb4",
+"sec": 1.635,
+"lufs_raw": -22.5
+},
+"line:wp_how_many_friends": {
+"file": "wp_how_many_friends.mp3",
+"text": "How many food friends are there now?",
+"sig": "7a43b2585b49",
+"sec": 1.995,
+"lufs_raw": -23.5
+},
+"line:wp_had": {
+"file": "wp_had.mp3",
+"text": "had",
+"sig": "a54cb788953e",
+"sec": 0.655,
+"lufs_raw": -24.3
+},
+"line:wp_in_basket": {
+"file": "wp_in_basket.mp3",
+"text": "in the picnic basket.",
+"sig": "11fe5e43bfc0",
+"sec": 1.491,
+"lufs_raw": -22.5
+},
+"line:wp_ate": {
+"file": "wp_ate.mp3",
+"text": "ate",
+"sig": "8d1239665dde",
+"sec": 0.675,
+"lufs_raw": -23.2
+},
+"line:wp_left": {
+"file": "wp_left.mp3",
+"text": "are left?",
+"sig": "1272676ae858",
+"sec": 0.885,
+"lufs_raw": -21.8
+},
+"line:wp_there_were": {
+"file": "wp_there_were.mp3",
+"text": "There were",
+"sig": "1134b2756ebf",
+"sec": 0.785,
+"lufs_raw": -22.4
+},
+"line:wp_on_blanket": {
+"file": "wp_on_blanket.mp3",
+"text": "on the blanket.",
+"sig": "de4c454f37d0",
+"sec": 1.145,
+"lufs_raw": -21.7
+},
+"line:wp_took": {
+"file": "wp_took.mp3",
+"text": "took",
+"sig": "72e8f81bd24a",
+"sec": 0.665,
+"lufs_raw": -22.7
+},
+"line:wp_away": {
+"file": "wp_away.mp3",
+"text": "away.",
+"sig": "7102458825b4",
+"sec": 0.735,
+"lufs_raw": -21.5
+},
+"line:wp_how_many_left": {
+"file": "wp_how_many_left.mp3",
+"text": "How many are left?",
+"sig": "6d560cc928d9",
+"sec": 1.245,
+"lufs_raw": -22.7
+},
+"line:blob_strawberry": {
+"file": "blob_strawberry.mp3",
+"text": "Jammy!",
+"sig": "4145d70cec44",
+"sec": 0.805,
+"lufs_raw": -22.3
+},
+"line:blob_apple": {
+"file": "blob_apple.mp3",
+"text": "Crisp!",
+"sig": "10a99b5f21fb",
+"sec": 0.775,
+"lufs_raw": -21.3
+},
+"line:blob_corn": {
+"file": "blob_corn.mp3",
+"text": "Niblet!",
+"sig": "c9172545d9e0",
+"sec": 0.865,
+"lufs_raw": -21.3
+},
+"line:blob_blueberry": {
+"file": "blob_blueberry.mp3",
+"text": "Bloop!",
+"sig": "47b6f11546be",
+"sec": 0.765,
+"lufs_raw": -21.9
+},
+"line:blob_banana": {
+"file": "blob_banana.mp3",
+"text": "Peel!",
+"sig": "c2857015b661",
+"sec": 0.745,
+"lufs_raw": -22.6
+},
+"line:blob_pear": {
+"file": "blob_pear.mp3",
+"text": "Petey Pear!",
+"sig": "b98bbf0bc82e",
+"sec": 0.945,
+"lufs_raw": -22.8
+},
+"line:blob_carrot": {
+"file": "blob_carrot.mp3",
+"text": "Crunch!",
+"sig": "847c479fe34c",
+"sec": 0.815,
+"lufs_raw": -21.1
+},
+"line:blob_broccoli": {
+"file": "blob_broccoli.mp3",
+"text": "Brock!",
+"sig": "de899f00f395",
+"sec": 0.795,
+"lufs_raw": -22.1
+},
+"line:blob_sushi": {
+"file": "blob_sushi.mp3",
+"text": "Umi!",
+"sig": "fbcc3483dfc4",
+"sec": 0.765,
+"lufs_raw": -22.9
+},
+"line:blob_taco": {
+"file": "blob_taco.mp3",
+"text": "Guac!",
+"sig": "154dbdd2f81f",
+"sec": 0.765,
+"lufs_raw": -21.4
+},
+"line:blob_pizza": {
+"file": "blob_pizza.mp3",
+"text": "Slice!",
+"sig": "05bcffab61e1",
+"sec": 0.845,
+"lufs_raw": -20.8
+},
+"line:blob_pancake": {
+"file": "blob_pancake.mp3",
+"text": "Maple!",
+"sig": "733aa7033007",
+"sec": 0.835,
+"lufs_raw": -21.6
+},
+"line:blob_cupcake": {
+"file": "blob_cupcake.mp3",
+"text": "Sprinkles!",
+"sig": "bc6ea0c4b8e3",
+"sec": 0.955,
+"lufs_raw": -20.8
+},
+"line:blob_avocado": {
+"file": "blob_avocado.mp3",
+"text": "Avo!",
+"sig": "ea791e41ab0b",
+"sec": 0.785,
+"lufs_raw": -23.1
+},
+"line:blob_watermelon": {
+"file": "blob_watermelon.mp3",
+"text": "Mellie!",
+"sig": "bc32343911e0",
+"sec": 0.745,
+"lufs_raw": -21.0
+},
+"line:blob_pretzel": {
+"file": "blob_pretzel.mp3",
+"text": "Twist!",
+"sig": "85bf702e9603",
+"sec": 0.785,
+"lufs_raw": -23.1
+},
+"line:blob_grapes": {
+"file": "blob_grapes.mp3",
+"text": "Vinnie!",
+"sig": "e032a71a7894",
+"sec": 0.735,
+"lufs_raw": -22.4
+},
+"line:blob_onigiri": {
+"file": "blob_onigiri.mp3",
+"text": "Nori!",
+"sig": "9374913e1946",
+"sec": 0.785,
+"lufs_raw": -20.5
+},
+"line:blob_pineapple": {
+"file": "blob_pineapple.mp3",
+"text": "Spike!",
+"sig": "cb271f116890",
+"sec": 0.835,
+"lufs_raw": -20.1
+},
+"line:blob_waffle": {
+"file": "blob_waffle.mp3",
+"text": "Wally!",
+"sig": "3437297e0d16",
+"sec": 0.785,
+"lufs_raw": -21.5
+},
+"line:blob_lemon": {
+"file": "blob_lemon.mp3",
+"text": "Zest!",
+"sig": "3dc20efb0313",
+"sec": 0.765,
+"lufs_raw": -22.0
+},
+"line:blob_donut": {
+"file": "blob_donut.mp3",
+"text": "Minty!",
+"sig": "75cabcc242c9",
+"sec": 0.845,
+"lufs_raw": -21.0
+},
+"line:blob_popcorn": {
+"file": "blob_popcorn.mp3",
+"text": "Popper!",
+"sig": "552c66a968ce",
+"sec": 0.815,
+"lufs_raw": -22.1
+},
+"line:blob_peach": {
+"file": "blob_peach.mp3",
+"text": "Peachy!",
+"sig": "e39f2d90ab45",
+"sec": 0.835,
+"lufs_raw": -24.5
+},
+"line:blob_cheese": {
+"file": "blob_cheese.mp3",
+"text": "Gouda!",
+"sig": "adf967709cdb",
+"sec": 0.775,
+"lufs_raw": -22.1
+},
+"line:blob_cookie": {
+"file": "blob_cookie.mp3",
+"text": "Chip!",
+"sig": "91fcd65480d3",
+"sec": 0.755,
+"lufs_raw": -24.1
+},
+"line:unlock_carrot": {
+"file": "unlock_carrot.mp3",
+"text": "Crunch joined the team!",
+"sig": "2c07c825489a",
+"sec": 1.425,
+"lufs_raw": -21.7
+},
+"line:hi_carrot": {
+"file": "hi_carrot.mp3",
+"text": "Crunch time! I'm Crunch! Ready, set, go! Let's run and munch together!",
+"sig": "f1e6c4b2fc94",
+"sec": 4.575,
+"lufs_raw": -23.5
+},
+"line:unlock_blueberry": {
+"file": "unlock_blueberry.mp3",
+"text": "Blueberry joined the team!",
+"sig": "6f2b2d750d80",
+"sec": 1.595,
+"lufs_raw": -22.5
+},
+"line:hi_blueberry": {
+"file": "hi_blueberry.mp3",
+"text": "Hi! I'm Bloop! Ooh, why is the sea so splashy? Let's find out together!",
+"sig": "24e7f076c77c",
+"sec": 4.705,
+"lufs_raw": -23.3
+},
+"line:unlock_corn": {
+"file": "unlock_corn.mp3",
+"text": "Corn joined the team!",
+"sig": "3ea87b17ee49",
+"sec": 1.395,
+"lufs_raw": -22.5
+},
+"line:hi_corn": {
+"file": "hi_corn.mp3",
+"text": "Hee hee! I'm Niblet! Knock knock! Who's there? Me, your new friend!",
+"sig": "88a6fb780afe",
+"sec": 3.774,
+"lufs_raw": -23.0
+},
+"line:unlock_grapes": {
+"file": "unlock_grapes.mp3",
+"text": "Grapes joined the team!",
+"sig": "43c597049e78",
+"sec": 1.453,
+"lufs_raw": -23.1
+},
+"line:hi_grapes": {
+"file": "hi_grapes.mp3",
+"text": "Hello, I'm Vinnie. I love the stars, and now I have a new friend. Twinkle twinkle!",
+"sig": "e0a21f14d9c0",
+"sec": 5.505,
+"lufs_raw": -23.0
+},
+"line:unlock_mochi": {
+"file": "unlock_mochi.mp3",
+"text": "Dora Dumpling joined the team!",
+"sig": "ee3705caea77",
+"sec": 1.916,
+"lufs_raw": -23.3
+},
+"line:hi_mochi": {
+"file": "hi_mochi.mp3",
+"text": "Hi hi! I'm Dora Dumpling! Squishy hugs for everyone! Let's munch some snacks together!",
+"sig": "0d48b7d19807",
+"sec": 5.935,
+"lufs_raw": -23.6
+},
+"line:unlock_banana": {
+"file": "unlock_banana.mp3",
+"text": "Peel joined the team!",
+"sig": "4a319b87edc4",
+"sec": 1.405,
+"lufs_raw": -22.1
+},
+"line:hi_banana": {
+"file": "hi_banana.mp3",
+"text": "Woo hoo! I'm Peel! Let's go bananas and munch together!",
+"sig": "aa22631a665f",
+"sec": 3.605,
+"lufs_raw": -22.8
+},
+"line:unlock_pear": {
+"file": "unlock_pear.mp3",
+"text": "Petey Pear joined the team!",
+"sig": "07815a575ad8",
+"sec": 1.665,
+"lufs_raw": -23.5
+},
+"line:hi_pear": {
+"file": "hi_pear.mp3",
+"text": "Hello, I'm Petey Pear. We make a great pair! Let's be friends.",
+"sig": "bcc6614bec4e",
+"sec": 4.105,
+"lufs_raw": -23.5
+},
+"line:it_plates": {
+"file": "it_plates.mp3",
+"text": "Picnic plates!",
+"sig": "10ef8076a424",
+"sec": 1.195,
+"lufs_raw": -22.1
+},
+"line:it_fruit_bowl": {
+"file": "it_fruit_bowl.mp3",
+"text": "Fruit bowl!",
+"sig": "1792bc471c5f",
+"sec": 0.985,
+"lufs_raw": -21.6
+},
+"line:it_lemonade_jug": {
+"file": "it_lemonade_jug.mp3",
+"text": "Lemonade jug!",
+"sig": "f97a0565c17d",
+"sec": 1.285,
+"lufs_raw": -21.6
+},
+"line:it_thermos": {
+"file": "it_thermos.mp3",
+"text": "Cocoa thermos!",
+"sig": "e085d75c8f2c",
+"sec": 1.235,
+"lufs_raw": -22.3
+},
+"line:ow_bow": {
+"file": "ow_bow.mp3",
+"text": "Balloon!",
+"sig": "cde3d8603d9a",
+"sec": 0.835,
+"lufs_raw": -21.8
+},
+"line:ow_cap": {
+"file": "ow_cap.mp3",
+"text": "Sun hat!",
+"sig": "d5b59507922c",
+"sec": 0.935,
+"lufs_raw": -21.9
+},
+"line:ow_headband": {
+"file": "ow_headband.mp3",
+"text": "Ice-cream cone!",
+"sig": "0e5455119f3a",
+"sec": 1.245,
+"lufs_raw": -22.9
+},
+"line:ow_sunglasses": {
+"file": "ow_sunglasses.mp3",
+"text": "Bookworm glasses!",
+"sig": "a663e524399d",
+"sec": 1.235,
+"lufs_raw": -21.8
+},
+"line:ow_flower": {
+"file": "ow_flower.mp3",
+"text": "Flower crown!",
+"sig": "2432cbd08f6b",
+"sec": 1.125,
+"lufs_raw": -23.6
+},
+"line:ow_partyhat": {
+"file": "ow_partyhat.mp3",
+"text": "Party hat!",
+"sig": "2c2b4561f1c7",
+"sec": 1.015,
+"lufs_raw": -22.7
+},
+"line:ow_beanie": {
+"file": "ow_beanie.mp3",
+"text": "Chef's hat!",
+"sig": "020a1f06031c",
+"sec": 1.005,
+"lufs_raw": -24.0
+},
+"line:ow_crown": {
+"file": "ow_crown.mp3",
+"text": "Crown!",
+"sig": "1002393082ae",
+"sec": 0.775,
+"lufs_raw": -23.8
+},
+"line:fr_strawberry_hi": {
+"file": "fr_strawberry_hi.mp3",
+"text": "This is Jammy! Jammy is sunny, sweet and always ready to start the fun.",
+"sig": "b005b1c7da35",
+"sec": 4.925,
+"lufs_raw": -23.6
+},
+"line:fr_strawberry_likes": {
+"file": "fr_strawberry_likes.mp3",
+"text": "Jammy's favorite thing is leading the picnic parade.",
+"sig": "43ed29f513ed",
+"sec": 3.252,
+"lufs_raw": -23.0
+},
+"line:fr_strawberry_dislikes": {
+"file": "fr_strawberry_dislikes.mp3",
+"text": "Jammy always says: Berry good job!",
+"sig": "2314d6b7d8e7",
+"sec": 2.655,
+"lufs_raw": -24.0
+},
+"line:fr_strawberry_food": {
+"file": "fr_strawberry_food.mp3",
+"text": "Jammy is a strawberry and loves a good picnic.",
+"sig": "8c8999f935e9",
+"sec": 2.985,
+"lufs_raw": -23.3
+},
+"line:fr_strawberry_tap1": {
+"file": "fr_strawberry_tap1.mp3",
+"text": "Berry good job!",
+"sig": "3d4f3988fc46",
+"sec": 1.275,
+"lufs_raw": -22.4
+},
+"line:fr_strawberry_tap2": {
+"file": "fr_strawberry_tap2.mp3",
+"text": "Hi, friend!",
+"sig": "eead902315c7",
+"sec": 1.015,
+"lufs_raw": -22.4
+},
+"line:fr_strawberry_tap3": {
+"file": "fr_strawberry_tap3.mp3",
+"text": "It's picnic time!",
+"sig": "d257771573f5",
+"sec": 1.305,
+"lufs_raw": -23.0
+},
+"line:fr_strawberry_nap": {
+"file": "fr_strawberry_nap.mp3",
+"text": "Zzz... picnic dreams...",
+"sig": "87839b54f663",
+"sec": 2.275,
+"lufs_raw": -24.9
+},
+"line:fr_apple_hi": {
+"file": "fr_apple_hi.mp3",
+"text": "This is Crisp! Crisp is calm and confident; a steady helper.",
+"sig": "6af9ce0a75ae",
+"sec": 4.286,
+"lufs_raw": -23.5
+},
+"line:fr_apple_likes": {
+"file": "fr_apple_likes.mp3",
+"text": "Crisp's favorite thing is crunchy autumn walks.",
+"sig": "da561b71b1de",
+"sec": 2.73,
+"lufs_raw": -23.8
+},
+"line:fr_apple_dislikes": {
+"file": "fr_apple_dislikes.mp3",
+"text": "Crisp always says: Nice and crisp!",
+"sig": "ed40c91b77e8",
+"sec": 2.525,
+"lufs_raw": -23.2
+},
+"line:fr_apple_food": {
+"file": "fr_apple_food.mp3",
+"text": "Crisp is a apple and loves a good picnic.",
+"sig": "70f8b16ebd57",
+"sec": 2.625,
+"lufs_raw": -22.6
+},
+"line:fr_apple_tap1": {
+"file": "fr_apple_tap1.mp3",
+"text": "Nice and crisp!",
+"sig": "e972c1d268a0",
+"sec": 1.205,
+"lufs_raw": -22.7
+},
+"line:fr_apple_tap2": {
+"file": "fr_apple_tap2.mp3",
+"text": "Hi, friend!",
+"sig": "eead902315c7",
+"sec": 1.015,
+"lufs_raw": -22.4
+},
+"line:fr_apple_tap3": {
+"file": "fr_apple_tap3.mp3",
+"text": "It's picnic time!",
+"sig": "d257771573f5",
+"sec": 1.305,
+"lufs_raw": -23.0
+},
+"line:fr_apple_nap": {
+"file": "fr_apple_nap.mp3",
+"text": "Zzz... picnic dreams...",
+"sig": "87839b54f663",
+"sec": 2.275,
+"lufs_raw": -24.9
+},
+"line:fr_corn_hi": {
+"file": "fr_corn_hi.mp3",
+"text": "This is Niblet! Niblet is goofy, toothy and full of giggles.",
+"sig": "3b22d5a88743",
+"sec": 4.045,
+"lufs_raw": -23.6
+},
+"line:fr_corn_likes": {
+"file": "fr_corn_likes.mp3",
+"text": "Niblet's favorite thing is telling corny jokes.",
+"sig": "dceb98e3b1bd",
+"sec": 2.955,
+"lufs_raw": -23.8
+},
+"line:fr_corn_dislikes": {
+"file": "fr_corn_dislikes.mp3",
+"text": "Niblet always says: Aw, shucks!",
+"sig": "792c7741d236",
+"sec": 2.565,
+"lufs_raw": -23.1
+},
+"line:fr_corn_food": {
+"file": "fr_corn_food.mp3",
+"text": "Niblet is a corn on the cob and loves a good picnic.",
+"sig": "653ab69fc053",
+"sec": 3.495,
+"lufs_raw": -23.0
+},
+"line:fr_corn_tap1": {
+"file": "fr_corn_tap1.mp3",
+"text": "Aw, shucks!",
+"sig": "795180cae78b",
+"sec": 0.985,
+"lufs_raw": -22.6
+},
+"line:fr_corn_tap2": {
+"file": "fr_corn_tap2.mp3",
+"text": "Hi, friend!",
+"sig": "eead902315c7",
+"sec": 1.015,
+"lufs_raw": -22.4
+},
+"line:fr_corn_tap3": {
+"file": "fr_corn_tap3.mp3",
+"text": "It's picnic time!",
+"sig": "d257771573f5",
+"sec": 1.305,
+"lufs_raw": -23.0
+},
+"line:fr_corn_nap": {
+"file": "fr_corn_nap.mp3",
+"text": "Zzz... picnic dreams...",
+"sig": "87839b54f663",
+"sec": 2.275,
+"lufs_raw": -24.9
+},
+"line:fr_blueberry_hi": {
+"file": "fr_blueberry_hi.mp3",
+"text": "This is Bloop! Bloop is tiny, curious and amazed by everything.",
+"sig": "7688803c230e",
+"sec": 4.457,
+"lufs_raw": -23.3
+},
+"line:fr_blueberry_likes": {
+"file": "fr_blueberry_likes.mp3",
+"text": "Bloop's favorite thing is asking \"why?.",
+"sig": "85172bbf34a4",
+"sec": 2.155,
+"lufs_raw": -23.2
+},
+"line:fr_blueberry_dislikes": {
+"file": "fr_blueberry_dislikes.mp3",
+"text": "Bloop always says: Bloop bloop, I did it!",
+"sig": "f7d300b4de59",
+"sec": 2.785,
+"lufs_raw": -22.9
+},
+"line:fr_blueberry_food": {
+"file": "fr_blueberry_food.mp3",
+"text": "Bloop is a blueberry and loves a good picnic.",
+"sig": "fd3f803739f9",
+"sec": 2.765,
+"lufs_raw": -23.0
+},
+"line:fr_blueberry_tap1": {
+"file": "fr_blueberry_tap1.mp3",
+"text": "Bloop bloop, I did it!",
+"sig": "fd13479ac4a6",
+"sec": 1.461,
+"lufs_raw": -23.1
+},
+"line:fr_blueberry_tap2": {
+"file": "fr_blueberry_tap2.mp3",
+"text": "Hi, friend!",
+"sig": "eead902315c7",
+"sec": 1.015,
+"lufs_raw": -22.4
+},
+"line:fr_blueberry_tap3": {
+"file": "fr_blueberry_tap3.mp3",
+"text": "It's picnic time!",
+"sig": "d257771573f5",
+"sec": 1.305,
+"lufs_raw": -23.0
+},
+"line:fr_blueberry_nap": {
+"file": "fr_blueberry_nap.mp3",
+"text": "Zzz... picnic dreams...",
+"sig": "87839b54f663",
+"sec": 2.275,
+"lufs_raw": -24.9
+},
+"line:fr_mochi_hi": {
+"file": "fr_mochi_hi.mp3",
+"text": "This is Dora Dumpling! Dora Dumpling is soft, cheerful and a little bit hungry.",
+"sig": "3b607f5da8de",
+"sec": 5.233,
+"lufs_raw": -23.4
+},
+"line:fr_mochi_likes": {
+"file": "fr_mochi_likes.mp3",
+"text": "Dora Dumpling's favorite thing is snack time.",
+"sig": "0900b3c0c75d",
+"sec": 2.663,
+"lufs_raw": -23.4
+},
+"line:fr_mochi_dislikes": {
+"file": "fr_mochi_dislikes.mp3",
+"text": "Dora Dumpling always says: Squishy hugs for everyone!",
+"sig": "6b8e7dcaa7f1",
+"sec": 3.745,
+"lufs_raw": -23.6
+},
+"line:fr_mochi_food": {
+"file": "fr_mochi_food.mp3",
+"text": "Dora Dumpling is a rice dumpling and loves a good picnic.",
+"sig": "e405b929fb4a",
+"sec": 3.815,
+"lufs_raw": -23.3
+},
+"line:fr_mochi_tap1": {
+"file": "fr_mochi_tap1.mp3",
+"text": "Squishy hugs for everyone!",
+"sig": "35e330e047df",
+"sec": 1.795,
+"lufs_raw": -23.4
+},
+"line:fr_mochi_tap2": {
+"file": "fr_mochi_tap2.mp3",
+"text": "Hi, friend!",
+"sig": "eead902315c7",
+"sec": 1.015,
+"lufs_raw": -22.4
+},
+"line:fr_mochi_tap3": {
+"file": "fr_mochi_tap3.mp3",
+"text": "It's picnic time!",
+"sig": "d257771573f5",
+"sec": 1.305,
+"lufs_raw": -23.0
+},
+"line:fr_mochi_nap": {
+"file": "fr_mochi_nap.mp3",
+"text": "Zzz... picnic dreams...",
+"sig": "87839b54f663",
+"sec": 2.275,
+"lufs_raw": -24.9
+},
+"line:fr_banana_hi": {
+"file": "fr_banana_hi.mp3",
+"text": "This is Peel! Peel is silly and bendy; loves a good laugh.",
+"sig": "3e4b25c39fd9",
+"sec": 3.945,
+"lufs_raw": -23.5
+},
+"line:fr_banana_likes": {
+"file": "fr_banana_likes.mp3",
+"text": "Peel's favorite thing is bouncing on trampolines.",
+"sig": "2a20ac1f8cc8",
+"sec": 3.146,
+"lufs_raw": -23.6
+},
+"line:fr_banana_dislikes": {
+"file": "fr_banana_dislikes.mp3",
+"text": "Peel always says: Let's go bananas!",
+"sig": "8be0facbd752",
+"sec": 2.635,
+"lufs_raw": -22.9
+},
+"line:fr_banana_food": {
+"file": "fr_banana_food.mp3",
+"text": "Peel is a banana and loves a good picnic.",
+"sig": "ff90340b6282",
+"sec": 2.826,
+"lufs_raw": -23.3
+},
+"line:fr_banana_tap1": {
+"file": "fr_banana_tap1.mp3",
+"text": "Let's go bananas!",
+"sig": "4d8816b68e23",
+"sec": 1.385,
+"lufs_raw": -22.8
+},
+"line:fr_banana_tap2": {
+"file": "fr_banana_tap2.mp3",
+"text": "Hi, friend!",
+"sig": "eead902315c7",
+"sec": 1.015,
+"lufs_raw": -22.4
+},
+"line:fr_banana_tap3": {
+"file": "fr_banana_tap3.mp3",
+"text": "It's picnic time!",
+"sig": "d257771573f5",
+"sec": 1.305,
+"lufs_raw": -23.0
+},
+"line:fr_banana_nap": {
+"file": "fr_banana_nap.mp3",
+"text": "Zzz... picnic dreams...",
+"sig": "87839b54f663",
+"sec": 2.275,
+"lufs_raw": -24.9
+},
+"line:fr_pear_hi": {
+"file": "fr_pear_hi.mp3",
+"text": "This is Petey Pear! Petey Pear is dreamy and gentle; thinks before he speaks.",
+"sig": "b70f96572f47",
+"sec": 5.255,
+"lufs_raw": -23.7
+},
+"line:fr_pear_likes": {
+"file": "fr_pear_likes.mp3",
+"text": "Petey Pear's favorite thing is cozy naps in the shade.",
+"sig": "04286f413357",
+"sec": 3.385,
+"lufs_raw": -24.4
+},
+"line:fr_pear_dislikes": {
+"file": "fr_pear_dislikes.mp3",
+"text": "Petey Pear always says: We make a great pear!",
+"sig": "35a39e131a99",
+"sec": 3.045,
+"lufs_raw": -23.2
+},
+"line:fr_pear_food": {
+"file": "fr_pear_food.mp3",
+"text": "Petey Pear is a pear and loves a good picnic.",
+"sig": "c9236f1cdc65",
+"sec": 2.922,
+"lufs_raw": -23.5
+},
+"line:fr_pear_tap1": {
+"file": "fr_pear_tap1.mp3",
+"text": "We make a great pear!",
+"sig": "2be99fd06d78",
+"sec": 1.375,
+"lufs_raw": -22.9
+},
+"line:fr_pear_tap2": {
+"file": "fr_pear_tap2.mp3",
+"text": "Hi, friend!",
+"sig": "eead902315c7",
+"sec": 1.015,
+"lufs_raw": -22.4
+},
+"line:fr_pear_tap3": {
+"file": "fr_pear_tap3.mp3",
+"text": "It's picnic time!",
+"sig": "d257771573f5",
+"sec": 1.305,
+"lufs_raw": -23.0
+},
+"line:fr_pear_nap": {
+"file": "fr_pear_nap.mp3",
+"text": "Zzz... picnic dreams...",
+"sig": "87839b54f663",
+"sec": 2.275,
+"lufs_raw": -24.9
+},
+"line:fr_carrot_hi": {
+"file": "fr_carrot_hi.mp3",
+"text": "This is Crunch! Crunch is sporty and determined; never gives up.",
+"sig": "ce4f5c779a62",
+"sec": 4.325,
+"lufs_raw": -23.0
+},
+"line:fr_carrot_likes": {
+"file": "fr_carrot_likes.mp3",
+"text": "Crunch's favorite thing is racing to the finish line.",
+"sig": "0369f9edba82",
+"sec": 3.415,
+"lufs_raw": -23.5
+},
+"line:fr_carrot_dislikes": {
+"file": "fr_carrot_dislikes.mp3",
+"text": "Crunch always says: Crunch time!",
+"sig": "cebd548afe38",
+"sec": 2.315,
+"lufs_raw": -23.1
+},
+"line:fr_carrot_food": {
+"file": "fr_carrot_food.mp3",
+"text": "Crunch is a carrot and loves a good picnic.",
+"sig": "eb89cdea7b2e",
+"sec": 2.645,
+"lufs_raw": -22.8
+},
+"line:fr_carrot_tap1": {
+"file": "fr_carrot_tap1.mp3",
+"text": "Crunch time!",
+"sig": "ed25aad0d48d",
+"sec": 1.025,
+"lufs_raw": -21.6
+},
+"line:fr_carrot_tap2": {
+"file": "fr_carrot_tap2.mp3",
+"text": "Hi, friend!",
+"sig": "eead902315c7",
+"sec": 1.015,
+"lufs_raw": -22.4
+},
+"line:fr_carrot_tap3": {
+"file": "fr_carrot_tap3.mp3",
+"text": "It's picnic time!",
+"sig": "d257771573f5",
+"sec": 1.305,
+"lufs_raw": -23.0
+},
+"line:fr_carrot_nap": {
+"file": "fr_carrot_nap.mp3",
+"text": "Zzz... picnic dreams...",
+"sig": "87839b54f663",
+"sec": 2.275,
+"lufs_raw": -24.9
+},
+"line:fr_broccoli_hi": {
+"file": "fr_broccoli_hi.mp3",
+"text": "This is Brock! Brock is kind and strong, like a little tree.",
+"sig": "73b1a6f8fadf",
+"sec": 3.765,
+"lufs_raw": -23.4
+},
+"line:fr_broccoli_likes": {
+"file": "fr_broccoli_likes.mp3",
+"text": "Brock's favorite thing is climbing real trees.",
+"sig": "d8ef8a1a3f23",
+"sec": 2.816,
+"lufs_raw": -23.2
+},
+"line:fr_broccoli_dislikes": {
+"file": "fr_broccoli_dislikes.mp3",
+"text": "Brock always says: Stand tall!",
+"sig": "bb56d75765f0",
+"sec": 2.285,
+"lufs_raw": -23.1
+},
+"line:fr_broccoli_food": {
+"file": "fr_broccoli_food.mp3",
+"text": "Brock is a broccoli and loves a good picnic.",
+"sig": "4e19fe626a5c",
+"sec": 2.826,
+"lufs_raw": -23.0
+},
+"line:fr_broccoli_tap1": {
+"file": "fr_broccoli_tap1.mp3",
+"text": "Stand tall!",
+"sig": "6c2931ddc0bd",
+"sec": 1.005,
+"lufs_raw": -21.5
+},
+"line:fr_broccoli_tap2": {
+"file": "fr_broccoli_tap2.mp3",
+"text": "Hi, friend!",
+"sig": "eead902315c7",
+"sec": 1.015,
+"lufs_raw": -22.4
+},
+"line:fr_broccoli_tap3": {
+"file": "fr_broccoli_tap3.mp3",
+"text": "It's picnic time!",
+"sig": "d257771573f5",
+"sec": 1.305,
+"lufs_raw": -23.0
+},
+"line:fr_broccoli_nap": {
+"file": "fr_broccoli_nap.mp3",
+"text": "Zzz... picnic dreams...",
+"sig": "87839b54f663",
+"sec": 2.275,
+"lufs_raw": -24.9
+},
+"line:fr_sushi_hi": {
+"file": "fr_sushi_hi.mp3",
+"text": "This is Umi! Umi is polite, tidy and quietly clever.",
+"sig": "9b9892f7f3cb",
+"sec": 4.125,
+"lufs_raw": -23.4
+},
+"line:fr_sushi_likes": {
+"file": "fr_sushi_likes.mp3",
+"text": "Umi's favorite thing is ocean waves.",
+"sig": "f36242709cf1",
+"sec": 2.445,
+"lufs_raw": -23.7
+},
+"line:fr_sushi_dislikes": {
+"file": "fr_sushi_dislikes.mp3",
+"text": "Umi always says: Roll with it!",
+"sig": "b8368ce40dba",
+"sec": 2.257,
+"lufs_raw": -23.3
+},
+"line:fr_sushi_food": {
+"file": "fr_sushi_food.mp3",
+"text": "Umi is a sushi and loves a good picnic.",
+"sig": "2f60a5b95d1a",
+"sec": 2.865,
+"lufs_raw": -23.2
+},
+"line:fr_sushi_tap1": {
+"file": "fr_sushi_tap1.mp3",
+"text": "Roll with it!",
+"sig": "2387ed9fbc28",
+"sec": 1.035,
+"lufs_raw": -21.5
+},
+"line:fr_sushi_tap2": {
+"file": "fr_sushi_tap2.mp3",
+"text": "Hi, friend!",
+"sig": "eead902315c7",
+"sec": 1.015,
+"lufs_raw": -22.4
+},
+"line:fr_sushi_tap3": {
+"file": "fr_sushi_tap3.mp3",
+"text": "It's picnic time!",
+"sig": "d257771573f5",
+"sec": 1.305,
+"lufs_raw": -23.0
+},
+"line:fr_sushi_nap": {
+"file": "fr_sushi_nap.mp3",
+"text": "Zzz... picnic dreams...",
+"sig": "87839b54f663",
+"sec": 2.275,
+"lufs_raw": -24.9
+},
+"line:fr_taco_hi": {
+"file": "fr_taco_hi.mp3",
+"text": "This is Guac! Guac is wild, wacky and fun at parties.",
+"sig": "c421b99e66df",
+"sec": 3.965,
+"lufs_raw": -23.8
+},
+"line:fr_taco_likes": {
+"file": "fr_taco_likes.mp3",
+"text": "Guac's favorite thing is taco Tuesday dance.",
+"sig": "da2bc240c03a",
+"sec": 3.015,
+"lufs_raw": -23.3
+},
+"line:fr_taco_dislikes": {
+"file": "fr_taco_dislikes.mp3",
+"text": "Guac always says: Let's taco 'bout it!",
+"sig": "c810c61a7979",
+"sec": 2.768,
+"lufs_raw": -23.4
+},
+"line:fr_taco_food": {
+"file": "fr_taco_food.mp3",
+"text": "Guac is a taco and loves a good picnic.",
+"sig": "1cb9b54bab53",
+"sec": 2.895,
+"lufs_raw": -22.8
+},
+"line:fr_taco_tap1": {
+"file": "fr_taco_tap1.mp3",
+"text": "Let's taco 'bout it!",
+"sig": "4c170543cc5c",
+"sec": 1.485,
+"lufs_raw": -22.9
+},
+"line:fr_taco_tap2": {
+"file": "fr_taco_tap2.mp3",
+"text": "Hi, friend!",
+"sig": "eead902315c7",
+"sec": 1.015,
+"lufs_raw": -22.4
+},
+"line:fr_taco_tap3": {
+"file": "fr_taco_tap3.mp3",
+"text": "It's picnic time!",
+"sig": "d257771573f5",
+"sec": 1.305,
+"lufs_raw": -23.0
+},
+"line:fr_taco_nap": {
+"file": "fr_taco_nap.mp3",
+"text": "Zzz... picnic dreams...",
+"sig": "87839b54f663",
+"sec": 2.275,
+"lufs_raw": -24.9
+},
+"line:fr_pizza_hi": {
+"file": "fr_pizza_hi.mp3",
+"text": "This is Slice! Slice is cool and confident; shares every slice.",
+"sig": "463563a4ba4a",
+"sec": 4.645,
+"lufs_raw": -23.8
+},
+"line:fr_pizza_likes": {
+"file": "fr_pizza_likes.mp3",
+"text": "Slice's favorite thing is pizza parties with friends.",
+"sig": "7713a8d96184",
+"sec": 3.348,
+"lufs_raw": -24.1
+},
+"line:fr_pizza_dislikes": {
+"file": "fr_pizza_dislikes.mp3",
+"text": "Slice always says: You're a-pizza-zing!",
+"sig": "7b55b55991c3",
+"sec": 2.644,
+"lufs_raw": -23.2
+},
+"line:fr_pizza_food": {
+"file": "fr_pizza_food.mp3",
+"text": "Slice is a pizza slice and loves a good picnic.",
+"sig": "f8406aa3a206",
+"sec": 3.252,
+"lufs_raw": -23.1
+},
+"line:fr_pizza_tap1": {
+"file": "fr_pizza_tap1.mp3",
+"text": "You're a-pizza-zing!",
+"sig": "e14640cfda0d",
+"sec": 1.365,
+"lufs_raw": -22.6
+},
+"line:fr_pizza_tap2": {
+"file": "fr_pizza_tap2.mp3",
+"text": "Hi, friend!",
+"sig": "eead902315c7",
+"sec": 1.015,
+"lufs_raw": -22.4
+},
+"line:fr_pizza_tap3": {
+"file": "fr_pizza_tap3.mp3",
+"text": "It's picnic time!",
+"sig": "d257771573f5",
+"sec": 1.305,
+"lufs_raw": -23.0
+},
+"line:fr_pizza_nap": {
+"file": "fr_pizza_nap.mp3",
+"text": "Zzz... picnic dreams...",
+"sig": "87839b54f663",
+"sec": 2.275,
+"lufs_raw": -24.9
+},
+"line:fr_pancake_hi": {
+"file": "fr_pancake_hi.mp3",
+"text": "This is Maple! Maple is warm and cozy, like a sunny morning.",
+"sig": "8a0cc0bfcb26",
+"sec": 4.353,
+"lufs_raw": -23.4
+},
+"line:fr_pancake_likes": {
+"file": "fr_pancake_likes.mp3",
+"text": "Maple's favorite thing is breakfast in bed.",
+"sig": "b9ee00db021e",
+"sec": 2.885,
+"lufs_raw": -24.5
+},
+"line:fr_pancake_dislikes": {
+"file": "fr_pancake_dislikes.mp3",
+"text": "Maple always says: Stack it up!",
+"sig": "b4367145126d",
+"sec": 2.355,
+"lufs_raw": -23.2
+},
+"line:fr_pancake_food": {
+"file": "fr_pancake_food.mp3",
+"text": "Maple is a pancake stack and loves a good picnic.",
+"sig": "5fdb5ca00dc7",
+"sec": 3.425,
+"lufs_raw": -23.2
+},
+"line:fr_pancake_tap1": {
+"file": "fr_pancake_tap1.mp3",
+"text": "Stack it up!",
+"sig": "e59244ada636",
+"sec": 1.005,
+"lufs_raw": -21.1
+},
+"line:fr_pancake_tap2": {
+"file": "fr_pancake_tap2.mp3",
+"text": "Hi, friend!",
+"sig": "eead902315c7",
+"sec": 1.015,
+"lufs_raw": -22.4
+},
+"line:fr_pancake_tap3": {
+"file": "fr_pancake_tap3.mp3",
+"text": "It's picnic time!",
+"sig": "d257771573f5",
+"sec": 1.305,
+"lufs_raw": -23.0
+},
+"line:fr_pancake_nap": {
+"file": "fr_pancake_nap.mp3",
+"text": "Zzz... picnic dreams...",
+"sig": "87839b54f663",
+"sec": 2.275,
+"lufs_raw": -24.9
+},
+"line:fr_cupcake_hi": {
+"file": "fr_cupcake_hi.mp3",
+"text": "This is Sprinkles! Sprinkles is sweet and sparkly; loves to celebrate.",
+"sig": "41031f4bc5e7",
+"sec": 4.941,
+"lufs_raw": -23.1
+},
+"line:fr_cupcake_likes": {
+"file": "fr_cupcake_likes.mp3",
+"text": "Sprinkles's favorite thing is birthday candles.",
+"sig": "bb54117aaf9f",
+"sec": 3.056,
+"lufs_raw": -23.8
+},
+"line:fr_cupcake_dislikes": {
+"file": "fr_cupcake_dislikes.mp3",
+"text": "Sprinkles always says: Sprinkle some joy!",
+"sig": "019cfb921d39",
+"sec": 3.105,
+"lufs_raw": -23.1
+},
+"line:fr_cupcake_food": {
+"file": "fr_cupcake_food.mp3",
+"text": "Sprinkles is a cupcake and loves a good picnic.",
+"sig": "05e9aa72e254",
+"sec": 3.145,
+"lufs_raw": -22.7
+},
+"line:fr_cupcake_tap1": {
+"file": "fr_cupcake_tap1.mp3",
+"text": "Sprinkle some joy!",
+"sig": "59845671ce0f",
+"sec": 1.445,
+"lufs_raw": -22.7
+},
+"line:fr_cupcake_tap2": {
+"file": "fr_cupcake_tap2.mp3",
+"text": "Hi, friend!",
+"sig": "eead902315c7",
+"sec": 1.015,
+"lufs_raw": -22.4
+},
+"line:fr_cupcake_tap3": {
+"file": "fr_cupcake_tap3.mp3",
+"text": "It's picnic time!",
+"sig": "d257771573f5",
+"sec": 1.305,
+"lufs_raw": -23.0
+},
+"line:fr_cupcake_nap": {
+"file": "fr_cupcake_nap.mp3",
+"text": "Zzz... picnic dreams...",
+"sig": "87839b54f663",
+"sec": 2.275,
+"lufs_raw": -24.9
+},
+"line:ow_explorer": {
+"file": "ow_explorer.mp3",
+"text": "Explorer cap!",
+"sig": "850a07c151e6",
+"sec": 1.195,
+"lufs_raw": -21.6
+},
+"line:ow_snorkel": {
+"file": "ow_snorkel.mp3",
+"text": "Snorkel mask!",
+"sig": "816a1c1127f0",
+"sec": 1.225,
+"lufs_raw": -21.9
+},
+"line:ow_conductor": {
+"file": "ow_conductor.mp3",
+"text": "Conductor cap!",
+"sig": "8e291f87e380",
+"sec": 1.127,
+"lufs_raw": -21.8
+},
+"line:ow_bee": {
+"file": "ow_bee.mp3",
+"text": "Bee antennae!",
+"sig": "8f355ae4888e",
+"sec": 1.055,
+"lufs_raw": -21.6
+},
+"line:ow_dino": {
+"file": "ow_dino.mp3",
+"text": "Dino hood!",
+"sig": "490823b12d0c",
+"sec": 0.985,
+"lufs_raw": -22.3
+},
+"line:ow_headlamp": {
+"file": "ow_headlamp.mp3",
+"text": "Doctor's headlamp!",
+"sig": "76803b169986",
+"sec": 1.315,
+"lufs_raw": -23.0
+},
+"line:ow_rainhat": {
+"file": "ow_rainhat.mp3",
+"text": "Rain hat!",
+"sig": "c5aff3c3e28a",
+"sec": 0.985,
+"lufs_raw": -21.6
+},
+"line:ow_safari": {
+"file": "ow_safari.mp3",
+"text": "Safari hat!",
+"sig": "dc14c2070200",
+"sec": 1.185,
+"lufs_raw": -24.2
+},
+"line:ow_astronaut": {
+"file": "ow_astronaut.mp3",
+"text": "Astronaut helmet!",
+"sig": "2024f8749c60",
+"sec": 1.335,
+"lufs_raw": -23.2
+},
+"line:ow_wizard": {
+"file": "ow_wizard.mp3",
+"text": "Wizard hat!",
+"sig": "fa766b129d00",
+"sec": 0.995,
+"lufs_raw": -21.9
+},
+"line:ow_gradcap": {
+"file": "ow_gradcap.mp3",
+"text": "Graduation cap!",
+"sig": "6133ad6e88e5",
+"sec": 1.415,
+"lufs_raw": -22.5
+},
+"line:ow_kite": {
+"file": "ow_kite.mp3",
+"text": "Kite!",
+"sig": "7331c0320b67",
+"sec": 0.755,
+"lufs_raw": -23.3
+},
+"line:ow_lollipop": {
+"file": "ow_lollipop.mp3",
+"text": "Lollipop!",
+"sig": "5aa41a948168",
+"sec": 1.015,
+"lufs_raw": -21.8
+},
+"line:ow_bouquet": {
+"file": "ow_bouquet.mp3",
+"text": "Flower bouquet!",
+"sig": "6553b36a886f",
+"sec": 1.185,
+"lufs_raw": -22.3
+},
+"line:ow_book": {
+"file": "ow_book.mp3",
+"text": "Book!",
+"sig": "60849cf8a7f7",
+"sec": 0.715,
+"lufs_raw": -20.8
+},
+"line:ow_trophy": {
+"file": "ow_trophy.mp3",
+"text": "Trophy!",
+"sig": "46782f444951",
+"sec": 0.885,
+"lufs_raw": -23.1
+},
+"line:ow_bubbles": {
+"file": "ow_bubbles.mp3",
+"text": "Bubble wand!",
+"sig": "537626b8938f",
+"sec": 1.035,
+"lufs_raw": -23.0
+},
+"line:ow_net": {
+"file": "ow_net.mp3",
+"text": "Butterfly net!",
+"sig": "5af961a50de1",
+"sec": 1.245,
+"lufs_raw": -23.2
+},
+"line:ow_telescope": {
+"file": "ow_telescope.mp3",
+"text": "Telescope!",
+"sig": "dcc302d3457a",
+"sec": 0.975,
+"lufs_raw": -22.6
+},
+"line:ow_teddy": {
+"file": "ow_teddy.mp3",
+"text": "Teddy bear!",
+"sig": "7029a62db798",
+"sec": 0.925,
+"lufs_raw": -21.9
+},
+"line:ow_umbrella": {
+"file": "ow_umbrella.mp3",
+"text": "Umbrella!",
+"sig": "27c055c1e738",
+"sec": 0.885,
+"lufs_raw": -21.7
+},
+"line:ow_wand": {
+"file": "ow_wand.mp3",
+"text": "Magic wand!",
+"sig": "61c7b8d0f734",
+"sec": 1.195,
+"lufs_raw": -22.5
+},
+"line:ow_ukulele": {
+"file": "ow_ukulele.mp3",
+"text": "Ukulele!",
+"sig": "a7f466eac466",
+"sec": 1.005,
+"lufs_raw": -22.5
+},
+"line:ow_flag": {
+"file": "ow_flag.mp3",
+"text": "Flag!",
+"sig": "ed76dd427944",
+"sec": 0.775,
+"lufs_raw": -22.2
+},
+"line:ow_basket": {
+"file": "ow_basket.mp3",
+"text": "Picnic basket!",
+"sig": "b8df97fd2912",
+"sec": 1.285,
+"lufs_raw": -21.6
+},
+"line:ow_golden_basket": {
+"file": "ow_golden_basket.mp3",
+"text": "Golden picnic basket!",
+"sig": "c522c146b2cf",
+"sec": 1.677,
+"lufs_raw": -22.8
+},
+"line:ow_kite_hint": {
+"file": "ow_kite_hint.mp3",
+"text": "Play on 3 days in one week to earn this!",
+"sig": "17f65cae65b2",
+"sec": 2.506,
+"lufs_raw": -23.1
+},
+"line:ow_lollipop_hint": {
+"file": "ow_lollipop_hint.mp3",
+"text": "Finish Compare Berry Beach to earn this!",
+"sig": "566be45af88a",
+"sec": 2.274,
+"lufs_raw": -23.9
+},
+"line:ow_explorer_hint": {
+"file": "ow_explorer_hint.mp3",
+"text": "Finish Add-Up Broccoli Woods to earn this!",
+"sig": "890b3abfbd92",
+"sec": 2.455,
+"lufs_raw": -23.6
+},
+"line:ow_book_hint": {
+"file": "ow_book_hint.mp3",
+"text": "Master 2 skills to earn this!",
+"sig": "786fbc115a1f",
+"sec": 1.869,
+"lufs_raw": -24.4
+},
+"line:ow_bouquet_hint": {
+"file": "ow_bouquet_hint.mp3",
+"text": "Collect 160 stars to earn this!",
+"sig": "acea6b838551",
+"sec": 2.692,
+"lufs_raw": -23.5
+},
+"line:ow_trophy_hint": {
+"file": "ow_trophy_hint.mp3",
+"text": "Win 3 friend challenges with no oopsies to earn this!",
+"sig": "e2c19aec6548",
+"sec": 3.936,
+"lufs_raw": -23.8
+},
+"line:ow_snorkel_hint": {
+"file": "ow_snorkel_hint.mp3",
+"text": "Finish Mystery Melon Bay to earn this!",
+"sig": "43abac42561f",
+"sec": 2.418,
+"lufs_raw": -23.2
+},
+"line:ow_conductor_hint": {
+"file": "ow_conductor_hint.mp3",
+"text": "Meet your weekly goal in 5 weeks to earn this!",
+"sig": "39b83a5ad292",
+"sec": 2.768,
+"lufs_raw": -23.8
+},
+"line:ow_teddy_hint": {
+"file": "ow_teddy_hint.mp3",
+"text": "Play on 25 different days to earn this!",
+"sig": "7c4f4d73cb77",
+"sec": 2.672,
+"lufs_raw": -23.2
+},
+"line:ow_bubbles_hint": {
+"file": "ow_bubbles_hint.mp3",
+"text": "Get 3 stars on both stops of 2 island areas to earn this!",
+"sig": "bf7ed0120411",
+"sec": 4.056,
+"lufs_raw": -24.4
+},
+"line:ow_bee_hint": {
+"file": "ow_bee_hint.mp3",
+"text": "Get 3 stars on both stops of Take-Away Apple Grove to earn this!",
+"sig": "7f59ffd1ddb6",
+"sec": 4.354,
+"lufs_raw": -24.2
+},
+"line:ow_net_hint": {
+"file": "ow_net_hint.mp3",
+"text": "Finish Take-Away Apple Grove and meet your weekly goal in 5 weeks to earn this!",
+"sig": "fbd217a61ce8",
+"sec": 5.047,
+"lufs_raw": -23.8
+},
+"line:ow_headlamp_hint": {
+"file": "ow_headlamp_hint.mp3",
+"text": "Finish Even-Odd Cookie Caves and master 4 skills to earn this!",
+"sig": "35bcc14c64b2",
+"sec": 4.265,
+"lufs_raw": -23.3
+},
+"line:ow_dino_hint": {
+"file": "ow_dino_hint.mp3",
+"text": "Get 3 stars on both stops of Teen Cocoa Volcano to earn this!",
+"sig": "59a007edad72",
+"sec": 4.545,
+"lufs_raw": -24.7
+},
+"line:ow_telescope_hint": {
+"file": "ow_telescope_hint.mp3",
+"text": "Get 3 stars on both stops of Big Sum Lolly Lighthouse to earn this!",
+"sig": "20eb4110eac0",
+"sec": 4.395,
+"lufs_raw": -24.3
+},
+"line:ow_umbrella_hint": {
+"file": "ow_umbrella_hint.mp3",
+"text": "Meet your weekly goal in 6 weeks to earn this!",
+"sig": "671ed12ae590",
+"sec": 2.683,
+"lufs_raw": -23.7
+},
+"line:ow_rainhat_hint": {
+"file": "ow_rainhat_hint.mp3",
+"text": "Meet your weekly goal in 8 weeks to earn this!",
+"sig": "6fe26ca786fa",
+"sec": 2.725,
+"lufs_raw": -23.8
+},
+"line:ow_ukulele_hint": {
+"file": "ow_ukulele_hint.mp3",
+"text": "Meet your weekly goal in 10 weeks to earn this!",
+"sig": "03a3e37fcff9",
+"sec": 2.775,
+"lufs_raw": -23.8
+},
+"line:ow_wand_hint": {
+"file": "ow_wand_hint.mp3",
+"text": "Master 5 skills to earn this!",
+"sig": "baf10e66b41b",
+"sec": 2.015,
+"lufs_raw": -23.4
+},
+"line:ow_wizard_hint": {
+"file": "ow_wizard_hint.mp3",
+"text": "Master 7 skills to earn this!",
+"sig": "34ce3dab6ed0",
+"sec": 2.095,
+"lufs_raw": -23.9
+},
+"line:ow_gradcap_hint": {
+"file": "ow_gradcap_hint.mp3",
+"text": "Master 10 skills to earn this!",
+"sig": "bb98f295d775",
+"sec": 1.869,
+"lufs_raw": -24.3
+},
+"line:ow_astronaut_hint": {
+"file": "ow_astronaut_hint.mp3",
+"text": "Collect 450 stars to earn this!",
+"sig": "6a2bb114f946",
+"sec": 2.685,
+"lufs_raw": -23.4
+},
+"line:ow_safari_hint": {
+"file": "ow_safari_hint.mp3",
+"text": "Collect 600 stars to earn this!",
+"sig": "242e18391248",
+"sec": 2.314,
+"lufs_raw": -23.8
+},
+"line:ow_basket_hint": {
+"file": "ow_basket_hint.mp3",
+"text": "Collect 750 stars to earn this!",
+"sig": "6a07d9b569aa",
+"sec": 2.74,
+"lufs_raw": -23.4
+},
+"line:ow_flag_hint": {
+"file": "ow_flag_hint.mp3",
+"text": "Collect 900 stars and meet your weekly goal in 6 weeks to earn this!",
+"sig": "d158fd50b2b9",
+"sec": 4.875,
+"lufs_raw": -23.2
+},
+"line:ow_golden_basket_hint": {
+"file": "ow_golden_basket_hint.mp3",
+"text": "Finish the whole Picnic Island story to earn this!",
+"sig": "08d9d57e0bb5",
+"sec": 2.96,
+"lufs_raw": -24.2
+},
+"line:hub_you_need": {
+"file": "hub_you_need.mp3",
+"text": "You need",
+"sig": "1881c355681d",
+"sec": 0.835,
+"lufs_raw": -21.1
+},
+"line:hub_more_stars": {
+"file": "hub_more_stars.mp3",
+"text": "more stars to go!",
+"sig": "d448e5cf35ab",
+"sec": 1.435,
+"lufs_raw": -22.7
+},
+"line:hub_more_star": {
+"file": "hub_more_star.mp3",
+"text": "more star to go!",
+"sig": "b36f90c6c68d",
+"sec": 1.335,
+"lufs_raw": -21.8
+},
+"line:hub_ask_grownup": {
+"file": "hub_ask_grownup.mp3",
+"text": "Ask a grown-up for help.",
+"sig": "f026cb443db4",
+"sec": 1.609,
+"lufs_raw": -22.7
+},
+"line:munch_ready_touch": {
+"file": "munch_ready_touch.mp3",
+"text": "Ready? Tap a square to walk, and tap your friend to munch. Tap Play!",
+"sig": "e4df5019d703",
+"sec": 4.152,
+"lufs_raw": -23.7
+},
+"line:bb_intro_howto": {
+"file": "bb_intro_howto.mp3",
+"text": "Pick your swing, then answer the pitch! Harder questions hit farther!",
+"sig": "1971eee9a8a3",
+"sec": 4.114,
+"lufs_raw": -22.8
+},
+"line:bb_one_player_sub": {
+"file": "bb_one_player_sub.mp3",
+"text": "Three innings. Harder questions hit farther!",
+"sig": "badd1d7e8152",
+"sec": 3.008,
+"lufs_raw": -23.0
+},
+"line:rm_it_costs": {
+"file": "rm_it_costs.mp3",
+"text": "It costs",
+"sig": "5b65d18ae02b",
+"sec": 0.945,
+"lufs_raw": -21.7
+},
+"line:rm_bits_you_have": {
+"file": "rm_bits_you_have.mp3",
+"text": "star bits. You have",
+"sig": "5351c456a8c8",
+"sec": 1.565,
+"lufs_raw": -23.1
+},
+"line:err_count_dots": {
+"file": "err_count_dots.mp3",
+"text": "Touch each dot and count them. One, two, three!",
+"sig": "e317625c445e",
+"sec": 2.98,
+"lufs_raw": -23.6
+},
+"line:err_count_back": {
+"file": "err_count_back.mp3",
+"text": "Start from the big number, then count back.",
+"sig": "42722ca28ad6",
+"sec": 2.645,
+"lufs_raw": -23.1
+},
+"line:err_make_ten": {
+"file": "err_make_ten.mp3",
+"text": "How many more make ten? Count up to ten on your fingers.",
+"sig": "89d7ee1cba04",
+"sec": 3.204,
+"lufs_raw": -23.0
+},
+"line:err_number_line": {
+"file": "err_number_line.mp3",
+"text": "Say the numbers in order. Which one is missing?",
+"sig": "711a1afd5a0a",
+"sec": 2.836,
+"lufs_raw": -22.8
+},
+"line:tp_title": {
+"file": "tp_title.mp3",
+"text": "Tiny Picnic!",
+"sig": "6d8e0efdfb50",
+"sec": 1.155,
+"lufs_raw": -22.0
+},
+"line:tp_hello": {
+"file": "tp_hello.mp3",
+"text": "Tiny Picnic! Let's play!",
+"sig": "6293fbd91bc9",
+"sec": 1.815,
+"lufs_raw": -23.1
+},
+"line:tp_match": {
+"file": "tp_match.mp3",
+"text": "Find the same one!",
+"sig": "8b6f506bb66b",
+"sec": 1.325,
+"lufs_raw": -22.9
+},
+"line:tp_yay_1": {
+"file": "tp_yay_1.mp3",
+"text": "Yay! You found it!",
+"sig": "dd3e9775355d",
+"sec": 1.265,
+"lufs_raw": -23.6
+},
+"line:tp_yay_2": {
+"file": "tp_yay_2.mp3",
+"text": "Great job!",
+"sig": "93233fe0a7fd",
+"sec": 1.055,
+"lufs_raw": -23.8
+},
+"line:tp_yay_3": {
+"file": "tp_yay_3.mp3",
+"text": "Hooray!",
+"sig": "488230fab29a",
+"sec": 0.795,
+"lufs_raw": -22.4
+},
+"line:tp_yay_4": {
+"file": "tp_yay_4.mp3",
+"text": "You did it!",
+"sig": "b77c1ddae0f2",
+"sec": 0.965,
+"lufs_raw": -22.5
+},
+"line:tp_done": {
+"file": "tp_done.mp3",
+"text": "Hooray! What a great picnic!",
+"sig": "a1f37fcbc6b2",
+"sec": 1.815,
+"lufs_raw": -23.3
+},
+"line:tp_again": {
+"file": "tp_again.mp3",
+"text": "Play again?",
+"sig": "d4542f528758",
+"sec": 0.945,
+"lufs_raw": -21.8
+},
+"line:tp_home": {
+"file": "tp_home.mp3",
+"text": "Bye bye, picnic!",
+"sig": "7ca02b352fbd",
+"sec": 1.375,
+"lufs_raw": -23.2
+},
+"line:tp_find_strawberry": {
+"file": "tp_find_strawberry.mp3",
+"text": "Find the strawberry!",
+"sig": "1fcd0baabb93",
+"sec": 1.305,
+"lufs_raw": -22.1
+},
+"line:tp_is_strawberry": {
+"file": "tp_is_strawberry.mp3",
+"text": "That's a strawberry!",
+"sig": "9116c9b65dc0",
+"sec": 1.255,
+"lufs_raw": -22.5
+},
+"line:tp_find_apple": {
+"file": "tp_find_apple.mp3",
+"text": "Find the apple!",
+"sig": "af174d43a5a0",
+"sec": 1.165,
+"lufs_raw": -20.9
+},
+"line:tp_is_apple": {
+"file": "tp_is_apple.mp3",
+"text": "That's an apple!",
+"sig": "8f40c366615c",
+"sec": 1.075,
+"lufs_raw": -22.2
+},
+"line:tp_find_banana": {
+"file": "tp_find_banana.mp3",
+"text": "Find the banana!",
+"sig": "a2bd066e37c7",
+"sec": 1.185,
+"lufs_raw": -21.6
+},
+"line:tp_is_banana": {
+"file": "tp_is_banana.mp3",
+"text": "That's a banana!",
+"sig": "fa054bebb8ff",
+"sec": 1.055,
+"lufs_raw": -21.4
+},
+"line:tp_find_corn": {
+"file": "tp_find_corn.mp3",
+"text": "Find the corn!",
+"sig": "55fa9068d7f1",
+"sec": 1.145,
+"lufs_raw": -22.8
+},
+"line:tp_is_corn": {
+"file": "tp_is_corn.mp3",
+"text": "That's corn!",
+"sig": "749f5c4c9d15",
+"sec": 0.995,
+"lufs_raw": -21.7
+},
+"line:tp_find_lemon": {
+"file": "tp_find_lemon.mp3",
+"text": "Find the lemon!",
+"sig": "72b4b457e5a4",
+"sec": 1.145,
+"lufs_raw": -21.9
+},
+"line:tp_is_lemon": {
+"file": "tp_is_lemon.mp3",
+"text": "That's a lemon!",
+"sig": "7af83d9b8691",
+"sec": 1.055,
+"lufs_raw": -21.9
+},
+"line:tp_find_blueberry": {
+"file": "tp_find_blueberry.mp3",
+"text": "Find the blueberry!",
+"sig": "fd4bf0ce6511",
+"sec": 1.285,
+"lufs_raw": -21.6
+},
+"line:tp_is_blueberry": {
+"file": "tp_is_blueberry.mp3",
+"text": "That's a blueberry!",
+"sig": "ff3ddc579724",
+"sec": 1.195,
+"lufs_raw": -21.5
+},
+"line:tp_find_carrot": {
+"file": "tp_find_carrot.mp3",
+"text": "Find the carrot!",
+"sig": "9ed382b951c1",
+"sec": 1.175,
+"lufs_raw": -22.0
+},
+"line:tp_is_carrot": {
+"file": "tp_is_carrot.mp3",
+"text": "That's a carrot!",
+"sig": "94718e48771f",
+"sec": 1.105,
+"lufs_raw": -22.9
+},
+"line:tp_find_broccoli": {
+"file": "tp_find_broccoli.mp3",
+"text": "Find the broccoli!",
+"sig": "62bfbe31b00c",
+"sec": 1.315,
+"lufs_raw": -21.8
+},
+"line:tp_is_broccoli": {
+"file": "tp_is_broccoli.mp3",
+"text": "That's broccoli!",
+"sig": "5a1c30d525cd",
+"sec": 1.145,
+"lufs_raw": -21.9
+},
+"line:tp_find_pear": {
+"file": "tp_find_pear.mp3",
+"text": "Find the pear!",
+"sig": "0021521c8763",
+"sec": 1.095,
+"lufs_raw": -21.1
+},
+"line:tp_is_pear": {
+"file": "tp_is_pear.mp3",
+"text": "That's a pear!",
+"sig": "0140762de8f5",
+"sec": 0.975,
+"lufs_raw": -22.5
+},
+"line:tp_find_grapes": {
+"file": "tp_find_grapes.mp3",
+"text": "Find the grapes!",
+"sig": "66b8e92bee61",
+"sec": 1.245,
+"lufs_raw": -22.4
+},
+"line:tp_is_grapes": {
+"file": "tp_is_grapes.mp3",
+"text": "Those are grapes!",
+"sig": "58d6e4863a64",
+"sec": 1.213,
+"lufs_raw": -22.9
+},
+"line:tp_find_watermelon": {
+"file": "tp_find_watermelon.mp3",
+"text": "Find the watermelon!",
+"sig": "71dc5fd29765",
+"sec": 1.443,
+"lufs_raw": -23.1
+},
+"line:tp_is_watermelon": {
+"file": "tp_is_watermelon.mp3",
+"text": "That's a watermelon!",
+"sig": "df66f12d68f6",
+"sec": 1.345,
+"lufs_raw": -22.4
+},
+"line:tp_find_pineapple": {
+"file": "tp_find_pineapple.mp3",
+"text": "Find the pineapple!",
+"sig": "eaa00c8b2fd1",
+"sec": 1.375,
+"lufs_raw": -22.0
+},
+"line:tp_is_pineapple": {
+"file": "tp_is_pineapple.mp3",
+"text": "That's a pineapple!",
+"sig": "2c9510f40b1f",
+"sec": 1.265,
+"lufs_raw": -23.2
+},
+"line:tp_find_cupcake": {
+"file": "tp_find_cupcake.mp3",
+"text": "Find the cupcake!",
+"sig": "853d843088eb",
+"sec": 1.335,
+"lufs_raw": -22.2
+},
+"line:tp_is_cupcake": {
+"file": "tp_is_cupcake.mp3",
+"text": "That's a cupcake!",
+"sig": "c49e7ab41710",
+"sec": 1.245,
+"lufs_raw": -22.2
+},
+"line:tp_find_cookie": {
+"file": "tp_find_cookie.mp3",
+"text": "Find the cookie!",
+"sig": "a38faa3445cf",
+"sec": 1.185,
+"lufs_raw": -21.3
+},
+"line:tp_is_cookie": {
+"file": "tp_is_cookie.mp3",
+"text": "That's a cookie!",
+"sig": "95e306d72514",
+"sec": 1.117,
+"lufs_raw": -22.7
+},
+"line:tp_find_circle": {
+"file": "tp_find_circle.mp3",
+"text": "Find the circle!",
+"sig": "f6b5cd426fee",
+"sec": 1.195,
+"lufs_raw": -21.5
+},
+"line:tp_is_circle": {
+"file": "tp_is_circle.mp3",
+"text": "That's a circle!",
+"sig": "05146e18a176",
+"sec": 1.105,
+"lufs_raw": -22.9
+},
+"line:tp_find_square": {
+"file": "tp_find_square.mp3",
+"text": "Find the square!",
+"sig": "cc40d6df2b4f",
+"sec": 1.125,
+"lufs_raw": -21.9
+},
+"line:tp_is_square": {
+"file": "tp_is_square.mp3",
+"text": "That's a square!",
+"sig": "1e8ccb2139f5",
+"sec": 1.065,
+"lufs_raw": -21.9
+},
+"line:tp_find_triangle": {
+"file": "tp_find_triangle.mp3",
+"text": "Find the triangle!",
+"sig": "82fdc213afab",
+"sec": 1.345,
+"lufs_raw": -22.0
+},
+"line:tp_is_triangle": {
+"file": "tp_is_triangle.mp3",
+"text": "That's a triangle!",
+"sig": "1289d0e52837",
+"sec": 1.225,
+"lufs_raw": -23.7
+},
+"line:tp_find_star": {
+"file": "tp_find_star.mp3",
+"text": "Find the star!",
+"sig": "f0529e15e8ce",
+"sec": 1.145,
+"lufs_raw": -22.6
+},
+"line:tp_is_star": {
+"file": "tp_is_star.mp3",
+"text": "That's a star!",
+"sig": "b3c18778fa21",
+"sec": 1.115,
+"lufs_raw": -22.8
+},
+"line:tp_find_heart": {
+"file": "tp_find_heart.mp3",
+"text": "Find the heart!",
+"sig": "8cc2c1a716c6",
+"sec": 1.185,
+"lufs_raw": -22.4
+},
+"line:tp_is_heart": {
+"file": "tp_is_heart.mp3",
+"text": "That's a heart!",
+"sig": "af298b9e9224",
+"sec": 1.035,
+"lufs_raw": -22.3
+},
+"line:tp_color_red": {
+"file": "tp_color_red.mp3",
+"text": "Which one is red?",
+"sig": "d68209f37c30",
+"sec": 1.225,
+"lufs_raw": -21.2
+},
+"line:tp_c_red": {
+"file": "tp_c_red.mp3",
+"text": "That's red!",
+"sig": "d5174a0e5186",
+"sec": 0.925,
+"lufs_raw": -21.8
+},
+"line:tp_color_yellow": {
+"file": "tp_color_yellow.mp3",
+"text": "Which one is yellow?",
+"sig": "a941634fd17e",
+"sec": 1.345,
+"lufs_raw": -21.2
+},
+"line:tp_c_yellow": {
+"file": "tp_c_yellow.mp3",
+"text": "That's yellow!",
+"sig": "eb09e9901bee",
+"sec": 0.975,
+"lufs_raw": -22.6
+},
+"line:tp_color_blue": {
+"file": "tp_color_blue.mp3",
+"text": "Which one is blue?",
+"sig": "a5017a430749",
+"sec": 1.251,
+"lufs_raw": -21.4
+},
+"line:tp_c_blue": {
+"file": "tp_c_blue.mp3",
+"text": "That's blue!",
+"sig": "c8ebfb5a72ef",
+"sec": 0.955,
+"lufs_raw": -20.9
+},
+"line:tp_color_green": {
+"file": "tp_color_green.mp3",
+"text": "Which one is green?",
+"sig": "5c1da273e663",
+"sec": 1.285,
+"lufs_raw": -21.1
+},
+"line:tp_c_green": {
+"file": "tp_c_green.mp3",
+"text": "That's green!",
+"sig": "ff50f884cf87",
+"sec": 1.005,
+"lufs_raw": -21.5
+},
+"line:tp_color_orange": {
+"file": "tp_color_orange.mp3",
+"text": "Which one is orange?",
+"sig": "6860532a8dcb",
+"sec": 1.395,
+"lufs_raw": -22.0
+},
+"line:tp_c_orange": {
+"file": "tp_c_orange.mp3",
+"text": "That's orange!",
+"sig": "d615eb08e3ac",
+"sec": 1.027,
+"lufs_raw": -22.8
+},
+"line:tp_color_purple": {
+"file": "tp_color_purple.mp3",
+"text": "Which one is purple?",
+"sig": "1f84a8f3a537",
+"sec": 1.305,
+"lufs_raw": -22.2
+},
+"line:tp_c_purple": {
+"file": "tp_c_purple.mp3",
+"text": "That's purple!",
+"sig": "5010694a0b59",
+"sec": 1.065,
+"lufs_raw": -22.4
+},
+"line:tp_count_1": {
+"file": "tp_count_1.mp3",
+"text": "Find one!",
+"sig": "018746dc14c0",
+"sec": 0.915,
+"lufs_raw": -21.0
+},
+"line:tp_n_1": {
+"file": "tp_n_1.mp3",
+"text": "That's one!",
+"sig": "63bfbb9a3b52",
+"sec": 0.955,
+"lufs_raw": -23.1
+},
+"line:tp_count_2": {
+"file": "tp_count_2.mp3",
+"text": "Find two!",
+"sig": "7679bc8ef85e",
+"sec": 0.985,
+"lufs_raw": -20.7
+},
+"line:tp_n_2": {
+"file": "tp_n_2.mp3",
+"text": "That's two!",
+"sig": "feb59c59fc99",
+"sec": 0.945,
+"lufs_raw": -22.1
+},
+"line:tp_count_3": {
+"file": "tp_count_3.mp3",
+"text": "Find three!",
+"sig": "cdc9e946dfb0",
+"sec": 1.015,
+"lufs_raw": -21.2
+},
+"line:tp_n_3": {
+"file": "tp_n_3.mp3",
+"text": "That's three!",
+"sig": "1a210bac147e",
+"sec": 0.955,
+"lufs_raw": -21.7
+},
+"line:pt_stop": {
+"file": "pt_stop.mp3",
+"text": "Great stopping point! You played so well today. Time to rest.",
+"sig": "0d35542667ae",
+"sec": 4.114,
+"lufs_raw": -23.3
+},
+"line:pt_bye": {
+"file": "pt_bye.mp3",
+"text": "Bye bye! See you next time!",
+"sig": "2093a8cac33a",
+"sec": 1.855,
+"lufs_raw": -23.6
+},
+"line:pt_stretch": {
+"file": "pt_stretch.mp3",
+"text": "Time for a stretch! Reach up high, wiggle your fingers, and take a big breath.",
+"sig": "590814927d9f",
+"sec": 4.945,
+"lufs_raw": -23.6
 }
 }

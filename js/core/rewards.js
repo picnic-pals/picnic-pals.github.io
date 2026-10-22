@@ -1,7 +1,12 @@
-/* Blob Arcade — rewards: stickers for milestones, and blob outfits/colours unlocked by total stars earned.
-   Stars are never spent (kids never "lose" anything); unlocks are milestones. */
+/* Picnic Pals — rewards: stickers, outfits/colours, room-furniture pricing, character unlock rules, long-term goals.
+   Stars are never spent or lost; unlocks are milestones. The Blob Room spends a separate star-bit wallet.
+   TIERS: common = stars every round (small per-round result only) · uncommon = stickers, cheap outfits/colors/furniture, at most
+   CONFIG.uncommonPerSession per session, batch-celebrated once in the hub (never mid-round) · rare = real milestones (a mastered
+   skill, the weekly goal, a story area, a perfect challenge) · epic = friends (several mastered skills, over weeks) and showpieces.
+   Tune everything in CONFIG. Existing saves keep everything already unlocked (grandfather()). */
 (function (A) {
   'use strict';
+  var TT = A.TITLES || {}; // game titles live in util.js (A.TITLES); node tools that skip util.js just get blank hints
   var st5 = function (cx, cy, r, fill, ex) { return A.Blobs.star5(cx, cy, r, fill, ex); };
   var INK = '#4a3b6b';
   function face(y, col) { col = col || INK; return '<circle cx="43" cy="' + y + '" r="2.6" fill="' + col + '"/><circle cx="57" cy="' + y + '" r="2.6" fill="' + col + '"/><path d="M45 ' + (y + 6) + 'Q50 ' + (y + 10) + ' 55 ' + (y + 6) + '" stroke="' + col + '" stroke-width="2.2" fill="none" stroke-linecap="round"/>'; }
@@ -47,13 +52,216 @@
   }
 
   function mc() { return A.Curriculum; }
+  /* ======================= ONE PLACE TO TUNE REWARD PACING =======================
+     Three tracks run side by side, so one prize is nearly always close:
+       friends  — characters, earned only by MASTERING skills (coach.js mastery spans separate days; placed/skipped skills don't
+                  count, so every kid's milestones sit on their own ladder)
+       hats     — Pop Quiz themes (Pop Quiz isn't built yet: data hook only, see hats + Rewards.popQuizTheme)
+       weekly   — furniture + stickers for the forgiving weekly goal (play N of 7 days; never resets), reviews, bosses, effort
+     No random draws, no expiring offers, no streak loss, no sibling leaderboards. Stars are never lost. */
+  var CONFIG = {
+    uncommonPerSession: 2,        // uncommon unlocks earned per play session (day); extras wait for the next session
+    cardsPerSession: 3,           // prizes shown on the end-of-session card in the hub; extras queue for next session
+    // star-cost outfits/colors (stars are a lifetime total, never spent). Cheap ones are uncommon, dearer ones rare.
+    outfitCost: { none: 0, bow: 12, cap: 10, headband: 65, sunglasses: 90, flower: 135, partyhat: 190, beanie: 260, crown: 360 },
+    colorCost: { classic: 0, berry: 20, mint: 45, sunny: 75, sky: 115, grape: 165, cocoa: 260, rainbow: 420 },
+    rareAt: 100,                  // star-cost unlocks at/above this count as rare (not limited by the per-session cap)
+    outfitNeed: { crown: 'weeks4' }, colorNeed: { rainbow: 'master3' },    // badge needed on top of the stars
+    weekly: { days: 3, of: 7 },   // weekly goal: play on 3 days in a Mon–Sun week. Missing a day never resets anything.
+    // room furniture: star-bit price from its old base price on a curve (cheap starter pieces → expensive showpieces)
+    furniture: { curve: [[5, 15], [9, 30], [14, 55], [18, 85], [24, 120], [99, 150]],   // [old base price up to, new price]
+      firstWin: { plates: 5, plant_cactus: 25 },   // one tiny first-session buy (plates, ✦ 5; with the 10-star Sun hat) and the 10 bits it saves added to the cactus, so week 1 / month 1 pacing stays the same
+      gates: { bed_cloud: 'week1', plant_tree: 'week1', fishtank: 'master1', telescope: 'area1', tent: 'perfectCh', piano: 'weeks4', lemonade_jug: 'week1', thermos: 'area1' },  // badge AND price
+      showpieces: { bed_cloud: 160, fishtank: 180, telescope: 200, tent: 220, piano: 240 } },
+    // FRIENDS track — data only, keyed by character id; add more entries to extend. need: { mastered | weeks | popquiz | reviews | bosses : n }
+    // Picnic Pals food friends (ids/order from art/foods/cast.json via js/core/foods-data.js): 4 starters, then one new friend per
+    // mastered skill, in cast.json unlock order (Dora Dumpling first). Existing players keep everything they had (unlocks are never removed).
+    characters: (function () {
+      var FD = A.FoodData || {}, order = FD.order || ['mochi', 'banana', 'pear', 'carrot', 'broccoli', 'sushi', 'taco', 'pizza', 'pancake', 'cupcake'];
+      return { starter: (FD.starters || ['strawberry', 'apple', 'corn', 'blueberry']).slice(),
+        unlockable: order.map(function (id, i) { return { id: id, need: { mastered: i + 1 } }; }) };
+    })(),
+    // HATS track hook: Pop Quiz theme id → outfit id (granted when Rewards.popQuizTheme(p, theme) is called and that outfit exists).
+    // Pop Quiz isn't built: until it is, each of these is earned by the existing milestone in outfitEarn below (either path unlocks it).
+    hats: { space: 'astronaut', animals: 'safari', dinosaurs: 'dino', ocean: 'snorkel', bugs: 'bee', weather: 'rainhat', body: 'headlamp', vehicles: 'conductor', world: 'explorer' },
+    // EARN RULES for the theme hats + held items. An outfit listed here is LOCKED UNTIL EARNED (no price = not free).
+    // need (all must hold): stars (lifetime star shop, the outfitCost curve continued) · weeks (weekly 3-of-7 goal met in n weeks)
+    // · mastered (skills) · area (finish Story area #i: both stops) · area3at (3 stars on both stops of area #i) · area3 (any area) ·
+    // chPerfect · days (play days) · island (finish the whole Picnic Island story) · badge. Area numbers are Story.AREAS order.
+    // Spread out on purpose: 2 in week 1, a few in month 1, the rest multi-week (weeks/mastery/hard 3-star challenges).
+    outfitEarn: {
+      kite: { need: { weeks: 1 } },                 // first weekly goal
+      lollipop: { need: { area: 1 } },              // Compare Berry Beach
+      explorer: { need: { area: 2 } },              // Add-Up Broccoli Woods (Pop Quiz: World, later)
+      book: { need: { mastered: 2 } },              // pairs with the bookworm glasses
+      bouquet: { need: { stars: 160 } },
+      trophy: { need: { chPerfect: 3 } },           // 3 friend challenges with no oopsies (1 came too early from a lucky round)
+      snorkel: { need: { area: 6 } },               // Mystery Melon Bay, the island's lagoon (Pop Quiz: Ocean, later)
+      conductor: { need: { weeks: 5 } },            // (Pop Quiz: Vehicles, later)
+      teddy: { need: { days: 25 } },                // 25 play days, any pace
+      bubbles: { need: { area3: 2 } },              // 3 stars on both stops of 2 areas
+      bee: { need: { area3at: 8 } },                // 3 stars all through Take-Away Apple Grove (Pop Quiz: Bugs, later)
+      net: { need: { area: 8, weeks: 5 } },         // Take-Away Apple Grove + five great weeks (pairs with the bee)
+      headlamp: { need: { area: 9, mastered: 4 } }, // Even-Odd Cookie Caves (the last area) + 4 mastered skills (Pop Quiz: Body, later)
+      dino: { need: { area3at: 5 } },               // 3 stars all through Teen Cocoa Volcano (Pop Quiz: Dinosaurs, later)
+      telescope: { need: { area3at: 7 } },          // 3 stars all through Big Sum Lolly Lighthouse
+      umbrella: { need: { weeks: 6 } },
+      rainhat: { need: { weeks: 8 } },              // pairs with the umbrella (Pop Quiz: Weather, later)
+      ukulele: { need: { weeks: 10 } },
+      wand: { need: { mastered: 5 } },
+      wizard: { need: { mastered: 7 } },            // big mastery milestone
+      gradcap: { need: { mastered: 10 } },          // every math skill on the island
+      astronaut: { need: { stars: 450 } },          // (Pop Quiz: Space, later)
+      safari: { need: { stars: 600 } },             // (Pop Quiz: Animals, later)
+      basket: { need: { stars: 750 } },
+      flag: { need: { stars: 900, weeks: 6 } },
+      golden_basket: { need: { island: 1 } }        // the rarest: finish the whole Picnic Island story
+    },
+    // long-term goals (weeks). The hub shows the first unfinished one as the "next goal" bar.
+    goals: [
+      { id: 'g_week1', name: 'Play 3 days this week', icon: '📅', of: 'weekDays', need: 3 },
+      { id: 'g_master1', name: 'Master a skill', icon: '🏅', of: 'mastered', need: 1 },
+      { id: 'g_stars150', name: 'Earn 150 stars', icon: '⭐', of: 'stars', need: 150 },
+      { id: 'g_master3', name: 'Master 3 skills', icon: '🎓', of: 'mastered', need: 3 },
+      { id: 'g_weeks4', name: 'Meet your weekly goal 4 times', icon: '🧺', of: 'weeks', need: 4 },
+      { id: 'g_friends', name: 'Meet every friend', icon: '💛', of: 'friends', need: 0 },
+      { id: 'g_stars500', name: 'Earn 500 stars', icon: '🌟', of: 'stars', need: 500 },
+      { id: 'g_master6', name: 'Master 6 skills', icon: '👑', of: 'mastered', need: 6 }
+    ]
+  };
+  var LEGACY_OUTFIT = { bow: 3, cap: 6, headband: 10, sunglasses: 15, flower: 20, partyhat: 26, beanie: 33, crown: 45 };   // pre-pacing costs (grandfathering)
+  var LEGACY_COLOR = { berry: 8, mint: 12, sunny: 18, sky: 24, grape: 30, cocoa: 38, rainbow: 55 };
+  /* ---------- milestone stats ---------- */
+  function dayNum(k) { var a = k.split('-'); return Math.round(Date.UTC(+a[0], +a[1] - 1, +a[2]) / 864e5); }
+  function weekOf(k) { var n = dayNum(k); return n - ((n + 3) % 7); }     // Monday-based week number (day 0 = Thu 1970-01-01)
+  function today() { return A.today ? A.today() : new Date().toISOString().slice(0, 10); }
+  function weekCounts(p) { var w = {}; Object.keys(p.days || {}).forEach(function (k) { if (/^\d{4}-\d\d-\d\d$/.test(k)) { var x = weekOf(k); w[x] = (w[x] || 0) + 1; } }); return w; }
+  function weeksMet(p) { var w = weekCounts(p), n = 0; for (var k in w) if (w[k] >= CONFIG.weekly.days) n++; return n; }
+  function weekDays(p) { return weekCounts(p)[weekOf(today())] || 0; }
+  function mastered(p) { try { var C = mc(); return C.masteredCount(p, 'math') + (C.list('reading').length ? C.masteredCount(p, 'reading') : 0); } catch (e) { return 0; } }
+  function masteredSkills(p) { try { var C = mc(); return C.ACTIVE.filter(function (s) { var st = p.skills[s.id]; return st && st.status === 'mastered' && !st.placed; }); } catch (e) { return []; } }
+  function tinyN(p) { return ((p.games || {}).tiny || {}).rounds || 0; }
+  function sdata(p) { var s = p.story || (p.story = {}); s.stops = s.stops || {}; s.challenges = s.challenges || {}; return s; }
+  function stopOk(p, i, f) { var s = sdata(p); return ['big', 'little'].some(function (pa) { var r = s.stops[pa + ':' + i]; return r && !r.placed && f(r); }); }   // stops passed by placement (not played) never earn rewards
+  function areasN(p, f) { var n = 0; ((A.Story && A.Story.AREAS) || []).forEach(function (a, ai) { if (!a.side && stopOk(p, ai * 2, f) && stopOk(p, ai * 2 + 1, f)) n++; }); return n; }
+  function areaOk(p, ai, f) { return stopOk(p, ai * 2, f) && stopOk(p, ai * 2 + 1, f); }
+  function areaName(ai) { var a = ((A.Story && A.Story.AREAS) || [])[ai]; return a && a.name ? a.name : 'area ' + (ai + 1); }
+  function chPerfect(p) { var c = sdata(p).challenges, n = 0; for (var k in c) if (c[k] && c[k].perfect) n++; return n; }
+  function cast() { return CONFIG.characters; }
+  function allChars() { return cast().starter.concat(cast().unlockable.map(function (u) { return u.id; })); }
+  function friendsN(p) { var b = (p.unlocks && p.unlocks.blobs) || {}; return allChars().filter(function (id) { return b[id] || p.blob === id; }).length; }
+  function stats(p) { var e = p.effort || {};
+    return { stars: p.stars || 0, mastered: mastered(p), days: Object.keys(p.days || {}).length, weekDays: weekDays(p), weeks: weeksMet(p),
+      areas: areasN(p, function (r) { return r.passed; }), area3: areasN(p, function (r) { return r.stars >= 3; }), chPerfect: chPerfect(p),
+      friends: friendsN(p), friendsAll: allChars().length, stickers: Object.keys(p.stickers || {}).length,
+      popquiz: Object.keys((p.popquiz || {}).themes || {}).length, island: (sdata(p).finished || 0) > 0 ? 1 : 0, reviews: e.reviews || 0, bosses: e.bosses || 0, tries: e.tries || 0 }; }
+  // badges: milestones that gate outfits and furniture
+  var BADGES = {
+    week1: { name: 'Weekly goal', hint: 'Play on 3 days in one week', test: function (x) { return x.weeks >= 1; } },
+    weeks4: { name: 'Four great weeks', hint: 'Meet your weekly goal in 4 weeks', test: function (x) { return x.weeks >= 4; } },
+    master1: { name: 'Skill master', hint: 'Master a skill', test: function (x) { return x.mastered >= 1; } },
+    master3: { name: 'Super learner', hint: 'Master 3 skills', test: function (x) { return x.mastered >= 3; } },
+    area1: { name: 'Area hero', hint: 'Beat a whole Story area', test: function (x) { return x.areas >= 1; } },
+    perfectCh: { name: 'Perfect challenge', hint: 'Win a friend challenge with no oopsies', test: function (x) { return x.chPerfect >= 1; } }
+  };
+  function badge(p, id, x) { var b = BADGES[id]; return !!b && b.test(x || stats(p)); }
+  /* ---------- earn rules (CONFIG.outfitEarn): theme hats + held items, locked until earned ---------- */
+  var EARN = CONFIG.outfitEarn;
+  function earnParts(p, id, x) {
+    var r = EARN[id]; if (!r) return null; x = x || stats(p);
+    return Object.keys(r.need).map(function (k) { var n = r.need[k], ok, have, need = n;
+      if (k === 'area') { ok = areaOk(p, n, function (q) { return q.passed; }); have = ok ? 1 : 0; need = 1; }
+      else if (k === 'area3at') { ok = areaOk(p, n, function (q) { return q.stars >= 3; }); have = ok ? 1 : 0; need = 1; }
+      else if (k === 'badge') { ok = badge(p, n, x); have = ok ? 1 : 0; need = 1; }
+      else { have = Math.min(x[k] || 0, n); ok = (x[k] || 0) >= n; }
+      return { what: k, n: n, have: have, need: need, ok: ok }; });
+  }
+  function earnOk(p, id, x) { var ps = earnParts(p, id, x); return !!ps && ps.every(function (q) { return q.ok; }); }
+  // plain hint for a locked tile: "Finish Compare Berry Beach to earn this!" (item names are fine; never names a friend)
+  function earnHint(p, id) {
+    var ps = earnParts(p, id); if (!ps) return ''; var all = ps.filter(function (q) { return !q.ok; }); if (!all.length) all = ps;
+    var bits = all.map(function (q) { var n = q.n;
+      switch (q.what) {
+        case 'area': return 'finish ' + areaName(n);
+        case 'area3at': return 'get 3 stars on both stops of ' + areaName(n);
+        case 'area3': return n > 1 ? 'get 3 stars on both stops of ' + n + ' island areas' : 'get 3 stars on both stops of any island area';
+        case 'stars': return 'collect ' + n + ' stars';
+        case 'weeks': return n === 1 ? 'play on 3 days in one week' : 'meet your weekly goal in ' + n + ' weeks';
+        case 'mastered': return 'master ' + n + ' skill' + (n > 1 ? 's' : '');
+        case 'chPerfect': return n > 1 ? 'win ' + n + ' friend challenges with no oopsies' : 'win a friend challenge with no oopsies';
+        case 'days': return 'play on ' + n + ' different days';
+        case 'island': return 'finish the whole Picnic Island story';
+        case 'badge': return (BADGES[n] || { hint: n }).hint.toLowerCase();
+      } return q.what + ' ' + n; });
+    var t = bits.join(' and '); return t.charAt(0).toUpperCase() + t.slice(1) + ' to earn this!';
+  }
+  // short on-tile label for a locked Dress Up tile ("3★ Apple Grove"); tapping still reads the full earnHint
+  function earnShort(p, id) {
+    var ps = earnParts(p, id); if (!ps) return ''; var all = ps.filter(function (q) { return !q.ok; }); if (!all.length) all = ps;
+    function place(n) { return areaName(n).split(' ').slice(-2).join(' '); }
+    return all.map(function (q) { var n = q.n;
+      switch (q.what) {
+        case 'area': return 'Finish ' + place(n);
+        case 'area3at': return '3\u2605 ' + place(n);
+        case 'area3': return '3\u2605 on ' + n + (n > 1 ? ' areas' : ' area');
+        case 'stars': return n + ' \u2B50';
+        case 'weeks': return n === 1 ? '3 days in a week' : n + (all.length > 1 ? ' weeks' : ' great weeks');
+        case 'mastered': return all.length > 1 ? n + ' skills' : 'Master ' + n + ' skill' + (n > 1 ? 's' : '');
+        case 'chPerfect': return n + ' perfect challenge' + (n > 1 ? 's' : '');
+        case 'days': return n + ' play days';
+        case 'island': return 'Finish the island';
+        case 'badge': return (BADGES[n] || { name: n }).name;
+      } return q.what + ' ' + n; }).join(' + ');
+  }
+  function earnProgress(p, id) { var ps = earnParts(p, id); if (!ps) return null; var have = 0, need = 0; ps.forEach(function (q) { have += q.have; need += q.need; });
+    return { ok: ps.every(function (q) { return q.ok; }), have: have, need: need, parts: ps, hint: earnHint(p, id) }; }
+  // multi-week rules (weeks >= 2, 5+ mastered, 3-star areas, the island, 400+ stars, 20+ days) are epic, the rest rare
+  function earnTier(id) { var n = (EARN[id] || {}).need || {}; return (n.weeks >= 2 || n.mastered >= 5 || 'area3at' in n || n.island || n.stars >= 400 || n.days >= 20) ? 'epic' : 'rare'; }
+  /* ---------- FRIENDS track (data-driven, keyed by id) ---------- */
+  var NEED_TXT = { mastered: ['master', 'skill'], weeks: ['meet your weekly goal', 'time'], popquiz: ['finish', 'Pop Quiz theme'], reviews: ['finish', 'Memory Lane review'], bosses: ['beat', 'boss round'] };
+  function charRule(id) { return cast().unlockable.filter(function (u) { return u.id === id; })[0] || null; }
+  function charProgress(p, id, x) {
+    var r = charRule(id); if (!r) return { ok: cast().starter.indexOf(id) >= 0, parts: [] };
+    x = x || stats(p); var parts = Object.keys(r.need).map(function (k) { return { what: k, have: Math.min(x[k] || 0, r.need[k]), need: r.need[k], ok: (x[k] || 0) >= r.need[k] }; });
+    return { ok: parts.every(function (q) { return q.ok; }), parts: parts };
+  }
+  function charName(id) { var r = charRule(id); return (r && r.name) || (A.Blobs && A.Blobs.byId && A.Blobs.byId[id] || { name: id }).name; }
+  // "Master 1 more skill to meet a new friend!" (never names the friend: keeps the surprise)
+  function charHint(p, id) {
+    var pr = charProgress(p, id), bits = pr.parts.filter(function (q) { return !q.ok; }).map(function (q) { var t = NEED_TXT[q.what] || [q.what, ''], m = q.need - q.have;
+      return t[0] + ' ' + m + ' more ' + t[1] + (m > 1 && t[1] ? 's' : ''); });
+    var s = bits.join(' and '); return s ? s.charAt(0).toUpperCase() + s.slice(1) + ' to meet a new friend!' : '';
+  }
+  // the next friend to meet (in list order) with progress — for the "Next friend" card
+  function nextFriend(p) {
+    var b = (p.unlocks && p.unlocks.blobs) || {}, x = stats(p), r = cast().unlockable.filter(function (u) { return !b[u.id] && p.blob !== u.id; })[0]; if (!r) return null;
+    var pr = charProgress(p, r.id, x), have = 0, need = 0; pr.parts.forEach(function (q) { have += q.have; need += q.need; });
+    return { id: r.id, name: charName(r.id), have: have, need: need, pct: need ? Math.round(100 * have / need) : 100, hint: charHint(p, r.id) };
+  }
+  /* ---------- HATS track hook (Pop Quiz, later) ---------- */
+  function popQuizTheme(p, theme) { var q = p.popquiz || (p.popquiz = { themes: {} }); q.themes = q.themes || {}; if (!q.themes[theme]) q.themes[theme] = Date.now(); return check(p); }
+  /* ---------- weekly track hooks: reviews / bosses / effort ("tried again") counters ---------- */
+  function effort(p, kind, n) { var e = p.effort || (p.effort = {}); e[kind] = (e[kind] || 0) + (n || 1); }
+  /* ---------- furniture prices on a curve + badge gates (applied to the shared room catalog) ---------- */
+  function furniturePrice(base) { var c = CONFIG.furniture.curve; for (var i = 0; i < c.length; i++) if (base <= c[i][0]) return c[i][1]; return c[c.length - 1][1]; }
+  function applyRoomPrices() {
+    var RC = A.RoomCatalog; if (!RC || RC.paced) return; RC.paced = true; var F = CONFIG.furniture;
+    RC.ITEMS.forEach(function (it) {
+      if (it.starter || it.need) return;
+      it.base = it.price; it.price = (F.firstWin && F.firstWin[it.id]) || F.showpieces[it.id] || furniturePrice(it.base);
+      var g = F.gates[it.id]; if (g && BADGES[g]) { it.badge = g; it.hint = BADGES[g].hint; it.tier = F.showpieces[it.id] ? 'epic' : 'rare'; }
+      else it.tier = it.price <= 30 ? 'uncommon' : 'rare';
+    });
+    var e0 = RC.earned; RC.earned = function (p, it) { if (it.badge) return badge(p, it.badge); return e0(p, it); };
+  }
+  applyRoomPrices();
   var STICKERS = [
-    { id: 'first_munch', name: 'First Munch!', hint: 'Finish a Mochi Munch round', art: 'donut', test: function (p) { return p.games.munch.rounds >= 1; } },
+    { id: 'first_munch', name: 'First Munch!', hint: 'Finish a ' + TT.munch + ' round', art: 'donut', test: function (p) { return p.games.munch.rounds >= 1; } },
     { id: 'stars_10', name: '10 Stars', hint: 'Earn 10 stars', art: 'star', test: function (p) { return p.stars >= 10; } },
     { id: 'perfect_1', name: 'Perfect!', hint: 'A round with no oopsies', art: 'sun', test: function (p) { return p.games.munch.perfect >= 1; } },
     { id: 'stars_25', name: '25 Stars', hint: 'Earn 25 stars', art: 'rainbow', test: function (p) { return p.stars >= 25; } },
     { id: 'rounds_10', name: '10 Rounds', hint: 'Play 10 rounds', art: 'cupcake', test: function (p) { return p.games.munch.rounds >= 10; } },
-    { id: 'dress_up', name: 'Dress Up', hint: 'Change your blob in Dress Up', art: 'strawberry', test: function (p) { return !!p.flags.dressed; } },
+    { id: 'dress_up', name: 'Dress Up', hint: 'Change your friend in Dress Up', art: 'strawberry', test: function (p) { return !!p.flags.dressed; } },
     { id: 'master_1', name: 'Skill Master', hint: 'Master a new math skill', art: 'medal', test: function (p) { return mc().masteredCount(p) >= 1; } },
     { id: 'perfect_3', name: 'Triple Perfect', hint: '3 perfect rounds in a row', art: 'icecream', test: function (p) { return (p.games.munch.best || 0) >= 3; } },
     { id: 'days_3', name: '3 Play Days', hint: 'Play on 3 different days', art: 'ladybug', test: function (p) { return Object.keys(p.days).length >= 3; } },
@@ -65,32 +273,132 @@
     { id: 'stars_100', name: '100 Stars', hint: 'Earn 100 stars', art: 'trophy', test: function (p) { return p.stars >= 100; } },
     { id: 'rounds_50', name: '50 Rounds', hint: 'Play 50 rounds', art: 'watermelon', test: function (p) { return p.games.munch.rounds >= 50; } },
     { id: 'stars_200', name: '200 Stars', hint: 'Earn 200 stars', art: 'planet', test: function (p) { return p.stars >= 200; } },
-    { id: 'bb_first', name: 'Play Ball!', hint: 'Finish a game of Blob Baseball', art: 'baseball', test: function (p) { return ((p.games.baseball || {}).games || 0) >= 1; } },
-    { id: 'bb_homer', name: 'Home Run Hero', hint: 'Hit a home run in Blob Baseball', art: 'homer', test: function (p) { return ((p.games.baseball || {}).homers || 0) >= 1; } },
+    { id: 'bb_first', name: 'Play Ball!', hint: 'Finish a game of ' + TT.baseball, art: 'baseball', test: function (p) { return ((p.games.baseball || {}).games || 0) >= 1; } },
+    { id: 'bb_homer', name: 'Home Run Hero', hint: 'Hit a home run in ' + TT.baseball, art: 'homer', test: function (p) { return ((p.games.baseball || {}).homers || 0) >= 1; } },
+    { id: 'week_1', tier: 'rare', name: 'Great Week', hint: 'Play on 3 days in one week', art: 'sun', test: function (p) { return weeksMet(p) >= 1; } },
+    { id: 'week_4', tier: 'rare', name: 'Four Great Weeks', hint: 'Meet your weekly goal in 4 weeks', art: 'moon', test: function (p) { return weeksMet(p) >= 4; } },
+    { id: 'area_1', tier: 'rare', name: 'Area Hero', hint: 'Beat a whole Story area', art: 'trophy', test: function (p) { return areasN(p, function (r) { return r.passed; }) >= 1; } },
+    { id: 'ch_perfect', tier: 'rare', name: 'Flawless!', hint: 'Win 2 friend challenges with no oopsies', art: 'medal', test: function (p) { return chPerfect(p) >= 2; } },   // 2, so one lucky round isn't enough
+    { id: 'area_3star', tier: 'epic', name: 'Three-Star Area', hint: 'Get 3 stars on both stops of 2 Story areas', art: 'crown', test: function (p) { return areasN(p, function (r) { return r.stars >= 3; }) >= 2; } },
+    { id: 'master_5', tier: 'epic', name: 'Brain Champ', hint: 'Master 5 skills', art: 'planet', test: function (p) { return mastered(p) >= 5; } },
+    // Tiny Picnic (toddler mode): a sticker every few rounds, nothing more (one star per round is given by the game)
+    { id: 'tiny_3', name: 'Tiny Picnic', hint: 'Play 3 Tiny Picnic rounds', art: 'strawberry', test: function (p) { return tinyN(p) >= 3; } },
+    { id: 'tiny_8', name: 'Picnic Helper', hint: 'Play 8 Tiny Picnic rounds', art: 'cupcake', test: function (p) { return tinyN(p) >= 8; } },
+    { id: 'tiny_15', name: 'Picnic Pal', hint: 'Play 15 Tiny Picnic rounds', art: 'balloon', test: function (p) { return tinyN(p) >= 15; } },
+    { id: 'tiny_25', name: 'Picnic Star', hint: 'Play 25 Tiny Picnic rounds', art: 'rainbow', test: function (p) { return tinyN(p) >= 25; } },
     { id: 'master_all', name: 'Math Champ', hint: 'Master every skill to 20', art: 'crown', test: function (p) { return mc().masteredAll(p) && mc().masteredCount(p) > 0; } }
   ];
+  // tiers of the original stickers (new ones carry their own) and harder thresholds (ids kept, so old saves keep what they earned)
+  var STK_TIER = { master_1: 'rare', perfect_3: 'rare', days_7: 'rare', master_3: 'epic', stars_100: 'rare', stars_200: 'rare', rounds_50: 'rare', master_all: 'epic', grumbly: 'rare', bb_homer: 'rare' };
+  var STK_FIX = { stars_25: 40, stars_50: 90, stars_100: 160, stars_200: 320, rounds_10: 15, rounds_25: 40, rounds_50: 90 };
+  STICKERS.forEach(function (s) {
+    s.tier = s.tier || STK_TIER[s.id] || 'uncommon';
+    var n = STK_FIX[s.id]; if (!n) return;
+    if (/^stars_/.test(s.id)) { s.hint = 'Earn ' + n + ' stars'; s.test = function (p) { return p.stars >= n; }; }
+    else { s.hint = 'Play ' + n + ' rounds'; s.test = function (p) { return p.games.munch.rounds >= n; }; }
+  });
   var STK_BY = {}; STICKERS.forEach(function (s) { STK_BY[s.id] = s; });
-  var OUTFIT_COST = { none: 0, bow: 3, cap: 6, headband: 10, sunglasses: 15, flower: 20, partyhat: 26, beanie: 33, crown: 45 };
-  var COLOR_COST = { classic: 0, berry: 8, mint: 12, sunny: 18, sky: 24, grape: 30, cocoa: 38, rainbow: 55 };
+  var OUTFIT_COST = CONFIG.outfitCost, COLOR_COST = CONFIG.colorCost;
 
-  function unlocked(p, kind, id) {
-    if (kind === 'blob') return !!(p.unlocks.blobs && p.unlocks.blobs[id]) || p.blob === id;
-    var cost = (kind === 'outfit' ? OUTFIT_COST : COLOR_COST)[id] || 0;
-    return cost === 0 || p.stars >= cost || !!p.unlocks[kind === 'outfit' ? 'outfits' : 'colors'][id];
+  function pace(p) { var x = p.pace || (p.pace = { v: 1, day: '', n: 0, queue: [] }); x.queue = x.queue || []; return x; }
+  // old saves: keep every outfit/color the old (cheaper) star costs had already unlocked; won characters stay in p.unlocks.blobs
+  function grandfather(p) {
+    if (!p || !p.unlocks || (p.flags && p.flags.paced)) return; p.flags = p.flags || {}; p.flags.paced = 1;
+    var u = p.unlocks; u.outfits = u.outfits || {}; u.colors = u.colors || {};
+    Object.keys(LEGACY_OUTFIT).forEach(function (id) { if (p.stars >= LEGACY_OUTFIT[id] && !u.outfits[id]) u.outfits[id] = 1; });
+    Object.keys(LEGACY_COLOR).forEach(function (id) { if (p.stars >= LEGACY_COLOR[id] && !u.colors[id]) u.colors[id] = 1; });
   }
-  // Find newly-earned rewards, record them, return [{kind, id}] for celebrating.
+  function costOk(p, kind, id, x) { var cost = (kind === 'outfit' ? OUTFIT_COST : COLOR_COST)[id] || 0, nd = (kind === 'outfit' ? CONFIG.outfitNeed : CONFIG.colorNeed)[id]; return p.stars >= cost && (!nd || badge(p, nd, x)); }
+  function unlocked(p, kind, id) {
+    grandfather(p);
+    if (kind === 'blob') return !!(p.unlocks.blobs && p.unlocks.blobs[id]) || p.blob === id;
+    if (kind === 'outfit' && EARN[id]) return !!p.unlocks.outfits[id];   // earn-rule items: only once earned (never "free")
+    var cost = (kind === 'outfit' ? OUTFIT_COST : COLOR_COST)[id] || 0;
+    return cost === 0 || !!p.unlocks[kind === 'outfit' ? 'outfits' : 'colors'][id];
+  }
+  function tierOf(it) {
+    if (it.kind === 'sticker') return STK_BY[it.id].tier;
+    if (it.kind === 'blob') return 'epic';
+    if (it.kind === 'hat') return 'rare';
+    if (it.kind === 'outfit' && EARN[it.id]) return earnTier(it.id);
+    var cost = (it.kind === 'outfit' ? OUTFIT_COST : COLOR_COST)[it.id] || 0; return cost >= CONFIG.rareAt ? 'rare' : 'uncommon';
+  }
+  /* Find newly-earned rewards and record them. Uncommon ones are limited per session (day); everything earned goes into
+     p.pace.queue and is celebrated together back in the hub (celebrateSession). Returns [{kind, id, tier}] earned now. */
   function check(p) {
+    if (!p || p.guest) return [];
+    grandfather(p); var P = pace(p), d = today(); if (P.day !== d) { P.day = d; P.n = 0; }
+    var x = stats(p), cand = [], bl = p.unlocks.blobs || (p.unlocks.blobs = {});
+    cast().unlockable.forEach(function (u) { if (!bl[u.id] && charProgress(p, u.id, x).ok && (!A.Blobs || !A.Blobs.byId || A.Blobs.byId[u.id])) cand.push({ kind: 'blob', id: u.id }); });
+    var th = (p.popquiz || {}).themes || {}; Object.keys(th).forEach(function (t) { var o = CONFIG.hats[t]; if (o && A.Blobs && A.Blobs.outfitById && A.Blobs.outfitById[o] && !p.unlocks.outfits[o]) cand.push({ kind: 'hat', id: o }); });
+    STICKERS.forEach(function (s) { if (!p.stickers[s.id] && s.test(p)) cand.push({ kind: 'sticker', id: s.id }); });
+    Object.keys(EARN).forEach(function (id) { if (!p.unlocks.outfits[id] && earnOk(p, id, x)) cand.push({ kind: 'outfit', id: id }); });
+    Object.keys(OUTFIT_COST).forEach(function (id) { if (OUTFIT_COST[id] > 0 && !p.unlocks.outfits[id] && costOk(p, 'outfit', id, x)) cand.push({ kind: 'outfit', id: id }); });
+    Object.keys(COLOR_COST).forEach(function (id) { if (COLOR_COST[id] > 0 && !p.unlocks.colors[id] && costOk(p, 'color', id, x)) cand.push({ kind: 'color', id: id }); });
     var out = [];
-    STICKERS.forEach(function (s) { if (!p.stickers[s.id] && s.test(p)) { p.stickers[s.id] = Date.now(); out.push({ kind: 'sticker', id: s.id }); } });
-    Object.keys(OUTFIT_COST).forEach(function (id) { if (OUTFIT_COST[id] > 0 && !p.unlocks.outfits[id] && p.stars >= OUTFIT_COST[id]) { p.unlocks.outfits[id] = Date.now(); out.push({ kind: 'outfit', id: id }); } });
-    Object.keys(COLOR_COST).forEach(function (id) { if (COLOR_COST[id] > 0 && !p.unlocks.colors[id] && p.stars >= COLOR_COST[id]) { p.unlocks.colors[id] = Date.now(); out.push({ kind: 'color', id: id }); } });
+    cand.forEach(function (it) {
+      it.tier = tierOf(it);
+      if (it.tier === 'uncommon') { if (P.n >= CONFIG.uncommonPerSession) return; P.n++; }
+      var t = Date.now();
+      if (it.kind === 'sticker') p.stickers[it.id] = t; else if (it.kind === 'outfit' || it.kind === 'hat') p.unlocks.outfits[it.id] = t; else if (it.kind === 'color') p.unlocks.colors[it.id] = t; else bl[it.id] = t;
+      if (it.kind === 'blob' || /^master/.test(it.id)) { var ms = masteredSkills(p).slice(-1)[0]; if (ms) it.skill = ms.id; }
+      out.push(it); P.queue.push({ kind: it.kind, id: it.id, tier: it.tier, skill: it.skill || null });
+    });
     return out;
   }
+  // "You can compare numbers to 20 now!" — what was learned (skill.can if a skill has one, else its short description)
+  function learnedLine(sid) { var s = A.Curriculum && A.Curriculum.byId[sid]; if (!s) return ''; return s.can ? 'You can ' + s.can + ' now!' : 'You mastered ' + (s.short || s.name) + '!'; }
+  // the old "next star prize" (outfit/color by stars)
+  // the next star prize, skipping anything the player already owns (e.g. the colour picked at creation)
   function nextGoal(p) {
     var all = [];
-    Object.keys(OUTFIT_COST).forEach(function (id) { if (OUTFIT_COST[id] > p.stars) all.push({ kind: 'outfit', id: id, cost: OUTFIT_COST[id] }); });
-    Object.keys(COLOR_COST).forEach(function (id) { if (COLOR_COST[id] > p.stars) all.push({ kind: 'color', id: id, cost: COLOR_COST[id] }); });
+    Object.keys(OUTFIT_COST).forEach(function (id) { if (OUTFIT_COST[id] > p.stars && !CONFIG.outfitNeed[id] && !unlocked(p, 'outfit', id)) all.push({ kind: 'outfit', id: id, cost: OUTFIT_COST[id] }); });
+    Object.keys(COLOR_COST).forEach(function (id) { if (COLOR_COST[id] > p.stars && !CONFIG.colorNeed[id] && !unlocked(p, 'color', id) && p.color !== id) all.push({ kind: 'color', id: id, cost: COLOR_COST[id] }); });
     all.sort(function (a, b) { return a.cost - b.cost; }); return all[0] || null;
+  }
+  function goals(p) { var x = stats(p); return CONFIG.goals.map(function (g) { var need = g.of === 'friends' ? x.friendsAll : g.need, have = Math.min(x[g.of] || 0, need);
+    return { id: g.id, name: g.name, icon: g.icon, have: have, need: need, pct: need ? Math.round(100 * have / need) : 100, done: have >= need }; }); }
+  // long-term goal for the "next goal" bar: the first unfinished CONFIG.goals entry
+  function longGoal(p) { return goals(p).filter(function (g) { return !g.done; })[0] || null; }
+  function itemName(it) {
+    if (it.kind === 'sticker') return STK_BY[it.id].name;
+    if (it.kind === 'outfit' || it.kind === 'hat') return (A.Blobs && A.Blobs.outfitById[it.id] || { name: it.id }).name;
+    if (it.kind === 'color') return (A.Blobs && A.Blobs.colorById[it.id] || { name: it.id }).name + ' color';
+    if (it.kind === 'blob') return charName(it.id);
+    return it.id;
+  }
+  function itemArt(p, it) {
+    if (it.kind === 'sticker') return stickerSVG(STK_BY[it.id].art);
+    if (it.kind === 'outfit' || it.kind === 'hat') return A.Blobs.svg({ blob: p.blob, color: p.color, outfit: it.id });
+    if (it.kind === 'color') return A.Blobs.svg({ blob: p.blob, color: it.id, outfit: p.outfit });
+    return A.Blobs.svg({ blob: it.id, expr: 'happy' });
+  }
+  /* new-friend reveal: a picnic basket shakes, opens, and the friend pops out (art/theme/unlock -> assets/picnic/unlock,
+     built by tools/build-unlock-art.js with no sparkle or glow). Friends without reveal art just show in the prize list. */
+  var UNLOCK_ROOT = (function () { var sc = typeof document !== "undefined" && document.currentScript; return sc && sc.src ? sc.src.replace(/js\/core\/rewards\.js(\?.*)?$/, '') + 'assets/picnic/unlock/' : 'assets/picnic/unlock/'; })();
+  var REVEAL_IDS = ['mochi', 'banana', 'pear', 'carrot', 'broccoli', 'sushi', 'taco', 'pizza', 'pancake', 'cupcake', 'avocado', 'watermelon', 'pretzel', 'grapes', 'onigiri', 'pineapple', 'waffle', 'lemon', 'donut', 'popcorn', 'peach', 'cheese', 'cookie'];
+  function hasRevealArt(id) { return REVEAL_IDS.indexOf(id) >= 0; }
+  function lockedArt(id) { return hasRevealArt(id) ? UNLOCK_ROOT + 'locked_' + id + '.webp' : ''; }
+  function revealHTML(id) {
+    var u = function (n) { return '<img src="' + UNLOCK_ROOT + n + '.webp" alt="" draggable="false">'; };
+    return '<div class="fbasket" aria-hidden="true"><span class="fb1">' + u('basket_closed') + '</span><span class="fb2">' + u('basket_opening') + '</span><span class="fb3">' + u('basket_open') + '</span>' +
+      '<span class="fb4">' + u('reveal_' + id) + '</span></div><p class="fbname">' + A.esc(charName(id)) + '</p>';
+  }
+  /* end of session (back in the hub): ONE card with up to CONFIG.cardsPerSession prizes (biggest first); extras stay queued */
+  var ORDER = { epic: 0, rare: 1, uncommon: 2 };
+  function takeSession(p) { var P = pace(p); P.queue.sort(function (a, b) { return (a.tier in ORDER ? ORDER[a.tier] : 2) - (b.tier in ORDER ? ORDER[b.tier] : 2); });
+    var now = P.queue.slice(0, CONFIG.cardsPerSession); P.queue = P.queue.slice(CONFIG.cardsPerSession); return now; }
+  function celebrateSession(p) {
+    if (!p || !pace(p).queue.length) return Promise.resolve(false);
+    var items = takeSession(p), left = pace(p).queue.length; if (A.Store) A.Store.save();
+    var learned = items.filter(function (it) { return it.skill; }).map(function (it) { return learnedLine(it.skill); })[0] || '';
+    var html = '<div class="sessprizes">' + items.map(function (it) { return '<div class="sp ' + it.tier + '"><span class="spa">' + itemArt(p, it) + '</span><b>' + A.esc(itemName(it)) + '</b>' +
+      '<small>' + ({ blob: 'New friend!', sticker: 'Sticker', outfit: 'Outfit', hat: 'Hat', color: 'Color' }[it.kind] || '') + (it.tier === 'rare' || it.tier === 'epic' ? ' ★' : '') + '</small>' + '</div>'; }).join('') + '</div>' +
+      (learned ? '<p class="splearn">' + A.esc(learned) + '</p>' : '') + (left ? '<p class="spmore">+' + left + ' more waiting for next time!</p>' : '');
+    var voice = ['rw_session_prizes']; if (items.some(function (it) { return it.kind === 'blob'; })) voice.push('rw_new_friend'); if (learned) voice.push('rw_you_learned'); if (left) voice.push('rw_more_next_time');
+    var nf = items.filter(function (it) { return it.kind === 'blob' && hasRevealArt(it.id); })[0];
+    return A.UI.card({ tag: "Today's prizes", title: items.length === 1 ? itemName(items[0]) : 'You earned ' + items.length + ' prizes!', art: nf ? revealHTML(nf.id) : '', html: html, glow: !items.some(function (it) { return it.kind === 'blob'; }),
+      voice: voice, sfx: 'unlock', confetti: !nf, btn: 'Yay!', cls: 'reward session' + (nf ? ' newfriend' : ''), minMs: nf ? 1800 : 0 }).then(function () { return true; });
   }
   // Show celebration cards one after another
   function celebrate(p, items, who) { // who: show the player name on each card (two-player mode)
@@ -98,6 +406,7 @@
     var chain = Promise.resolve();
     (items || []).forEach(function (it) {
       chain = chain.then(function () {
+        if (it.kind !== 'skill' && !it.now) { if (!pre) A.UI.toast('🎁 ' + itemName(it) + ' — saved for the end!'); return; }   // batch-celebrated in the hub
         if (it.kind === 'sticker') {
           var s = STK_BY[it.id];
           return A.UI.card({ tag: pre + 'New sticker!', title: s.name, art: stickerSVG(s.art), glow: true, sub: s.hint, voice: ['hub_new_sticker'], sfx: 'unlock', confetti: true, btn: 'Yay!', cls: 'reward' });
@@ -119,5 +428,9 @@
     return chain;
   }
 
-  A.Rewards = { STICKERS: STICKERS, stickerById: STK_BY, stickerSVG: stickerSVG, OUTFIT_COST: OUTFIT_COST, COLOR_COST: COLOR_COST, unlocked: unlocked, check: check, celebrate: celebrate, nextGoal: nextGoal };
+  A.Rewards = { CONFIG: CONFIG, BADGES: BADGES, badge: badge, stats: stats, weeksMet: weeksMet, weekDays: weekDays, charRule: charRule, charProgress: charProgress, charHint: charHint, nextFriend: nextFriend,
+    characters: function () { return CONFIG.characters; }, popQuizTheme: popQuizTheme, effort: effort, furniturePrice: furniturePrice, applyRoomPrices: applyRoomPrices, grandfather: grandfather, pace: pace,
+    longGoal: longGoal, goals: goals, takeSession: takeSession, celebrateSession: celebrateSession, revealHTML: revealHTML, hasRevealArt: hasRevealArt, lockedArt: lockedArt, itemName: itemName, tierOf: tierOf, learnedLine: learnedLine,
+    STICKERS: STICKERS, stickerById: STK_BY, stickerSVG: stickerSVG, OUTFIT_COST: OUTFIT_COST, COLOR_COST: COLOR_COST, unlocked: unlocked, check: check, celebrate: celebrate, nextGoal: nextGoal,
+    OUTFIT_EARN: EARN, earnOk: earnOk, earnHint: earnHint, earnShort: earnShort, earnProgress: earnProgress, earnTier: earnTier };
 })(window.Arcade);

@@ -56,7 +56,7 @@
       var r = gen(L), good = r.good(), cells = [good], keys = {}, labels = {}, g = 0; keys[good.k] = 1; labels[good.label] = 1;
       while (cells.length < n && g++ < 300) { var b = r.bad(); if (!keys[b.k] && !labels[b.label]) { keys[b.k] = 1; labels[b.label] = 1; cells.push(b); } }
       var arr = A.shuffle(cells.slice()), Q = q(r);
-      return { text: Q.text, pic: Q.pic || null, say: Q.say, fact: good.fact, answer: arr.indexOf(good), target: r.target,
+      return { text: Q.text, pic: Q.pic || null, say: Q.say, listen: !!(Q.listen || r.listen), fact: good.fact, answer: arr.indexOf(good), target: r.target,
         choices: arr.map(function (c) { return { label: c.label, html: c.html, say: c.name, k: c.k }; }) };
     };
   }
@@ -136,17 +136,20 @@
 
   /* ----- Sight words (Reading & Words) ----- */
   function swLine(w) { return A.SightWords.lineId(w); }
-  SK.push({ id: 'sight', name: 'Sight words', short: 'Dolch pre-primer words', strand: 'Sight words', std: 'K.RF.3c', grade: 'PK–K', subject: 'reading', sayFact: false, secs: [10, 11],
+  SK.push({ id: 'sight', name: 'Sight words', short: 'Dolch pre-primer words', strand: 'Sight words', std: 'K.RF.3c', grade: 'PK–K', subject: 'reading', sayFact: true, listen: true, secs: [10, 11],
     levels: ['First 20 words', 'All 40 pre-primer words'],
     intro: { line: 'skill_sight', example: wordHtml('the') + ' ' + wordHtml('and') + ' ' + wordHtml('see') },
     gen: function (L) {
       var pool = E.SIGHT_LEVELS[L], T = pick(pool);
-      var like = pool.filter(function (w) { return w !== T && (w.charAt(0).toLowerCase() === T.charAt(0).toLowerCase() || w.length === T.length); });
-      function mk(w) { return { label: w, html: wordHtml(w), fact: ['sw_that_says', swLine(w)], name: [swLine(w)], k: w.toLowerCase() }; }
-      return { text: 'Munch the word ' + em(T), hint: 'Look at every letter!', say: ['rule_sight', swLine(T)], target: T,
-        good: function () { return mk(T); }, bad: function () { return mk(like.length && Math.random() < (L ? .55 : .3) ? pick(like) : pick(others(pool, T))); } };
+      // audio-only prompt: the word is not printed; choices are silent; a sound-alike (to / two) is never a wrong choice
+      var alike = A.Grade1Words && A.Grade1Words.soundsAlike || function (a, b) { return a === b; };
+      var ok = pool.filter(function (w) { return !alike(w, T); });
+      var like = ok.filter(function (w) { return w.charAt(0).toLowerCase() === T.charAt(0).toLowerCase() || w.length === T.length; });
+      function mk(w) { return { label: w, html: wordHtml(w), fact: w === T ? ['sw_that_says', swLine(w)] : ['rule_sight', swLine(T)], name: [], k: w.toLowerCase() }; }
+      return { text: '<span class="listen">Listen and find the word</span>', listen: true, hint: 'Tap 🔊 to hear it again. Listen for the first sound, then look for the letter that makes it.', say: ['rule_sight', swLine(T)], target: T,
+        good: function () { return mk(T); }, bad: function () { return mk(like.length && Math.random() < (L ? .55 : .3) ? pick(like) : pick(ok)); } };
     } });
-  SK[5].ask = askFrom(SK[5].gen, function (r) { return { text: 'Find the word ' + em(r.target), say: ['sw_find', swLine(r.target)] }; });
+  SK[5].ask = askFrom(SK[5].gen, function (r) { return { text: '<span class="listen">Listen and find the word</span>', listen: true, say: ['sw_find', swLine(r.target)] }; });
 
   // concepts first (colors, shapes), then reading (letters, beginning sounds, rhymes, sight words); math order is unchanged
   SK.forEach(function (s) { C.register(s); });
@@ -165,7 +168,7 @@
     var s = C.current(p, subj), st = C.state(p, s.id), b = p.bonus || (p.bonus = { asked: 0, right: 0, recent: [] }), recent = b.recent || (b.recent = []), q, id, g = 0;
     do { q = A.Questions.make(s, st.level, { choices: p.age != null && p.age <= 5 ? 3 : 4 }); id = 'skill:' + s.id + ':' + q.target + ':' + q.choices[q.answer].label; } while (recent.indexOf(id) >= 0 && g++ < 12);
     recent.push(id); while (recent.length > 60) recent.shift();   // not the same question again soon
-    return { id: id, skill: s.id, level: st.level, cat: 'skill', d: 1, q: plain(q.text), line: null, parts: q.say, answer: q.answer,
+    return { id: id, skill: s.id, level: st.level, cat: 'skill', d: 1, q: plain(q.text), line: null, parts: A.ReadAloud ? A.ReadAloud.auto(p, q) : q.say, partsAll: q.say, fact: q.fact || [], listen: !!q.listen, answer: q.answer,
       choices: q.choices.map(function (c) { return { emoji: c.html || A.esc(c.label), text: c.label, hideText: true, parts: c.say || [c.label] }; }) };
   }
   BQ.pick = function (p, opt) {

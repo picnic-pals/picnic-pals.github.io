@@ -1,4 +1,4 @@
-/* Blob Arcade — every spoken line, with an ID. This one list drives:
+/* Picnic Pals — every spoken line, with an ID. This one list drives:
    - the in-app recorder (parent area), - voice playback, - RECORDING_SCRIPT.md (tools/build-recording-script.js).
    File name for a line = <id>.mp3 (or .m4a / .wav / .webm).
    Sentences are COMPOSED from parts, e.g. ['munch_rule_make', 7] -> "Munch the ones that make" + "7". */
@@ -16,24 +16,34 @@
     ['hub_pick_game', 'What do you want to play?'],
     ['hub_coming_soon', 'That game is coming soon!'],
     ['hub_stickers', 'Here is your sticker book!'],
-    ['hub_closet', 'Dress-up time! Pick your blob, a color, and an outfit.'],
-    ['hub_im', "Hi, I'm", 'Followed by a blob name, e.g. "Hi, I\'m" + "Mochi!"'],
+    ['hub_closet', 'Dress-up time! Pick your friend, a backdrop color, a hat, and something to hold.'],
+    ['hub_im', "Hi, I'm", 'Followed by a friend name, e.g. "Hi, I\'m" + "Jammy!"'],
     ['hub_looking_good', 'Looking good!'],
     ['hub_locked', 'Keep earning stars to unlock that one!'],
+    ['hub_you_need', 'You need', 'Followed by a number, then "more stars to go!"'], ['hub_more_stars', 'more stars to go!'], ['hub_more_star', 'more star to go!'],
     ['hub_new_sticker', 'You got a new sticker!'],
     ['hub_new_outfit', 'You unlocked a new outfit!'],
     ['hub_new_color', 'You unlocked a new color!'],
     ['hub_grownups', 'That button is for grown-ups.'],
-    ['hub_lets_go', "Let's go!"]
+    ['hub_ask_grownup', 'Ask a grown-up for help.'],
+    ['hub_lets_go', "Let's go!"],
+    ['hub_continue', "Let's keep playing!"]
   ]);
-  sec('names', 'Player & blob names', 'now', 'Say each name brightly, like you are introducing them. (Kids\' own names are spoken by the browser voice.)', [
-    ['pl_one', 'Player 1!'], ['pl_two', 'Player 2!'],
-    ['blob_mochi', 'Mochi!'], ['blob_poppy', 'Poppy!'], ['blob_dewdrop', 'Dewdrop!'],
-    ['blob_pickle', 'Pickle!'], ['blob_nova', 'Nova!'], ['blob_clem', 'Clem!']
+  sec('rewards', 'Prizes & goals', 'now', 'End-of-session prize card, save toast and goals.', [
+    ['rw_session_prizes', 'Look at the prizes you earned today!'],
+    ['rw_new_friend', 'You made a new friend!'],
+    ['rw_you_learned', 'You learned something new. Hooray for you!'],
+    ['rw_more_next_time', 'More prizes are waiting for next time!'],
+    ['rw_saved', 'All saved!'],
+    ['rw_next_goal', "Here's your next goal!"]
   ]);
-  sec('munch', 'Mochi Munch', 'now', 'Rule lines are followed by a number clip, e.g. "Munch the ones that make" + "7".', [
-    ['munch_title', 'Mochi Munch!'],
+  sec('names', 'Player & friend names', 'now', 'Say each name brightly, like you are introducing them. (Kids\' own names are spoken by the browser voice.) Friend names marked * are placeholders.', [
+    ['pl_one', 'Player 1!'], ['pl_two', 'Player 2!']
+  ].concat(((A.FoodData && A.FoodData.cast) || []).map(function (c) { return ['blob_' + c.id, c.name + '!', c.food + (c.placeholder ? ' (placeholder name)' : '')]; })));
+  sec('munch', A.TITLES.munch, 'now', 'Rule lines are followed by a number clip, e.g. "Munch the ones that make" + "7".', [
+    ['munch_title', 'Picnic Munch!'],
     ['munch_ready', 'Ready? Press the space bar, or tap Play!'],
+    ['munch_ready_touch', 'Ready? Tap a square to walk, and tap your friend to munch. Tap Play!', 'Touch screens (no keyboard)'],
     ['munch_intro', 'Help me munch the right ones!'],
     ['munch_how_keys', 'Use the arrow keys to move. Press space to munch!'],
     ['munch_how_touch', 'Tap a square to walk there. Tap me to munch!'],
@@ -71,6 +81,11 @@
     ['fb_detour', "Let's play one you know, then come back to this one!"],
     ['fb_back_now', "Nice! Now let's go back to the new one!"],
     ['fb_review_good', 'You still remember it! Great!'],
+    ['coach_streak5', 'Five in a row! Super streak!', 'Streak reward (with confetti) after 5 right answers in a row'],
+    ['coach_streak10', 'Ten in a row! You are amazing!', 'Streak reward after 10, 15, 20 … right answers in a row'],
+    ['coach_watch_me', "Let's do one together. Watch me!", 'Worked example after 3 misses in a row'],
+    ['coach_easy_one', "Let's try an easy one. You can do it!", 'Ease off after 2 misses in a row (an easier snack glows)'],
+    ['coach_test_out', 'You are so speedy! Next round is a quick test to skip ahead!', 'After 5 fast right answers in a row: the next round is a 5-question test-out'],
     ['fb_keep_going', 'Keep going!'],
     ['fb_new_skill', 'New skill!'],
     ['fb_try_again', 'Try again!']
@@ -88,7 +103,7 @@
     ['skill_evenodd', 'Even and odd! Even numbers make pairs. Odd numbers have one left over.']
   ]);
   if (A.EarlyWords) sec('early', 'Colors, shapes, letters & words (new skills)', 'now', 'Rules, letter names and picture words for the Reading & Words and Early Concepts skills. Say letter NAMES ("bee", not "buh"). Picture words: say each word on its own, clearly.', A.EarlyWords.VOICE);
-  sec('munch2', 'Mochi Munch: timer, bonus questions & two players', 'now', 'Lines with "+ name" are followed by a player name, e.g. "That one is for" + "Player 2!".', [
+  sec('munch2', A.TITLES.munch + ': timer, bonus questions & two players', 'now', 'Lines with "+ name" are followed by a player name, e.g. "That one is for" + "Player 2!".', [
     ['munch_times_up', "Time's up! Let's see how you did!"],
     ['munch_little_time', 'Just a little time left!'],
     ['fb_careful', "Careful munching! Let's try that one again."],
@@ -113,7 +128,7 @@
     ['hub_team', 'Team!'], ['hub_race', 'Race!'],
     ['name_guest', 'Guest!']
   ]);
-  sec('munch3', 'Mochi Munch: menu, levels & high scores', 'now', 'Short, bright and friendly.', [
+  sec('munch3', A.TITLES.munch + ': menu, levels & high scores', 'now', 'Short, bright and friendly.', [
     ['menu_pick', 'Story, free play, or two players?'],
     ['menu_story', 'Story!'], ['menu_free', 'Free play!'],
     ['lvl_level', 'Level', '+ number, e.g. "Level" + "3"'],
@@ -133,7 +148,7 @@
     ['story_high_scores', 'High scores!'],
     ['story_new_journey', 'A brand new journey! Here we go!'],
     ['hub_new_player', "Let's make a new player! What's your name?"],
-    ['hub_pick_blob', 'Pick your blob!'],
+    ['hub_pick_blob', 'Pick your friend!'],
     ['hub_pick_color', 'Pick a color!'],
     ['hub_welcome', 'Welcome to the arcade!'],
     ['hub_bye', 'Bye bye! See you soon!'],
@@ -144,14 +159,14 @@
     ['ch_fail_acc', 'Careful munching wins the challenge. Try again!'],
     ['ch_won_again', 'You beat the challenge again! Super fast!'],
     ['unlock_pick', 'You can be your new friend in Dress Up!'],
-    ['hub_locked_blob', 'That friend is waiting on Blob Island. Win the challenge in Story mode!']
+    ['hub_locked_blob', 'That friend is still on the way. Keep learning to meet them!']
   ]);
   if (A.Story) {
-    var st = [['story_title', 'Blob Island!'], ['story_prologue', A.Story.PROLOGUE], ['story_finale', A.Story.FINALE]];
+    var st = [['story_title', A.Story.WORLD + '!'], ['story_prologue', A.Story.PROLOGUE], ['story_finale', A.Story.FINALE]];
     A.Story.AREAS.forEach(function (a) { st.push(['area_' + a.id, a.name + '!', 'Area name on the island map']); });
     A.Story.AREAS.forEach(function (a) { st.push(['beat_' + a.id, a.beat, 'Said by ' + a.friend.charAt(0).toUpperCase() + a.friend.slice(1) + ' when you arrive at ' + a.name]); });
-    A.Story.CH.forEach(function (c) { var nm = c.blob.charAt(0).toUpperCase() + c.blob.slice(1); st.push(['unlock_' + c.blob, nm + ' joined the team!']); st.push(['hi_' + c.blob, c.hi, 'Said by ' + nm + ' when they join the team (in their own personality)']); });
-    sec('story', 'Mochi Munch story: Blob Island', 'later', 'Story-book voice, warm and excited. The built-in voice already covers these.', st);
+    A.Story.CH.forEach(function (c) { var nm = (((A.FoodData && A.FoodData.cast) || []).filter(function (f) { return f.id === c.blob; })[0] || {}).name || (c.blob.charAt(0).toUpperCase() + c.blob.slice(1)); /* the friend's name, not the internal id */ st.push(['unlock_' + c.blob, nm + ' joined the team!']); st.push(['hi_' + c.blob, c.hi, 'Said by ' + nm + ' when they join the team (in their own personality)']); });
+    sec('story', A.TITLES.munch + ' story: ' + A.Story.WORLD, 'later', 'Story-book voice, warm and excited. The built-in voice already covers these.', st);
   }
   var n20 = []; for (var i = 0; i <= 20; i++) n20.push(['num_' + i, String(i)]);
   sec('numbers', 'Numbers 0–20', 'now', 'Say each number on its own, clearly and cheerfully (not like a question).', n20);
@@ -167,8 +182,8 @@
   sec('dolch_pp', 'Sight words: Dolch Pre-Primer (40)', 'later', 'Say each word once, clearly, the way you would read it to a little one.', words(A.SightWords.PREPRIMER));
   sec('dolch_p', 'Sight words: Dolch Primer (52)', 'later', '', words(A.SightWords.PRIMER));
 
-  sec('baseball', 'Blob Baseball', 'now', 'The umpire lines ("Strike!", "You\'re out!", "Home run!") can be big and loud, like a real umpire. Lines with "+ number" or "+ name" are followed by one.', [
-    ['bb_title', 'Blob Baseball!'], ['bb_play_ball', 'Play ball!'], ['bb_batter_up', 'Batter up!', 'Also followed by a name: "Batter up," + "Player 1!"'],
+  sec('baseball', A.TITLES.baseball, 'now', 'The umpire lines ("Strike!", "You\'re out!", "Home run!") can be big and loud, like a real umpire. Lines with "+ number" or "+ name" are followed by one.', [
+    ['bb_title', 'Snack Slugger!'], ['bb_play_ball', 'Play ball!'], ['bb_batter_up', 'Batter up!', 'Also followed by a name: "Batter up," + "Player 1!"'],
     ['bb_swing', 'Swing!'], ['bb_strike', 'Strike!'], ['bb_strike_two', 'Strike two!'], ['bb_strike_three', "Strike three! You're out!"],
     ['bb_ball', 'Ball!'], ['bb_foul', 'Foul ball!'], ['bb_hit', "It's a hit!"], ['bb_single', 'Single!'],
     ['bb_double', 'Double!'], ['bb_triple', 'Triple!'], ['bb_home_run', 'Home run!'], ['bb_grand_slam', 'A grand slam!'],
@@ -176,14 +191,14 @@
     ['bb_safe', 'Safe!'], ['bb_out', "You're out!"], ['bb_caught', 'Caught it! That\'s an out!'], ['bb_three_outs', 'Three outs! Switch sides!'], ['bb_three_outs_next', 'Three outs! On to the next inning!'],
     ['bb_inning_over', "That's the inning! Great batting!"], ['bb_inning', 'Inning', '+ number, e.g. "Inning" + "2"'], ['bb_last_inning', 'Last inning!'],
     ['bb_next_inning', 'Next inning!'], ['bb_great_swing', 'Great swing!'], ['bb_swing_tip', 'Pick your swing! A single is easy. A home run is a challenge. Get it right, and you hit it!'],
-    ['bb_pick_swing', 'Pick your swing!'], ['bb_sw_single', 'A single! Nice and easy.'], ['bb_sw_double', 'A double! Just right.'],
+    ['bb_pick_swing', 'Pick your swing!'], ['bb_intro_howto', 'Pick your swing, then answer the pitch! Harder questions hit farther!'], ['bb_one_player_sub', 'Three innings. Harder questions hit farther!'], ['bb_sw_single', 'A single! Nice and easy.'], ['bb_sw_double', 'A double! Just right.'],
     ['bb_sw_triple', 'A triple! Here comes a tricky one.'], ['bb_sw_homer', 'Going for a home run! Here comes a challenge!'],
     ['bb_big_whiff', 'Whoosh! What a big swing! That is just one strike.'], ['bb_nudge', 'The crowd wants a big swing! Want to try a double or a triple?'],
     ['bb_time_strike', "Out of time! That's a strike."], ['bb_you_scored', 'You scored', '+ number + "runs!"'], ['bb_runs', 'runs!'], ['bb_run', 'run!'],
     ['bb_wins_game', 'wins the game!', 'After a name: "Player 1" + "wins the game!"'], ['bb_tie_game', "It's a tie game! What a game!"],
     ['bb_you_win', 'You win the game!'], ['bb_good_game', 'Good game!'], ['bb_new_high', 'A new high score!'], ['bb_high_scores', 'High scores!']
   ]);
-  sec('baseballq', 'Blob Baseball questions (sentence parts)', 'now', 'Question starters, joined with numbers: "What\'s" + "5" + "plus" + "7" → "What\'s five plus seven?". Say them like the start of a question.', [
+  sec('baseballq', A.TITLES.baseball + ' questions (sentence parts)', 'now', 'Question starters, joined with numbers: "What\'s" + "5" + "plus" + "7" → "What\'s five plus seven?". Say them like the start of a question.', [
     ['bbq_whats', "What's"], ['bbq_how_many_dots', 'How many dots?'], ['bbq_find', 'Find the number', '+ number'],
     ['bbq_biggest', 'Which number is the biggest?'], ['bbq_smallest', 'Which number is the smallest?'],
     ['bbq_even', 'Which number is even?'], ['bbq_odd', 'Which number is odd?'],
@@ -197,14 +212,14 @@
     ['pk_tie', "It's a tie! One more kick!"]
   ]);
 
-  sec('room', 'Blob Room', 'now', 'Cozy and warm, like showing a friend around your room.', [
-    ['rm_title', 'My Room!'], ['rm_welcome', 'Welcome to your very own room!'], ['rm_welcome_back', 'Welcome home!'],
+  sec('room', 'Picnic Spot', 'now', 'Cozy and warm, like showing a friend around your room.', [
+    ['rm_title', 'My Picnic Spot!'], ['rm_it_costs', 'It costs', 'Followed by a number, then "star bits. You have" + number'], ['rm_bits_you_have', 'star bits. You have'], ['rm_welcome', 'Welcome to your very own picnic spot!'], ['rm_welcome_back', 'Welcome home!'],
     ['rm_shop', "Let's go shopping! What would you like?"], ['rm_decorate', "Let's decorate! Pick a thing, then pick a spot."],
     ['rm_pick_spot', 'Pick a spot!'], ['rm_placed', 'There! It looks great!'], ['rm_bought', "It's yours! Hooray!"],
     ['rm_need_more', 'You need a few more star bits. Play a game to earn some!'], ['rm_costs', 'It costs', '+ number + "star bits."'],
     ['rm_star_bits', 'star bits.'], ['rm_put_away', 'Put away!'], ['rm_undo', 'Undo!'], ['rm_flip', 'Flip!'],
     ['rm_spot_taken', 'That spot is taken. Try another one!'], ['rm_new_wall', 'Ooh, new wallpaper!'], ['rm_new_floor', 'Ooh, a new floor!'],
-    ['rm_trophies', 'Here is your trophy shelf!'], ['rm_friends', 'Here are your blob friends!'],
+    ['rm_trophies', 'Here is your trophy shelf!'], ['rm_friends', 'Here are your picnic friends!'],
     ['rm_locked_friend', 'This friend is still a secret! Win a story challenge to meet them.'],
     ['rm_locked_item', 'This one is a special prize! Keep playing to win it.'], ['rm_prize_won', 'You won a special prize for your room!'],
     ['rm_friend_up', "You're even better friends now!"], ['rm_shh', "Shh... they're napping."], ['rm_bye', 'Bye bye! See you soon!'],
@@ -212,6 +227,20 @@
     ['fr_unlock_likes', 'Now you know what I like!'], ['fr_unlock_face', 'I learned a new face! Look!'],
     ['fr_unlock_more', 'Now you know all about me!'], ['fr_unlock_gift', 'I made you a present for your room!'],
     ['fr_lvl1', 'New friend!'], ['fr_lvl2', 'Pal!'], ['fr_lvl3', 'Good friend!'], ['fr_lvl4', 'Best friend!'], ['fr_lvl5', 'Forever friend!']
+  ]);
+  sec('coach2', 'Coach v2: placement check, mistake hints, picnic story problems', 'now', 'Story problems are built from short parts, e.g. "Biscuit" + "found" + 3 + "apples" + "in the picnic basket, and" + 4 + "more under the blanket." + "How many" + "apples". A custom pet name is read by the browser voice.', [
+    ['skill_wordprob', 'Story problems! Listen to the picnic story, then find how many.'],
+    ['place_intro', "Let's see what you already know!"], ['place_skip', 'Wow! You already know this one. Let\'s skip ahead!'],
+    ['place_higher', "Great job! Let's start a little higher."], ['place_normal', "Thanks! Let's learn it together."],
+    ['err_teen', 'Teen numbers start with one ten. Tens first, then ones.'], ['err_count_on', 'Start from the number, then count up.'], ['err_count_dots', 'Touch each dot and count them. One, two, three!'], ['err_count_back', 'Start from the big number, then count back.'], ['err_make_ten', 'How many more make ten? Count up to ten on your fingers.'], ['err_number_line', 'Say the numbers in order. Which one is missing?'],
+    ['err_bed', 'Make a bed with your hands. B comes first, d comes last.'], ['err_story', "Let's picture the story. Are we putting together, or taking away?"],
+    ['err_first_letter', 'Look at the first letter.'],
+    ['pet_biscuit', 'Biscuit', 'The default pet name'], ['wp_your_pet', 'Your pet', 'Said instead of a custom pet name when there is no speech voice'],
+    ['wp_found', 'found'], ['wp_f_apples', 'apples'], ['wp_f_strawberries', 'strawberries'], ['wp_f_blueberries', 'blueberries'], ['wp_f_carrots', 'carrots'],
+    ['wp_in_basket_and', 'in the picnic basket, and'], ['wp_more_blanket', 'more under the blanket.'], ['wp_how_many', 'How many'],
+    ['wp_friends_sat', 'food friends sat on the picnic blanket.'], ['wp_more_came', 'more came to the picnic.'], ['wp_how_many_friends', 'How many food friends are there now?'],
+    ['wp_had', 'had'], ['wp_in_basket', 'in the picnic basket.'], ['wp_ate', 'ate'], ['wp_left', 'are left?'],
+    ['wp_there_were', 'There were'], ['wp_on_blanket', 'on the blanket.'], ['wp_took', 'took'], ['wp_away', 'away.'], ['wp_how_many_left', 'How many are left?']
   ]);
   if (A.Friends) {
     var fl = [];
@@ -221,10 +250,16 @@
       o.taps.forEach(function (t, i) { fl.push(['fr_' + b + '_tap' + (i + 1), t, 'When tapped in the room']); });
       fl.push(['fr_' + b + '_nap', o.napLine, 'Sleepy, while napping']);
     });
-    sec('friends', 'Blob friends: bios and room chatter', 'now', 'Each blob talks about themselves. Give each one their own personality (sweet, dreamy, sporty, curious, silly, starry).', fl);
+    sec('friends', 'Picnic friends: bios and room chatter', 'later', 'Read by the browser voice until recorded. Each food friend talks about themselves. Give each one their own personality (see art/foods/bios.json).', fl);
   }
-  if (A.RoomCatalog) sec('roomitems', 'Blob Room things (' + A.RoomCatalog.ITEMS.length + ')', 'later', 'Item names, said brightly when a kid taps one in the shop.',
+  if (A.RoomCatalog) sec('roomitems', 'Picnic Spot things (' + A.RoomCatalog.ITEMS.length + ')', 'later', 'Item names, said brightly when a kid taps one in the shop.',
     A.RoomCatalog.ITEMS.map(function (it) { return ['it_' + it.id, it.name + '!']; }));
+
+  if (A.Blobs && A.Blobs.OUTFITS) sec('outfits', 'Dress Up hats and held items (' + (A.Blobs.OUTFITS.length - 1) + ')', 'later', 'Hat and held-item names, said brightly when a kid picks one in Dress Up.',
+    A.Blobs.OUTFITS.filter(function (o) { return o.id !== 'none'; }).map(function (o) { return ['ow_' + o.id, o.name + '!']; }));
+  // locked Dress Up tiles: the plain earn hint (rewards.js CONFIG.outfitEarn), read when a kid taps a locked hat/item
+  if (A.Blobs && A.Rewards && A.Rewards.OUTFIT_EARN) sec('outfithints', 'Dress Up: how to earn each locked hat or item', 'later', 'Friendly and encouraging, said when a kid taps a locked hat or held item.',
+    Object.keys(A.Rewards.OUTFIT_EARN).map(function (id) { return ['ow_' + id + '_hint', A.Rewards.earnHint({ stars: 0, days: {}, skills: {}, unlocks: { outfits: {}, colors: {}, blobs: {} }, story: { stops: {}, challenges: {} } }, id)]; }));
 
   if (A.BonusQ) {
     sec('bonusq', 'Bonus questions (' + A.BonusQ.QS.length + ')', 'later', 'Read each question like a friendly quiz host. The built-in voice already covers these, so record them whenever you like.',
@@ -232,6 +267,10 @@
     var seen = {}, ans = [];
     A.BonusQ.QS.forEach(function (q) { q.choices.forEach(function (c) { if (!seen[c.line]) { seen[c.line] = 1; ans.push([c.line, c.text]); } }); });
     sec('bonusc', 'Bonus question answers (' + ans.length + ')', 'later', 'Say each answer on its own, brightly. They are read out as choices, and after "The answer is".', ans);
+  }
+  if (A.Tiny) {
+    sec('tiny', 'Tiny Picnic (toddler mode)', 'now', 'Slow, warm and simple, for a 2-year-old. Prompts, gentle "that\'s a ..." lines for any tap, and cheers.', A.Tiny.LINES);
+    sec('playtime', 'Play-time limit & stretch breaks', 'now', 'Calm and kind. Said at a natural stopping point, never mid-question.', A.Tiny.PT_LINES);
   }
   var BY = {}, ALL = [];
   S.forEach(function (s) { s.lines.forEach(function (l) { l.section = s.id; BY[l.id] = l; ALL.push(l); }); });

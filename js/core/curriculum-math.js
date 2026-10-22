@@ -15,6 +15,40 @@
   function plus(a, b) { return { label: a + ' + ' + b, fact: [a, 'w_plus', b, 'w_is', a + b] }; }
   function minus(a, b) { return { label: a + ' − ' + b, fact: [a, 'w_minus', b, 'w_is', a - b] }; }
 
+  /* ---------- picnic story problems (word problems) ----------
+     Food friends, the picnic basket and the family pet. The pet's name is a grown-up setting kept only on this device
+     (A.Store.settings.pet = { name, type: 'dog' | 'cat' | 'other' }, default Biscuit the dog). The default name has a built-in
+     clip (pet_biscuit); any other name is said by the browser's speech voice, like player names (alt: "your pet"). */
+  var PET_EMOJI = { dog: '🐶', cat: '🐱', other: '🐾' };
+  var WP_FOODS = [{ id: 'apples', em: '🍎' }, { id: 'strawberries', em: '🍓' }, { id: 'blueberries', em: '🫐' }, { id: 'carrots', em: '🥕' }];
+  function pet() {
+    var s = (A.Store && A.Store.data && A.Store.settings && A.Store.settings.pet) || {}, nm = String(s.name || '').trim().slice(0, 16) || 'Biscuit', type = PET_EMOJI[s.type] ? s.type : 'dog';
+    var part = /^biscuit$/i.test(nm) ? 'pet_biscuit' : { id: 'petname_' + nm.toLowerCase().replace(/[^a-z0-9]/g, ''), text: nm, alt: ['wp_your_pet'] };
+    return { name: nm, type: type, em: PET_EMOJI[type], part: part };
+  }
+  // L: 0 = within 10, 1 = within 20. Returns a Munch rule (good cells = the answer) with .wp = { a, b, op, ans, food, em, text }
+  function wordProblem(L, forceOp) {
+    var P = pet(), f = pick(WP_FOODS), op = forceOp || (Math.random() < .5 ? '+' : '-'), max = L ? 20 : 10, a, b, ans, text, say, kind = rnd(0, 1);
+    if (op === '+') { ans = L ? rnd(11, 20) : rnd(3, 10); a = rnd(Math.max(1, ans - (L ? 10 : 9)), Math.min(L ? 10 : 9, ans - 1)); b = ans - a; }
+    else { a = L ? rnd(11, 20) : rnd(3, 10); b = rnd(1, L ? Math.min(10, a - 1) : a - 1); ans = a - b; }
+    var food = f.id;
+    if (op === '+' && kind === 0) { text = P.name + ' found ' + a + ' ' + food + ' in the picnic basket and ' + b + ' more under the blanket. How many ' + food + '?';
+      say = [P.part, 'wp_found', a, 'wp_f_' + food, 'wp_in_basket_and', b, 'wp_more_blanket', 'wp_how_many', 'wp_f_' + food]; }
+    else if (op === '+') { text = a + ' food friends sat on the picnic blanket. ' + b + ' more came to the picnic. How many food friends are there now?'; f = { id: 'friends', em: '🍓' };
+      say = [a, 'wp_friends_sat', b, 'wp_more_came', 'wp_how_many_friends']; }
+    else if (kind === 0) { text = P.name + ' had ' + a + ' ' + food + ' in the picnic basket. ' + P.name + ' ate ' + b + '. How many ' + food + ' are left?';
+      say = [P.part, 'wp_had', a, 'wp_f_' + food, 'wp_in_basket', P.part, 'wp_ate', b, 'wp_how_many', 'wp_f_' + food, 'wp_left']; }
+    else { text = 'There were ' + a + ' ' + food + ' on the blanket. ' + P.name + ' took ' + b + ' away. How many are left?';
+      say = ['wp_there_were', a, 'wp_f_' + food, 'wp_on_blanket', P.part, 'wp_took', b, 'wp_away', 'wp_how_many_left']; }
+    var wrongOp = op === '+' ? Math.abs(a - b) : a + b;
+    function mk(v) { return { label: String(v), fact: v === ans ? ['w_thats', v] : ['w_thats', v, 'w_not', ans] }; }
+    var pic = '<span class="wp-pic" aria-hidden="true"><span class="pet">' + P.em + '</span>' + (op === '+' ? Array(Math.min(a, 20) + 1).join(f.em) + ' + ' + Array(Math.min(b, 20) + 1).join(f.em) : Array(Math.min(a, 20) + 1).join(f.em)) + '</span>';
+    return { text: '<span class="wp-text">' + A.esc(text) + '</span>', plain: text, pic: pic, hint: 'Draw the story: make a dot for each one, then ' + (op === '+' ? 'put them together.' : 'cross out the ones that go away.'), say: say, story: true,
+      wp: { a: a, b: b, op: op, ans: ans, food: f.id, em: f.em, text: text, pet: P.name },
+      good: function () { return mk(ans); },
+      bad: function () { var r = Math.random(), v; if (r < .3 && wrongOp !== ans && wrongOp <= max + 10 && wrongOp >= 0) return mk(wrongOp); do { v = ans + pick([-2, -1, 1, 2, 3]); } while (v < 0 || v === ans); return mk(v); } };
+  }
+
   /* ---------- skill catalogue ----------
      status 'active' = playable now; 'later' = designed but not yet built (shown locked in the dashboard). */
   var SKILLS = [
@@ -44,7 +78,7 @@
       gen: function (L) {
         var T = L ? rnd(5, 10) : rnd(3, 6);
         function sum(s) { var a = (s >= 2 && !(L && Math.random() < .12)) ? rnd(1, s - 1) : rnd(0, s); return plus(a, s - a); }
-        return { text: 'Munch the ones that make ' + em(T), hint: 'Add them up!', say: ['munch_rule_make', T],
+        return { text: 'Munch the ones that make ' + em(T), hint: 'Start with the bigger number, then count on.', say: ['munch_rule_make', T],
           good: function () { return sum(T); }, bad: function () { return sum(near(T, 1, 10, [-2, -1, 1, 2])); } };
       } },
     { id: 'sub10', name: 'Take away to 10', short: 'Subtraction within 10', strand: 'Add & subtract', std: '1.OA.6', grade: '1', sayFact: true,
@@ -53,7 +87,7 @@
       gen: function (L) {
         var T = L ? rnd(0, 7) : rnd(1, 4), maxA = L ? 10 : 6;
         function diff(d) { var a = d < maxA ? rnd(d + 1, maxA) : d; return minus(a, a - d); }
-        return { text: 'Munch the ones that make ' + em(T), hint: 'Take away!', say: ['munch_rule_make', T],
+        return { text: 'Munch the ones that make ' + em(T), hint: 'Start at the first number, then count back.', say: ['munch_rule_make', T],
           good: function () { return diff(T); }, bad: function () { return diff(near(T, 0, L ? 9 : 5, [-2, -1, 1, 2])); } };
       } },
     { id: 'make10', name: 'Make 10', short: 'Pairs that make ten', strand: 'Add & subtract', std: '1.OA.6', grade: '1', sayFact: true,
@@ -76,7 +110,7 @@
           return { label: String(v), fact: v === N ? ['w_thats', v] : ['w_thats', v, 'w_not', N] };
         }
         return { text: 'Munch the number ' + em(N), hint: N + ' is 10 and ' + (N - 10) + ' more', say: ['munch_rule_number', N],
-          good: function () { return mk(N); }, bad: function () { var v; do { v = rnd(Math.max(10, N - 4), Math.min(20, N + 4)); } while (v === N || v < 11); return mk(v); } };
+          good: function () { return mk(N); }, bad: function () { var rv = +String(N).split('').reverse().join(''); if (rv !== N && rv > 20 && Math.random() < .2) return { label: String(rv), fact: ['w_thats', rv, 'w_not', N] }; var v; do { v = rnd(Math.max(10, N - 4), Math.min(20, N + 4)); } while (v === N || v < 11); return mk(v); } };
       } },
     { id: 'missing', name: 'Missing number', short: 'Missing addends', strand: 'Add & subtract', std: '1.OA.8', grade: '1', sayFact: true,
       levels: ['Box is 1–4', 'Box is 1–9'],
@@ -110,6 +144,10 @@
         return { text: 'Munch the ones that make ' + em(T), hint: L ? 'Tip: take away to 10 first!' : 'Count back!', say: ['munch_rule_make', T],
           good: function () { return diff(T); }, bad: function () { return diff(near(T, L ? 1 : 8, L ? 11 : 16, [-2, -1, 1, 2])); } };
       } },
+    { id: 'wordprob', name: 'Picnic story problems', short: 'Add & subtract word problems (within 10, then 20)', strand: 'Add & subtract', std: '1.OA.1', grade: '1', sayFact: true,
+      levels: ['Stories within 10', 'Stories within 20'],
+      intro: { line: 'skill_wordprob', example: '3 🍎 + 4 🍎 = <b>7</b> apples' },
+      gen: function (L) { return wordProblem(L); } },
     { id: 'evenodd', name: 'Even & odd', short: 'Even and odd numbers', strand: 'Patterns', std: '2.OA.3 (early)', grade: '1–2', sayFact: true,
       levels: ['Numbers to 10', 'Numbers to 20'],
       intro: { line: 'skill_evenodd', example: '2, 4, 6 are even · 1, 3, 5 are odd' },
@@ -148,12 +186,13 @@
     return t[subj];
   }
   function live() { return SUBJECTS.filter(function (x) { return list(x.id).length; }); }
-  // the subject mix: 'mixed' -> weights by age (5 and under: 40% early concepts, 30% letters & sounds, 30% math; older: mostly math)
+  // the subject mix: 'mixed' -> weights by age (5 and under: 40% early concepts, 30% letters & sounds, 30% math; 6+: 60% math, 30% reading, 10% concepts)
   function mixWeights(p) {
     var m = p.mix || 'mixed', w = {}, have = live().map(function (x) { return x.id; });
     if (m !== 'mixed' && have.indexOf(m) >= 0) { w[m] = 1; return w; }
     var little = p.age != null && p.age <= 5;
-    var base = little ? { concepts: .4, reading: .3, math: .3 } : { math: .8, reading: .12, concepts: .08 };
+    var base = little ? { concepts: .4, reading: .3, math: .3 } : { math: .6, reading: .3, concepts: .1 };
+    if (p.levels && p.levels.concepts === 'off') base.concepts = 0;   // grown-up setting: Early Concepts off
     var tot = 0; have.forEach(function (id) { w[id] = base[id] || 0; tot += w[id]; });
     if (!tot) { w.math = 1; return w; }
     Object.keys(w).forEach(function (id) { w[id] /= tot; });
@@ -168,12 +207,13 @@
     return best;
   }
 
-  function blankState() { return { status: 'locked', level: 0, topPasses: 0, struggles: 0, attempts: 0, correct: 0, hist: [], timeMs: 0, introduced: false, placed: false, last: 0 }; }
+  function blankState() { return { status: 'locked', level: 0, topPasses: 0, struggles: 0, attempts: 0, correct: 0, hist: [], timeMs: 0, introduced: false, placed: false, last: 0, needsPractice: false, offerTestOut: false }; }
 
   function ensure(p) {
     p.skills = p.skills || {};
     ACTIVE.forEach(function (s) { if (!p.skills[s.id]) p.skills[s.id] = blankState(); else A.Store && fillState(p.skills[s.id]); });
     if (!p.mix) p.mix = 'mixed';
+    if (A.Coach) A.Coach.data(p);   // per-item coaching data (added 2026-10-21; old saves get an empty one)
     live().forEach(function (x) {
       var T = track(p, x.id), L = list(x.id);
       if (!T.current || !BY[T.current] || BY[T.current].status !== 'active' || subjOf(BY[T.current]) !== x.id) T.current = L[0].id;
@@ -181,6 +221,7 @@
     });
     return p;
   }
+  function offerPlace(st) { if (st && !st.attempts && !st.placeDone && st.status !== 'mastered') st.placeOffer = true; }
   function fillState(st) { var b = blankState(); for (var k in b) if (!(k in st)) st[k] = b[k]; }
   function state(p, id) { ensure(p); return p.skills[id]; }
 
@@ -213,22 +254,40 @@
   function nextSkill(id) { var L = list(subjOf(BY[id])), i = L.findIndex(function (s) { return s.id === id; }); return i >= 0 ? L[i + 1] || null : null; }
   function prevSkill(id) { var L = list(subjOf(BY[id])), i = L.findIndex(function (s) { return s.id === id; }); return i > 0 ? L[i - 1] : null; }
 
-  // What should the next round be?  Every 4th round mixes in a quick review of a mastered skill.
+  // What should the next round be?  The session mix (coach.js): about 65% the current skill, 20% recently mastered skills and
+  // 15% older mastered ones (skills with review items due first). The first 2 rounds of a subject warm up on the current skill.
+  // A grown-up pin keeps to the current skill. A "test-out" offer (5 fast right answers in a row) makes the next round a 5-question probe.
   // opt.subject: force a subject (else the kid's mix decides)
   function pickRound(p, opt) {
     ensure(p);
     var subj = (opt && opt.subject) || p.nextSubject || chooseSubject(p); p.nextSubject = null;
     if (!list(subj).length) subj = 'math';
-    var T = track(p, subj), cur = T.current, st = p.skills[cur];
+    var T = track(p, subj), cur = T.current, st = p.skills[cur], K = A.Coach, top = BY[cur].levels.length - 1;
     T.rounds = (T.rounds || 0) + 1;
+    // placement check: the first time a newly opened skill comes up, a 5-question "what do you already know?" check (coach.js; only callers that can run it ask: opt.placement)
+    if (K && K.wantsPlacement && K.wantsPlacement(p, cur) && opt && opt.placement && !(A.Store && A.Store.data && A.Store.settings.placement === false)) return { skill: BY[cur], level: top, review: false, placement: true, nQ: K.PLACE_N };
+    if (st.offerTestOut) { st.offerTestOut = false; return { skill: BY[cur], level: A.clamp(st.level, 0, top), review: false, testOut: true, nOk: 5 }; }
     var mastered = list(subj).filter(function (s) { return p.skills[s.id].status === 'mastered' && s.id !== cur; });
-    if (!p.math.pin && T.rounds % 4 === 0 && mastered.length && st.introduced) {
-      var r = pick(mastered); return { skill: r, level: r.levels.length - 1, review: true };
+    if (!p.math.pin && mastered.length && st.introduced && T.rounds > 2) {
+      var have = { recent: [], older: [] };
+      mastered.forEach(function (s) { have[K ? K.bucket(p, s.id) : 'recent'].push(s); });
+      var slot = K ? K.chooseSlot(p, { recent: have.recent.length > 0, older: have.older.length > 0 }) : (T.rounds % 4 === 0 ? 'recent' : 'current');
+      if (slot !== 'current' && have[slot] && have[slot].length) {
+        var pool = have[slot], due = K ? pool.filter(function (s) { return K.dueItems(p, s.id).length; }) : [];
+        var r = pick(due.length ? due : pool); return { skill: r, level: r.levels.length - 1, review: true, slot: slot };
+      }
     }
-    return { skill: BY[cur], level: A.clamp(st.level, 0, BY[cur].levels.length - 1), review: false };
+    var lv = A.clamp(st.level, 0, top), eased = false;
+    if (K && lv > 0 && K.winnable(p, cur) < 0) { lv--; eased = true; }   // keep ~75-85% winnable: one easier round, the level itself stays
+    return { skill: BY[cur], level: lv, review: false, eased: eased };
   }
 
-  function recordAnswer(p, id, ok) { var st = state(p, id); st.attempts++; if (ok) st.correct++; st.last = Date.now(); }
+  // one answer. opt (optional): { key: item id, hint: bool, fast: bool } -> coaching signals from coach.js (or null)
+  function recordAnswer(p, id, ok, opt) {
+    var st = state(p, id); st.attempts++; if (ok) st.correct++; st.last = Date.now();
+    if (A.Coach && opt && opt.key != null) return A.Coach.answer(p, id, opt.key, ok, opt);
+    return null;
+  }
 
   // Call when a round ends. Returns {say:[parts], events:{...}}
   function finishRound(p, round, res) {
@@ -239,30 +298,52 @@
     st.timeMs += res.ms || 0; st.introduced = true;
     var ev = { acc: acc }, say;
     if (round.review) {
-      say = acc >= .8 ? ['fb_review_good'] : ['fb_keep_going'];
-      return { say: say, events: ev };
+      if (acc >= .8) return { say: ['fb_review_good'], events: ev };
+      // a failed spaced review reopens the skill: "needs practice" at its top level, practiced next, then back to the current skill
+      if (st.status === 'mastered') {
+        st.status = 'open'; st.needsPractice = true; st.topPasses = 0; st.level = top; ev.reopened = s.id;
+        if (!p.math.pin && T.current !== s.id) { T.returnTo = T.returnTo || T.current; T.current = s.id; }
+      }
+      return { say: ['fb_keep_going'], events: ev };
+    }
+    if (round.testOut) {   // 5-question test-out probe: all right, no hint -> skip the level, or (at the top level) the whole skill
+      ev.testOut = true;
+      if (res.correct >= 5 && !res.wrong && !res.hinted) {
+        if (A.Coach) A.Coach.bumpItems(p, s.id, 3);
+        if (st.level < top) { st.level++; st.topPasses = 0; ev.levelUp = true; ev.testedOut = 'level'; return { say: ['fb_level_up', 'fb_trickier'], events: ev }; }
+        ev.testedOut = 'skill'; st.topPasses = 2; st.needsPractice = false;
+        st.status = 'mastered'; st.placed = false; st.testedOut = true; ev.mastered = s.id;
+        var tn = nextSkill(s.id);
+        if (tn && !p.math.pin) { var ts = state(p, tn.id); if (ts.status === 'locked') ts.status = 'open'; T.current = tn.id; ev.newSkill = tn.id; offerPlace(ts); }
+        return { say: ['fb_mastered'], events: ev };
+      }
+      // otherwise: scored like a normal round below
     }
     if (res.timedOut) { // the timer ran out: slow-but-accurate is never punished
       ev.timedOut = true; ev.frac = res.frac;
       if (acc >= .8 && (res.frac || 0) < .75) { st.struggles = 0; return { say: ['fb_careful'], events: ev }; } // same level again (and the game adds time)
       // otherwise: >= 75% munched and accurate counts like a finished round; low accuracy uses the normal rules below
     }
+    if (acc < .8 || res.gaveUp) st.topPasses = 0;   // the pass streak resets on any weak round
     if (res.gaveUp) { // ran out of hearts
       if (st.level > 0) { st.level--; ev.levelDown = true; }
       else st.struggles++;
     } else if (acc >= .8) {
       st.struggles = 0;
+      if (st.needsPractice && st.level >= top) { st.needsPractice = false; st.status = 'mastered'; ev.remastered = s.id; }
       if (T.returnTo && T.returnTo !== s.id) { // back from a confidence-building detour
         T.current = T.returnTo; T.returnTo = null; ev.back = true; say = ['fb_back_now'];
       } else if (st.level < top) { st.level++; ev.levelUp = true; say = ['fb_level_up', 'fb_trickier']; }
       else {
         st.topPasses++;
-        if (st.status !== 'mastered' && st.topPasses >= 2) {
+        var rd = A.Coach ? A.Coach.ready(p, s.id) : { ok: true };
+        if (st.status !== 'mastered' && st.topPasses >= 2 && !rd.ok) { ev.notYet = rd.why; say = ['fb_great_job']; }   // strong rounds, but not enough items / days yet
+        else if (st.status !== 'mastered' && st.topPasses >= 2) {
           st.status = 'mastered'; st.placed = false; ev.mastered = s.id;
           var nx = nextSkill(s.id);
           if (nx && !p.math.pin) {
             var ns = state(p, nx.id); if (ns.status === 'locked') ns.status = 'open';
-            T.current = nx.id; ev.newSkill = nx.id; say = ['fb_mastered'];
+            T.current = nx.id; ev.newSkill = nx.id; offerPlace(ns); say = ['fb_mastered'];
           } else if (nx) { var ns2 = state(p, nx.id); if (ns2.status === 'locked') ns2.status = 'open'; say = ['fb_mastered']; }
           else say = [subjOf(s) === 'math' ? 'fb_champion' : 'fb_star_learner'];
         } else if (st.status === 'mastered') {
@@ -293,12 +374,15 @@
     if (s.status !== 'active') return { label: 'Later', cls: 'later' };
     var st = state(p, id);
     var recent = st.hist.slice(-8).map(function (h) { var t = h.c + h.w; return t ? h.c / t : 1; });
-    var label = st.status === 'mastered' ? (st.placed ? 'Mastered (placed)' : 'Mastered') : st.attempts > 0 ? 'Practicing' : (st.status === 'open' ? 'Not started' : 'Not started');
-    var cls = st.status === 'mastered' ? 'mastered' : st.attempts > 0 ? 'practicing' : 'none';
+    // status: Learning (below the top level) / Practicing (top level, building up items and days) / Mastered / Needs review
+    var K = A.Coach, top = s.levels.length - 1;
+    var label = st.needsPractice ? 'Needs review' : st.status === 'mastered' ? (st.placed ? 'Mastered (placed)' : st.testedOut ? 'Mastered (tested out)' : 'Mastered') : st.attempts > 0 ? (st.level < top ? 'Learning' : 'Practicing') : 'Not started';
+    var cls = st.needsPractice ? 'review' : st.status === 'mastered' ? 'mastered' : st.attempts > 0 ? (st.level < top ? 'learning' : 'practicing') : 'none';
     var acc = st.attempts ? st.correct / st.attempts : null;
     var trend = null;
     if (recent.length >= 4) { var h = Math.floor(recent.length / 2); var a1 = avg(recent.slice(0, h)), a2 = avg(recent.slice(h)); trend = a2 - a1 > .07 ? 'up' : a1 - a2 > .07 ? 'down' : 'flat'; }
-    return { label: label, cls: cls, acc: acc, recent: recent, trend: trend, level: st.level, levels: s.levels.length, attempts: st.attempts, timeMs: st.timeMs, rounds: st.hist.length, current: track(p, subjOf(s)).current === id };
+    return { label: label, cls: cls, acc: acc, recent: recent, trend: trend, level: st.level, levels: s.levels.length, attempts: st.attempts, timeMs: st.timeMs, rounds: st.hist.length, current: track(p, subjOf(s)).current === id,
+      missed: K ? K.mostMissed(p, id, 3) : [], lastPracticed: (K && K.lastSeen(p, id)) || st.last || null, nextReview: K ? K.nextDue(p, id) : null, ready: K && st.attempts ? K.ready(p, id) : null, rule: K ? K.rule(id).label : '' };
   }
   function avg(a) { return a.reduce(function (x, y) { return x + y; }, 0) / (a.length || 1); }
 
@@ -316,7 +400,7 @@
     return skill;
   }
   A.Curriculum = {
-    register: register, SUBJECTS: SUBJECTS, subjectOf: subjOf, list: list, track: track, mixWeights: mixWeights, chooseSubject: chooseSubject,
+    register: register, wordProblem: wordProblem, pet: pet, PET_EMOJI: PET_EMOJI, SUBJECTS: SUBJECTS, subjectOf: subjOf, list: list, track: track, mixWeights: mixWeights, chooseSubject: chooseSubject,
     current: function (p, subj) { ensure(p); return BY[track(p, subj || 'math').current]; },
     SKILLS: SKILLS, ACTIVE: ACTIVE, byId: BY, frame: frame,
     ensure: ensure, state: state, place: place, setCurrent: setCurrent, markMastered: markMastered, resetSkill: resetSkill,

@@ -29,6 +29,7 @@
     ov.querySelector('.close').addEventListener('click', P.close);
     A.$$('.tabs button', ov).forEach(function (b) { b.addEventListener('click', function () { st.tab = b.dataset.t; stopMic(); render(); }); });
     ov.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.preventDefault(); P.close(); } e.stopPropagation(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && P.isOpen() && !A.$('#gate') && !ov.contains(e.target)) { e.preventDefault(); e.stopPropagation(); P.close(); } }, true);
     A.on('clips:changed', function () { if (P.isOpen() && st.tab === 'voice') renderVoiceCounts(); });
   }
   function body() { return ov.querySelector('.body'); }
@@ -53,16 +54,27 @@
       '<div><b>' + nStk + ' / ' + A.Rewards.STICKERS.length + '</b><span>stickers</span></div>' +
       '<div><b>' + Object.keys(p.days).length + '</b><span>days played</span></div>' +
       '<div><b>' + A.ago(p.lastPlayed) + '</b><span>last played</span></div></div>';
+    h += '<div class="mixbox exportbox"><b>Progress snapshot</b> <button class="sbtn pri" data-exp="copy">📋 Copy progress summary</button> <button class="sbtn" data-exp="json">⬇ Download .json</button>' +
+      ' <label class="anon"><input type="checkbox" data-anon' + (st.anon ? ' checked' : '') + '> Use “Player 1” instead of the name</label>' +
+      '<small class="muted">Plain-text summary (status, accuracy, items seen, last practiced, next review, most-missed items, mistakes we spotted, weekly goal, time played). For a teacher or tutor.</small><pre class="exp-out" hidden></pre></div>';
     // subject mix (Free Play, 2 Players, Baseball, bonus questions) + one table per subject
     var W = C().mixWeights(p), SUBJ = C().SUBJECTS.filter(function (x) { return C().list(x.id).length; });
     var mixTxt = SUBJ.filter(function (x) { return W[x.id]; }).map(function (x) { return Math.round(W[x.id] * 100) + '% ' + x.name; }).join(' · ');
     h += '<div class="mixbox"><label><b>Subject mix</b> <select data-mix aria-label="Subject mix"><option value="mixed"' + (p.mix === 'mixed' || !p.mix ? ' selected' : '') + '>Mixed (by age)</option>' +
       SUBJ.map(function (x) { return '<option value="' + x.id + '"' + (p.mix === x.id ? ' selected' : '') + '>Only ' + x.name + '</option>'; }).join('') + '</select></label>' +
-      '<p class="muted">Free Play, 2 Players, Blob Baseball and bonus questions: <b data-mixtxt>' + mixTxt + '</b>. Mixed: age 5 and under gets about 40% Early Concepts, 30% letters &amp; sounds, 30% math; older kids mostly math for now. Story mode keeps its own areas (Letter Lagoon has the new skills).</p></div>';
-    h += '<p class="muted">Each subject is its own ladder. A skill is <b>mastered</b> after 2 rounds of 80%+ at its top level; then the next skill in that subject unlocks. Every 4th round of a subject is a quick review of a mastered skill. In Blob Baseball each half-inning counts as one round.</p>';
+      '<p class="muted">Free Play, 2 Players, ' + A.TITLES.baseball + ' and bonus questions: <b data-mixtxt>' + mixTxt + '</b>. Mixed: age 5 and under gets about 40% Early Concepts, 30% letters &amp; sounds, 30% math; age 6 and up gets about 60% math, 30% reading, 10% Early Concepts. Story mode keeps its own areas (Letter Lagoon and Word Woods have the reading skills).</p></div>';
+    if (A.Levels) {   // per-subject start level (grade); changing it moves that ladder's start, adaptive up / down from there
+      h += '<div class="mixbox lvbox"><b>Levels</b> ' + SUBJ.map(function (x) {
+        var cur = (p.levels && p.levels[x.id]) || 'auto', opts = [['auto', 'Auto (by age: ' + A.Levels.GRADES.concat([['off', '']]).filter(function (g) { return g[0] === A.Levels.byAge(p, x.id); })[0][1] + ')']].concat(A.Levels.GRADES).concat(x.id === 'concepts' ? [['off', 'Off']] : []);
+        return '<label class="lvsel">' + x.name + ' <select data-sublvl="' + x.id + '" aria-label="' + x.name + ' level">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cur ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
+          (A.Levels.soon(p, x.id) ? ' <small class="soon" data-soon="' + x.id + '">starts at the top skill · more coming soon</small>' : '') + '</label>';
+      }).join(' ') + '<p class="muted">Sets where each subject starts (earlier skills count as placed). <b>Auto</b>: age 5 and under starts at Pre-K; age 6–7 starts Math at Adding to 10 and Reading at 2nd grade (long vowels); age 8+ starts Reading at 3rd grade (homophones). Too easy or too hard? The game still moves up and down on its own.</p></div>';
+    }
+    h += '<p class="muted">Each subject is its own ladder. A skill is <b>mastered</b> after 2 rounds of 80%+ at its top level; then the next skill in that subject unlocks. Every 4th round of a subject is a quick review of a mastered skill. In ' + A.TITLES.baseball + ' each half-inning counts as one round.</p>';
     h += '<div class="togs" style="margin-bottom:12px">' +
       tog('pin', 'Stay on the chosen skill', 'Turns off automatic moving to new skills (levels still adjust).', p.math.pin) +
-      tog('grumbly', 'Grumbly in Mochi Munch', 'A slow, gentle cloud that wanders and bumps the player back to the corner. Extra challenge.', p.games.munch.grumbly) + '</div>';
+      (A.ReadAloud ? tog('readstories', 'Read stories aloud', 'Reading stories: read the story out loud by itself. Auto: on for age 5 and under, off for 6+ (they read it, and only the question is spoken). The 🔊 button always reads it.', A.ReadAloud.on(p)) : '') +
+      tog('grumbly', 'Grumbly in ' + A.TITLES.munch, 'A slow, gentle cloud that wanders and bumps the player back to the corner. Extra challenge.', p.games.munch.grumbly) + '</div>';
     SUBJ.forEach(function (x) {
       var T = C().track(p, x.id), cur = C().byId[T.current], cs = p.skills[T.current];
       h += '<section class="subj" data-subj="' + x.id + '"><h3>' + x.emoji + ' ' + x.name + (W[x.id] ? ' <small class="muted">' + Math.round(W[x.id] * 100) + '% of rounds</small>' : ' <small class="muted">off in the mix</small>') + '</h3>' +
@@ -72,18 +84,36 @@
       C().SKILLS.forEach(function (s) { if (C().subjectOf(s) === x.id) h += skillRow(p, s); });
       h += '</tbody></table></section>';
     });
-    h += '<h3>Sight words</h3><p class="muted">The Dolch Pre-Primer words are now the “Sight words” skill in Reading &amp; Words (Mochi Munch, Baseball, Letter Lagoon). Word lists: ' + A.SightWords.lists.map(function (l) { return l.name + ' (' + l.words.length + ' words)'; }).join(', ') + '.</p>';
+    h += '<h3>Sight words</h3><p class="muted">The Dolch Pre-Primer words are now the “Sight words” skill in Reading &amp; Words (' + A.TITLES.munch + ', Baseball, Letter Lagoon). Word lists: ' + A.SightWords.lists.map(function (l) { return l.name + ' (' + l.words.length + ' words)'; }).join(', ') + '.</p>';
     b.innerHTML = h;
     A.$$('[data-kid]', b).forEach(function (x) { x.addEventListener('click', function () { st.kid = x.dataset.kid; render(); }); });
+    var an = b.querySelector('[data-anon]'); if (an) an.addEventListener('change', function () { st.anon = an.checked; });
+    A.$$('[data-exp]', b).forEach(function (x) { x.addEventListener('click', function () { exportProgress(p, x.dataset.exp, b); }); });
     A.$$('[data-cur]', b).forEach(function (x) { x.addEventListener('click', function () { C().setCurrent(p, x.dataset.cur); save(); render(); A.UI.toast(p.name + ' will practice ' + C().byId[x.dataset.cur].name + ' next.'); }); });
     A.$$('[data-mast]', b).forEach(function (x) { x.addEventListener('click', function () { C().markMastered(p, x.dataset.mast); save(); render(); }); });
     A.$$('[data-reset]', b).forEach(function (x) { x.addEventListener('click', function () { if (x.dataset.armed) { C().resetSkill(p, x.dataset.reset); save(); render(); } else { x.dataset.armed = 1; x.textContent = 'Tap again'; x.classList.add('red'); } }); });
+    A.$$('[data-sublvl]', b).forEach(function (x) { x.addEventListener('change', function () { A.Levels.set(p, x.dataset.sublvl, x.value); save(); render(); A.UI.toast(p.name + ': ' + x.options[x.selectedIndex].text); }); });
     A.$$('[data-mix]', b).forEach(function (x) { x.addEventListener('change', function () { p.mix = x.value; p.mixCredit = {}; save(); render(); A.UI.toast(p.name + ': ' + x.options[x.selectedIndex].text); }); });
     A.$$('[data-lvl]', b).forEach(function (x) { x.addEventListener('change', function () { C().setCurrent(p, x.dataset.lvl, +x.value); save(); render(); }); });
     A.$$('.tog', b).forEach(function (t) { t.addEventListener('click', function () {
       if (t.dataset.k === 'pin') p.math.pin = !p.math.pin; else if (t.dataset.k === 'grumbly') p.games.munch.grumbly = !p.games.munch.grumbly;
+      else if (t.dataset.k === 'readstories') A.ReadAloud.set(p, !A.ReadAloud.on(p));
       save(); t.classList.toggle('on');
     }); });
+  }
+  // the grown-up progress snapshot: copy as plain text, or download as .json (coach.js progressSummary / progressText)
+  function exportProgress(p, how, b) {
+    var opt = { anon: !!st.anon }, out = b.querySelector('.exp-out');
+    if (how === 'json') {
+      var o = A.Coach.progressSummary(p, opt), txt = JSON.stringify(o, null, 2), fn = 'progress-' + (opt.anon ? 'player-1' : String(p.name).toLowerCase().replace(/[^a-z0-9]+/g, '-')) + '-' + o.exported.slice(0, 10) + '.json';
+      P.lastExport = { kind: 'json', name: fn, text: txt };
+      try { var url = URL.createObjectURL(new Blob([txt], { type: 'application/json' })), a = document.createElement('a'); a.href = url; a.download = fn; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(url); }, 4000); } catch (e) {}
+      A.UI.toast('Downloaded ' + fn); return;
+    }
+    var t = A.Coach.progressText(p, opt); P.lastExport = { kind: 'text', text: t };
+    out.textContent = t; out.hidden = false;
+    var done = function () { A.UI.toast('Progress summary copied'); }, fallback = function () { try { var r = document.createRange(); r.selectNodeContents(out); var sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); document.execCommand('copy'); } catch (e) {} A.UI.toast('Summary shown below — select it and copy'); };
+    try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, fallback); else fallback(); } catch (e) { fallback(); }
   }
   function skillRow(p, s) {
     var m = C().summary(p, s.id), h = '';
@@ -92,10 +122,19 @@
       (m.trend ? ' ' + ({ up: '↗', down: '↘', flat: '→' })[m.trend] : '') + (m.recent.length ? '' : '<small class="muted">—</small>');
     var lvlSel = '<select data-lvl="' + s.id + '">' + s.levels.map(function (L, i) { return '<option value="' + i + '"' + (i === m.level ? ' selected' : '') + '>' + (i + 1) + ': ' + A.esc(L) + '</option>'; }).join('') + '</select>';
     h += '<tr class="' + (m.current ? 'cur' : '') + '" data-skill="' + s.id + '"><td><b>' + A.esc(s.name) + '</b>' + (m.current ? ' <small>▶ now</small>' : '') + '<br><small class="muted">' + A.esc(s.short) + ' · ' + s.std + '</small></td>' +
-      '<td><span class="st ' + m.cls + '">' + m.label + '</span></td><td>' + lvlSel + '</td><td>' + pct(m.acc) + '</td><td class="hide-sm">' + m.attempts + '</td><td>' + spark + '</td><td class="hide-sm">' + A.fmtTime(m.timeMs) + '</td>' +
+      '<td><span class="st ' + m.cls + '">' + m.label + '</span>' + coachInfo(m) + '</td><td>' + lvlSel + '</td><td>' + pct(m.acc) + '</td><td class="hide-sm">' + m.attempts + '</td><td>' + spark + '</td><td class="hide-sm">' + A.fmtTime(m.timeMs) + '</td>' +
       '<td><div class="act">' + (m.current ? '' : '<button class="sbtn pri" data-cur="' + s.id + '">Practice this</button>') +
       (m.cls === 'mastered' ? '<button class="sbtn" data-reset="' + s.id + '" title="Clear this skill\'s progress">Reset</button>' : '<button class="sbtn" data-mast="' + s.id + '">Mark mastered</button>') + '</div></td></tr>';
     return h;
+  }
+  // mastery coaching details under the status: last practiced, next spaced review, most-missed items, what mastery still needs
+  function shortDate(t) { if (!t) return '—'; var d = new Date(t), n = new Date(); var same = d.toDateString() === n.toDateString(); return same ? 'today' : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); }
+  function coachInfo(m) {
+    if (!m.attempts && !m.lastPracticed) return '';
+    var h = '<div class="coach"><small>Last: ' + shortDate(m.lastPracticed) + (m.cls === 'review' ? ' · Next review: <b>now</b>' : m.nextReview ? ' · Next review: ' + (m.nextReview <= Date.now() ? '<b>due</b>' : shortDate(m.nextReview)) : '') + '</small>';
+    if (m.missed && m.missed.length) h += '<small class="missed">Most missed: ' + m.missed.map(function (x) { return '<b>' + A.esc(x.k.replace(/^rc_(\d)_(\d+)$/, function (_, L, i) { return 'story ' + (+L + 1) + '.' + (+i + 1); }).replace(/^hom_(\d+)$/, 'sentence $1')) + '</b> ×' + x.m; }).join(', ') + '</small>';
+    if (m.cls === 'practicing' && m.ready && !m.ready.ok) h += '<small class="muted" title="' + A.esc(m.rule) + '">To master: ' + A.esc(m.ready.why.join('; ')) + '</small>';
+    return h + '</div>';
   }
   function tog(k, label, small, on) { return '<button class="tog' + (on ? ' on' : '') + '" data-k="' + k + '"><span>' + label + (small ? '<small>' + small + '</small>' : '') + '</span><span class="sw"></span></button>'; }
 
@@ -229,9 +268,9 @@
     A.Clips.all().then(function (recs) {
       if (!recs || !recs.length) { A.UI.toast('No recordings on this device yet.'); return; }
       var files = recs.map(function (r) { return { name: r.id + '.' + extFor(r.type), data: r.blob }; });
-      files.push({ name: 'README.txt', data: 'Blob Arcade voice recordings (' + recs.length + ' files), exported ' + new Date().toString() + '.\r\nImport this zip in the grown-up area (Voice recorder > Import) on another device,\r\nor unzip the files into the website folder audio/voice/ and run tools/make-voice-manifest.\r\n' });
+      files.push({ name: 'README.txt', data: 'Picnic Pals voice recordings (' + recs.length + ' files), exported ' + new Date().toString() + '.\r\nImport this zip in the grown-up area (Voice recorder > Import) on another device,\r\nor unzip the files into the website folder audio/voice/ and run tools/make-voice-manifest.\r\n' });
       return A.Zip.make(files).then(function (zip) {
-        var a = document.createElement('a'); a.href = URL.createObjectURL(zip); a.download = 'blob-arcade-voice-' + A.today() + '.zip';
+        var a = document.createElement('a'); a.href = URL.createObjectURL(zip); a.download = 'picnic-pals-voice-' + A.today() + '.zip';
         document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
         A.UI.toast('Exported ' + recs.length + ' recordings.');
       });
@@ -263,55 +302,101 @@
   /* ================= SETTINGS ================= */
   function renderSettings(b) {
     var s = A.Store.settings;
-    b.innerHTML = '<h3>Sound & voice</h3><div class="togs">' +
-      tog('sound', 'Sound effects', 'Boops, chomps and fanfares (made by the browser, no files).', s.sound) +
+    var kids = A.Store.profiles(), PT = A.PlayTime;
+    function slider(k, label, small) { var v = s.muteAll ? 0 : (s[k] == null ? (k === 'musicVol' ? .5 : 1) : s[k]); return '<label class="tog volrow" data-x="' + k + '"><span>' + label + '<small>' + small + '</small></span><input type="range" min="0" max="1" step="0.05" data-vol="' + k + '" value="' + (s[k] == null ? (k === 'musicVol' ? .5 : 1) : s[k]) + '" aria-label="' + label + '"><b class="volpct" data-volpct="' + k + '">' + Math.round(100 * (s[k] == null ? (k === 'musicVol' ? .5 : 1) : s[k])) + '%</b></label>'; }
+    b.innerHTML = '<h3>Volume</h3><div class="togs">' +
+      tog('muteAll', 'Mute everything', 'Turns off the voice, sound effects and music at once. Your volume levels are kept for later.', !!s.muteAll) +
+      slider('voiceVol', 'Voice volume', 'The friendly voice that reads everything out loud.') +
+      slider('sfxVol', 'Sound effects volume', 'Pops, chomps and cheers.') +
+      slider('musicVol', 'Music volume', 'The background tunes.') +
+      '</div><h3>Play time</h3><p class="muted">Set a daily play-time limit for each child. When time is up, the game waits for a natural stopping point (the end of a round), then shows a calm “Great stopping point!” screen. Your child never loses stars or prizes. Only a grown-up can add more time. Play time is counted on this device only and starts fresh each day.</p><div class="togs">' +
+      (kids.length ? kids.map(function (k) { var L = PT ? PT.limit(k.id) : 0, used = PT ? Math.floor(PT.used(k.id) / 60000) : 0, ex = PT ? PT.extra(k.id) : 0;
+        return '<label class="tog ptrow" data-x="pt"><span>' + A.esc(k.name) + '<small>Played today: ' + used + ' min' + (ex ? ' · extra time added today: ' + ex + ' min' : '') + '</small></span>' +
+          '<select data-ptlimit="' + k.id + '" aria-label="Daily play-time limit for ' + A.esc(k.name) + '">' + (PT ? PT.LIMITS : [0]).map(function (m) { return '<option value="' + m + '"' + (m === L ? ' selected' : '') + '>' + (m ? m + ' minutes a day' : 'No limit') + '</option>'; }).join('') + '</select>' +
+          '<button class="sbtn" data-ptadd="' + k.id + '" title="Add 15 minutes for today only">+15 min today</button></label>'; }).join('') : '<p class="muted">Add a player first.</p>') +
+      tog('breakReminder', 'Stretch-break reminder', 'Every 20 minutes of play, at the end of a round, a friend says “Time for a stretch!” Your child taps OK to keep playing.', !!s.breakReminder) +
+      '</div><h3>Sound & voice</h3><div class="togs">' +
+      tog('sound', 'Sound effects', 'Boops, chomps and cheers.', s.sound) +
       tog('voice', 'Voice', 'Read the rules and feedback out loud.', s.voice) +
-      tog('recorded', 'Use your voice', 'Play your recordings (made here or in audio/voice/) when available.', s.recorded !== false) +
-      tog('ttsClips', 'Use built-in voice clips', 'Friendly computer-generated clips that come with the arcade. Off = the browser’s speech voice fills in.', s.ttsClips !== false) +
-      tog('mixVoice', 'Mix voices in one sentence', 'Off (recommended): a sentence uses your voice only when every part is recorded, otherwise the built-in clips — so it never jumps between voices.', s.mixVoice) +
-      '<button class="tog" data-x="rate"><span>Computer voice speed<small>For the browser’s speech voice only.</small></span><select data-rate><option value="0.8">Slow</option><option value="0.9">Normal</option><option value="1">Quick</option></select></button>' +
+      tog('recorded', 'Use your recordings', 'Play the lines you recorded in the Voice recorder, when there is one.', s.recorded !== false) +
+      tog('ttsClips', 'Use the built-in voice', 'A friendly recorded computer voice that comes with the game. Off: your device’s own reading voice is used instead.', s.ttsClips !== false) +
+      tog('mixVoice', 'Mix voices in one sentence', 'Off (recommended): a sentence uses your recordings only when you recorded every part of it, so the voice never switches halfway.', s.mixVoice) +
+      '<button class="tog" data-x="rate"><span>Computer voice speed<small>For your device’s own reading voice only.</small></span><select data-rate><option value="0.8">Slow</option><option value="0.9">Normal</option><option value="1">Quick</option></select></button>' +
       '</div><h3>Music & games</h3><div class="togs">' +
-      tog('music', 'Music', 'Gentle, made-on-the-fly tunes for the hub and games (no files). It gets quieter whenever someone is talking. Kids can also mute it with the 🎵 button or the M key.', s.music !== false) +
-      '<button class="tog" data-x="mvol"><span>Music volume<small>Separate from sound effects.</small></span><input type="range" min="0" max="1" step="0.05" data-mvol aria-label="Music volume"></button>' +
-      '<button class="tog" data-x="bbclock"><span>Blob Baseball shot clock<small>Optional time limit per pitch. Off (default): no clock — answering fast just makes bigger hits. When it runs out it is a strike, and the answer is shown.</small></span><select data-bbclock aria-label="Baseball shot clock"><option value="0">Off</option><option value="30">30 s</option><option value="20">20 s</option><option value="15">15 s</option><option value="10">10 s</option></select></button>' +
-      tog('timer', 'Munch timer', 'A friendly countdown bar in Mochi Munch. When time runs out the round ends kindly and still earns stars. Each player’s pace is set in Players (Relaxed / Normal / Speedy). Off = no clock, and bonus questions give a star instead of time.', s.timer !== false) +
+      tog('music', 'Music', 'Gentle background tunes. They get quieter whenever the voice is talking. Kids can also turn music off with the 🎵 button or the M key.', s.music !== false) +
+      '<button class="tog" data-x="bbclock"><span>' + A.TITLES.baseball + ' shot clock<small>Optional time limit per pitch. Off (default): no clock — answering fast just makes bigger hits. When it runs out it is a strike, and the answer is shown.</small></span><select data-bbclock aria-label="Baseball shot clock"><option value="0">Off</option><option value="30">30 s</option><option value="20">20 s</option><option value="15">15 s</option><option value="10">10 s</option></select></button>' +
+      tog('timer', 'Munch timer', 'A friendly countdown bar in ' + A.TITLES.munch + '. When time runs out the round ends kindly and still earns stars. Each player’s pace is set in Players (Relaxed / Normal / Speedy). Off = no clock, and bonus questions give a star instead of time.', s.timer !== false) +
       tog('padRumble', 'Controller rumble', 'Game controllers: a light buzz for a correct munch and a bigger one for a home run (controllers that support it, in Chrome/Edge). Controllers can play every game but can never open this grown-up area.', s.padRumble !== false) +
-      '</div><div class="bar"><button class="sbtn pri" data-test>🔊 Test voice: “Hi, I’m Mochi!”</button></div>' +
-      '<h3>Privacy</h3><p class="muted">Everything stays on this device: progress lives in this browser’s local storage, recordings in its IndexedDB. No accounts, ads, analytics or internet requests. Clearing the browser’s site data erases it — use Export in the Voice recorder to back up recordings.</p>' +
+      tog('placement', 'Placement check for new skills', 'When a new skill opens, ' + A.TITLES.munch + ' first asks 5 quick questions (“Let’s see what you already know!”). 5 of 5 skips the skill (it still comes back for review), 4 of 5 starts a level higher.', s.placement !== false) +
+      '</div><h3>Story problems</h3><div class="togs">' +
+      '<label class="tog petset" data-x="pet"><span>Pet name<small>Used in the picnic story problems. Stays on this device only (it is not in save codes or exports). Default: Biscuit. A custom name is read by the browser’s voice.</small></span>' +
+      '<span class="petin"><input data-petname maxlength="16" autocomplete="off" spellcheck="false" placeholder="Biscuit" aria-label="Pet name"><select data-pettype aria-label="Pet type"><option value="dog">🐶 Dog</option><option value="cat">🐱 Cat</option><option value="other">🐾 Other</option></select></span></label>' +
+      '</div><div class="bar"><button class="sbtn pri" data-test>🔊 Test voice: “Hi, I’m Jammy!”</button></div>' +
+      '<h3>Privacy</h3><p class="muted">Everything stays on this device, inside this web browser: progress, play time and your voice recordings. There are no accounts, no ads, no tracking, and nothing is sent over the internet. Clearing this browser’s history and site data erases it, so use Export in the Voice recorder to back up your recordings.</p>' +
       '<h3>Start over</h3><p class="muted">Erases all players and progress on this device (recordings are kept).</p><div class="bar"><button class="sbtn red" data-resetall>Erase all progress</button></div>' +
-      '<p class="muted" style="margin-top:24px">Blob Arcade · data schema v' + A.Store.SCHEMA + ' · ' + A.VoiceLines.all.length + ' voice lines · ' + C().list('math').length + ' math skills · ' + (C().ACTIVE.length - C().list('math').length) + ' reading & early-concepts skills</p>';
+      '<p class="muted" style="margin-top:24px">Picnic Pals · save version ' + A.Store.SCHEMA + ' · ' + A.VoiceLines.all.length + ' voice lines · ' + C().list('math').length + ' math skills · ' + (C().ACTIVE.length - C().list('math').length) + ' reading & early-concepts skills</p>';
     b.querySelector('[data-rate]').value = String(s.rate || 0.9);
+    var pet = s.pet || {}, pn = b.querySelector('[data-petname]'), pt = b.querySelector('[data-pettype]');
+    pn.value = pet.name && pet.name !== 'Biscuit' ? pet.name : ''; pt.value = pet.type || 'dog';
+    function savePet() { s.pet = { name: String(pn.value || '').replace(/[<>]/g, '').trim().slice(0, 16) || 'Biscuit', type: pt.value }; save(); }
+    pn.addEventListener('change', savePet); pn.addEventListener('input', savePet); pt.addEventListener('change', savePet);
+    [pn, pt].forEach(function (x) { x.addEventListener('click', function (e) { e.stopPropagation(); }); x.addEventListener('keydown', function (e) { e.stopPropagation(); }); });
     var bc = b.querySelector('[data-bbclock]'); bc.value = String(s.bbClock || 0); bc.addEventListener('change', function (e) { s.bbClock = +e.target.value; save(); }); bc.addEventListener('click', function (e) { e.stopPropagation(); });
-    var mv = b.querySelector('[data-mvol]'); mv.value = String(s.musicVol != null ? s.musicVol : .5);
-    mv.addEventListener('input', function (e) { s.musicVol = +e.target.value; save(); if (A.Music) A.Music.apply(); });
-    mv.addEventListener('click', function (e) { e.stopPropagation(); });
+    A.$$('[data-vol]', b).forEach(function (mv) {
+      var k = mv.dataset.vol;
+      mv.addEventListener('input', function (e) { s[k] = +e.target.value; save(); var pc = b.querySelector('[data-volpct="' + k + '"]'); if (pc) pc.textContent = Math.round(100 * s[k]) + '%'; if (k === 'musicVol' && A.Music) A.Music.apply(); });
+      mv.addEventListener('change', function () { if (k === 'sfxVol') A.Audio.sfx('pop'); if (k === 'voiceVol') A.Voice.say(['hub_looking_good'], { force: true }); });
+      mv.addEventListener('click', function (e) { e.stopPropagation(); }); mv.addEventListener('keydown', function (e) { if (e.key !== 'Escape') e.stopPropagation(); });
+    });
+    A.$$('[data-ptlimit]', b).forEach(function (x) { x.addEventListener('click', function (e) { e.stopPropagation(); }); x.addEventListener('change', function () { PT.setLimit(x.dataset.ptlimit, +x.value); var k = A.Store.get(x.dataset.ptlimit); A.UI.toast(k.name + ': ' + x.options[x.selectedIndex].text); }); });
+    A.$$('[data-ptadd]', b).forEach(function (x) { x.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); PT.addTime(x.dataset.ptadd, 15); var k = A.Store.get(x.dataset.ptadd); A.UI.toast('+15 minutes today for ' + k.name); render(); }); });
     b.querySelector('[data-rate]').addEventListener('change', function (e) { s.rate = +e.target.value; save(); });
     A.$$('.tog[data-k]', b).forEach(function (t) { t.addEventListener('click', function () {
-      var k = t.dataset.k; s[k] = (k === 'recorded' || k === 'ttsClips' || k === 'music' || k === 'timer' || k === 'padRumble') ? s[k] === false : !s[k]; save(); t.classList.toggle('on'); if (k === 'sound' && s.sound) A.Audio.sfx('tap');
+      var k = t.dataset.k; if (k === 'muteAll' || k === 'breakReminder') { s[k] = !s[k]; save(); t.classList.toggle('on'); if (A.Music) { A.Music.apply(); A.emit('music:changed'); } if (k === 'muteAll') A.Voice.stop(); return; }
+      s[k] = (k === 'recorded' || k === 'ttsClips' || k === 'music' || k === 'timer' || k === 'padRumble' || k === 'placement') ? s[k] === false : !s[k]; save(); t.classList.toggle('on'); if (k === 'sound' && s.sound) A.Audio.sfx('tap');
       if (k === 'music' && A.Music) { A.Music.apply(); A.emit('music:changed'); }
     }); });
-    b.querySelector('[data-test]').addEventListener('click', function () { A.Voice.say(['hub_im', 'blob_mochi'], { force: true }); });
+    b.querySelector('[data-test]').addEventListener('click', function () { A.Voice.say(['hub_im', 'blob_strawberry'], { force: true }); });
     b.querySelector('[data-resetall]').addEventListener('click', function (e) {
       var x = e.currentTarget; if (!x.dataset.armed) { x.dataset.armed = 1; x.textContent = 'Tap again to erase everything'; return; }
       A.Store.resetAll(); st.kid = null; save(); A.UI.toast('All progress erased.'); render();
     });
   }
 
+  /* ---- Move to another device: save code + .json download ---- */
+  function showMove(b, p) {
+    var box = b.querySelector('#moveBox'), code = A.Store.exportCode(p), json = JSON.stringify(A.Store.exportObj(p));
+    var url = URL.createObjectURL(new Blob([json], { type: 'application/json' })), fn = 'picnic-pals-' + p.name.replace(/[^a-z0-9]+/gi, '-').toLowerCase() + '.json';
+    box.innerHTML = '<h3>📦 Move ' + A.esc(p.name) + ' to another device</h3>' +
+      '<p class="muted">On the other device open Grown-ups → Players → “Move a player here”, then paste this code or pick the file. ' +
+      '<b>Privacy:</b> the code holds only game progress (stars, skills, stickers, room) and the name the kid typed (“' + A.esc(p.name) + '”). No other personal data, and nothing is sent anywhere.</p>' +
+      '<div class="bar"><textarea readonly data-code rows="3" style="flex:1;min-width:260px" aria-label="Save code for ' + A.esc(p.name) + '">' + A.esc(code) + '</textarea></div>' +
+      '<div class="bar"><button class="sbtn pri" data-copy>📋 Copy code</button><a class="sbtn" data-dl href="' + url + '" download="' + fn + '">⬇️ Download .json file</a><span class="muted">' + code.length + ' characters</span><button class="sbtn" data-mclose>Close</button></div>';
+    box.querySelector('[data-copy]').addEventListener('click', function () { var t = box.querySelector('[data-code]'); t.select(); var ok = false; try { ok = document.execCommand('copy'); } catch (e) {} if (navigator.clipboard) navigator.clipboard.writeText(code).catch(function () {}); A.UI.toast(ok || navigator.clipboard ? 'Save code copied!' : 'Select the code and copy it.'); });
+    box.querySelector('[data-mclose]').addEventListener('click', function () { box.innerHTML = ''; });
+    box.scrollIntoView({ block: 'nearest' }); box.querySelector('[data-copy]').focus();
+  }
   /* ================= PLAYERS ================= */
   function renderPlayers(b) {
     var kids = A.Store.profiles();
-    var h = '<h3>Players</h3><p class="muted">Kids can make their own player with the big “+ New player” tile, and delete one with “✏️ Edit players” on the Who’s playing screen. Blob, color and outfit are in Dress Up (new players start with Mochi and Poppy; the other blobs are won in Story mode friend challenges, or use “Unlock all characters”). Age is optional; it makes the Munch timer and story path friendlier for little ones.</p><div class="players">';
+    var h = '<h3>Players</h3><p class="muted">Kids can make their own player with the big “+ New player” tile. To rename or delete a player, use “🔒 Edit players” on the Who’s playing screen (it asks the grown-up question first; deleting asks again). Friend, backdrop color, hats and held items are in Dress Up (new players start with Jammy, Crisp, Niblet and Bloop; the other friends join one at a time as your child masters new skills, or use “Unlock all characters”. “📦 Move to another device” makes a save code / .json file). Age is optional; it makes the Munch timer and story path friendlier for little ones.</p><div class="players">';
     kids.forEach(function (k) {
       h += '<div class="pl" data-pid="' + k.id + '">' + kidAv(k) + '<input type="text" maxlength="16" value="' + A.esc(k.name) + '" aria-label="Name">' +
         '<select data-blob aria-label="Blob">' + A.Blobs.CAST.map(function (c) { return '<option value="' + c.id + '"' + (c.id === k.blob ? ' selected' : '') + '>' + c.name + '</option>'; }).join('') + '</select>' +
-        '<select data-age aria-label="Age">' + [['', 'Age: —'], [3, 'Age 3'], [4, 'Age 4'], [5, 'Age 5'], [6, 'Age 6'], [7, 'Age 7'], [8, 'Age 8+']].map(function (o) { return '<option value="' + o[0] + '"' + (String(k.age == null ? '' : Math.min(k.age, 8)) === String(o[0]) ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
+        '<select data-age aria-label="Age">' + [['', 'Age: —'], [2, 'Age 2'], [3, 'Age 3'], [4, 'Age 4'], [5, 'Age 5'], [6, 'Age 6'], [7, 'Age 7'], [8, 'Age 8+']].map(function (o) { return '<option value="' + o[0] + '"' + (String(k.age == null ? '' : Math.min(k.age, 8)) === String(o[0]) ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
+        '<select data-toddler aria-label="Toddler mode" title="Toddler mode: Tiny Picnic (big pictures, no wrong answers, no timer) becomes the main game and the school-level games are hidden. Auto: on for age 2.">' + [['auto', 'Toddler mode: Auto (age 2)'], ['on', 'Toddler mode: On'], ['off', 'Toddler mode: Off']].map(function (o) { return '<option value="' + o[0] + '"' + ((k.toddler || 'auto') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
+        '<select data-gentle aria-label="Gentle Munch" title="Gentle Munch: no hearts (misses never end the round) and no countdown. Auto: on for age 5 and under.">' + [['auto', 'Gentle Munch: Auto (5 and under)'], ['on', 'Gentle Munch: On'], ['off', 'Gentle Munch: Off (hearts + timer)']].map(function (o) { return '<option value="' + o[0] + '"' + ((k.munchGentle || 'auto') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
         '<select data-pace aria-label="Munch timer pace" title="Munch timer pace. Auto: Relaxed for age 5 and under, Normal otherwise.">' + [['auto', 'Timer: Auto (by age)'], ['relaxed', 'Timer: Relaxed'], ['normal', 'Timer: Normal'], ['speedy', 'Timer: Speedy']].map(function (o) { return '<option value="' + o[0] + '"' + ((k.timerPace || 'auto') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
         '<span class="muted">⭐ ' + k.stars + ' · ' + A.fmtTime(k.time.total) + (k.story && k.story.bestRun ? ' · 🏆 ' + k.story.bestRun : '') + ' · ✦ ' + ((k.wallet && k.wallet.bits) || 0) + ' star bits' + '</span><span style="flex:1"></span>' +
-        '<button class="sbtn" data-unlockall title="Make every blob character selectable for this player">' + (A.Blobs.CAST.every(function (c) { return k.unlocks.blobs && k.unlocks.blobs[c.id]; }) ? '✓ All characters' : '🔓 Unlock all characters') + '</button>' +
-        '<button class="sbtn" data-bits title="Give this player 10 star bits to spend in the Blob Room shop (stars and progress are not changed)">✦ +10 star bits</button><button class="sbtn" data-room title="Empty the Blob Room back to the starter room. Everything bought stays in the kid\'s things box.">🏠 Reset room</button>' + '<button class="sbtn" data-rp>Reset progress</button><button class="sbtn red" data-del>🗑 Delete player</button></div>';
+        '<button class="sbtn" data-unlockall title="Make every food friend selectable for this player">' + (A.Blobs.CAST.every(function (c) { return k.unlocks.blobs && k.unlocks.blobs[c.id]; }) ? '✓ All characters' : '🔓 Unlock all characters') + '</button>' +
+        '<button class="sbtn" data-bits title="Give this player 10 star bits to spend in the Picnic Spot shop (stars and progress are not changed)">✦ +10 star bits</button><button class="sbtn" data-room title="Empty the Picnic Spot back to the starter spot. Everything bought stays in the kid\'s things box.">🏠 Reset room</button>' + '<button class="sbtn" data-move title="Export this player as a save code or .json file to move to another device">📦 Move to another device</button>' + '<button class="sbtn" data-rp>Reset progress</button><button class="sbtn red" data-del>🗑 Delete player</button></div>';
     });
-    h += '</div><h3>Add a player</h3><div class="bar"><input type="text" maxlength="16" placeholder="Name (e.g. Player 1)" data-newname><select data-newblob>' + A.Blobs.CAST.map(function (c) { return '<option value="' + c.id + '">' + c.name + '</option>'; }).join('') + '</select>' +
-      '<select data-newstart><option value="count10">Start at: Find the number (preschool / K)</option>' + A.Curriculum.list('math').slice(1).map(function (s) { return '<option value="' + s.id + '">Start at: ' + s.name + '</option>'; }).join('') + '</select>' +
+    h += '</div><div class="movebox" id="moveBox"></div><h3>Move a player here from another device</h3><p class="muted">Paste a save code, or pick a .json save file. You will be asked before anything is replaced.</p>' +
+      '<div class="bar"><textarea data-impcode rows="2" placeholder="Paste a save code (starts with BA3.)" aria-label="Save code" style="flex:1;min-width:260px"></textarea><input type="file" accept=".json,application/json" data-impfile aria-label="Save file"><button class="sbtn pri" data-imp>Import</button></div><div class="impmsg" data-impmsg role="status"></div>' +
+      '<h3>Add a player</h3><div class="bar"><input type="text" maxlength="16" placeholder="Name (e.g. Player 1)" data-newname><select data-newblob>' + A.Blobs.CAST.map(function (c) { return '<option value="' + c.id + '">' + c.name + '</option>'; }).join('') + '</select>' +
+      // "Start at" for each subject (same grades as the per-subject Levels menus above)
+      ['math', 'reading'].filter(function (x) { return A.Levels && A.Curriculum.list(x).length; }).map(function (x) { var nm = x === 'math' ? 'Math' : 'Reading';
+        return '<select data-newstart="' + x + '" aria-label="' + nm + ' starts at"><option value="auto">' + nm + ' starts at: Auto (by age)</option>' + A.Levels.GRADES.map(function (g) { return '<option value="' + g[0] + '">' + nm + ' starts at: ' + g[1] + (g[0] === 'pk' || g[0] === 'k' ? '' : ' grade') + '</option>'; }).join('') + '</select>'; }).join('') +
       '<button class="sbtn pri" data-add>Add player</button></div>';
     b.innerHTML = h;
     A.$$('.pl', b).forEach(function (row) {
@@ -321,15 +406,35 @@
       row.querySelector('[data-unlockall]').addEventListener('click', function () { if (A.Story) A.Story.unlockAll(p); else A.Blobs.CAST.forEach(function (c) { p.unlocks.blobs[c.id] = Date.now(); }); save(); A.UI.toast('All characters unlocked for ' + p.name + '.'); render(); });
       row.querySelector('[data-age]').addEventListener('change', function (e) { p.age = e.target.value === '' ? null : +e.target.value; save(); });
       row.querySelector('[data-pace]').addEventListener('change', function (e) { p.timerPace = e.target.value; save(); });
+      row.querySelector('[data-toddler]').addEventListener('change', function (e) { p.toddler = e.target.value; if (p.toddler === 'auto') delete p.toddler; save(); A.UI.toast(p.name + ': ' + e.target.options[e.target.selectedIndex].text); });
+      row.querySelector('[data-gentle]').addEventListener('change', function (e) { p.munchGentle = e.target.value; if (p.munchGentle === 'auto') delete p.munchGentle; save(); });
       row.querySelector('[data-bits]').addEventListener('click', function () { var w = p.wallet || (p.wallet = { bits: 0, earned: 0, spent: 0 }); w.bits += 10; w.granted = (w.granted || 0) + 10; save(); A.UI.toast('✦ +10 star bits for ' + p.name + '!'); render(); });
       row.querySelector('[data-room]').addEventListener('click', function (e) { var x = e.currentTarget; if (!x.dataset.armed) { x.dataset.armed = 1; x.textContent = 'Tap again to reset ' + p.name + '’s room'; x.classList.add('red'); return; } p.room = null; save(); A.UI.toast(p.name + '’s room is back to the starter room. Bought things are in the things box.'); render(); });
+      row.querySelector('[data-move]').addEventListener('click', function () { showMove(b, p); });
       row.querySelector('[data-rp]').addEventListener('click', function (e) { var x = e.currentTarget; if (!x.dataset.armed) { x.dataset.armed = 1; x.textContent = 'Tap again to reset ' + p.name; x.classList.add('red'); return; } A.Store.resetProgress(id); save(); render(); });
       row.querySelector('[data-del]').addEventListener('click', function (e) { var x = e.currentTarget; if (!x.dataset.armed) { x.dataset.armed = 1; x.textContent = 'Tap again to delete ' + p.name + ' (can’t be undone)'; return; } A.Store.remove(id); if (st.kid === id) st.kid = null; save(); render(); });
     });
+    var msg = b.querySelector('[data-impmsg]');
+    function doImport(txt) {
+      var r = A.Store.parseSave(txt); msg.className = 'impmsg'; if (!r.ok) { msg.classList.add('bad'); msg.textContent = '⚠️ ' + r.error; return; }
+      var np = r.player, old = A.Store.clash(np);
+      if (!old) { A.Store.importPlayer(np); save(); A.UI.toast(np.name + ' moved to this device!'); render(); return; }
+      msg.innerHTML = 'A player called <b>' + A.esc(old.name) + '</b> is already on this device (⭐ ' + old.stars + '). The save has ⭐ ' + np.stars + '. ' +
+        '<button class="sbtn red" data-repl>Replace ' + A.esc(old.name) + '</button> <button class="sbtn" data-asnew>Keep both</button> <button class="sbtn" data-cancel>Cancel</button>';
+      msg.querySelector('[data-repl]').addEventListener('click', function () { A.Store.importPlayer(np, old); save(); A.UI.toast(np.name + ' was replaced with the save.'); render(); });
+      msg.querySelector('[data-asnew]').addEventListener('click', function () { np.name = (np.name + ' 2').slice(0, 16); A.Store.importPlayer(np); save(); A.UI.toast('Added ' + np.name + '!'); render(); });
+      msg.querySelector('[data-cancel]').addEventListener('click', function () { msg.textContent = 'Nothing was changed.'; });
+    }
+    b.querySelector('[data-imp]').addEventListener('click', function () {
+      var f = b.querySelector('[data-impfile]').files[0], code = b.querySelector('[data-impcode]').value;
+      if (f) { if (f.size > 2e6) { msg.textContent = '⚠️ That file is too big to be a save.'; return; } var rd = new FileReader(); rd.onload = function () { doImport(String(rd.result)); }; rd.readAsText(f); }
+      else if (code.trim()) doImport(code); else { msg.textContent = 'Paste a save code or pick a save file first.'; }
+    });
+    A.$$('textarea, input[type=file]', b).forEach(function (x) { x.addEventListener('keydown', function (e) { e.stopPropagation(); }); });
     b.querySelector('[data-add]').addEventListener('click', function () {
       var nm = b.querySelector('[data-newname]').value.trim(); if (!nm) { b.querySelector('[data-newname]').focus(); return; }
-      var p = A.Store.add(nm, b.querySelector('[data-newblob]').value), start = b.querySelector('[data-newstart]').value;
-      if (start !== 'count10') A.Curriculum.place(p, start);
+      var p = A.Store.add(nm, b.querySelector('[data-newblob]').value);
+      A.$$('[data-newstart]', b).forEach(function (x) { if (x.value !== 'auto') A.Levels.set(p, x.dataset.newstart, x.value); });
       save(); A.UI.toast('Added ' + p.name + '!'); render();
     });
   }

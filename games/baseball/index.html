@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-page-title="baseball">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: data:; font-src 'self'; connect-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
-<title>Blob Baseball · Blob Arcade</title>
+<title>Snack Slugger · Picnic Pals</title>
 <link rel="icon" type="image/svg+xml" href="../../img/icon.svg">
 <link rel="apple-touch-icon" href="../../img/icon-192.png">
 <link rel="stylesheet" href="../../css/core.css">
@@ -16,7 +16,7 @@
 <body>
 <section class="screen" id="menu">
   <div class="mhead"><button class="iconbtn" id="menuHome" aria-label="Back to the arcade" data-nav>⌂</button>
-    <div class="mlogo"><span class="mav" id="menuAv"></span><span><b>Blob Baseball</b><small id="menuHi"></small></span></div>
+    <div class="mlogo"><span class="mav" id="menuAv"></span><span><b data-title="baseball">Snack Slugger</b><small id="menuHi"></small></span></div>
     <button class="chipbtn gold" id="menuScores" data-nav>🏆 High scores <kbd>H</kbd></button><button class="iconbtn music" id="menuMusic" aria-label="Music on/off (M)">🎵</button></div>
   <h2 class="mq" id="menuQ"></h2><div class="mtiles" id="menuTiles"></div>
   <div class="keys mk"><span class="grp"><kbd>←</kbd><kbd>→</kbd> choose</span><span class="grp"><kbd class="wide">Space</kbd> pick</span><span class="grp"><kbd>Esc</kbd> back</span></div>
@@ -41,23 +41,30 @@
 <script src="../../audio/voice/manifest.js"></script>
 <script src="../../audio/voice-tts/manifest.js"></script>
 <script src="../../js/core/util.js"></script>
+<script src="../../js/core/foods-data.js"></script>
+<script src="../../js/core/wear-data.js"></script>
 <script src="../../js/core/storage.js"></script>
 <script src="../../js/core/sightwords.js"></script>
 <script src="../../js/core/bonus-questions.js"></script>
 <script src="../../js/core/story.js"></script>
 <script src="../../js/core/early-words.js"></script>
+<script src="../../js/core/grade1-words.js"></script>
 <script src="../../js/core/room-catalog.js"></script>
 <script src="../../js/core/friends.js"></script>
+<script src="../../js/core/tiny-data.js"></script>
 <script src="../../js/core/voice-lines.js"></script>
 <script src="../../js/core/curriculum-math.js"></script>
+<script src="../../js/core/coach.js"></script>
 <script src="../../js/core/questions.js"></script>
 <script src="../../js/core/skills-early.js"></script>
+<script src="../../js/core/skills-grade1.js"></script>
 <script src="../../js/core/blobs.js"></script>
 <script src="../../js/core/audio.js"></script>
 <script src="../../js/core/music.js"></script>
 <script src="../../js/core/zip.js"></script>
 <script src="../../js/core/rewards.js"></script>
 <script src="../../js/core/ui.js"></script>
+<script src="../../js/core/playtime.js"></script>
 <script src="../../js/core/gamepad.js"></script>
 <script src="../../js/core/parent.js"></script>
 <script src="baseball.js"></script>

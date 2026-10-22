@@ -1,13 +1,31 @@
-/* Blob Arcade — profiles & progress, saved only in this browser (localStorage). Versioned schema. */
+/* Picnic Pals (was Blob Arcade) — profiles & progress, saved only in this browser (localStorage). Versioned schema. */
 (function (A) {
   'use strict';
   var KEY = 'blobArcade.data';
-  var SCHEMA = 3;
-  var STARTER_BLOBS = ['mochi', 'poppy'];   // everyone starts with these; the other blobs are won in Story mode challenges
+  var SCHEMA = 4;
+  // everyone starts with these food friends; the others are met by mastering skills (js/core/rewards.js CONFIG.characters)
+  var STARTER_BLOBS = (A.FoodData && A.FoodData.starters) || ['strawberry', 'apple', 'corn', 'blueberry'];
+  // Picnic Pals: old blob ids → food friend ids (art/foods/README.md). Friends that are unlockables are granted, so nobody loses a buddy.
+  var BLOB_TO_FOOD = { mochi: 'mochi', poppy: 'strawberry', dewdrop: 'blueberry', pickle: 'corn', clem: 'carrot', nova: 'grapes' };
+  var GRANT_ON_MIGRATE = { mochi: 1, carrot: 1, grapes: 1 };
+  function migrateBlobs(p) {
+    var now = Date.now(), map = function (id) { return BLOB_TO_FOOD[id] || id; };
+    var oldB = (p.unlocks && p.unlocks.blobs) || {}, nb = {};
+    Object.keys(oldB).forEach(function (id) { var to = map(id); if (oldB[id]) nb[to] = Math.max(nb[to] || 0, typeof oldB[id] === 'number' ? oldB[id] : 1) || 1; });
+    if (p.blob) { var was = p.blob; p.blob = map(was); if (!nb[p.blob]) nb[p.blob] = now; }
+    Object.keys(nb).forEach(function (id) { if (!GRANT_ON_MIGRATE[id]) return; nb[id] = nb[id] || now; });
+    STARTER_BLOBS.forEach(function (id) { nb[id] = nb[id] || 1; });
+    p.unlocks = p.unlocks || {}; p.unlocks.blobs = nb;
+    // friendship points follow the friend (merge if two old blobs map to one food)
+    if (p.friends) { var nf = {}; Object.keys(p.friends).forEach(function (id) { var to = map(id), f = p.friends[id];
+      if (!nf[to]) nf[to] = f; else { var g = nf[to]; g.pts = (g.pts || 0) + (f.pts || 0); g.lvl = Math.max(g.lvl || 1, f.lvl || 1); g.news = (g.news || []).concat(f.news || []); } }); p.friends = nf; }
+    if (p.pace && p.pace.queue) p.pace.queue.forEach(function (q) { if (q.kind === 'blob') q.id = map(q.id); });
+    (p.flags = p.flags || {}).picnic = 1;
+  }
 
   function blankProfile(name, blob) {
     return {
-      id: 'p_' + A.uid(), name: name || 'Player', blob: blob || 'mochi', color: 'classic', outfit: 'none',
+      id: 'p_' + A.uid(), name: name || 'Player', blob: blob || STARTER_BLOBS[0], color: 'classic', outfit: 'none', held: 'none',
       createdAt: Date.now(), lastPlayed: 0,
       age: null,                      // optional, years (makes the Munch timer more generous for little ones)
       timerPace: 'auto',              // Munch timer length: 'auto' (by age) | 'relaxed' | 'normal' | 'speedy'
@@ -19,7 +37,7 @@
       room: null,                     // Blob Room layout, made on the first visit: { v, wall, floor, items: [{ u, id, c, r, f }], gifts: {} } (games/room)
       friends: {},                    // blobId -> friendship { pts, lvl, day, taps, visit, news } (js/core/friends.js)
       stickers: {},                   // stickerId -> timestamp earned
-      unlocks: { outfits: {}, colors: {}, blobs: { mochi: 1, poppy: 1 } }, // id -> timestamp (blobs: starters + friends won in Story challenges)
+      unlocks: { outfits: {}, colors: {}, blobs: STARTER_BLOBS.reduce(function (o, id) { o[id] = 1; return o; }, {}) }, // id -> timestamp (blobs: starter food friends + friends met by mastering skills)
       time: { total: 0, games: {} },  // ms played
       days: {},                       // 'YYYY-MM-DD' -> true
       games: { munch: { rounds: 0, perfect: 0, streak: 0, best: 0, grumblyWins: 0, grumbly: false, timeUps: 0, teamRounds: 0, raceRounds: 0, raceWins: 0 },
@@ -61,9 +79,14 @@
     2: function (d) {
       (d.profiles || []).forEach(function (p) {
         p.unlocks = p.unlocks || {}; var b = p.unlocks.blobs = p.unlocks.blobs || {};
-        STARTER_BLOBS.forEach(function (id) { b[id] = b[id] || 1; }); if (p.blob) b[p.blob] = b[p.blob] || Date.now();
+        ['mochi', 'poppy'].forEach(function (id) { b[id] = b[id] || 1; }); if (p.blob) b[p.blob] = b[p.blob] || Date.now();
       });
       d.schema = 3;
+    },
+    // v3 -> v4: Picnic Pals. Blob characters become food friends; progress, the chosen friend and unlocks carry over.
+    3: function (d) {
+      (d.profiles || []).forEach(migrateBlobs);
+      d.schema = 4;
     }
   };
 
@@ -82,12 +105,14 @@
   }
   // No preset players: a fresh visitor makes their own player in the hub (name, age, blob).
   function seed() { D.seeded = true; }
-  // Age-based start: 6 and up begin math at "Adding to 10" (earlier skills count as placed); younger kids start at the beginning.
+  // Age-based start: 6 and up begin math at "Adding to 10" and Reading & Words by grade level (earlier skills count as placed); younger kids start at the beginning.
   // (The subject mix follows p.age on its own, see Curriculum.mixWeights.)
   function startByAge(p) {
     if (!p || !A.Curriculum) return p;
     A.Curriculum.ensure(p);
-    if (p.age != null && p.age >= 6) A.Curriculum.place(p, 'add10');
+    // per-subject levels (p.levels: 'auto' = by age, or a grade) set where each ladder starts; see A.Levels in skills-grade1.js
+    if (A.Levels) A.Levels.applyAll(p);
+    else if (p.age != null && p.age >= 6) A.Curriculum.place(p, 'add10');
     return p;
   }
   var saveT = null;
@@ -111,15 +136,52 @@
     return 'ok';
   }
 
+  function prune(o, t) { if (!o || typeof o !== 'object' || Array.isArray(o) || !t || typeof t !== 'object') return o; var r = {};
+    for (var k in o) { if (k in t && JSON.stringify(o[k]) === JSON.stringify(t[k]) && k !== 'id' && k !== 'createdAt') continue; r[k] = (k in t && t[k] && typeof t[k] === 'object' && !Array.isArray(t[k])) ? prune(o[k], t[k]) : o[k]; }
+    return r; }
+  function b64e(s) { return btoa(unescape(encodeURIComponent(s))).replace(/=+$/, ''); }
+  function b64d(s) { return decodeURIComponent(escape(atob(s))); }
+  function sum(s) { var h = 0x811c9dc5; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return ('0000000' + h.toString(36)).slice(-7); }  // FNV-1a
   A.Store = {
     KEY: KEY, SCHEMA: SCHEMA, blank: blankProfile, startByAge: startByAge,
-    load: load, save: save, persistence: persistence, STARTER_BLOBS: STARTER_BLOBS,
+    load: load, save: save, persistence: persistence, STARTER_BLOBS: STARTER_BLOBS, BLOB_TO_FOOD: BLOB_TO_FOOD, GRANT_ON_MIGRATE: GRANT_ON_MIGRATE, migrateBlobs: migrateBlobs,
     get data() { return D || load(); },
     get settings() { return (D || load()).settings; },
     profiles: function () { return (D || load()).profiles; },
     get: function (id) { return (D || load()).profiles.filter(function (p) { return p.id === id; })[0] || null; },
     active: function () { var d = D || load(); return A.Store.get(d.activeId) || null; },
-    setActive: function (id) { (D || load()).activeId = id; save(); },
+    setActive: function (id) { var d = D || load(); d.activeId = id; if (id) d.lastId = id; save(); },
+    // the last player who played on this device (for the hub's big "Continue" button)
+    last: function () { var d = D || load(), p = A.Store.get(d.lastId) || A.Store.get(d.activeId); if (p) return p; var ps = d.profiles.slice().sort(function (a, b) { return (b.lastPlayed || 0) - (a.lastPlayed || 0); }); return ps[0] && ps[0].lastPlayed ? ps[0] : null; },
+    /* ---- move a player to another device: a short save code (base64 of compact JSON + checksum) or a .json file ----
+       The code holds only game progress and the name the kid typed (no other personal data). */
+    exportObj: function (p) { return { app: 'blobArcade', kind: 'player', schema: SCHEMA, at: Date.now(), player: JSON.parse(JSON.stringify(p)) }; },
+    // compact: leave out everything still at its blank-player default (import fills it back in), keeps the code short
+    exportCompact: function (p) { var o = A.Store.exportObj(p); o.player = prune(o.player, blankProfile(p.name, p.blob)); o.player.id = p.id; o.player.name = p.name; o.player.stars = p.stars; o.player.blob = p.blob; return o; },
+    exportCode: function (p) { var j = JSON.stringify(A.Store.exportCompact(p)); return 'BA3.' + b64e(j) + '.' + sum(j); },
+    // parse a save code OR the text of a .json file → { ok, player, error }
+    parseSave: function (txt) {
+      txt = String(txt || '').trim(); var j = null;
+      try {
+        if (/^BA\d\./.test(txt)) { var m = txt.replace(/\s+/g, '').split('.'); if (m.length !== 3) return { ok: false, error: 'That code is not complete. Copy all of it and try again.' };
+          j = b64d(m[1]); if (sum(j) !== m[2]) return { ok: false, error: 'That code has a typo (the check doesn’t match). Copy it again.' }; }
+        else if (txt.charAt(0) === '{') j = txt; else return { ok: false, error: 'That doesn’t look like a save code or save file.' };
+        var o = JSON.parse(j);
+        if (!o || o.app !== 'blobArcade' || o.kind !== 'player' || !o.player || typeof o.player !== 'object') return { ok: false, error: 'That is not a Picnic Pals player save.' };
+        if (!(o.schema <= SCHEMA)) return { ok: false, error: 'That save is from a newer version of the game. Update this device first.' };
+        var p = o.player; if (typeof p.name !== 'string' || !p.name.trim() || typeof p.stars !== 'number' || !(p.stars >= 0) || typeof p.id !== 'string') return { ok: false, error: 'That save is missing player details.' };
+        p.name = p.name.trim().slice(0, 16);
+        // compact codes from before Picnic Pals left out the old blob defaults (blob 'mochi', starters mochi + poppy): put them back before migrating
+        if (o.schema < 4) { if (!p.blob) p.blob = 'mochi'; p.unlocks = p.unlocks || {}; var ob = p.unlocks.blobs = p.unlocks.blobs || {}; if (o.schema >= 3) { ob.mochi = ob.mochi || 1; ob.poppy = ob.poppy || 1; } }
+        if (o.schema < SCHEMA) { var tmp = { schema: o.schema, profiles: [p] }; while (tmp.schema < SCHEMA && MIGRATE[tmp.schema]) MIGRATE[tmp.schema](tmp); }
+        fill(p, blankProfile(p.name, p.blob)); if (A.Curriculum) A.Curriculum.ensure(p);
+        return { ok: true, player: p };
+      } catch (e) { return { ok: false, error: 'That code could not be read. Copy all of it and try again.' }; }
+    },
+    // the player on this device that an import would replace (same id or same name), or null
+    clash: function (p) { return A.Store.profiles().filter(function (q) { return q.id === p.id; })[0] || A.Store.profiles().filter(function (q) { return q.name.toLowerCase() === p.name.toLowerCase(); })[0] || null; },
+    // add (or, if `replace` is given, replace that player with) an imported player
+    importPlayer: function (p, replace) { var d = D || load(); if (replace) { var i = d.profiles.indexOf(replace); p.id = replace.id; d.profiles[i] = p; } else { if (A.Store.get(p.id)) p.id = 'p_' + A.uid(); d.profiles.push(p); } save(); return p; },
     add: function (name, blob) {
       var p = blankProfile(String(name || '').trim().slice(0, 16) || 'Player', blob);
       if (A.Curriculum) A.Curriculum.ensure(p);
@@ -129,7 +191,7 @@
     remove: function (id) { var d = D || load(); d.profiles = d.profiles.filter(function (p) { return p.id !== id; }); if (d.activeId === id) d.activeId = null; save(); },
     resetProgress: function (id) {
       var d = D || load(), i = d.profiles.findIndex(function (p) { return p.id === id; }); if (i < 0) return;
-      var old = d.profiles[i], p = blankProfile(old.name, old.blob); p.id = old.id; p.flags.preset = old.flags.preset; p.age = old.age; p.timerPace = old.timerPace; p.unlocks.blobs[p.blob] = Date.now();
+      var old = d.profiles[i], p = blankProfile(old.name, old.blob); p.id = old.id; p.flags.preset = old.flags.preset; p.age = old.age; p.timerPace = old.timerPace; if (old.toddler) p.toddler = old.toddler; p.unlocks.blobs[p.blob] = Date.now();
       startByAge(p);
       d.profiles[i] = p; save(); return p;
     },

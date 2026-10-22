@@ -20,7 +20,7 @@
   function bb(p) { return p.games.baseball; }
   var GUEST = { easy: ['count10', 1], medium: ['add10', 1], hard: ['add20', 1] };
   function makeGuest(kind) {
-    var g = A.Store.blank('Guest', 'clem'); g.id = 'guest'; g.color = 'sky'; g.guest = true; g.age = kind === 'easy' ? 4 : null; C.ensure(g);
+    var g = A.Store.blank('Guest', 'carrot'); g.id = 'guest'; g.color = 'sky'; g.guest = true; g.age = kind === 'easy' ? 4 : null; C.ensure(g);
     var lv = GUEST[kind] || GUEST.medium; C.place(g, lv[0]); C.state(g, lv[0]).level = lv[1]; C.state(g, lv[0]).introduced = true; return g;
   }
   var SPEED = 1;                      // tests speed the animations up
@@ -96,8 +96,8 @@
       step = s; var box = $('#menuTiles'), fns = {};
       if (s === 'main') {
         $('#menuQ').textContent = 'One player, or two players?';
-        box.innerHTML = tile('one', '1 Player', '3 innings · answer fast for big hits!', '<span class="one bat">' + B.forProfile(P1, { expr: 'happy', outfit: 'helmet', helmet: COLORS[0].c, helmetDark: COLORS[0].d }) + '</span>', 'onep') +
-          tile('two', '2 Players', 'Take turns at bat, each with your own questions', '<span class="pair">' + B.forProfile(P1, { expr: 'happy', outfit: 'helmet', helmet: COLORS[0].c, helmetDark: COLORS[0].d }) + B.svg({ blob: P1.blob === 'poppy' ? 'mochi' : 'poppy', expr: 'happy', outfit: 'helmet', helmet: COLORS[1].c, helmetDark: COLORS[1].d }) + '</span>', 'two');
+        box.innerHTML = tile('one', '1 Player', '3 innings · harder questions hit farther!', '<span class="one bat">' + B.forProfile(P1, { expr: 'bat', outfit: 'helmet', helmet: COLORS[0].c, helmetDark: COLORS[0].d }) + '</span>', 'onep') +
+          tile('two', '2 Players', 'Take turns at bat, each with your own questions', '<span class="pair">' + B.forProfile(P1, { expr: 'happy', outfit: 'helmet', helmet: COLORS[0].c, helmetDark: COLORS[0].d }) + B.svg({ blob: P1.blob === 'apple' ? 'strawberry' : 'apple', expr: 'happy', outfit: 'helmet', helmet: COLORS[1].c, helmetDark: COLORS[1].d }) + '</span>', 'two');
         fns = { one: function () { go('mode=solo'); }, two: function () { V.say(['hub_pick_friend']); render('partner'); } };
       } else {
         $('#menuQ').textContent = 'Who is playing with ' + P1.name + '?';
@@ -107,11 +107,12 @@
           fns['p:' + p.id] = function () { V.say([nameParts(p)]); go('mode=two&p2=' + encodeURIComponent(p.id)); };
         });
         [['easy', 'Guest · Easy', 'Counting'], ['medium', 'Guest · Medium', 'Adding to 10'], ['hard', 'Guest · Hard', 'Adding to 20']].forEach(function (g) {
-          h += tile('g:' + g[0], g[1], g[2], '<span class="one">' + B.svg({ blob: 'clem', color: 'sky', expr: 'happy' }) + '</span>', 'guest');
+          h += tile('g:' + g[0], g[1], g[2], '<span class="one">' + B.svg({ blob: 'corn', color: 'sky', expr: 'happy' }) + '</span>', 'guest');
           fns['g:' + g[0]] = function () { go('mode=two&p2=guest-' + g[0]); };
         });
         box.innerHTML = h + '<button class="mtile backt" data-nav data-id="back"><span class="mt">◀ Back</span></button>'; fns.back = back;
       }
+      var one = A.$('#menuTiles .mtile[data-id=one]'); if (one) one._say = ['hub_one_player', 'bb_one_player_sub'];   // keyboard focus reads the tile
       A.$$('#menuTiles .mtile').forEach(function (b) { b.addEventListener('click', function () { var f = fns[b.dataset.id]; if (f) f(); }); b.addEventListener('pointerenter', function () { B.anim(b, 'squish', 420); }); });
       // 2-player setup: controllers join with A, X swaps seats (js/core/gamepad.js)
       A.Pad.context({ setup: s === 'partner' });
@@ -216,15 +217,15 @@
 
   var park = $('#park'); park.insertAdjacentHTML('afterbegin', parkSVG());
   var svg = $('#parkSvg'), ball = $('#ball'), shadow = $('#ballShadow');
-  var rival = P1.blob === 'pickle' || (P2 && P2.blob === 'pickle') ? 'clem' : 'pickle';
+  var rival = P1.blob === 'corn' || (P2 && P2.blob === 'corn') ? 'carrot' : 'corn';
   var pitcher = actor($('#pitcherG'), B.svg({ blob: rival, color: 'grape', outfit: 'cap', expr: 'happy' }), 118, { cls: 'pitcher' }); place(pitcher, MOUND.x, MOUND.y - 4);
-  var fielders = FIELDERS.map(function (f, k) { var g = actor($('#fielders'), B.svg({ blob: ['dewdrop', 'nova', 'poppy'][k], color: 'grape', outfit: 'cap', expr: 'happy' }), 70, { cls: 'fielder' }); place(g, f.x, f.y); return g; });
+  var fielders = FIELDERS.map(function (f, k) { var g = actor($('#fielders'), B.svg({ blob: ['blueberry', 'apple', 'corn'][k], color: 'grape', outfit: 'cap', expr: 'happy' }), 70, { cls: 'fielder' }); place(g, f.x, f.y); return g; });
   var batter = null, batEl = null;
   function newBatter(walkIn) {
     if (batter) batter.remove();
     var pl = bat();
-    batter = actor($('#batterG'), blobOf(pl), 180, { cls: 'batter' });
-    batEl = document.createElementNS(NS, 'g'); batEl.setAttribute('class', 'bat');
+    batter = actor($('#batterG'), blobOf(pl, { expr: 'bat' }), 180, { cls: 'batter' });   // food friends hold their own bat in the 'batting' pose
+    batEl = document.createElementNS(NS, 'g'); batEl.setAttribute('class', 'bat'); batEl.style.display = 'none';
     batEl.innerHTML = '<path d="M-6 -4 L10 -5 L112 -11 Q124 -10 124 0 Q124 10 112 11 L10 5 L-6 4 Z" fill="#e0a868" stroke="#a8743a" stroke-width="2.5"/><rect x="-10" y="-6" width="20" height="12" rx="4" fill="#4a3b6b"/><path d="M30 -5 L100 -9" stroke="#fff" stroke-width="2" opacity=".5"/>';
     batter.appendChild(batEl); setBat(-118);
     if (walkIn) { place(batter, 560, 760); return tween(520, function (t) { place(batter, lerp(560, 712, t), 760 - 40 * t - Math.abs(Math.sin(t * Math.PI * 3)) * 12); }); }
@@ -310,7 +311,7 @@
 
   /* ---------- scoreboard ---------- */
   function renderBoard() {
-    var h = '<div class="sbt">BLOB BASEBALL</div><table><tr><th></th>';
+    var h = '<div class="sbt">' + A.TITLES.baseball.toUpperCase() + '</div><table><tr><th></th>';
     for (var i = 1; i <= INNINGS; i++) h += '<th class="' + (i === G.inning ? 'cur' : '') + '">' + i + '</th>';
     h += '<th class="tot">R</th><th>H</th></tr>';
     PL.forEach(function (pl, k) {
@@ -333,14 +334,24 @@
 
   /* ---------- the pitch: question + answer cards ---------- */
   function newQuestion() {
-    var pl = bat(), r = pl.round, q, g = 0, st = Q.step(pl.P, r, (G.swing || SWINGS[1]).off), n = nChoices(pl.P);
+    var pl = bat(), r = pl.round, q, g = 0, off = (G.swing || SWINGS[1]).off, n = nChoices(pl.P);
+    // a review round only sets the easy "single"; double and up are at the player's own level (current skill + level)
+    if (r.review && off >= 0) { var cs = C.current(pl.P, (r.skill && r.skill.subject) || 'math'); if (cs) r = { skill: cs, level: C.state(pl.P, cs.id).level, review: false }; }
+    var st = Q.step(pl.P, r, off);
     if (st.easy) n = Math.max(2, n - 1);                       // very first step: "easier" = fewer choices
     else if (st.hard && st.offset === 1) n = 4;                  // a challenge that can't climb (little ones / the very top): bigger numbers, all 4 choices
     do { q = Q.make(st.skill, st.level, { choices: n, hard: st.hard }); } while (G.recent.indexOf(q.key) >= 0 && g++ < 20);
+    // coach estimate: of a few candidates, the one whose expected success is nearest the coach's target (about 80-85 %)
+    if (!st.hard && A.Coach && A.Coach.pickItem && !pl.P.guest) {
+      var cands = [q]; for (var k = 0; k < 4; k++) { var c2 = Q.make(st.skill, st.level, { choices: n }); if (G.recent.indexOf(c2.key) < 0) cands.push(c2); }
+      q = A.Coach.pickItem(pl.P, st.skill.id, cands.map(function (c) { return { key: itemKey(c), q: c }; }), off < 0 ? { easeOff: true } : undefined).q;
+    }
     q.atLevel = st.atLevel; q.offset = st.offset;
     G.recent.push(q.key); if (G.recent.length > 12) G.recent.shift();
     return q;
   }
+  // the coach's item id for a pitch: the fact / word (e.g. "3 + 4"), like Picnic Munch's cells
+  function itemKey(q) { var t = String(q.text || '').replace(/<[^>]*>/g, ' '), m = t.match(/(\d+)\s*([+−-])\s*(\d+)/); return m ? m[1] + ' ' + (m[2] === '-' ? '−' : m[2]) + ' ' + m[3] : (t.replace(/\s+/g, ' ').trim() || q.key); }
   function renderQuestion(q) {
     $('#qTxt').innerHTML = q.text; $('#qPic').innerHTML = q.pic || ''; $('#qPic').classList.toggle('on', !!q.pic);
     var box = $('#cards'); box.innerHTML = ''; box.classList.toggle('n3', q.choices.length === 3);
@@ -411,7 +422,7 @@
     $('#pitcherG').classList.add('set');
     G.accept = true; G.busy = false; G.voiceDone = false; G.qT0 = Date.now(); $('#shot').textContent = S.bbClock > 0 ? '⏱ ' + S.bbClock : '';
     var my = G.pitchN;
-    Promise.race([V.say(q.say), wait(6000)]).then(function () { if (G.pitchN === my && !G.voiceDone) { G.voiceDone = true; G.qT0 = Date.now(); } });
+    Promise.race([V.say(A.ReadAloud ? A.ReadAloud.auto(bat().P, q) : q.say), wait(6000)]).then(function () { if (G.pitchN === my && !G.voiceDone) { G.voiceDone = true; G.qT0 = Date.now(); } });
     clearInterval(G.timer); G.timer = setInterval(tick, 100); tick();
   }
   function lockCards(ok, i, q) {
@@ -423,7 +434,7 @@
     G.accept = false; G.busy = true; clearInterval(G.timer);
     var q = G.q, pl = bat(), ok = i === q.answer, e = elapsed(), w = G.swing || SWINGS[1];
     // logged against the skill actually asked (a Single may be the step below, a Home Run the next step up)…
-    pl.pitches++; C.recordAnswer(pl.P, q.skill, ok);
+    pl.pitches++; C.recordAnswer(pl.P, q.skill, ok, { key: itemKey(q) });
     // …and only pitches at her own level count toward this half-inning's level-up round, so easier/harder swings don't skew it
     if (q.atLevel) { if (ok) pl.hr++; else pl.hw++; }
     if (ok) { pl.right++; pl.times.push(e); var rt = bb(pl.P).rt; if (!pl.P.guest) rt[q.skill] = rt[q.skill] ? +(rt[q.skill] * .8 + e * .2).toFixed(2) : +e.toFixed(2); }
@@ -463,6 +474,7 @@
       var ad = advance(z.bases, z.k === 'hr' ? 560 : 380);
       var voice = [HITLINE[z.k]];
       if (z.k === 'hr' && loaded) voice = ['bb_grand_slam'];
+      if (q && q.listen && q.fact && q.fact.length) voice = q.fact.concat(voice);   // word-reading: say the word after a right answer
       if (ad.runs === 1 && z.k !== 'hr') voice.push('bb_run_scores'); else if (ad.runs >= 2) voice.push(ad.runs, 'bb_runs_score');
       var vp = sayWait(voice, 4500);
       if (z.k === 'hr') { crowd(true, true); fireworks(6); M.charge(); UI.rain(40); A.Pad.rumble(G.half, 'big'); } else if (z.k !== 'sg' || ad.runs) crowd(true, false);
@@ -582,7 +594,7 @@
       var chain = Promise.resolve();
       res.forEach(function (r, k) { chain = chain.then(function () { return A.Rewards.celebrate(r.pl.P, rewards[k], TWO ? r.pl.name : null); }); });
       return chain;
-    }).then(function () { location.reload(); });
+    }).then(function () { return A.PlayTime ? A.PlayTime.checkpoint().then(function (ok) { if (!ok) return new Promise(function () {}); }) : null; }).then(function () { location.reload(); });   // play-time limit: only after the game's end card
   }
 
   /* ---------- input ---------- */
@@ -632,7 +644,7 @@
     set speed(v) { SPEED = v; }, get speed() { return SPEED; },
     total: totalRuns, endGame: endGame, bases: function () { return G.bases.map(Boolean); }
   };
-  wait(400).then(function () { return UI.card({ tag: TWO ? PL[0].name + ' vs ' + PL[1].name : 'Batter up!', title: 'Blob Baseball', art: '<div class="dance">' + blobOf(PL[0]) + '</div>',
+  wait(400).then(function () { return UI.card({ tag: TWO ? PL[0].name + ' vs ' + PL[1].name : 'Batter up!', title: A.TITLES.baseball, art: '<div class="dance">' + blobOf(PL[0]) + '</div>',
     html: '<p class="howto">Pick your swing, then answer the pitch!<br><span class="zchip sg">⚾ single · easy</span> <span class="zchip db">⚾⚾ double</span> <span class="zchip tr">🔥 triple · tricky</span> <span class="zchip hr">💥 home run · challenge</span><br>Get it right and you hit it!</p>' + (TWO && (A.Pad.seats()[0] || A.Pad.seats()[1]) ? '<p class="small">' + A.esc(PL[0].name) + ': ' + A.Pad.label(0, '⌨ keyboard') + ' · ' + A.esc(PL[1].name) + ': ' + A.Pad.label(1, '⌨ keyboard') + '</p>' : ''),
-    sub: INNINGS + ' innings · 3 outs or ' + PL[0].cap + ' batters each inning', btn: 'Play ball! ▶', voice: ['bb_title'], cls: 'bbintro', minMs: 500 }); }).then(startHalf);
+    sub: INNINGS + ' innings · 3 outs or ' + PL[0].cap + ' batters each inning', btn: 'Play ball! ▶', voice: ['bb_title', 'bb_intro_howto'], cls: 'bbintro', minMs: 500 }); }).then(startHalf);
 })(window.Arcade);

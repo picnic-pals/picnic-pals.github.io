@@ -27,6 +27,8 @@ js/core/storage.js         profiles & progress (versioned schema, migrations)
 js/core/curriculum-math.js math skills, levels, mastery logic (active: within 20; "later" entries to 100 / grade 2) + register() plug-in point
 js/core/skills-early.js    Early Concepts (colors, shapes) + Reading & Words (letters, beginning sounds, rhymes, sight words) skills; bonus stars ask from them
 js/core/early-words.js     word/picture lists, colors, shapes, letters, rhyme sets, their voice lines, and the Letter Lagoon story area
+js/core/skills-grade1.js   1st-grade Reading & Words skills: CVC words, sh/ch/th, more sight words, opposites, action words
+js/core/grade1-words.js    their word/picture lists (CVC, digraphs, Dolch primer + first grade, opposites, verbs/nouns), voice lines, Word Woods area
 js/core/questions.js       multiple-choice questions from any registered skill (skill.ask(level) or built from skill.gen) — used by Blob Baseball
 js/core/gamepad.js         game controllers (Gamepad API): controller → the same keys, seats for 2 players, hot-plug, rumble, button glyphs
 js/core/room-catalog.js    Blob Room shop: 64 items (categories, prices, special prizes and how they're won)
@@ -45,6 +47,7 @@ js/core/zip.js             tiny zip writer (store-only) and reader (stored + def
 audio/voice/               YOUR voice files go here (+ manifest.js listing them) — they always beat the built-in clips
 audio/voice-tts/           built-in voice clips (computer-generated with Kokoro TTS, voice af_heart): 1072 line clips + 1364 whole-sentence clips
 tools/                     make-voice-manifest (node/python), generate-tts.py + list-tts-jobs.js, build-recording-script, catalog loader
+                           build-food-data.py, build-room-art.py, build-unlock-art.js, build-wear-art.py (Dress Up hats + held items -> js/core/wear-data.js, assets/picnic/wear/)
 RECORDING_SCRIPT.md/.pdf   the script for recording the voice lines
 fonts/Fredoka.ttf          bundled font (SIL OFL, see fonts/OFL.txt)
 screenshots/               test screenshots + test-results.json
@@ -99,6 +102,13 @@ rules, 2 Players and story stops call the same `gen(level)`, and `Arcade.Story.a
 (`js/core/curriculum-catalog.js` / `curriculum-content*.js` are unused partial drafts from an earlier attempt; nothing loads them and
 the content files are left out of the zip.)
 
+### Coaching engine v2 (js/core/coach.js, second block)
+- **Per-item estimates (Elo-style):** a rating per player per skill (`p.coach.theta[skill]`) and a difficulty per item (`item.e`); P(right) = 1/(1+e^-(theta−e)). Mochi Munch draws 3 candidates for each right cell and keeps the one closest to **82.5 %** expected success (`Coach.pickItem`); after misses it aims easier (87–92 %), after a fast run a little harder (76 %). The 65/20/15 current/recent/review mix still picks the skill. Old (v1) coach data migrates on load (`coach.v` 1 → 2; ratings seeded from each item's history; nothing removed; save schema stays v3).
+- **Error diagnosis:** `Coach.ERRORS` is a table of `{ id, label, test(ctx), hint }` rows (teen reversal, off-by-one counting on, b/d, wrong operation, look-alike word); `Coach.HINTS` holds the mini-lessons. Add a pattern by adding a row. Counts are saved per player in `p.coach.errors[skill]` (+ a short `errLog`). In Munch a diagnosed miss shows a small, non-blocking hint card, and the worked example leads with it.
+- **Placement check:** when a skill opens because the one before it was finished, Free Play asks 5 quick questions first ("Let's see what you already know!"). 5/5 = skip (Mastered (placed), still reviewed), 4/5 = start a level higher, else start normally. Grown-up setting: Settings → "Placement check for new skills".
+- **Picnic story problems** (`wordprob`, after "Take away to 20"; within 10, then within 20; 85 % over 20 answers on 2 days). The pet name is a device-only grown-up setting (`settings.pet`, default Biscuit the dog); the default name has a clip, a custom one is said by the browser voice (like player names).
+- **Progress snapshot:** Grown-up area → Progress → "Copy progress summary" (plain text) or "Download .json", per player, with an option to show "Player 1" instead of the name.
+
 ### Subjects: Math, Reading & Words, Early Concepts
 `Arcade.Curriculum.SUBJECTS`. Each subject is its own ladder (own "now practicing" skill, levels, mastery and every-4th-round review);
 math progress lives where it always did (`p.math`), the others in `p.tracks.reading` / `p.tracks.concepts`.
@@ -106,12 +116,26 @@ math progress lives where it always did (`p.math`), the others in `p.tracks.read
   triangle, star, heart, then + rectangle, oval, diamond; SVG in varied colors, sizes and turns).
 - **Reading & Words**: Letters (find B; then big + little letters), Beginning sounds (picture cells: "things that start with B"),
   Rhymes (picture cells: "things that rhyme with cat"), Sight words (Dolch pre-primer: 20 most common, then all 40).
+  Then 1st grade (same ladder): Short vowel words (CVC: picture → word with one-letter look-alikes like cat/cot/cut, then read the
+  word → picture), sh/ch/th (pictures, then words; wrong ones start with s/c/h/t), More sight words (Dolch primer 52, then first
+  grade 41), Opposites (picture pairs like 🔥 hot / 🧊 cold, then word pairs), Action words (verbs with pictures, then action or
+  naming words). Then 2nd-3rd grade: Long vowels (silent e: cap/cape; vowel teams ai ee oa ea), Big kid sight words (Dolch 2nd 46,
+  3rd 41), Homophones (pick the spelling that fits a read-aloud sentence), Prefixes & suffixes (un-, re-, then -ful, -less), Reading
+  stories (read a 1-2 sentence story, answer who/what/where). Word-reading tasks speak only the prompt, never the answer choices.
+- **Levels** (New player screen, optional; grown-up area → Progress → Levels): Math / Reading / Early Concepts, Auto (by age) or
+  Pre-K … 5th (Early Concepts also Off). Sets where that ladder starts (earlier skills placed); adaptive up/down still applies. A grade
+  above the content starts at the top rung with a "more coming soon" note. Reading: Pre-K letters, K beginning sounds, 1st CVC,
+  2nd long vowels, 3rd homophones; Auto = age 6 → 1st, 7 → 2nd, 8+ → 3rd. Math Auto is unchanged (6+ at Adding to 10).
+  New players aged 6+ start Reading & Words at Short vowel words (the pre-K skills count as placed); struggling
+  there detours back to sight words like any skill, and a younger kid who masters sight words moves on to them.
 - **Mix** (grown-up area → Progress → Subject mix, per kid): "Mixed (by age)" — age 5 and under about 40% Early Concepts, 30% Reading &
   Words, 30% math; older kids 80% math, 12% reading, 8% concepts — or "Only <subject>". The split is exact over time (smooth
   weighted round-robin, `p.mixCredit`) and applies to Free Play, 2 Players (each kid their own mix), Blob Baseball and bonus stars
   (bonus stars ask a question from the kid's reading/concepts skill about as often as those subjects come up).
 - **Letter Lagoon**: a story side trip (🏝️, friend Dewdrop) with 6 stops, one per new skill, open from the start; ↓ on the map goes there.
   Side stops never change the main 20-stop journey, so old saves keep their progress.
+- **Word Woods**: a second side trip (🌲, friend Pickle) with 6 stops (CVC words, long vowels, big-kid sight words, homophones, prefixes & suffixes, reading stories), open from the start; ↓ goes to
+  Letter Lagoon, ↓ again to Word Woods (← → also walk from one to the other).
 - Voice: rules and words are short clips stitched together (`rule_begins` + letter, `pw_<word>`, `lt_<letter>`); no new sentence clips.
 
 ## Blob Baseball
@@ -184,6 +208,22 @@ Each player has their own cozy room (the **My Room** tile in the game picker). E
 | pick from tray, place, pick up | tap chip, tap spot / thing | Tab/↓ to tray, Space; arrows move the square | A, D-pad |
 | flip · put away · undo · done | buttons | R · Delete · Z · Esc | Y · X · View · B |
 | close a panel / go home | ✕ / 🏠 | Esc | B |
+
+## Tiny Picnic (toddler mode)
+
+`games/tiny/` — the main game for age-2 players (`A.toddler(p)`: grown-up setting per player in Grown-ups → Players, Auto = on for age 2, or On / Off).
+Three or four BIG picture tiles (food friends from `assets/picnic/friends/`, simple shapes, colors, matching, counting 1–3) and one spoken
+prompt (`js/core/tiny-data.js`, voice lines `tp_*`). Every tap is happy: the right one cheers, any other giggles and says its name, then the
+prompt repeats. No timer, no hearts, nothing lost. 6 prompts a round, then a calm "Hooray!" card and back to the hub. One star a round and
+the `tiny_*` stickers (3 / 8 / 15 / 25 rounds). The toddler hub shows Tiny Picnic as the big first tile (plus the Picnic Spot) and hides the
+school-level games and goal bars.
+
+## Play time, breaks and volume (grown-up Settings)
+
+`js/core/playtime.js`: per-player daily limit (Off / 15 / 20 / 30 / 45 min) and an optional stretch reminder every 20 minutes. Play time is
+kept only on this device (localStorage key `picnicpals-playtime`, not in saves or save codes) and resets each day. `PlayTime.checkpoint()`
+is called only between rounds (hub, end-of-round cards in Munch / Baseball / Tiny Picnic, arriving in the Picnic Spot), so a child is never
+cut off mid-question and keeps every reward. Only a grown-up (gate) can add time. Volume: `settings.voiceVol`, `sfxVol`, `musicVol` and `muteAll`.
 
 ## Game controllers
 Xbox, PlayStation (DualShock 4 / DualSense), Switch Pro and most generic USB/Bluetooth pads, in Chrome and Edge (standard mapping).
@@ -273,4 +313,6 @@ level-5 present, achievement prize, trophy shelf/stickers/roster silhouettes, da
 New subjects (`early-tests.js`; alone: `node early-run.js`; generators only, no browser: `node early-check.js`): every skill/level's
 5×4 grid has 5–9 correct cells that match the rule and 3–4-choice questions with exactly one right answer (thousands of samples), the
 subject mix (40/30/30 for age ≤ 5, 80/12/8 older, pinned subject), older saves, Free Play / 2P / bonus star / Baseball with the new
-skills, Letter Lagoon, and the dashboard by subject. Zip: `python3 _test/build-zip.py` from the kids-games folder.
+skills, Letter Lagoon, and the dashboard by subject. 1st-grade reading (`grade1-tests.js`, also run by `node early-run.js`; Node
+only: `node grade1-check.js`): same grid/question checks for the 5 skills, the age-6 start and drop-down, Free Play / 2P / bonus /
+Baseball, and Word Woods. Zip: `python3 _test/build-zip.py` from the kids-games folder.

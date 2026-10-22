@@ -170,6 +170,10 @@ kbd.hit { transform: translateY(.14em); box-shadow: 0 .04em 0 #cbbfe0, inset 0 0
 #parent .st { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
 #parent .st.mastered { background: #d4f7e8; color: #1f8a5f; }
 #parent .st.practicing { background: #fff1c4; color: #8a6400; }
+#parent .st.learning { background: #e3efff; color: #2a5fa8; }
+#parent .st.review { background: #ffe0e6; color: #b3324f; }
+#parent .coach small { display: block; line-height: 1.3; margin-top: 3px; font-size: 12px; color: #6d5f8c; }
+#parent .coach .missed b { color: #b3324f; font-weight: 700; }
 #parent .st.none { background: #efe9f8; color: var(--ink2); }
 #parent .st.later { background: #f2f2f2; color: #999; }
 #parent .sparkbars { display: inline-flex; align-items: flex-end; gap: 2px; height: 24px; vertical-align: middle; }
@@ -281,3 +285,66 @@ body.pad .cutscene .kh, body.pad .bonusq .kh { display: none !important; }
 .mixbox select { font: inherit; padding: 4px 8px; border-radius: 10px; margin-left: 6px; }
 .mixbox p { margin: 6px 0 0; }
 section.subj h3 small { font-weight: 500; font-size: .7em; }
+/* 1st-grade reading: a picture with its word under it (opposites, action words) */
+.ea-pw { display: inline-flex; flex-direction: column; align-items: center; line-height: 1; vertical-align: middle; }
+.ea-pw .ea-cap { font-weight: 700; font-size: .55em; margin-top: .12em; color: #4b3c6e; }
+.example .ea-pw .ea-cap { font-size: .6em; }
+/* 2nd-3rd grade reading: a short story (comprehension) and the blank in a homophone sentence */
+.ea-story { font-weight: 600; font-style: normal; color: #3d3160; display: block; font-size: .82em; line-height: 1.25; margin-bottom: .15em; }
+.ea-blank { display: inline-block; min-width: 2.2em; border-bottom: 3px solid #b39ddb; color: transparent; }
+
+/* ---------- coach v2: placement check, mistake mini-lessons, picnic story problems ---------- */
+.placement-card .card { max-width: 640px; }
+.pc-sub { font-size: clamp(18px, 3vmin, 24px); }
+.pc-dots { display: flex; gap: 8px; justify-content: center; margin: 4px 0 8px; } .pc-dots i { width: 14px; height: 14px; border-radius: 50%; background: #eee6f5; } .pc-dots i.done { background: #9fe0b5; } .pc-dots i.now { background: var(--pink); }
+.pc-q { font-size: clamp(24px, 4.6vmin, 40px); font-weight: 700; margin: 6px 0 10px; } .pc-pic { margin-bottom: 8px; }
+.pc-opts { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin: 8px 0 4px; }
+.pc-opt { min-width: 110px; min-height: 84px; padding: 10px 18px; border-radius: 22px; background: #fff; box-shadow: 0 5px 0 var(--line); font-size: clamp(24px, 4.4vmin, 38px); font-weight: 700; display: flex; align-items: center; gap: 10px; justify-content: center; }
+.pc-opt kbd { font-size: 13px; color: var(--ink3); background: #f3eefa; border-radius: 8px; padding: 1px 6px; }
+.pc-opt:focus-visible { outline: 4px solid #7fc8ff; } .pc-opt.right { background: #e3f9ea; box-shadow: 0 5px 0 #9fe0b5; } .pc-opt.picked { opacity: .55; }
+.diag-hint { position: fixed; left: 50%; bottom: 150px; transform: translateX(-50%); z-index: 65; background: #fffdf3; border-radius: 22px; padding: 10px 18px 12px; box-shadow: 0 6px 0 #f1dca0, 0 10px 30px #0002; max-width: min(560px, 94vw); text-align: center; pointer-events: none; animation: dhin .35s ease-out; }
+.diag-hint.out { opacity: 0; transition: opacity .4s; } @keyframes dhin { from { opacity: 0; } to { opacity: 1; } }
+@media (min-width: 900px) and (min-aspect-ratio: 5/4) { .diag-hint { left: 12px; top: 128px; bottom: auto; transform: none; max-width: min(270px, calc(50vw - 240px)); } }
+.exportbox .anon { white-space: nowrap; font-size: 15px; } .exportbox small { display: block; margin-top: 4px; } .exportbox .exp-out { white-space: pre-wrap; overflow-wrap: anywhere; background: #fff; border-radius: 12px; padding: 10px 12px; font-size: 13px; max-height: 360px; overflow: auto; margin: 8px 0 0; }
+.diag-hint .dh-t { display: block; font-size: 18px; color: #b98a00; }
+.diag { font-size: clamp(16px, 2.6vmin, 22px); } .diag p { margin: 6px 0 0; font-weight: 600; }
+.diag.teen { display: flex; flex-wrap: wrap; gap: 6px 18px; justify-content: center; align-items: flex-end; } .diag.teen > p { flex-basis: 100%; }
+.diag.teen .tens, .diag.teen .ones { display: flex; flex-direction: column; align-items: center; gap: 2px; } .diag.teen .tens b { color: #2a72cc; } .diag.teen .ones b { color: #d9661a; }
+.diag .hops { letter-spacing: .02em; color: #2a72cc; } .diag.bed .hands { font-size: 1.8em; display: flex; justify-content: center; gap: 10px; } .diag.bed .hands .e { color: var(--ink3); }
+.diag.story .pic { font-size: 1.5em; letter-spacing: .05em; } .diag.story s { opacity: .35; } .diag.first .w { font-size: 1.6em; } .diag.first .w b { color: var(--pink); }
+.wp-pic { display: block; font-size: .8em; letter-spacing: .04em; margin-top: .1em; } .wp-pic .pet { margin-right: .35em; }
+.worked .diag { margin-bottom: 10px; }
+
+/* Picnic Pals food friends (js/core/blobs.js): one picture per pose; the x-<expr> class (or a parent animation class) picks it */
+.blob.food .pz { display: none; }
+.blob.food.x-idle .pz-front, .blob.food.x-front .pz-front { display: inline; }
+.blob.food.x-happy .pz-happy, .blob.food.x-love .pz-happy, .blob.food.x-wink .pz-happy, .blob.food.x-silly .pz-happy { display: inline; }
+.blob.food.x-cheer .pz-cheering, .blob.food.x-cheering .pz-cheering, .blob.food.x-wow .pz-cheering, .blob.food.x-starry .pz-cheering { display: inline; }
+.blob.food.x-chomp .pz-munching, .blob.food.x-munch .pz-munching, .blob.food.x-munching .pz-munching { display: inline; }
+.blob.food.x-sad .pz-sad { display: inline; }
+.blob.food.x-oops .pz-oops { display: inline; }
+.blob.food.x-think .pz-thinking, .blob.food.x-thinking .pz-thinking { display: inline; }
+.blob.food.x-sleepy .pz-sleepy, .blob.food.x-dreamy .pz-sleepy { display: inline; }
+.blob.food.x-bat .pz-batting, .blob.food.x-batting .pz-batting { display: inline; }
+.blob.food.x-kick .pz-kicking, .blob.food.x-kicking .pz-kicking { display: inline; }
+.happy .blob.food .pz, .dance .blob.food .pz, .chomp .blob.food .pz, .wobble .blob.food .pz { display: none !important; }
+.happy .blob.food .pz-happy { display: inline !important; }
+.dance .blob.food .pz-cheering { display: inline !important; }
+.chomp .blob.food .pz-munching { display: inline !important; }
+.wobble .blob.food .pz-oops { display: inline !important; }
+.blob.food image { image-rendering: auto; }
+#gate .opts.six { grid-template-columns: repeat(3, 1fr); }
+#gate .q .gwait { display: block; font-size: 34px; color: var(--ink); }
+#gate .q .gsec { display: block; font-size: 20px; font-weight: 600; color: var(--ink2); margin-top: 6px; }
+/* UX batch 2: grown-up volume + play time, stop / stretch cards */
+#parent .volrow input[type=range] { flex: 0 0 200px; min-height: 48px; }
+#parent .volrow .volpct { min-width: 3em; text-align: right; }
+#parent .ptrow select { min-height: 48px; font-size: 16px; }
+#parent .ptrow .sbtn { min-height: 48px; }
+.ptcard .card { max-width: 560px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.ptcard .card .art.ptart { height: auto; width: clamp(150px, 30vmin, 230px); margin: 0 auto; }
+.ptcard .card .art.ptart > svg, .ptcard .card .art.ptart svg { width: 100%; height: auto; max-height: 230px; }
+.ptcard .card h2 { font-size: clamp(32px, 6.5vmin, 52px); }
+.ptcard .ptadd { gap: 12px; }
+.ptcard .bigbtn, .ptcard .pill { min-height: 56px; }
+#parent .volrow > span { flex: 1; }

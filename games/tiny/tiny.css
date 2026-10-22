@@ -1,0 +1,33 @@
+/* Tiny Picnic (toddler mode): very big targets, calm slow motion, no flashing */
+body { background: linear-gradient(#fff6e8, #ffe9f1); }
+#tiny { display: flex; flex-direction: column; align-items: center; height: 100vh; height: 100dvh; padding: 12px 16px 20px; box-sizing: border-box; gap: 8px; }
+.tbar { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.homebtn, .sayagain { width: 84px; height: 84px; border-radius: 50%; border: 0; background: #fff; font-size: 40px; box-shadow: 0 5px 0 #f0d9e4; cursor: pointer; }
+.dots { display: flex; gap: 10px; }
+.dots i { width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: inset 0 0 0 3px #f2cfe0; transition: background .6s; }
+.dots i.on { background: #ffc94d; box-shadow: inset 0 0 0 3px #f0b400; }
+.ask { display: flex; align-items: center; justify-content: center; gap: 14px; min-height: 120px; }
+.pal img { width: clamp(100px, 18vmin, 150px); height: auto; display: block; }
+.cue:empty { display: none; }
+.cuepic img { width: clamp(90px, 15vmin, 130px); height: auto; display: block; background: #fff; border-radius: 28px; padding: 8px; box-shadow: 0 0 0 5px #ffd6e3; }
+.cueswatch { display: block; width: 100px; height: 100px; border-radius: 50%; box-shadow: 0 0 0 6px #fff, 0 6px 0 6px #0001; }
+.asktxt { font-size: 18px; color: var(--ink2); margin: 0; max-width: 180px; }   /* small, for grown-ups; the prompt is spoken */
+.tgrid { flex: 1; width: 100%; max-width: 980px; display: grid; gap: clamp(14px, 3vmin, 28px); align-content: center; justify-content: center; grid-template-columns: repeat(3, minmax(150px, 280px)); }
+.tgrid.n4 { grid-template-columns: repeat(4, minmax(140px, 230px)); }
+@media (orientation: portrait) { .tgrid, .tgrid.n4 { grid-template-columns: repeat(2, minmax(150px, 300px)); } .tgrid.n3 .ttile:last-child { grid-column: 1 / span 2; justify-self: center; width: 50%; } }
+.ttile { min-width: 140px; min-height: 140px; aspect-ratio: 1; border: 0; border-radius: 40px; background: #fff; box-shadow: 0 8px 0 #f0d9e4, 0 14px 30px #4a3b6b1a; cursor: pointer; display: grid; place-items: center; padding: 12px; transition: transform .5s ease, opacity .6s ease; }
+.ttile:focus-visible { outline: 6px solid #8fb8ff; outline-offset: 4px; }
+.tart { width: 100%; height: 100%; display: grid; place-items: center; }
+.tart img, .tart svg { width: 82%; height: 82%; object-fit: contain; }
+.grp { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; width: 100%; height: 100%; gap: 4px; }
+.grp img { width: 44%; height: auto; }
+.grp.g1 img { width: 70%; }
+.ttile.yay { transform: scale(1.08); box-shadow: 0 8px 0 #ffd36b, 0 0 0 10px #fff1b8; animation: tyay 1.2s ease-in-out; }
+.ttile.rest { opacity: .45; }
+.ttile.giggle { animation: tgig 1.1s ease-in-out; }
+@keyframes tyay { 0% { transform: scale(1); } 40% { transform: scale(1.12) translateY(-10px); } 100% { transform: scale(1.08); } }
+@keyframes tgig { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-6deg); } 45% { transform: rotate(6deg); } 70% { transform: rotate(-4deg); } }
+.tinydone .tinyhero img { width: 100%; height: 100%; object-fit: contain; animation: tbob 2.4s ease-in-out infinite; }
+@keyframes tbob { 50% { transform: translateY(-8px); } }
+@media (prefers-reduced-motion: reduce) { .ttile, .ttile.yay, .ttile.giggle, .tinyhero img { animation: none !important; transition: none; } }
+.tbar { padding-right: 84px; box-sizing: border-box; }   /* room for the grown-up gear in the corner */

@@ -11,6 +11,8 @@
   if (!P1) { location.replace(A.ROOT + 'index.html#players'); return; }
   C.ensure(P1);
   var S = A.Store.settings;
+  var GENTLE = A.gentleMunch(P1);   // little ones: no hearts, no countdown (grown-up setting per player)
+  function timerWanted() { return S.timer !== false && !GENTLE; }
 
   /* ---------- who is playing ---------- */
   var qs = {}; location.search.replace(/^\?/, '').split('&').forEach(function (kv) { var p = kv.split('='); if (p[0]) qs[decodeURIComponent(p[0])] = decodeURIComponent(p[1] || ''); });
@@ -18,7 +20,7 @@
   var STORY = qs.mode === 'story', MODE = qs.mode === 'team' || qs.mode === 'versus' ? qs.mode : null, P2 = null;
   var GUEST = { easy: ['count10', 1], medium: ['add10', 1], hard: ['add20', 1] };
   function makeGuest(kind) {
-    var g = A.Store.blank('Guest', 'clem'); g.id = 'guest'; g.color = 'sky'; g.guest = true; g.age = kind === 'easy' ? 4 : null; C.ensure(g);
+    var g = A.Store.blank('Guest', 'carrot'); g.id = 'guest'; g.color = 'sky'; g.guest = true; g.age = kind === 'easy' ? 4 : null; C.ensure(g);
     var lv = GUEST[kind] || GUEST.medium; C.place(g, lv[0]); C.state(g, lv[0]).level = lv[1]; C.state(g, lv[0]).introduced = true; return g;
   }
   if (MODE && qs.p2) { P2 = /^guest/.test(qs.p2) ? makeGuest(qs.p2.split('-')[1]) : A.Store.get(qs.p2); if (P2 && P2.id === P1.id) P2 = null; if (P2) C.ensure(P2); }
@@ -38,10 +40,10 @@
   function mkPlayer(P, i) { return { i: i, P: P, name: P.name, col: COLORS[i], pos: { r: 0, c: 0 }, target: null, walkT: null, lastMove: 0, busy: false, el: null, round: null, rule: null, nOk: 0, remaining: 0, correct: 0, wrong: 0, done: false, doneAt: 0 }; }
   var PL = [mkPlayer(P1, 0)]; if (TWO) PL.push(mkPlayer(P2, 1));
   var G = { lastStars: null, active: false, cells: [], hearts: 3, grum: null, grumT: null, t0: 0, first: true, team: { done: false } };
-  var T = { on: S.timer !== false, limit: 0, left: 0, low: false, lastSec: -1, iv: null, said: false, bonusAdd: 0 };
+  var T = { on: timerWanted(), limit: 0, left: 0, low: false, lastSec: -1, iv: null, said: false, bonusAdd: 0 };
   var B = { cell: -1, shown: false, plannedAt: 0, open: false, q: null, sel: 0, el: null, used: false };
-  var board = $('#board'), wrap = $('#boardWrap'), cellEls = [], grumEl, starEl, CS = 100, GAP = 8;
-  document.body.classList.toggle('two', TWO); document.body.classList.toggle('notimer', !T.on);
+  var board = $('#board'), wrap = $('#boardWrap'), cellEls = [], grumEl, starEl, CS = 100, CW = 100, GAP = 8;
+  document.body.classList.toggle('two', TWO); document.body.classList.toggle('notimer', !T.on); document.body.classList.toggle('gentle', GENTLE && !TWO);
 
   /* ---------- timer ---------- */
   // seconds per target cell, by skill and level (walking + thinking time); generous on purpose
@@ -59,7 +61,7 @@
     clearInterval(T.iv); T.low = false; T.said = false; T.lastSec = -1; T.bonusAdd = 0;
     var lim = Math.max.apply(null, PL.map(secondsFor)); if (TWO) lim *= 1.1;
     var chal = PL[0].round && PL[0].round.challenge;
-    T.on = chal ? true : S.timer !== false; document.body.classList.toggle('notimer', !T.on); document.body.classList.toggle('challenge', !!chal);
+    T.on = chal ? true : timerWanted(); document.body.classList.toggle('notimer', !T.on); document.body.classList.toggle('challenge', !!chal);
     if (chal) lim = chal.target;
     T.limit = T.left = Math.round(lim); renderTimer(); M.setFast(false);
     if (!T.on) return;
@@ -89,8 +91,14 @@
     var cells = [];
     PL.forEach(function (pl) {
       var R = pl.round.skill.gen(pl.round.level), mine = TWO ? N / 2 : N, nOk = TWO ? A.rnd(5, 6) : pl.round.nOk || A.rnd(6, 8), i;
-      for (i = 0; i < nOk; i++) { var g = R.good(); g.ok = true; g.owner = pl.i; cells.push(g); }
+      var pickable = A.Coach && A.Coach.pickItem && !R.rc && R.hom == null && typeof R.target !== 'string' && !pl.P.guest;
+      for (i = 0; i < nOk; i++) {
+        var g = R.good();
+        if (pickable) { var cands = [g, R.good(), R.good()].map(function (c) { return { key: c.label, cell: c }; }); g = A.Coach.pickItem(pl.P, pl.round.skill.id, cands).cell; }   // coach v2: expected success near 80-85%
+        g.ok = true; g.owner = pl.i; cells.push(g);
+      }
       for (i = nOk; i < mine; i++) { var b = R.bad(); b.ok = false; b.owner = pl.i; cells.push(b); }
+      pl.workedShown = false; pl.workedOpen = false; pl.lastAns = 0; pl.diag = null; pl.diagSeen = {};
       pl.rule = R; pl.nOk = nOk; pl.remaining = nOk; pl.correct = 0; pl.wrong = 0; pl.done = false; pl.doneAt = 0; pl.busy = false;
       pl.target = null; clearTimeout(pl.walkT); pl.walkT = null;
     });
@@ -126,9 +134,10 @@
   function renderRule() {
     if (!TWO) {
       var pl = PL[0];
-      $('#ruleTxt').innerHTML = pl.rule.text + (pl.rule.hint ? '<span class="hint">' + pl.rule.hint + '</span>' : '');
+      // strategy hint only after a mistake (never up front)
+      $('#ruleTxt').innerHTML = pl.rule.text + (pl.rule.hint && pl.wrong > 0 ? '<span class="hint">' + pl.rule.hint + '</span>' : '');
       var chip = $('#levelChip'), s = pl.round.skill;
-      chip.textContent = pl.round.story ? pl.round.stop.area.emoji + ' Stop ' + pl.round.stop.n + ' · ' + pl.round.stop.area.name : pl.round.review ? 'Review: ' + s.name : s.name + ' · Level ' + (pl.round.level + 1);
+      chip.textContent = pl.round.story ? pl.round.stop.area.emoji + ' Stop ' + pl.round.stop.n + ' · ' + pl.round.stop.area.name : pl.round.review ? 'Review: ' + s.name : pl.round.testOut ? 'Test-out: ' + s.name + ' · 5 to skip ahead' : s.name + ' · Level ' + (pl.round.level + 1);
       chip.classList.toggle('review', !!pl.round.review);
       return;
     }
@@ -149,12 +158,33 @@
     GAP = Math.max(6, Math.round(Math.min(W, H) * .018));
     CS = Math.floor(Math.min((W - GAP * (COLS - 1)) / COLS, (H - GAP * (ROWS - 1)) / ROWS, 190));
     CS = Math.max(44, CS);
-    board.style.gridTemplateColumns = 'repeat(' + COLS + ',' + CS + 'px)'; board.style.gridAutoRows = CS + 'px'; board.style.gap = GAP + 'px';
+    // skills with phrase answers (stories) get wider tiles when there is room (same rows, so the walk/munch grid is unchanged)
+    var wide = PL.some(function (pl) { return pl.round && pl.round.skill && pl.round.skill.wideCells; });
+    CW = wide ? Math.max(CS, Math.min(Math.floor((W - GAP * (COLS - 1)) / COLS), Math.round(CS * 1.7))) : CS;
+    board.style.gridTemplateColumns = 'repeat(' + COLS + ',' + CW + 'px)'; board.style.gridAutoRows = CS + 'px'; board.style.gap = GAP + 'px';
     board.style.setProperty('--cs', CS + 'px');
     PL.map(function (p) { return p.el; }).concat([grumEl, starEl]).forEach(function (e) { if (e) { e.style.width = CS + 'px'; e.style.height = CS + 'px'; } });
-    place(false);
+    place(false); fitCells();
   }
-  function xy(p, dx) { return 'translate(' + (p.c * (CS + GAP) + (dx || 0)) + 'px,' + (p.r * (CS + GAP)) + 'px)'; }
+  // Make every tile label fit inside its tile: first shrink on one line (a little), then wrap at spaces and shrink again,
+  // never below MIN_FONT px for the label's text. Shrinking sets the label's own --cs, so pictures/frames scale with the text.
+  var MIN_FONT = 13;
+  function over(l) { return l.scrollWidth > l.clientWidth || l.scrollHeight > l.clientHeight; }
+  function textPx(l) { var t = l.querySelector('.ea-word,.ea-cap') || l; return parseFloat(getComputedStyle(t).fontSize) || 16; }
+  function fitCell(d) {
+    var l = d.querySelector('.lbl'); if (!l) return;
+    l.style.removeProperty('--cs'); d.classList.remove('wrap', 'tight');
+    l.style.maxWidth = Math.floor(d.clientWidth * .92) + 'px'; l.style.maxHeight = Math.floor(d.clientHeight * .92) + 'px';   // whole pixels: no rounding "overflow"
+    if (!over(l)) return;
+    var k = 1, f0 = textPx(l);
+    while (over(l) && k > .72 && f0 * k * .92 >= MIN_FONT) { k *= .92; l.style.setProperty('--cs', (CS * k) + 'px'); }
+    if (!over(l)) return;
+    d.classList.add('wrap'); k = 1; l.style.removeProperty('--cs');
+    while (over(l) && f0 * k * .94 >= MIN_FONT) { k *= .94; l.style.setProperty('--cs', (CS * k) + 'px'); }
+    if (over(l)) d.classList.add('tight');   // still too big at the minimum size (caller can test for .tight)
+  }
+  function fitCells() { cellEls.forEach(fitCell); }
+  function xy(p, dx) { return 'translate(' + (p.c * (CW + GAP) + (CW - CS) / 2 + (dx || 0)) + 'px,' + (p.r * (CS + GAP)) + 'px)'; }
   function place(anim) {
     var els = PL.map(function (p) { return p.el; }).concat([grumEl, starEl]).filter(Boolean);
     if (!anim) els.forEach(function (e) { e.style.transition = 'none'; });
@@ -168,6 +198,7 @@
   function anim(pl, cls, ms) { A.Blobs.anim(pl.el, cls, ms); }
   function renderHearts(lost) {
     var h = $('#hearts'); h.className = 'hearts'; h.innerHTML = '';
+    if (GENTLE && !TWO) { h.classList.add('gentle'); h.setAttribute('aria-hidden', 'true'); return; }   // gentle: no hearts to lose
     for (var i = 0; i < 3; i++) { var s = document.createElement('span'); s.innerHTML = HEART; var sv = s.firstChild; if (i >= G.hearts) sv.classList.add('gone'); if (lost && i === G.hearts) sv.classList.add('pop'); h.appendChild(sv); }
   }
   function bubble(t) { var b = $('#bubble'); $('#bubbleMsg').textContent = t; b.classList.remove('say'); void b.offsetWidth; b.classList.add('say'); }
@@ -212,26 +243,123 @@
     pl.el.classList.remove('happy', 'wobble');
     anim(pl, 'chomp', 460); SFX.chomp();
     if (cell.ok) {
-      cell.eaten = true; pl.correct++; pl.remaining--; C.recordAnswer(P, sid, true); A.Pad.rumble(pl.i, 'light');
+      cell.eaten = true; pl.correct++; pl.remaining--; var sig = C.recordAnswer(P, sid, true, ansOpt(pl, cell)); A.Pad.rumble(pl.i, 'light');
       setTimeout(function () { el.classList.add('eaten'); }, 160);
       setTimeout(function () { anim(pl, 'happy', 1000); }, 200); SFX.yay();
       var rc = el.getBoundingClientRect(); UI.sparkle(rc.left + rc.width / 2, rc.top + rc.height / 2); UI.plusText(rc.left + rc.width / 2, rc.top + rc.height * .3, '+1');
-      var line = [A.pick(YUM)]; if (pl.round.skill.sayFact) line = line.concat(cell.fact);
+      var line = [A.pick(YUM)]; if (pl.round.skill.sayFact || pl.rule.listen) line = line.concat(cell.fact);   // word-reading: the word is spoken after a right munch
       if (pl.remaining <= 0) {
         pl.done = true; pl.doneAt = Date.now();
         if (TWO) { if (MODE === 'versus' && !PL.some(function (o) { return o !== pl && o.done; })) G.winner = pl.i; line = ['munch_all_done']; setTimeout(function () { anim(pl, 'dance', 1600); }, 500); }
       }
       talk(line);
-      renderRule(); renderSide();
+      renderRule(); renderSide(); coachAfter(pl, sig, cell);
       if (PL.every(function (p) { return p.done; })) { endRound('done'); } else maybeBonus();
     } else {
-      if (!cell.tried) { cell.tried = true; pl.wrong++; C.recordAnswer(P, sid, false); if (!TWO) { G.hearts--; renderHearts(true); } }
+      var wsig = null;
+      if (!cell.tried) { cell.tried = true; pl.wrong++; wsig = C.recordAnswer(P, sid, false, ansOpt(pl, cell)); if (!TWO) { if (!GENTLE) { G.hearts--; renderHearts(true); } if (pl.wrong === 1) renderRule(); } diagnoseMiss(pl, cell); }
       el.classList.add('tried'); el.classList.remove('nope'); void el.offsetWidth; el.classList.add('nope');
       setTimeout(function () { pl.el.classList.remove('chomp'); anim(pl, 'wobble', 800); }, 140); SFX.oops();
-      talk([nearMiss(pl, cell) ? 'fb_so_close' : 'fb_oops'].concat(cell.fact));
-      if (!TWO && G.hearts <= 0) { G.active = false; stopTimer(); stopGrumbly(); setTimeout(outOfHearts, 2400); }
+      // word-reading rules: say the re-prompt, but don't print it (the bubble would show the answer's spelling)
+      if (pl.rule.listen || pl.rule.noPrint) { talk(['fb_oops'].concat(cell.fact), false); bubble('Oops! Listen again, then try another one.'); }
+      else talk([nearMiss(pl, cell) ? 'fb_so_close' : 'fb_oops'].concat(cell.fact));
+      if (!TWO && !GENTLE && G.hearts <= 0) { G.active = false; stopTimer(); stopGrumbly(); setTimeout(function () { (wsig && wsig.worked ? workedExample(pl) : Promise.resolve()).then(outOfHearts); }, 2400); }
+      else coachAfter(pl, wsig, cell);
     }
     A.Store.save();
+  }
+  /* coach v2 error diagnosis: tag the wrong answer (teen reversal, off by one, b/d, wrong operation, look-alike word…),
+     record it, and show its mini-lesson (non-blocking, once per type per round); the worked example then uses it too */
+  function diagnoseMiss(pl, cell) {
+    if (!A.Coach || !A.Coach.diagnose || pl.P.guest) return null;
+    var r = pl.rule, say = r.say || [], nums = say.filter(function (x) { return typeof x === 'number'; }), good = G.cells.filter(function (c) { return c.ok && (!TWO || c.owner === pl.i); })[0] || {};
+    var ctx = { chosen: cell.label, answer: typeof r.target === 'string' ? r.target : r.wp ? String(r.wp.ans) : nums.length ? String(nums[nums.length - 1]) : good.label };
+    if (r.wp) { ctx.op = r.wp.op; ctx.a = r.wp.a; ctx.b = r.wp.b; ctx.target = r.wp.ans; ctx.em = r.wp.em; }
+    var d = A.Coach.diagnose(pl.P, pl.round.skill.id, ctx); if (!d) return null;
+    pl.diag = d; pl.diagSeen = pl.diagSeen || {};
+    if (!TWO && !pl.diagSeen[d.type]) { pl.diagSeen[d.type] = 1; setTimeout(function () { if (G.active) { UI.diagHint(d); if (d.hint.say) talk(d.hint.say, false); } }, 1300); }
+    return d;
+  }
+  /* ---------- coaching (js/core/coach.js) ----------
+     item ids: a story passage, a homophone sentence, a word-reading target, else the cell itself (a fact like "3 + 4" or a number) */
+  function itemKey(pl, cell) {
+    var r = pl.rule;
+    if (r.rc) return r.rc;
+    if (r.hom != null) return 'hom_' + r.hom;
+    if (typeof r.target === 'string' && !/^(verb|noun)$/.test(r.target)) return r.target;
+    return cell.label;
+  }
+  function ansOpt(pl, cell) {
+    var t = Date.now(), ms = t - (pl.lastAns || G.t0); pl.lastAns = t;
+    var timed = !(pl.P.age != null && pl.P.age < 5);   // no fluency timing under 5
+    return { key: itemKey(pl, cell), hint: pl.wrong > 0 || !!pl.workedShown, ms: ms, fast: timed && ms < FAST_MS };
+  }
+  var FAST_MS = 4500;   // walk + munch: a "fast" answer in Munch
+  function coachAfter(pl, sig, cell) {
+    if (!sig || TWO || !G.active) return;
+    var P = pl.P, sid = pl.round.skill.id;
+    if (sig.streak) celebrateStreak(sig.streak);
+    if (sig.easeOff) easeOff(pl);
+    if (sig.worked) { workedExample(pl); return; }
+    if (sig.speedUp && !pl.round.testOut && !pl.round.review) { C.state(P, sid).offerTestOut = true; talk(['coach_test_out']); }
+    // re-ask: a cell munched by mistake comes back 2-3 munches later (judge it again: leaving it is the right answer)
+    var k = A.Coach && A.Coach.reaskDue(P, sid);
+    if (k != null) {
+      A.Coach.reaskTake(P, k);
+      G.cells.forEach(function (c, i) { if (c.tried && !c.eaten && itemKey(pl, c) === k) { c.tried = false; c.again = true; cellEls[i].classList.remove('tried'); cellEls[i].classList.add('again'); } });
+    }
+  }
+  function celebrateStreak(n) {
+    UI.rain(40); SFX.yay();
+    var b = $('#bubble'), r = b.getBoundingClientRect(); UI.plusText(r.left + r.width / 2, r.top, '⭐ ' + n + ' in a row!');
+    talk([n >= 10 ? 'coach_streak10' : 'coach_streak5']); $('#bubble').classList.add('streak'); setTimeout(function () { $('#bubble').classList.remove('streak'); }, 2600);
+  }
+  // 2 misses in a row: show the strategy hint and make an easy / already-known snack glow next to the player
+  function easeOff(pl) {
+    renderRule();
+    var K = A.Coach, sid = pl.round.skill.id, best = -1, bd = 1e9;
+    G.cells.forEach(function (c, i) {
+      if (!c.ok || c.eaten) return;
+      var known = K && K.item(pl.P, sid, itemKey(pl, c)).b >= 3, d = Math.abs(Math.floor(i / COLS) - pl.pos.r) + Math.abs(i % COLS - pl.pos.c) - (known ? 3 : 0);
+      if (d < bd) { bd = d; best = i; }
+    });
+    cellEls.forEach(function (e) { e.classList.remove('nudge'); });
+    if (best >= 0) cellEls[best].classList.add('nudge');
+    setTimeout(function () { talk(['coach_easy_one'], false); bubble(pl.rule.hint ? 'Hint: ' + pl.rule.hint.replace(/<[^>]+>/g, '') : 'Try the glowing one!'); }, 1500);
+  }
+  // 3 misses in a row: a short worked example (number line / count-on dots, sound it out, or the answer sentence highlighted)
+  function workedHtml(pl) {
+    var dg = pl.diag && pl.diag.hint ? pl.diag.hint.html(pl.diag.ctx) : '';
+    if (pl.rule.wp) { var w = pl.rule.wp; return dg + '<div class="worked story-math">' + A.Coach.HINTS.story_picture.html({ op: w.op, a: w.a, b: w.b, em: w.em }) + '<p class="wa">' + w.a + (w.op === '+' ? ' + ' : ' − ') + w.b + ' = <b>' + w.ans + '</b></p></div>'; }
+    if (dg) return dg + workedHtml0(pl);
+    return workedHtml0(pl);
+  }
+  function workedHtml0(pl) {
+    var r = pl.rule, good = G.cells.filter(function (c) { return c.ok; })[0] || {}, lab = String(good.label || ''), m;
+    if (r.rc) {
+      var pass = (r.text.match(/<span class="ea-story">([\s\S]*?)<\/span>/) || [])[1] || '', sents = pass.match(/[^.!?]+[.!?]+/g) || [pass];
+      var aw = String(r.target).toLowerCase().match(/[a-z']+/g) || [], qw = String(r.q || '').toLowerCase().match(/[a-z']+/g) || [];
+      var score = function (t) { var w = t.toLowerCase(); return aw.filter(function (x) { return x.length > 2 && w.indexOf(x) >= 0; }).length * 2 + qw.filter(function (x) { return x.length > 3 && w.indexOf(x) >= 0; }).length; };
+      var bi = 0; sents.forEach(function (t, i) { if (score(t) > score(sents[bi])) bi = i; });
+      return '<div class="worked story"><p>' + sents.map(function (t, i) { return i === bi ? '<mark>' + t.trim() + '</mark>' : t.trim(); }).join(' ') + '</p>' +
+        '<p class="wq">' + A.esc(r.q || '') + '</p><p class="wa">The clue is in the <mark>yellow</mark> sentence → <b>' + A.esc(r.target) + '</b></p></div>';
+    }
+    if ((m = /^(\d+) ([+−]) (\d+)$/.exec(lab))) {
+      var a = +m[1], b = +m[3], plus = m[2] === '+', res = plus ? a + b : a - b, hi = Math.max(a, res), dots = '';
+      for (var i = 0; i < (plus ? a + b : a); i++) dots += '<i class="' + (plus ? (i < a ? 'a' : 'b') : (i < res ? 'a' : 'x')) + '"></i>';
+      var line = ''; for (var n = 0; n <= Math.max(10, hi); n++) line += '<span class="' + (n === a ? 'st' : '') + (plus ? (n > a && n <= res ? ' hop' : '') : (n < a && n >= res ? ' hop' : '')) + (n === res ? ' end' : '') + '">' + n + '</span>';
+      return '<div class="worked math"><div class="wdots">' + dots + '</div><div class="nline">' + line + '</div><p class="wa">Start at <b>' + a + '</b>, ' + (plus ? 'count on' : 'hop back') + ' <b>' + b + '</b>: ' +
+        (function () { var o = []; for (var j = 1; j <= b; j++) o.push(plus ? a + j : a - j); return o.join(', '); })() + ' → <b>' + lab + ' = ' + res + '</b></p></div>';
+    }
+    if (/^\d+$/.test(lab)) return '<div class="worked math"><div class="wbig">' + lab + '</div><div>' + C.frame(Math.min(+lab, 10)) + (+lab > 10 ? C.frame(+lab - 10) : '') + '</div><p class="wa">Look for <b>' + lab + '</b>!</p></div>';
+    if (/^[a-z']+$/i.test(lab)) return '<div class="worked word"><div class="sound">' + lab.split('').map(function (ch) { return '<span>' + A.esc(ch) + '</span>'; }).join('<i>·</i>') + '</div><p class="wa">Sound it out, then say it fast: <b>' + A.esc(lab) + '</b></p></div>';
+    return '<div class="worked"><div class="wbig">' + (good.html || A.esc(lab)) + '</div><p class="wa">This one fits: <b>' + A.esc(lab) + '</b></p></div>';
+  }
+  function workedExample(pl) {
+    if (pl.workedOpen) return Promise.resolve(); pl.workedOpen = true; pl.workedShown = true;
+    var good = G.cells.filter(function (c) { return c.ok; })[0] || {}, voice = ['coach_watch_me'].concat(pl.rule.rc ? pl.rule.say : (good.fact || []));
+    return UI.card({ cls: 'worked-card', tag: 'Watch me!', title: "Let's do one together", html: workedHtml(pl), btn: 'Got it! ▶', voice: voice, minMs: 600 })
+      .then(function () { pl.workedOpen = false; });
   }
   function nearMiss(pl, cell) {
     var say = pl.rule.say, t = say[say.length - 1], f = cell.fact, v = f[f.length - 1];
@@ -265,12 +393,12 @@
       '<div class="res" aria-live="polite"></div><span class="kh">' + (A.isTouchOnly() ? 'Tap your answer' : keys) + '</span><span class="ph">' + A.Pad.g('dpad') + ' choose · ' + A.Pad.g('a') + ' answer</span></div></div>');
     document.body.appendChild(ov); B.el = ov; UI.cardOpen = true;
     A.$$('.choice', ov).forEach(function (b) { b.addEventListener('click', function () { answer(+b.dataset.k); }); b.addEventListener('pointerenter', function () { if (!B.answered) select(+b.dataset.k); }); });
-    ov.querySelector('[data-again]').addEventListener('click', function (e) { e.stopPropagation(); readQuestion(); });
+    ov.querySelector('[data-again]').addEventListener('click', function (e) { e.stopPropagation(); readQuestion(true); });
     select(0); readQuestion();
   }
-  function readQuestion() {
+  function readQuestion(all) {
     var q = B.q, tok = (B.readTok = (B.readTok || 0) + 1);
-    V.say(['bonus_title'].concat(q.parts || [q.line])).then(function () {
+    V.say(['bonus_title'].concat((all && q.partsAll) || q.parts || [q.line])).then(function () {
       var chain = Promise.resolve();
       B.order.forEach(function (ci, k) {
         chain = chain.then(function () { if (tok !== B.readTok || B.answered || !B.open) return; B.el.querySelectorAll('.choice')[k].classList.add('reading'); return V.say(q.choices[ci].parts || [q.choices[ci].line]).then(function () { var b = B.el && B.el.querySelectorAll('.choice')[k]; if (b) b.classList.remove('reading'); }); });
@@ -289,11 +417,13 @@
       var rb = btns[k].getBoundingClientRect(); UI.sparkle(rb.left + rb.width / 2, rb.top + rb.height / 2);
       if (T.on) { res.textContent = 'You got it! +15 seconds!'; voice = ['bonus_right']; B.bonusTime = 15; }
       else { res.textContent = 'You got it! A bonus star!'; voice = ['bonus_right_star']; B.bonusTime = 0; if (!pl.P.guest) pl.P.stars++; $('#starCount').textContent = P1.stars; }
+      if (q.listen && q.fact && q.fact.length) voice = q.fact.concat(voice);   // a word-reading question: say the word after a right answer
       res.className = 'res good';
     } else {
       SFX.soft(); btns[k].classList.add('nope'); B.bonusTime = 0;
       res.textContent = 'Good try! The answer is ' + q.choices[q.answer].text + '.'; res.className = 'res gentle';
-      voice = ['bonus_wrong'].concat(q.choices[q.answer].parts || [q.choices[q.answer].line]);
+      // a skill question says its fact ("That says said"), never the (silent) answer choices themselves
+      voice = ['bonus_wrong'].concat(q.cat === 'skill' ? q.fact || [] : q.choices[q.answer].parts || [q.choices[q.answer].line]);
     }
     A.Store.save();
     var t0 = Date.now(), closed = false;
@@ -335,7 +465,8 @@
     if (TWO && MODE === 'versus' && G.winner == null) { var f0 = PL[0].nOk ? PL[0].correct / PL[0].nOk : 0, f1 = PL[1].nOk ? PL[1].correct / PL[1].nOk : 0; G.winner = f0 > f1 ? 0 : f1 > f0 ? 1 : null; }
     var res = PL.map(function (pl) {
       var P = pl.P, fin = pl.done, frac = pl.nOk ? pl.correct / pl.nOk : 0, m = P.games.munch;
-      var out = C.finishRound(P, pl.round, { correct: pl.correct, wrong: pl.wrong, ms: ms, timedOut: !fin, frac: frac });
+      G.cells.forEach(function (c) { if (c.again && !c.tried && !c.eaten && (!TWO || c.owner === pl.i)) C.recordAnswer(P, pl.round.skill.id, true, { key: itemKey(pl, c), hint: true }); });
+      var out = C.finishRound(P, pl.round, { correct: pl.correct, wrong: pl.wrong, ms: ms, timedOut: !fin, frac: frac, hinted: pl.wrong > 0 || !!pl.workedShown });
       // adapt the clock: slow-but-accurate gets more time next round; very fast finishes slowly give some back
       var sid = pl.round.skill.id, tb = P.math.timeBoost || (P.math.timeBoost = {}), acc = pl.correct + pl.wrong ? pl.correct / (pl.correct + pl.wrong) : 1;
       if (T.on && !fin && acc >= .8) tb[sid] = Math.min(1.6, (tb[sid] || 1) * 1.15);
@@ -387,15 +518,20 @@
       var chain = Promise.resolve();
       res.forEach(function (r, k) { chain = chain.then(function () { return A.Rewards.celebrate(r.pl.P, rewards[k], TWO ? r.pl.name : null); }); });
       return chain;
-    }).then(nextRound);
+    }).then(ptGate).then(nextRound);
   }
+  // play-time limit / stretch break: only ever between rounds (never mid-question); a stopped game waits on the gentle stop screen
+  function ptGate() { return A.PlayTime ? A.PlayTime.checkpoint().then(function (ok) { if (!ok) return new Promise(function () {}); }) : null; }
   function outOfHearts() {
     if (STORY) return endStory(true);
     var pl = PL[0], ms = Math.min(Date.now() - G.t0, 15 * 60000), P = pl.P;
     C.finishRound(P, pl.round, { correct: pl.correct, wrong: pl.wrong, ms: ms, gaveUp: true });
     A.Store.addTime(P, 'munch', ms); A.Store.markPlayed(P); P.games.munch.streak = 0; A.Store.save();
     UI.card({ title: 'Snack break!', art: '<div>' + A.Blobs.forProfile(P, { expr: 'sad' }) + '</div>', sub: "That's okay! Let's try again!", btn: 'Try again ▶', sfx: 'soft', voice: ['munch_snack'], cls: 'tryagain', minMs: 700 })
-      .then(nextRound);
+      .then(ptGate).then(retryRound);
+  }
+  // "Try again": the same round again, straight away (no level card)
+  function retryRound() { if (!PL[0].round) return nextRound(); M.play('game'); startLevel();
   }
 
   /* ---------- round start ---------- */
@@ -404,13 +540,22 @@
     if (STORY) return storyMap();
     var intros = [];
     PL.forEach(function (pl) {
-      pl.round = PRE && pl.i === 0 ? PRE : C.pickRound(pl.P); if (pl.i === 0) PRE = null;
+      pl.round = PRE && pl.i === 0 ? PRE : C.pickRound(pl.P, { placement: !TWO }); if (pl.i === 0) PRE = null;
       var st = C.state(pl.P, pl.round.skill.id);
       if (!pl.round.review && !st.introduced) intros.push({ pl: pl, st: st });
     });
     A.Store.save();
     var chain = Promise.resolve();
-    intros.forEach(function (x) { chain = chain.then(function () { return A.Rewards.celebrate(x.pl.P, [{ kind: 'skill', id: x.pl.round.skill.id }], TWO ? x.pl.name : null).then(function () { x.st.introduced = true; A.Store.save(); }); }); });
+    // coach v2 placement check (5 quick questions), then the real round (the skill may now be skipped or start higher)
+    if (!TWO && PL[0].round.placement) {
+      var pp = PL[0]; intros.length = 0;
+      chain = UI.placement(pp.P, pp.round.skill).then(function () {
+        pp.round = C.pickRound(pp.P); var st2 = C.state(pp.P, pp.round.skill.id);
+        if (!pp.round.review && !st2.introduced) intros.push({ pl: pp, st: st2 });
+        A.Store.save();
+      });
+    }
+    chain = chain.then(function () { var c2 = Promise.resolve(); intros.forEach(function (x) { c2 = c2.then(function () { return A.Rewards.celebrate(x.pl.P, [{ kind: 'skill', id: x.pl.round.skill.id }], TWO ? x.pl.name : null).then(function () { x.st.introduced = true; A.Store.save(); }); }); }); return c2; });
     return chain.then(function () { return levelIntro(); }).then(startLevel);
   }
   function levelIntro() {
@@ -420,17 +565,20 @@
     return cutscene({ title: 'Level ' + LEVELN + '!', sub: TWO ? (MODE === 'team' ? 'Team munch' : 'Munch race') : PL[0].round.skill.name, voice: ['lvl_level', LEVELN],
       heroes: blobs, starsFrom: from ? from[0] : null, starsTo: from ? PL[0].P.stars : null });
   }
-  function ruleParts() {
-    if (!TWO) return PL[0].rule.say;
-    return PL.reduce(function (a, pl) { return a.concat([nameParts(pl.P)]).concat(pl.rule.say); }, []);
+  // auto: what is said by itself at the start of a round (a story question only, when "Read stories aloud" is off);
+  // the speaker button / R key always say the whole rule (story + question)
+  function ruleSay(pl, auto) { return auto && A.ReadAloud ? A.ReadAloud.auto(pl.P, pl.rule) : pl.rule.say; }
+  function ruleParts(auto) {
+    if (!TWO) return ruleSay(PL[0], auto);
+    return PL.reduce(function (a, pl) { return a.concat([nameParts(pl.P)]).concat(ruleSay(pl, auto)); }, []);
   }
   function startLevel() {
     buildLevel();
     G.grum = !TWO && !STORY && P1.games.munch.grumbly ? { r: ROWS - 1, c: COLS - 1 } : null;
     renderBoard(); G.active = true; G.winner = null;
     var rule = $('#rule'); rule.classList.remove('pop'); void rule.offsetWidth; rule.classList.add('pop');
-    bubble(TWO ? (MODE === 'team' ? 'Munch your own color — together!' : 'Munch your own color — go!') : A.isTouchOnly() ? 'Tap a square to walk. Tap your blob to munch!' : 'Arrow keys to move · Space to munch!');
-    var parts = ruleParts();
+    bubble(TWO ? (MODE === 'team' ? 'Munch your own color — together!' : 'Munch your own color — go!') : A.isTouchOnly() ? 'Tap a square to walk. Tap your friend to munch!' : 'Arrow keys to move · Space to munch!');
+    var parts = ruleParts(true);
     if (G.first) parts = (TWO ? [MODE === 'team' ? 'munch_2p_team' : 'munch_2p_race'] : ['munch_intro']).concat(parts);
     G.first = false;
     V.say(parts);
@@ -444,7 +592,7 @@
   function cutscene(o) {
     return new Promise(function (resolve) {
       var heroes = (o.heroes || [P1]).map(function (p, k) { return '<div class="cs-hero h' + k + '"><div class="hb">' + A.Blobs.forProfile(p, { expr: 'happy' }) + '</div></div>'; }).join('');
-      var cast = (o.friends || ['poppy', 'clem', 'dewdrop', 'pickle', 'nova']).filter(function (b) { return !(o.heroes || [P1]).some(function (h) { return h.blob === b; }); }).slice(0, 4);
+      var cast = (o.friends || ['strawberry', 'apple', 'corn', 'blueberry', 'mochi']).filter(function (b) { return !(o.heroes || [P1]).some(function (h) { return h.blob === b; }); }).slice(0, 4);
       var friends = cast.map(function (b, k) { return '<div class="cs-friend" style="animation-delay:' + (k * .12) + 's">' + A.Blobs.svg({ blob: b, expr: 'happy' }) + '</div>'; }).join('');
       var hasStars = o.starsFrom != null && o.starsTo != null;
       var ov = A.el('<div class="cutscene' + (o.finale ? ' finale' : '') + '" role="dialog" aria-label="' + A.esc(o.title) + '">' +
@@ -504,28 +652,37 @@
   function storyMap(from, to) {
     stopTimer(); G.active = false; M.play('hub');
     $('#game').classList.remove('on');
+    if (ST.placeAtLevel(P1)) { A.Store.save(); if (from == null) { from = to = ST.unlockedTo(P1); } }   // story starts at the player's level
     return A.MunchMap.open(P1, { from: from, to: to }).then(function (i) {
       $('#game').classList.add('on');
       if (typeof i === 'string') return startChallenge(+i.slice(1));
+      return playStop(i);
+    });
+  }
+  // play story stop i. retry: "Try again" straight back in (no story cards, no map)
+  function playStop(i, retry) {
+    {
       var cfg = ST.config(P1, i), R = ST.run(P1), stop = ST.STOPS[i], practice = !stop.side && (R.done || i !== R.stop);
       SR = { i: i, cfg: cfg, practice: practice };
       PL[0].round = { skill: C.byId[cfg.skill], level: cfg.level, nOk: cfg.nOk, timeX: cfg.timeX, story: true, stop: stop, review: false };
-      var chain = Promise.resolve();
-      if (!practice && i === 0) chain = chain.then(function () {
-        return UI.card({ cls: 'storycard', tag: 'Blob Island', title: 'The Missing Star-Snacks', art: '<div class="jump">' + A.Blobs.svg({ blob: 'mochi', expr: 'sad' }) + '</div>', sub: ST.PROLOGUE, btn: "Let's go ▶", voice: ['story_prologue'], minMs: 600 });
+      var chain = Promise.resolve(), sd0 = ST.data(P1); sd0.seen = sd0.seen || {};
+      if (retry) { M.play('game'); startLevel(); return Promise.resolve(); }
+      if (!practice && !sd0.seen.prologue && (i === 0 || (ST.stopInfo(P1, i - 1) || {}).placed)) chain = chain.then(function () { sd0.seen.prologue = Date.now(); A.Store.save();
+        return UI.card({ cls: 'storycard', tag: ST.WORLD, title: 'The Missing Star-Snacks', art: '<div class="jump">' + A.Blobs.svg({ blob: 'strawberry', expr: 'sad' }) + '</div>', sub: ST.PROLOGUE, btn: "Let's go ▶", voice: ['story_prologue'], minMs: 600 });
       });
       var sd = ST.data(P1), firstSide = stop.side && !sd.seen['area:' + stop.area.id];
       if (firstSide) sd.seen['area:' + stop.area.id] = Date.now();
-      if ((!practice && stop.lv === 0 && !stop.side) || firstSide) chain = chain.then(function () {
-        var a = stop.area;
+      var beatSeen = sd0.seen['beat:' + stop.area.id];   // each area's story card plays once
+      if ((!practice && stop.lv === 0 && !stop.side && !beatSeen) || firstSide) chain = chain.then(function () {
+        var a = stop.area; sd0.seen['beat:' + a.id] = Date.now(); A.Store.save();
         return UI.card({ cls: 'storycard beat', tag: a.emoji + ' ' + a.name, title: A.Blobs.byId[a.friend].name + ' says…', art: '<div class="jump">' + A.Blobs.svg({ blob: a.friend, expr: 'happy' }) + '</div>', sub: a.beat, btn: 'OK ▶', voice: ['area_' + a.id, 'beat_' + a.id], minMs: 600 });
       });
       return chain.then(function () {
         var parts = stop.side ? ['area_' + stop.area.id].concat(cfg.helper ? ['story_helper'] : []) : ['story_stop', stop.n].concat(cfg.helper ? ['story_helper'] : practice ? ['story_practice'] : []);
-        if (stop.side) return cutscene({ title: C.byId[cfg.skill].name + '!', sub: stop.area.emoji + ' ' + stop.area.name + (cfg.helper ? ' · a little easier' : ''), voice: parts, heroes: [P1], friends: [stop.area.friend, 'mochi', 'poppy', 'clem', 'nova'] });
-        return cutscene({ title: 'Stop ' + stop.n + '!', sub: stop.area.emoji + ' ' + stop.area.name + (cfg.helper ? ' · a little easier' : practice ? ' · practice' : ''), voice: parts, heroes: [P1], friends: [stop.area.friend, 'mochi', 'poppy', 'clem', 'nova'] });
+        if (stop.side) return cutscene({ title: C.byId[cfg.skill].name + '!', sub: stop.area.emoji + ' ' + stop.area.name + (cfg.helper ? ' · a little easier' : ''), voice: parts, heroes: [P1], friends: [stop.area.friend, 'mochi', 'strawberry', 'carrot', 'grapes'] });
+        return cutscene({ title: 'Stop ' + stop.n + '!', sub: stop.area.emoji + ' ' + stop.area.name + (cfg.helper ? ' · a little easier' : practice ? ' · practice' : ''), voice: parts, heroes: [P1], friends: [stop.area.friend, 'mochi', 'strawberry', 'carrot', 'grapes'] });
       }).then(function () { M.play('game'); startLevel(); });
-    });
+    }
   }
   /* ---------- friend challenges (unlock a new blob) ---------- */
   function startChallenge(k) {
@@ -534,9 +691,9 @@
     PL[0].round = { skill: C.byId[cc.skill], level: cc.level, nOk: cc.nOk, story: true, stop: stop, challenge: cc, review: false };
     return UI.card({ cls: 'storycard chcard', tag: '⭐ Friend challenge · ' + c.a.name, title: got ? 'Challenge time!' : 'Meet a new friend?',
       art: '<div class="jump' + (got ? '' : ' sil') + '">' + A.Blobs.svg({ blob: c.blob, expr: 'happy' }) + '</div>',
-      html: '<p class="chgoal">Munch all <b>' + cc.nOk + '</b> in under <b>' + cc.target + ' seconds</b><br>with at most 1 oops' + (got ? '' : ' to meet <b>' + nm + '</b>!') + '</p>',
+      html: '<p class="chgoal">Munch all <b>' + cc.nOk + '</b> in under <b>' + cc.target + ' seconds</b><br>with at most 1 oops' + (got ? '' : '<br><small class="chfriend">' + A.esc(A.Rewards.charHint(P1, c.blob) || (nm + ' is almost here!')) + '</small>') + '</p>',
       btn: 'Go! ▶', voice: got ? ['ch_again'] : ['ch_title', 'ch_intro'], minMs: 600 })
-      .then(function () { return cutscene({ title: 'Challenge!', sub: '⏱ ' + cc.target + ' seconds · ' + c.a.name, voice: ['lvl_ready'], heroes: [P1], friends: [c.blob === 'mochi' ? 'poppy' : 'mochi', 'poppy', 'clem', 'nova'].filter(function (b) { return b !== c.blob; }), ms: 2600 }); })
+      .then(function () { return cutscene({ title: 'Challenge!', sub: '⏱ ' + cc.target + ' seconds · ' + c.a.name, voice: ['lvl_ready'], heroes: [P1], friends: [c.blob === 'mochi' ? 'strawberry' : 'mochi', 'strawberry', 'carrot', 'grapes'].filter(function (b) { return b !== c.blob; }), ms: 2600 }); })
       .then(function () { M.play('game'); startLevel(); });
   }
   function endChallenge(gaveUp) {
@@ -545,16 +702,16 @@
     var out = ST.chRecord(P, cc.k, { finished: fin, wrong: pl.wrong, secs: secs });
     A.Store.addTime(P, 'munch', Math.min(Date.now() - G.t0, 15 * 60000)); A.Store.markPlayed(P); P.games.munch.rounds++;
     var stars = out.won ? 3 : fin ? 1 : 0; A.Store.earnStars(P, stars, 'challenge'); var rewards = A.Rewards.check(P); A.Store.save(); $('#starCount').textContent = P.stars;
-    T.on = S.timer !== false; document.body.classList.remove('challenge');
+    T.on = timerWanted(); document.body.classList.remove('challenge');
     var chain;
-    if (out.won && out.firstWin) chain = unlockScene(c);
+    if (out.won && (out.firstWin || rewards.some(function (r) { return r.kind === 'blob' && r.id === c.blob; }))) chain = unlockScene(c);
     else chain = UI.card({ cls: 'celebrate storyres' + (out.won ? '' : ' tryagain'), tag: '⭐ Friend challenge · ' + c.a.name,
       title: out.won ? 'Challenge won!' : !fin ? (gaveUp ? 'Snack break!' : "Time's up!") : 'So close!',
       art: '<div class="' + (out.won ? 'dance' : '') + '">' + A.Blobs.forProfile(P, { expr: out.won ? 'happy' : 'sad' }) + '</div>',
       html: '<p class="chgoal">' + (fin ? 'Your time: <b>' + secs + 's</b> (goal ' + cc.target + 's)' : 'You munched <b>' + pl.correct + '</b> of ' + pl.nOk) + (fin && pl.wrong > cc.maxWrong ? '<br>Oops: ' + pl.wrong + ' (1 is OK)' : '') + (out.newBest ? '<br>🏅 New best time!' : '') + '</p>',
       sub: out.won ? '' : (A.Rewards.unlocked(P, 'blob', c.blob) ? 'Try again for a faster time!' : nm + ' is waiting for you. Try again!'),
       btn: 'Map ▶', sfx: out.won ? 'win' : 'soft', confetti: out.won, voice: out.won ? ['ch_won_again'] : fin && pl.wrong > cc.maxWrong ? ['ch_fail_acc'] : ['ch_fail_time'], minMs: 800 });
-    chain.then(function () { return A.Rewards.celebrate(P, rewards); }).then(function () { A.MunchMap.preselect('c' + cc.k); storyMap(); });
+    chain.then(function () { return A.Rewards.celebrate(P, rewards); }).then(ptGate).then(function () { A.MunchMap.preselect('c' + cc.k); storyMap(); });
   }
   // the big moment: a new blob joins the team
   function unlockScene(c) {
@@ -606,15 +763,14 @@
       btn: out.passed ? 'Map ▶' : 'Try again ▶', sfx: out.passed ? 'win' : 'soft', confetti: out.passed, voice: voice, cls: 'celebrate storyres' + (out.passed ? '' : ' tryagain'), minMs: 900 });
     countUp(document.querySelector('.overlay.storyres'));
     card.then(function () { return A.Rewards.celebrate(P, rewards); }).then(function () {
-      if (out.finale) return cutscene({ finale: true, title: 'Blob Festival!', sub: 'Journey score ' + R.score, voice: ['story_finale'], heroes: [P], friends: ['mochi', 'poppy', 'clem', 'dewdrop', 'pickle', 'nova'] });
-    }).then(function () {
+      if (out.finale) return cutscene({ finale: true, title: ST.FESTIVAL + '!', sub: 'Journey score ' + R.score, voice: ['story_finale'], heroes: [P], friends: ['mochi', 'strawberry', 'carrot', 'blueberry', 'corn', 'grapes'] });
+    }).then(ptGate).then(function () {
       if (!out.passed) return storyRetry();
       storyMap(SR.i, out.runAdded ? Math.min(SR.i + 1, ST.mainCount() - 1) : out.sideNext != null ? out.sideNext : SR.i);
     });
   }
-  function storyRetry() { // straight back into the same stop (with "helper" settings after two misses)
-    var i = SR.i; SR = null; $('#game').classList.remove('on');
-    A.MunchMap.preselect(i); storyMap();
+  function storyRetry() { // straight back into the same stop (with "helper" settings after two misses), no map or story cards
+    var i = SR.i; SR = null; return playStop(i, true);
   }
   function countUp(ov) {
     if (!ov) return;
@@ -703,29 +859,30 @@
   renderMusicBtn();
 
   UI.gear({ onClose: function (changed) {
-    $('#starCount').textContent = P1.stars; T.on = S.timer !== false; document.body.classList.toggle('notimer', !T.on); M.apply(); renderMusicBtn();
+    $('#starCount').textContent = P1.stars; T.on = timerWanted(); document.body.classList.toggle('notimer', !T.on); M.apply(); renderMusicBtn();
     if (changed && G.active) { stopGrumbly(); stopTimer(); G.active = false; nextRound(); }
   } });
 
   /* ---------- start ---------- */
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (cellEls.length) fitCells(); });
   if (STORY) { document.body.classList.add('story'); storyMap(); }
   else if (!TWO) {
     M.play('game');
-    PRE = C.pickRound(P1); A.Store.save();
+    PRE = C.pickRound(P1, { placement: true }); A.Store.save();
     var fs = PRE.skill, fl = PRE.level;
-    UI.card({ cls: 'ready', tag: fs.name + ' · Level ' + (fl + 1), title: 'Mochi Munch', art: '<div class="jump">' + A.Blobs.forProfile(P1, { expr: 'happy' }) + '</div>',
-      sub: A.isTouchOnly() ? 'Tap a square to walk. Tap your blob to munch!' : (A.Pad.inUse() ? 'D-pad to move. ' + A.Pad.name('a') + ' to munch!' : 'Arrow keys to move. Space to munch!') + (T.on ? ' Beat the clock!' : ''), btn: '▶ Play', voice: ['munch_title', 'munch_ready'] })
+    UI.card({ cls: 'ready', tag: fs.name + ' · Level ' + (fl + 1), title: A.TITLES.munch, art: '<div class="jump">' + A.Blobs.forProfile(P1, { expr: 'happy' }) + '</div>',
+      sub: A.isTouchOnly() ? 'Tap a square to walk. Tap your friend to munch!' : (A.Pad.inUse() ? 'D-pad to move. ' + A.Pad.name('a') + ' to munch!' : 'Arrow keys to move. Space to munch!') + (T.on ? ' Beat the clock!' : ''), btn: '▶ Play', voice: ['munch_title', A.isTouchOnly() ? 'munch_ready_touch' : 'munch_ready'] })
       .then(nextRound);
   } else {
     M.play('game');
     var art = '<div class="duo mini2"><div class="pcol p2"><div class="pa jump">' + A.Blobs.forProfile(P2, { expr: 'happy' }) + '</div><b class="pn">' + A.esc(P2.name) + '</b><span class="kk">' + A.Pad.label(1, 'W A S D + F') + '</span></div>' +
       '<div class="pcol p1"><div class="pa jump">' + A.Blobs.forProfile(P1, { expr: 'happy' }) + '</div><b class="pn">' + A.esc(P1.name) + '</b><span class="kk">' + A.Pad.label(0, 'Arrows + Space') + '</span></div></div>';
-    UI.card({ cls: 'ready two', tag: MODE === 'team' ? 'Team munch' : 'Munch race', title: 'Mochi Munch', html: art,
+    UI.card({ cls: 'ready two', tag: MODE === 'team' ? 'Team munch' : 'Munch race', title: A.TITLES.munch, html: art,
       sub: MODE === 'team' ? 'Munch your own color. Work together to beat the clock!' : 'Munch your own color. Who finishes first?', btn: '▶ Play', voice: ['munch_title', MODE === 'team' ? 'munch_2p_team' : 'munch_2p_race'] })
       .then(nextRound);
   }
 
-  window.__munch = { G: G, PL: PL, T: T, B: B, P: function () { return P1; }, two: TWO, mode: MODE, munch: munch, moveBy: function (a, b, c) { if (c === undefined) return moveBy(0, a, b); return moveBy(a, b, c); },
-    onCellTap: onCellTap, nextRound: nextRound, unlockScene: unlockScene, story: STORY, SR: function () { return SR; }, cutscene: cutscene, endRound: endRound, showStar: showStar, setTimeLeft: function (s) { T.left = s; renderTimer(); }, COLS: COLS,
+  window.__munch = { G: G, PL: PL, T: T, B: B, gentle: GENTLE, retryRound: retryRound, P: function () { return P1; }, two: TWO, mode: MODE, munch: munch, moveBy: function (a, b, c) { if (c === undefined) return moveBy(0, a, b); return moveBy(a, b, c); },
+    onCellTap: onCellTap, nextRound: nextRound, unlockScene: unlockScene, story: STORY, SR: function () { return SR; }, cutscene: cutscene, endRound: endRound, showStar: showStar, fitCells: fitCells, workedExample: workedExample, coachAfter: coachAfter, celebrateStreak: celebrateStreak, renderBoard: renderBoard, setTimeLeft: function (s) { T.left = s; renderTimer(); }, COLS: COLS,
     goTo: function (i, cell) { if (cell === undefined) { cell = i; i = 0; } var pl = PL[i]; pl.target = null; clearTimeout(pl.walkT); pl.walkT = null; pl.pos = { r: Math.floor(cell / COLS), c: cell % COLS }; place(true); checkStar(pl); } };
 })(window.Arcade);

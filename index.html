@@ -7,9 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: data:; font-src 'self'; connect-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
-<title>Blob Arcade</title>
-<link rel="icon" type="image/svg+xml" href="img/icon.svg">
-<link rel="apple-touch-icon" href="img/icon-192.png">
+<title>Picnic Pals</title>
+<link rel="icon" type="image/png" href="assets/picnic/logo/picnic_pals_app_icon_192.png">
+<link rel="apple-touch-icon" href="assets/picnic/logo/picnic_pals_app_icon_192.png">
 <link rel="stylesheet" href="css/core.css">
 <link rel="stylesheet" href="css/hub.css">
 </head>
@@ -17,9 +17,10 @@
 
 <button class="iconbtn music" id="hubMusic" aria-label="Music on/off">🎵</button>
 <!-- WHO'S PLAYING -->
-<section class="screen hub" id="players">
-  <h1 class="logo" aria-label="Blob Arcade"></h1>
+<section class="screen hub scroll" id="players">
+  <h1 class="logo picnic" aria-label="Picnic Pals"><img src="assets/picnic/logo/picnic_pals_logo.webp" alt="Picnic Pals" width="1000" height="640" id="ppLogo"></h1>
   <p class="sub">Who's playing today?</p>
+  <div class="contwrap" id="contWrap"></div>
   <div class="who" id="who"></div>
   <div class="whofoot"><button class="chipbtn" id="editKids" data-nav aria-pressed="false">✏️ Edit players</button><span class="hint-foot" id="whoHint"></span></div>
 </section>
@@ -32,9 +33,10 @@
     <div class="nkform">
       <label class="nkl" for="nkName">1. Type your name</label>
       <input id="nkName" class="nkin" maxlength="16" autocomplete="off" spellcheck="false" placeholder="Name" data-nav>
-      <div class="nkl">2. Pick your blob</div><div class="opts" id="nkBlob"></div>
-      <div class="nkl">3. Pick a color</div><div class="opts" id="nkColor"></div>
-      <div class="nkl small">Age (optional, for grown-ups: makes the Munch timer friendlier)</div><div class="ages" id="nkAge"></div>
+      <div class="nkl">2. Pick your friend</div><div class="opts" id="nkBlob"></div>
+      <div class="nkl">3. Pick a backdrop color</div><div class="opts" id="nkColor"></div>
+      <div class="nkl small">Age (optional, for grown-ups: age 2 gets Tiny Picnic, a no-fail toddler game; 5 and under get Gentle Munch, with no hearts and no timer)</div><div class="ages" id="nkAge"></div>
+      <div class="nkl small">Levels (optional, for grown-ups: where each subject starts; Auto = by age)</div><div class="nklv" id="nkLv"></div>
       <button class="bigbtn mint" id="nkGo" data-nav>✓ Make my player</button>
     </div>
   </div>
@@ -46,11 +48,13 @@
     <button class="me" id="meBtn" data-nav aria-label="Switch player"><span class="av" id="meAv"></span><span><span class="hi" id="meHi"></span><small>Tap to switch player</small></span></button>
     <div class="starchip" aria-label="Stars"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg><span id="meStars">0</span></div>
     <div class="goal" id="goal"></div>
+    <div class="nextgoal" id="nextGoal"></div>
   </div>
   <div class="tiles" id="tiles"></div>
   <div class="actions">
     <button class="actbtn" id="stickBtn" data-nav><span class="ic" id="stickIc" style="background:#fff4dd"></span>Sticker Book</button>
     <button class="actbtn" id="closetBtn" data-nav><span class="ic" id="closetIc" style="background:#ffeef4"></span>Dress Up</button>
+    <button class="actbtn" id="friendsBtn" data-nav><span class="ic" id="friendsIc" style="background:#eef8e6"></span>Friends</button>
   </div>
 </section>
 
@@ -60,15 +64,23 @@
   <div class="book"><h2 id="bookTitle"></h2><div class="cnt" id="bookCnt"></div><div class="slots" id="slots"></div></div>
 </section>
 
+<!-- FRIEND COLLECTION (Picnic Pals) -->
+<section class="screen hub" id="friends">
+  <div class="topbar"><button class="backbtn" data-back data-nav>◀ Back</button></div>
+  <div class="book fbook"><h2 id="frTitle">Picnic Pals</h2><div class="cnt" id="frCnt"></div><div class="frcards" id="frCards"></div></div>
+</section>
+
 <!-- DRESS UP -->
 <section class="screen hub" id="closet">
   <div class="topbar"><button class="backbtn" data-back data-nav>◀ Done</button></div>
   <div class="closet">
     <div class="preview"><div class="big jump" id="prevBig"></div><div class="bn" id="prevName"></div><div class="bl" id="prevLooks"></div></div>
     <div class="racks">
-      <div class="rack"><h3>Pick your blob</h3><div class="opts" id="optBlob"></div></div>
-      <div class="rack"><h3>Colors</h3><div class="opts" id="optColor"></div></div>
-      <div class="rack"><h3>Outfits</h3><div class="opts" id="optOutfit"></div></div>
+      <div class="rack"><h3>Pick your friend</h3><div class="opts" id="optBlob"></div></div>
+      <div class="rack"><h3>Backdrop color</h3><div class="opts" id="optColor"></div></div>
+      <div class="rack"><h3>Hats</h3><div class="opts" id="optOutfit"></div></div>
+      <div class="rack"><h3>Hold</h3><div class="opts" id="optHeld"></div></div>
+      <div class="rack" id="rackBalloon" hidden><h3>Balloon color</h3><div class="opts" id="optBalloon"></div></div>
     </div>
   </div>
 </section>
@@ -76,23 +88,30 @@
 <script src="audio/voice/manifest.js"></script>
 <script src="audio/voice-tts/manifest.js"></script>
 <script src="js/core/util.js"></script>
+<script src="js/core/foods-data.js"></script>
+<script src="js/core/wear-data.js"></script>
 <script src="js/core/storage.js"></script>
 <script src="js/core/sightwords.js"></script>
 <script src="js/core/bonus-questions.js"></script>
 <script src="js/core/story.js"></script>
 <script src="js/core/early-words.js"></script>
+<script src="js/core/grade1-words.js"></script>
 <script src="js/core/room-catalog.js"></script>
 <script src="js/core/friends.js"></script>
+<script src="js/core/tiny-data.js"></script>
 <script src="js/core/voice-lines.js"></script>
 <script src="js/core/curriculum-math.js"></script>
+<script src="js/core/coach.js"></script>
 <script src="js/core/questions.js"></script>
 <script src="js/core/skills-early.js"></script>
+<script src="js/core/skills-grade1.js"></script>
 <script src="js/core/blobs.js"></script>
 <script src="js/core/audio.js"></script>
 <script src="js/core/music.js"></script>
 <script src="js/core/zip.js"></script>
 <script src="js/core/rewards.js"></script>
 <script src="js/core/ui.js"></script>
+<script src="js/core/playtime.js"></script>
 <script src="js/core/gamepad.js"></script>
 <script src="js/core/parent.js"></script>
 <script src="js/hub.js"></script>

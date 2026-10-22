@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-page-title="room">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: data:; font-src 'self'; connect-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
-<title>My Room · Blob Arcade</title>
+<title>Picnic Spot · Picnic Pals</title>
 <link rel="icon" type="image/svg+xml" href="../../img/icon.svg">
 <link rel="apple-touch-icon" href="../../img/icon-192.png">
 <link rel="stylesheet" href="../../css/core.css">
@@ -17,7 +17,7 @@
 <section class="screen on" id="room">
   <div class="rtop">
     <button class="iconbtn" id="homeBtn" data-nav aria-label="Back to the arcade"><svg viewBox="0 0 24 24"><path d="M3.5 11.2 12 4l8.5 7.2" fill="none" stroke="#7a6a99" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10.5V19a1 1 0 0 0 1 1h3.5v-5h3v5H17a1 1 0 0 0 1-1v-8.5" fill="#ffd6e3" stroke="#7a6a99" stroke-width="2.2" stroke-linejoin="round"/></svg></button>
-    <div class="rtitle"><span class="rav" id="rAv"></span><span><b id="rName">My Room</b><small id="rSub"></small></span></div>
+    <div class="rtitle"><span class="rav" id="rAv"></span><span><b id="rName" data-title="room">Picnic Spot</b><small id="rSub"></small></span></div>
     <div class="bits" id="bits" aria-live="polite" title="Star bits: earn 1 for every star in any game"><span class="bi">✦</span><b id="bitCount">0</b><small>star bits</small></div>
     <span class="saved" id="saved" aria-hidden="true">✓ Saved</span>
     <button class="iconbtn music" id="musicBtn" aria-label="Music on/off (M)">🎵</button>
@@ -45,23 +45,30 @@
 <script src="../../audio/voice/manifest.js"></script>
 <script src="../../audio/voice-tts/manifest.js"></script>
 <script src="../../js/core/util.js"></script>
+<script src="../../js/core/foods-data.js"></script>
+<script src="../../js/core/wear-data.js"></script>
 <script src="../../js/core/storage.js"></script>
 <script src="../../js/core/sightwords.js"></script>
 <script src="../../js/core/bonus-questions.js"></script>
 <script src="../../js/core/story.js"></script>
 <script src="../../js/core/early-words.js"></script>
+<script src="../../js/core/grade1-words.js"></script>
 <script src="../../js/core/room-catalog.js"></script>
 <script src="../../js/core/friends.js"></script>
+<script src="../../js/core/tiny-data.js"></script>
 <script src="../../js/core/voice-lines.js"></script>
 <script src="../../js/core/curriculum-math.js"></script>
+<script src="../../js/core/coach.js"></script>
 <script src="../../js/core/questions.js"></script>
 <script src="../../js/core/skills-early.js"></script>
+<script src="../../js/core/skills-grade1.js"></script>
 <script src="../../js/core/blobs.js"></script>
 <script src="../../js/core/audio.js"></script>
 <script src="../../js/core/music.js"></script>
 <script src="../../js/core/zip.js"></script>
 <script src="../../js/core/rewards.js"></script>
 <script src="../../js/core/ui.js"></script>
+<script src="../../js/core/playtime.js"></script>
 <script src="../../js/core/gamepad.js"></script>
 <script src="../../js/core/parent.js"></script>
 <script src="items-art.js"></script>

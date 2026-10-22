@@ -169,3 +169,8 @@ ul.bio li.lk { color: var(--ink3); background: #f6f3fa; }
 .biocard .minithumb { display: inline-block; width: 40px; height: 32px; vertical-align: middle; } .biocard .minithumb svg { width: 100%; height: 100%; }
 .biocard .card .bigbtn { font-size: clamp(22px, 3.4vmin, 30px); }
 @media (max-height: 820px) { .biocard .card .art { width: 100px; height: 92px; } ul.bio { gap: 4px; margin-top: 6px; } ul.bio li { padding: 4px 10px; font-size: 14px; } .biocard .card .fhow { margin: 4px 0 8px; } }
+/* the player's own friend stands on their backdrop colour (a little rug) */
+.rav { border-radius: 50%; }
+.friend .myspot { position: absolute; left: 6%; right: 6%; bottom: -6%; height: 22%; border-radius: 50%; z-index: -1; opacity: .95; }
+.friend { isolation: isolate; }
+.ptab { min-height: 48px; padding: 10px 16px; }   /* shop tabs: at least 48px to tap */

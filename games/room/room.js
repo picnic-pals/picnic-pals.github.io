@@ -12,9 +12,14 @@
   // grown-ups can grant star bits or reset the room in the parent area: pick up their changes when it closes
   var bitsAtOpen = P.wallet.bits;
   UI.gear({ onClose: function () { musicBtn(); M.apply(); var q = A.Store.get(P.id); if (!q || q.room !== RM || q.wallet.bits !== bitsAtOpen) location.reload(); } });
+  if (A.PlayTime) setTimeout(function () { A.PlayTime.checkpoint(); }, 600);   // play-time limit: checked on arrival (no rounds here)
 
   /* ================= geometry: a cut-away room, 1200 × 760 ================= */
-  var VW = 1200, VH = 760, BX0 = 220, BX1 = 980, BY0 = 30, BY1 = 360, FY1 = 760, COLS = 7, ROWS = 4, SLOTS = 6;
+  // Picnic Spot: the painted scene (assets/picnic/room/room_bg.webp, 1024x640 stretched to 1200x760) is the room; the floor grid
+  // and wall slots are invisible and line up with its floor (back edge at y 427, x 141..1061) and back wall.
+  var VW = 1200, VH = 760, BX0 = 141, BX1 = 1061, BY0 = 83, BY1 = 427, FY1 = 760, COLS = 7, ROWS = 4, SLOTS = 6;
+  var BG = '../../assets/picnic/room/room_bg.webp';
+  var SLOT_X = [222, 318, 508, 690, 884, 980], SLOT_Y = [190, 190, 112, 112, 190, 190]; // two each side of the window, two above it
   function lerp(a, b, t) { return a + (b - a) * t; }
   function sOf(t) { return t * (.6 + .4 * t); }                   // depth: back of the floor 0 → front 1 (rows nearer you are taller)
   function tOf(s) { return (-.6 + Math.sqrt(.36 + 1.6 * s)) / .8; }
@@ -26,14 +31,15 @@
     var s0 = sOf(r / ROWS), s1 = sOf((r + 1) / ROWS), u0 = c / COLS, u1 = (c + 1) / COLS;
     return [[xAt(u0, s0), yAt(s0)], [xAt(u1, s0), yAt(s0)], [xAt(u1, s1), yAt(s1)], [xAt(u0, s1), yAt(s1)]];
   }
-  function slotXY(i) { return { x: BX0 + (i + .5) * (BX1 - BX0) / SLOTS, y: 190 }; }
-  function slotRect(i) { var w = (BX1 - BX0) / SLOTS; return { x: BX0 + i * w + 6, y: 92, w: w - 12, h: 196 }; }
+  function slotXY(i) { return { x: SLOT_X[i], y: SLOT_Y[i] }; }
+  function slotRect(i) { var w = i === 2 || i === 3 ? 170 : 90, h = i === 2 || i === 3 ? 70 : 170; return { x: SLOT_X[i] - w / 2, y: SLOT_Y[i] - h / 2, w: w, h: h }; }
+  function nearestSlot(x, y) { var b = 0, bd = 1e9; for (var i = 0; i < SLOTS; i++) { var d = Math.hypot(x - SLOT_X[i], (y - SLOT_Y[i]) * 1.5); if (d < bd) { bd = d; b = i; } } return b; }
   function pts(a) { return a.map(function (q) { return q[0].toFixed(1) + ',' + q[1].toFixed(1); }).join(' '); }
   function pct(x, y) { return 'left:' + (x / VW * 100).toFixed(3) + '%;top:' + (y / VH * 100).toFixed(3) + '%;'; }
   // a point (room units) → floor cell or wall slot
   function hit(x, y) {
     if (y >= BY1) { var s = (y - BY1) / (FY1 - BY1), r = Math.min(ROWS - 1, Math.floor(tOf(s) * ROWS)), l = xAt(0, s), rr = xAt(1, s), c = Math.floor((x - l) / (rr - l) * COLS); if (c < 0 || c >= COLS) return null; return { k: 'floor', c: c, r: r }; }
-    if (x >= BX0 && x <= BX1 && y > 60) return { k: 'wall', s: Math.min(SLOTS - 1, Math.floor((x - BX0) / ((BX1 - BX0) / SLOTS))) };
+    if (x >= BX0 && x <= BX1 && y > 60) return { k: 'wall', s: nearestSlot(x, y) };
     return null;
   }
   // sky, wall and season helpers
@@ -133,17 +139,9 @@
     var svg = $('#roomSvg'), h = '<defs>' + wallPattern(RM.wall, 'wpat') + '<linearGradient id="shadeL" x1="0" x2="1"><stop offset="0" stop-color="#3b2d55" stop-opacity=".18"/><stop offset="1" stop-color="#3b2d55" stop-opacity=".06"/></linearGradient>' +
       '<linearGradient id="shadeR" x1="1" x2="0"><stop offset="0" stop-color="#3b2d55" stop-opacity=".18"/><stop offset="1" stop-color="#3b2d55" stop-opacity=".06"/></linearGradient>' +
       '<radialGradient id="warm" cx="50%" cy="45%" r="70%"><stop offset=".55" stop-color="#ffcf8a" stop-opacity="0"/><stop offset="1" stop-color="#ff9f5a" stop-opacity=".22"/></radialGradient></defs>';
-    h += '<rect width="' + VW + '" height="' + VH + '" fill="#f6e7d0"/>';
-    h += '<polygon points="' + pts([[BX0, BY0], [BX0, BY1], [0, FY1], [0, BY0 - 400]]) + '" fill="url(#wpat)"/><polygon points="' + pts([[BX0, BY0], [BX0, BY1], [0, FY1], [0, BY0 - 400]]) + '" fill="url(#shadeL)"/>';
-    h += '<polygon points="' + pts([[BX1, BY0], [BX1, BY1], [VW, FY1], [VW, BY0 - 400]]) + '" fill="url(#wpat)"/><polygon points="' + pts([[BX1, BY0], [BX1, BY1], [VW, FY1], [VW, BY0 - 400]]) + '" fill="url(#shadeR)"/>';
-    h += '<rect x="' + BX0 + '" y="' + BY0 + '" width="' + (BX1 - BX0) + '" height="' + (BY1 - BY0) + '" fill="url(#wpat)"/>';
-    h += '<rect x="' + BX0 + '" y="' + (BY1 - 18) + '" width="' + (BX1 - BX0) + '" height="18" fill="#fff" opacity=".8"/>';           // skirting board
-    h += '<path d="M' + BX0 + ' ' + BY0 + ' V' + BY1 + ' M' + BX1 + ' ' + BY0 + ' V' + BY1 + '" stroke="#3b2d55" stroke-opacity=".12" stroke-width="3"/>';
-    if (MONTH === 12) { h += '<path id="garland" d="M' + (BX0 + 10) + ' ' + (BY0 + 14) + ' Q' + ((BX0 + BX1) / 2) + ' ' + (BY0 + 70) + ' ' + (BX1 - 10) + ' ' + (BY0 + 14) + '" stroke="#43b98a" stroke-width="10" fill="none" stroke-linecap="round"/>'; for (var g = 0; g < 9; g++) { var t = (g + .5) / 9, gx = lerp(BX0 + 10, BX1 - 10, t), gy = BY0 + 14 + 4 * 56 * t * (1 - t); h += '<circle cx="' + gx.toFixed(0) + '" cy="' + gy.toFixed(0) + '" r="6" fill="' + ['#ff5a6e', '#ffd23c', '#5aa9f0'][g % 3] + '"/>'; } }
-    h += floorSvg(RM.floor);
-    h += '<path d="M' + BX0 + ' ' + BY1 + ' L0 ' + FY1 + ' M' + BX1 + ' ' + BY1 + ' L' + VW + ' ' + FY1 + '" stroke="#3b2d55" stroke-opacity=".15" stroke-width="3"/>';
-    h += windowSvg() + shelfSvg();
-    if (TOD === 'day') { var wq = quadOnWall(false, .18, .78, .3, .6); h += '<polygon id="sunbeam" points="' + pts([wq[3], wq[2], [620, 740], [380, 700]]) + '" fill="#fff4c0" opacity=".22"/>'; }
+    h += '<image href="' + BG + '" x="0" y="0" width="' + VW + '" height="' + VH + '" preserveAspectRatio="none"/>';
+    if (MONTH === 12) { h += '<path id="garland" d="M' + (BX0 + 10) + ' ' + (BY0 + 4) + ' Q' + ((BX0 + BX1) / 2) + ' ' + (BY0 + 50) + ' ' + (BX1 - 10) + ' ' + (BY0 + 4) + '" stroke="#43b98a" stroke-width="10" fill="none" stroke-linecap="round"/>'; for (var g = 0; g < 9; g++) { var t = (g + .5) / 9, gx = lerp(BX0 + 10, BX1 - 10, t), gy = BY0 + 4 + 4 * 46 * t * (1 - t); h += '<circle cx="' + gx.toFixed(0) + '" cy="' + gy.toFixed(0) + '" r="6" fill="' + ['#ff5a6e', '#ffd23c', '#5aa9f0'][g % 3] + '"/>'; } }
+    h += shelfSvg();
     // decorate grid (hidden unless decorating)
     h += '<g id="grid">';
     for (var r = 0; r < ROWS; r++) for (var c = 0; c < COLS; c++) h += '<polygon class="cell" data-c="' + c + '" data-r="' + r + '" points="' + pts(cellPoly(c, r)) + '"/>';
@@ -181,14 +179,14 @@
   /* ================= blob friends ================= */
   var SPEED = 1, FR = [];
   function friendSvg(b, expr) { return b === P.blob ? B.forProfile(P, { expr: expr }) : B.svg({ blob: b, expr: expr }); }
-  function setExpr(f, expr) { var s = f.el.querySelector('svg.blob'); if (s) s.setAttribute('class', 'blob x-' + expr + ' blob-' + f.b); f.expr = expr; }
+  function setExpr(f, expr) { var s = f.el.querySelector('svg.blob'); if (s) s.setAttribute('class', 'blob food x-' + expr + ' blob-' + f.b); f.expr = expr; }
   function freeCells() { var out = []; for (var r = 0; r < ROWS; r++) for (var c = 0; c < COLS; c++) if (!at(c, r)) out.push({ c: c, r: r }); return out; }
   function makeFriends() {
     $('#friendsL').innerHTML = ''; FR = [];
     var cells = A.shuffle ? A.shuffle(freeCells()) : freeCells().sort(function () { return Math.random() - .5; });
     F.of(P).forEach(function (b, i) {
       var cell = cells[i % Math.max(1, cells.length)] || { c: i % COLS, r: 2 }, p0 = cellXY(cell.c, cell.r);
-      var el = A.el('<div class="friend" data-nav role="button" tabindex="0" data-b="' + b + '" aria-label="' + B.byId[b].name + '"><div class="fb">' + friendSvg(b, 'idle') + '</div><span class="bub"></span><span class="zz">z<b>z</b><i>z</i></span></div>');
+      var el = A.el('<div class="friend" data-nav role="button" tabindex="0" data-b="' + b + '" aria-label="' + B.byId[b].name + '">' + (b === P.blob ? '<span class="myspot" style="' + B.backdrop(P.color) + '"></span>' : '') + '<div class="fb">' + friendSvg(b, 'idle') + '</div><span class="bub"></span><span class="zz">z<b>z</b><i>z</i></span></div>');
       var f = { b: b, el: el, x: p0.x + (Math.random() * 30 - 15), y: p0.y, tx: 0, ty: 0, st: 'idle', until: Date.now() + 600 + Math.random() * 2400, dir: 1, seat: null, expr: 'idle', bio: F.BIO[b] || { speed: 1, napP: .1, likes: [] } };
       el.addEventListener('click', function (e) { e.stopPropagation(); if (D.on) return; tapFriend(f, e); });
       el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); if (!e.repeat) tapFriend(f, null); } });
@@ -276,7 +274,7 @@
     return chain.then(function () { newsBusy = false; renderTray(); });
   }
   function heartsHTML(l) { var h = ''; for (var i = 1; i <= 5; i++) h += '<i class="' + (i <= l ? 'on' : '') + '">' + (i <= l ? '💗' : '🤍') + '</i>'; return h; }
-  function renderFriendCount() { $('#rSub').textContent = F.of(P).length + ' blob friends live here'; }
+  function renderFriendCount() { $('#rSub').textContent = F.of(P).length + ' food friends picnic here'; }
 
   /* ================= special prizes (achievements) ================= */
   function checkPrizes() {
@@ -290,12 +288,12 @@
   function trophies() {
     var g = P.games, st = P.story || {}, bb = g.baseball || {}, mu = g.munch || {}, maxF = F.of(P).reduce(function (m, b) { return Math.max(m, F.info(P, b).lvl); }, 0);
     return [
-      { id: 'story', name: 'Story champion', got: (st.finished || 0) >= 1, col: 'gold', hint: 'Finish Story mode in Mochi Munch', val: st.finished > 1 ? '×' + st.finished : '' },
-      { id: 'munchbest', name: 'Munch high score', got: (st.bestRun || 0) > 0, col: 'silver', hint: 'Play a Story run in Mochi Munch', val: st.bestRun ? String(st.bestRun) : '' },
+      { id: 'story', name: 'Story champion', got: (st.finished || 0) >= 1, col: 'gold', hint: 'Finish Story mode in ' + A.TITLES.munch, val: st.finished > 1 ? '×' + st.finished : '' },
+      { id: 'munchbest', name: 'Munch high score', got: (st.bestRun || 0) > 0, col: 'silver', hint: 'Play a Story run in ' + A.TITLES.munch, val: st.bestRun ? String(st.bestRun) : '' },
       { id: 'perfect', name: 'Perfect round', got: (mu.perfect || 0) >= 1, col: 'bronze', hint: 'A Munch round with no oopsies', val: mu.perfect ? '×' + mu.perfect : '' },
-      { id: 'grumbly', name: 'Grumbly buster', got: (mu.grumblyWins || 0) >= 1, col: 'silver', hint: 'Beat Grumbly in Mochi Munch', val: '' },
-      { id: 'bbbest', name: 'Baseball best', got: (bb.best || 0) > 0, col: 'gold', hint: 'Score a run in Blob Baseball', val: bb.best ? bb.best + ' runs' : '' },
-      { id: 'homer', name: 'Home run hero', got: (bb.homers || 0) >= 1, col: 'bronze', hint: 'Hit a home run in Blob Baseball', val: bb.homers ? '×' + bb.homers : '' },
+      { id: 'grumbly', name: 'Grumbly buster', got: (mu.grumblyWins || 0) >= 1, col: 'silver', hint: 'Beat Grumbly in ' + A.TITLES.munch, val: '' },
+      { id: 'bbbest', name: 'Baseball best', got: (bb.best || 0) > 0, col: 'gold', hint: 'Score a run in ' + A.TITLES.baseball, val: bb.best ? bb.best + ' runs' : '' },
+      { id: 'homer', name: 'Home run hero', got: (bb.homers || 0) >= 1, col: 'bronze', hint: 'Hit a home run in ' + A.TITLES.baseball, val: bb.homers ? '×' + bb.homers : '' },
       { id: 'bb2', name: '2-player win', got: (bb.twoWins || 0) + (mu.raceWins || 0) >= 1, col: 'silver', hint: 'Win a 2-player game', val: '' },
       { id: 'forever', name: 'Forever friend', got: maxF >= 5, col: 'gold', hint: 'Grow a friendship to level 5', val: '' }
     ];
@@ -320,12 +318,13 @@
   var shopCat = 'cozy';
   function openShop(cat) {
     shopCat = cat || shopCat;
-    var tabs = CAT.CATS.map(function (c) { return '<button class="ptab' + (c.id === shopCat ? ' on' : '') + '" data-nav data-cat="' + c.id + '">' + c.icon + ' ' + c.name + '</button>'; }).join('');
+    var tabs = CAT.CATS.filter(function (c) { return c.id !== 'paper'; }).map(function (c) { return '<button class="ptab' + (c.id === shopCat ? ' on' : '') + '" data-nav data-cat="' + c.id + '">' + c.icon + ' ' + c.name + '</button>'; }).join('');
     var items = CAT.ITEMS.filter(function (it) { return it.cat === shopCat && !it.starter; });
     var grid = items.map(function (it) {
-      var n = (P.inventory[it.id] || {}).n || 0, locked = it.need && !CAT.earned(P, it), afford = P.wallet.bits >= it.price;
-      var tag = it.need ? (locked ? '<span class="pr lock">🔒 Prize</span>' : '<span class="pr won">✓ Won!</span>') : '<span class="pr' + (afford ? '' : ' no') + '">✦ ' + it.price + '</span>';
-      return '<button class="sitem' + (locked ? ' locked' : '') + (n ? ' owned' : '') + '" data-nav data-id="' + it.id + '" aria-label="' + A.esc(it.name) + (it.need ? (locked ? ', special prize: ' + A.esc(it.hint) : ', won') : ', ' + it.price + ' star bits') + (n ? ', you have ' + n : '') + '">' +
+      var n = (P.inventory[it.id] || {}).n || 0, locked = (it.need || it.badge) && !CAT.earned(P, it), afford = P.wallet.bits >= it.price;
+      var tag = it.badge ? (locked ? '<span class="pr lock">🔒 ✦ ' + it.price + '</span>' : '<span class="pr' + (afford ? '' : ' no') + '">🏅 ✦ ' + it.price + '</span>') :
+        it.need ? (locked ? '<span class="pr lock">🔒 Prize</span>' : '<span class="pr won">✓ Won!</span>') : '<span class="pr' + (afford ? '' : ' no') + '">✦ ' + it.price + '</span>';
+      return '<button class="sitem' + (locked ? ' locked' : '') + (it.tier ? ' t-' + it.tier : '') + (n ? ' owned' : '') + '" data-nav data-id="' + it.id + '" aria-label="' + A.esc(it.name) + (it.badge ? (locked ? ', ' + it.price + ' star bits after you ' + A.esc(it.hint.toLowerCase()) : ', ' + it.price + ' star bits') : it.need ? (locked ? ', special prize: ' + A.esc(it.hint) : ', won') : ', ' + it.price + ' star bits') + (n ? ', you have ' + n : '') + '">' +
         '<span class="sa">' + ART.svg(it.id, 'thumb') + '</span><span class="sn">' + A.esc(it.name) + '</span>' + tag + (n ? '<span class="have">×' + n + '</span>' : '') + '</button>';
     }).join('');
     var pn = openPanel('shop', '<div class="phead"><h2>🛍️ Shop</h2><div class="bits small"><span class="bi">✦</span><b>' + P.wallet.bits + '</b><small>star bits</small></div><button class="iconbtn px" data-x aria-label="Close shop (Esc)">✕</button></div>' +
@@ -336,14 +335,15 @@
   function shopItem(it) {
     var n = (P.inventory[it.id] || {}).n || 0, art = '<div class="bigthumb">' + ART.svg(it.id, 'thumb') + '</div>';
     V.say(['it_' + it.id]);
-    if (it.need && !CAT.earned(P, it)) { A.Audio.sfx('locked'); return UI.card({ tag: 'Special prize', title: it.name, art: art, sub: '🔒 ' + it.hint + ' to win it!', btn: 'OK', voice: ['it_' + it.id, 'rm_locked_item'], cls: 'shopcard' }).then(function () { focusItem(it.id); }); }
-    if (it.need) return UI.card({ tag: 'Special prize', title: it.name, art: art, sub: 'You won this! It\'s in your things.', btn: 'OK', voice: ['it_' + it.id, 'rm_owned'], cls: 'shopcard' }).then(function () { focusItem(it.id); });
+    if (it.badge && !CAT.earned(P, it)) { A.Audio.sfx('locked'); return UI.card({ tag: '🏅 Badge item · ✦ ' + it.price, title: it.name, art: art, sub: '🔒 ' + it.hint + ' to open it up, then it costs ✦ ' + it.price + '.', btn: 'OK', voice: ['it_' + it.id, 'rm_locked_item'], cls: 'shopcard' }).then(function () { focusItem(it.id); }); }
+    if (it.need && !it.badge && !CAT.earned(P, it)) { A.Audio.sfx('locked'); return UI.card({ tag: 'Special prize', title: it.name, art: art, sub: '🔒 ' + it.hint + ' to win it!', btn: 'OK', voice: ['it_' + it.id, 'rm_locked_item'], cls: 'shopcard' }).then(function () { focusItem(it.id); }); }
+    if (it.need && !it.badge) return UI.card({ tag: 'Special prize', title: it.name, art: art, sub: 'You won this! It\'s in your things.', btn: 'OK', voice: ['it_' + it.id, 'rm_owned'], cls: 'shopcard' }).then(function () { focusItem(it.id); });
     var short = it.price - P.wallet.bits;
     if (short > 0) {
       A.Audio.sfx('locked');
-      return UI.card({ tag: '✦ ' + it.price + ' star bits', title: it.name, art: art, sub: 'You have ' + P.wallet.bits + '. You need ' + short + ' more star bit' + (short === 1 ? '' : 's') + ' — play a game to earn some!', btn: 'OK', voice: ['it_' + it.id, 'rm_need_more'], cls: 'shopcard' }).then(function () { focusItem(it.id); });
+      return UI.card({ tag: '✦ ' + it.price + ' star bits', title: it.name, art: art, sub: 'You have ' + P.wallet.bits + '. You need ' + short + ' more star bit' + (short === 1 ? '' : 's') + ' — play a game to earn some!', btn: 'OK', voice: ['it_' + it.id, 'rm_it_costs', it.price, 'rm_bits_you_have', P.wallet.bits, 'rm_need_more'], cls: 'shopcard' }).then(function () { focusItem(it.id); });
     }
-    return UI.confirm({ title: it.name, art: art, sub: (n ? 'You have ' + n + '. ' : '') + 'It costs ✦ ' + it.price + ' star bits. You have ' + P.wallet.bits + '.', yes: 'Buy for ✦ ' + it.price, no: 'Not now', cls: 'shopcard' }).then(function (yes) {
+    return UI.confirm({ title: it.name, art: art, sub: (n ? 'You have ' + n + '. ' : '') + 'It costs ✦ ' + it.price + ' star bits. You have ' + P.wallet.bits + '.', yes: 'Buy for ✦ ' + it.price, no: 'Not now', cls: 'shopcard', voice: ['it_' + it.id, 'rm_it_costs', it.price, 'rm_bits_you_have', P.wallet.bits] }).then(function (yes) {
       if (!yes) return focusItem(it.id);
       return buy(it);
     });
@@ -368,7 +368,7 @@
   var shelfTab = 'trophies';
   function openShelf(tab) {
     shelfTab = tab || shelfTab;
-    var tabs = [['trophies', '🏆 Trophies'], ['stickers', '⭐ Stickers'], ['friends', '💗 Blob friends']].map(function (t) { return '<button class="ptab' + (t[0] === shelfTab ? ' on' : '') + '" data-nav data-tab="' + t[0] + '">' + t[1] + '</button>'; }).join(''), body = '';
+    var tabs = [['trophies', '🏆 Trophies'], ['stickers', '⭐ Stickers'], ['friends', '💗 Picnic friends']].map(function (t) { return '<button class="ptab' + (t[0] === shelfTab ? ' on' : '') + '" data-nav data-tab="' + t[0] + '">' + t[1] + '</button>'; }).join(''), body = '';
     if (shelfTab === 'trophies') body = '<div class="trgrid">' + trophies().map(function (t) {
       return '<div class="trophy' + (t.got ? ' got' : '') + '" data-nav tabindex="0" data-tr="' + t.id + '" aria-label="' + A.esc(t.name) + (t.got ? '' : ', not yet: ' + A.esc(t.hint)) + '"><span class="cup">' + cupSvg(t.got ? t.col : 'none') + '</span><b>' + (t.got ? A.esc(t.name) : '???') + '</b><small>' + (t.got ? A.esc(t.val || '🎉') : A.esc(t.hint)) + '</small></div>';
     }).join('') + '</div>';
@@ -417,7 +417,7 @@
     if (!D.on) return;
     var ids = Object.keys(P.inventory).filter(function (id) { return CAT.byId[id]; });
     var things = ids.filter(function (id) { var k = CAT.byId[id].kind; return (k === 'floor' || k === 'rug' || k === 'wall') && avail(id) > 0; });
-    var styles = ids.filter(function (id) { var k = CAT.byId[id].kind; return k === 'paper' || k === 'tiles'; });
+    var styles = []; // wallpapers/floors don't apply to the painted picnic scene (still kept in saves)
     var h = things.map(function (id) { return '<button class="chip' + (D.hold && D.hold.id === id && !D.hold.from ? ' on' : '') + '" data-nav data-id="' + id + '" role="option" aria-label="' + A.esc(CAT.byId[id].name) + ', ' + avail(id) + ' to place">' + ART.svg(id, 'thumb') + '<span class="cn">' + A.esc(CAT.byId[id].name) + '</span>' + (avail(id) > 1 ? '<b class="cx">×' + avail(id) + '</b>' : '') + '</button>'; }).join('');
     if (!things.length) h += '<span class="empty">All your things are in the room! Visit the 🛍️ Shop for more.</span>';
     h += styles.map(function (id) { var it = CAT.byId[id], cur = RM.wall === id || RM.floor === id; return '<button class="chip style' + (cur ? ' cur' : '') + '" data-nav data-id="' + id + '" aria-label="' + A.esc(it.name) + (cur ? ', in use' : '') + '">' + ART.swatch(id) + '<span class="cn">' + A.esc(it.name) + '</span></button>'; }).join('');
@@ -577,14 +577,14 @@
   A.on('pad:mode', padKeys);
   A.Pad.context({});
 
-  $('#rAv').innerHTML = B.forProfile(P, { expr: 'happy' }); $('#rName').textContent = P.name + "'s Room"; $('#bitCount').textContent = P.wallet.bits; musicBtn();
+  $('#rAv').innerHTML = B.forProfile(P, { expr: 'happy' }); $('#rAv').setAttribute('style', B.backdrop(P.color)); $('#rName').textContent = P.name + "'s " + A.TITLES.room; $('#bitCount').textContent = P.wallet.bits; musicBtn();
   drawRoom(); renderThings(); renderFriendCount(); padKeys();
   // a daily visit: each friend living here gets a friendship point
   var ups = F.visit(P); RM.visits = (RM.visits || 0) + 1; var prizes = checkPrizes(); save();
   makeFriends(); requestAnimationFrame(step);
   M.play('cozy');
   var intro = firstVisit
-    ? UI.card({ tag: 'Welcome!', title: P.name + "'s Room", art: '<div class="dance">' + B.forProfile(P, { expr: 'love' }) + '</div>', html: '<p class="howto">This is <b>your</b> room! Your blob friends live here.<br>Earn <b>✦ star bits</b> in any game (1 for every star) and spend them in the <b>🛍️ Shop</b>.<br>Then <b>🎨 Decorate</b>: pick a thing, then pick a spot!</p>', btn: "Let's go! ▶", voice: ['rm_welcome'], cls: 'roomintro', minMs: 500 })
+    ? UI.card({ tag: 'Welcome!', title: P.name + "'s Picnic Spot", art: '<div class="dance">' + B.forProfile(P, { expr: 'love' }) + '</div>', html: '<p class="howto">This is <b>your</b> picnic spot! Your food friends picnic here.<br>Earn <b>✦ star bits</b> in any game (1 for every star) and spend them in the <b>🛍️ Shop</b>.<br>Then <b>🎨 Decorate</b>: pick a thing, then pick a spot!</p>', btn: "Let's go! ▶", voice: ['rm_welcome'], cls: 'roomintro', minMs: 500 })
     : (V.say(['rm_welcome_back']), Promise.resolve());
   intro.then(function () {
     var chain = Promise.resolve();

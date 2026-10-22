@@ -33,7 +33,7 @@
     for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
     noise = buf; return true;
   }
-  function vol() { var s = S(); return s.music === false ? 0 : .22 * (s.musicVol == null ? .5 : s.musicVol) * 2; }
+  function vol() { var s = S(); return s.music === false || s.muteAll ? 0 : .22 * (s.musicVol == null ? .5 : s.musicVol) * 2; }
 
   /* ---------- instruments ---------- */
   function env(g, t, a, peak, dec) { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + dec); }
@@ -150,7 +150,7 @@
   }
   function play(name) {
     st.want = name;
-    if (S().music === false || document.hidden) return;
+    if (S().music === false || S().muteAll || document.hidden) return;
     if (st.track === name && st.playing) return;
     startLoop(name);
   }
@@ -182,7 +182,7 @@
     duck.gain.cancelScheduledValues(t); duck.gain.setValueAtTime(duck.gain.value, t); duck.gain.linearRampToValueAtTime(on ? .3 : 1, t + (on ? .15 : .7));
   }
   function apply() { // settings changed
-    if (S().music === false) { stopLoop(); return; }
+    if (S().music === false || S().muteAll) { stopLoop(); return; }
     if (AC && out && st.playing) { var t = AC.currentTime; out.gain.cancelScheduledValues(t); out.gain.setValueAtTime(out.gain.value, t); out.gain.linearRampToValueAtTime(Math.max(vol(), 0), t + .2); }
     else if (st.want) play(st.want);
   }

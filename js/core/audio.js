@@ -11,6 +11,9 @@
 (function (A) {
   'use strict';
   function S() { return A.Store.settings; }
+  // grown-up volume sliders (0..1 each) + mute-all, saved on the device in settings
+  function lvl(k) { var s = S(); if (s.muteAll) return 0; var v = s[k]; return v == null ? 1 : Math.max(0, Math.min(1, +v)); }
+  A.vol = { voice: function () { return lvl('voiceVol'); }, sfx: function () { return lvl('sfxVol'); } };
 
   /* ================= SFX ================= */
   var AC = null, unlocked = false;
@@ -26,7 +29,7 @@
     o = o || {}; var a = ctx(); if (!a) return; var t = a.currentTime + (o.when || 0);
     var osc = a.createOscillator(), g = a.createGain(); osc.type = o.type || 'sine'; osc.frequency.setValueAtTime(f, t);
     if (o.to) osc.frequency.exponentialRampToValueAtTime(o.to, t + dur);
-    var v = o.vol || .18; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + .015); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    var v = Math.max(0.0002, (o.vol || .18) * lvl('sfxVol')); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + .015); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     osc.connect(g); g.connect(a.destination); osc.start(t); osc.stop(t + dur + .05);
   }
   var SFX = {
@@ -168,7 +171,7 @@
       var done = false; function fin() { if (!done) { done = true; res(); } }
       try {
         var u = new SpeechSynthesisUtterance(text.replace(/−/g, ' minus ').replace(/\+/g, ' plus '));
-        u.rate = S().rate || .9; u.pitch = 1.15; u.volume = 1; if (VOICE) { u.voice = VOICE; u.lang = VOICE.lang; } else u.lang = 'en-US';
+        u.rate = S().rate || .9; u.pitch = 1.15; u.volume = lvl('voiceVol'); if (VOICE) { u.voice = VOICE; u.lang = VOICE.lang; } else u.lang = 'en-US';
         u.onend = u.onerror = fin;
         speechSynthesis.speak(u);
         setTimeout(fin, 1500 + text.length * 95); // safety: some browsers never fire onend
@@ -283,7 +286,7 @@
       if (tok !== TOK) return true;
       var t = AC.currentTime + 0.04, t0 = t;
       bufs.forEach(function (b, i) {
-        var src = AC.createBufferSource(), g = AC.createGain(); src.buffer = b.buf; g.gain.value = b.gain;
+        var src = AC.createBufferSource(), g = AC.createGain(); src.buffer = b.buf; g.gain.value = b.gain * lvl('voiceVol');
         src.connect(g); g.connect(AC.destination); src.start(t, b.start, b.dur); sources.push(src);
         t += b.dur + (i < bufs.length - 1 ? gapAfter(segs[i]) : 0);
       });
@@ -292,7 +295,7 @@
     });
   }
   function playEl(segs, tok) {
-    var els = segs.map(function (s) { var a = new Audio(); a.preload = 'auto'; a.src = s.url; return a; });
+    var els = segs.map(function (s) { var a = new Audio(); a.preload = 'auto'; a.src = s.url; a.volume = lvl('voiceVol'); return a; });
     function ready(a) { return new Promise(function (res) { if (a.readyState >= 3) return res(); var d = false; function f() { if (!d) { d = true; res(); } } a.oncanplaythrough = f; a.onerror = f; setTimeout(f, 1500); }); }
     A.Voice.last.mode = 'element';
     return Promise.all(els.map(ready)).then(function () {
@@ -321,7 +324,7 @@
       setTimeout(function () { fin(true); }, 15000);
     });
   }
-  function playUrl(url, tok) { return playEl1(new Audio(url), { url: url, text: '' }, tok); }
+  function playUrl(url, tok) { var a = new Audio(url); a.volume = lvl('voiceVol'); return playEl1(a, { url: url, text: '' }, tok); }
   // play a run of clip segments (no speech inside)
   function playClips(segs, tok) {
     if (!segs.length) return Promise.resolve(true);

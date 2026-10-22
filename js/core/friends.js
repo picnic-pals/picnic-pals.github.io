@@ -1,4 +1,4 @@
-/* Blob Arcade — blob FRIENDS: little bios and friendship levels (Blob Room).
+/* Picnic Pals — food FRIENDS (was Blob Arcade blob friends): little bios and friendship levels (Blob Room).
    Friendship grows when a kid plays games AS that blob (1 point per star earned), visits the room (each friend
    living there: +1 once a day) and taps a friend in the room (+1, up to 3 a day each). Levels unlock small things:
      2 Pal          → "likes" (read aloud in the bio)
@@ -12,44 +12,31 @@
   var NAMES = ['New friend', 'Pal', 'Good friend', 'Best friend', 'Forever friend'];
   var TAPS_PER_DAY = 3;
   // personality: walk speed, how often they nap, what they like to visit
-  var BIO = {
-    mochi: { face: 'love', fav: 'snackcart', speed: 1, napP: .15, likes: ['snackcart', 'table_round', 'rug_round'],
-      hi: 'This is Mochi! Mochi is sweet, cheerful, and always a little bit hungry.',
-      lk: 'Mochi likes snacks, sunshine, and giving big squishy hugs.',
-      dl: "Mochi doesn't like rainy days with no snacks.",
-      food: "Mochi's favorite food is a warm, sticky rice bun.",
-      taps: ['Hee hee, that tickles!', 'Is it snack time yet?', "You're my best buddy!"], napLine: 'Mmm... dreaming of dumplings...' },
-    poppy: { face: 'dreamy', fav: 'bed_cloud', speed: .7, napP: .45, likes: ['bed_cloud', 'beanbag_pink', 'beanbag_blue', 'sofa', 'bed_simple'],
-      hi: 'This is Poppy! Poppy is dreamy and cozy, and loves slow, happy hums.',
-      lk: 'Poppy likes naps, soft pillows, and humming sleepy songs.',
-      dl: "Poppy doesn't like loud, beeping alarm clocks.",
-      food: "Poppy's favorite food is warm milk with honey.",
-      taps: ['Mmm... hello, sleepyhead!', "Let's snuggle on the beanbag.", 'Hum, hum, hum... la la la.'], napLine: 'Zzz... five more minutes...' },
-    clem: { face: 'wink', fav: 'soccergoal', speed: 1.6, napP: .05, likes: ['soccergoal', 'soccerball', 'batrack', 'hoop'],
-      hi: 'This is Clem! Clem is sporty and brave, and loves to run, kick, and cheer.',
-      lk: 'Clem likes running races, kicking balls, and cheering really loud!',
-      dl: "Clem doesn't like sitting still for too long.",
-      food: "Clem's favorite food is orange slices after a big game.",
-      taps: ['Ready, set, go!', "Wanna race me? Let's go!", 'High five! Yeah!'], napLine: 'Zzz... scoring a goal... zzz...' },
-    dewdrop: { face: 'wow', fav: 'fishtank', speed: 1.1, napP: .1, likes: ['fishtank', 'plant_tall', 'bookshelf', 'telescope'],
-      hi: 'This is Dewdrop! Dewdrop is curious about everything, and asks why a lot.',
-      lk: 'Dewdrop likes rain puddles, bubbles, and finding things out.',
-      dl: "Dewdrop doesn't like it when nobody answers her questions.",
-      food: "Dewdrop's favorite food is cold, juicy watermelon.",
-      taps: ['Why is the sky blue? Do you know?', 'Ooh, bubbles! Pop, pop!', "Hi hi! Let's explore!"], napLine: 'Zzz... splish, splash...' },
-    pickle: { face: 'silly', fav: 'toybox', speed: 1.3, napP: .08, likes: ['toybox', 'blocks', 'train', 'drum', 'plant_cactus'],
-      hi: 'This is Pickle! Pickle is a silly joker, and is always up to something fun.',
-      lk: 'Pickle likes jokes, funny faces, and playing hide and seek.',
-      dl: "Pickle doesn't like being bored. Boring is so boring!",
-      food: "Pickle's favorite food is crunchy pickles, of course!",
-      taps: ["Knock knock! Who's there? Pickle! Hee hee!", 'Boo! Did I surprise you?', "Let's make silly faces!"], napLine: 'Zzz... hee hee... zzz...' },
-    nova: { face: 'starry', fav: 'telescope', speed: .85, napP: .2, likes: ['telescope', 'lamp_star', 'poster_space', 'fairylights'],
-      hi: 'This is Nova! Nova is a dreamer and a stargazer, and hums little songs.',
-      lk: 'Nova likes the stars, the moon, and making wishes.',
-      dl: "Nova doesn't like cloudy nights, because the stars hide.",
-      food: "Nova's favorite food is star-shaped cookies.",
-      taps: ['Twinkle, twinkle! Hello, friend.', 'Did you make a wish today?', 'Look up! Can you see a star?'], napLine: 'Zzz... floating on the moon...' }
+  // room behaviour carried over from the old blob each food friend replaced (art/foods/README.md migration table); others get a default
+  var ROOM = {
+    mochi: { face: 'love', fav: 'snackcart', speed: 1, napP: .15, likes: ['snackcart', 'table_round', 'rug_round'] },
+    strawberry: { face: 'wink', fav: 'bed_cloud', speed: 1.1, napP: .2, likes: ['bed_cloud', 'beanbag_pink', 'sofa', 'rug_round'] },
+    carrot: { face: 'wink', fav: 'soccergoal', speed: 1.6, napP: .05, likes: ['soccergoal', 'soccerball', 'batrack', 'hoop'] },
+    blueberry: { face: 'wow', fav: 'fishtank', speed: 1.1, napP: .1, likes: ['fishtank', 'plant_tall', 'bookshelf', 'telescope'] },
+    corn: { face: 'silly', fav: 'toybox', speed: 1.3, napP: .08, likes: ['toybox', 'blocks', 'train', 'drum', 'plant_cactus'] },
+    grapes: { face: 'starry', fav: 'telescope', speed: .85, napP: .2, likes: ['telescope', 'lamp_star', 'poster_space', 'fairylights'] },
+    pear: { face: 'dreamy', fav: 'bed_cloud', speed: .7, napP: .45, likes: ['bed_cloud', 'beanbag_blue', 'bed_simple'] },
+    banana: { face: 'silly', fav: 'toybox', speed: 1.4, napP: .06, likes: ['toybox', 'hoop', 'blocks'] },
+    broccoli: { face: 'love', fav: 'plant_tree', speed: 1, napP: .1, likes: ['plant_tree', 'plant_tall', 'bookshelf'] }
   };
+  function low(t) { return t ? t.charAt(0).toLowerCase() + t.slice(1) : t; }
+  // bios from art/foods/bios.json (via foods-data.js), read aloud by the browser voice unless clips exist
+  var BIO = {};
+  ((A.FoodData && A.FoodData.cast) || []).forEach(function (c) {
+    var r = ROOM[c.id] || { face: 'love', fav: 'rug_round', speed: 1, napP: .12, likes: ['rug_round', 'sofa', 'table_round'] }, n = c.name, cp = c.catchphrase || '';
+    var fav = (c.favorite || '').replace(/^"|"$/g, '');
+    BIO[c.id] = { face: r.face, fav: r.fav, speed: r.speed, napP: r.napP, likes: r.likes,
+      hi: 'This is ' + n + '! ' + n + ' is ' + low(c.personality).replace(/\.$/, '') + '.',
+      lk: n + "'s favorite thing is " + low(fav).replace(/\.$/, '') + '.',
+      dl: n + ' always says: ' + cp,
+      food: n + ' is a ' + low(c.food).replace(/ \(.*\)$/, '') + ' and loves a good picnic.',
+      taps: [cp.replace(/^["“]|["”]$/g, ''), 'Hi, friend!', "It's picnic time!"], napLine: 'Zzz... picnic dreams...' };
+  });
   function today() { return A.today ? A.today() : new Date().toISOString().slice(0, 10); }
   function st(p, b) { var f = p.friends || (p.friends = {}); return f[b] || (f[b] = { pts: 0, lvl: 1, day: '', taps: 0, visit: '', news: [] }); }
   function lvlFor(pts) { var l = 1; for (var i = 0; i < LEVELS.length; i++) if (pts >= LEVELS[i]) l = i + 1; return l; }

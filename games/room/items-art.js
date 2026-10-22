@@ -85,13 +85,13 @@
     // wall things
     poster_space: [100, 130, r(6, 6, 88, 118, 4, '#2d2a5a') + c(50, 64, 20, '#ff8fb1') + e(50, 64, 34, 8, 'none', ' stroke="#ffd23c" stroke-width="4"') + star(20, 22, 6, '#ffe68a', 0) + star(80, 100, 5, '#ffe68a', 0) + c(76, 26, 3, '#fff', 0) + c(24, 104, 2.5, '#fff', 0)],
     poster_mochi: [100, 130, r(6, 6, 88, 118, 4, '#ffeef5') + p('M50 30 C74 30 86 52 86 70 C86 90 70 98 50 98 C30 98 14 90 14 70 C14 52 26 30 50 30 Z', '#fff4e6') + p('M50 30 C46 20 40 18 36 20 M50 30 C54 18 62 18 66 22', 'none', ' stroke="#43b98a" stroke-width="4"') +
-      c(38, 64, 4, K, 0) + c(62, 64, 4, K, 0) + p('M44 76 Q50 82 56 76', 'none') + c(30, 74, 5, '#ffb3cf', 0) + c(70, 74, 5, '#ffb3cf', 0) + '<text x="50" y="116" font-size="12" text-anchor="middle" font-family="sans-serif" font-weight="700" fill="' + K + '">MOCHI</text>'],
+      c(38, 64, 4, K, 0) + c(62, 64, 4, K, 0) + p('M44 76 Q50 82 56 76', 'none') + c(30, 74, 5, '#ffb3cf', 0) + c(70, 74, 5, '#ffb3cf', 0) + '<text x="50" y="116" font-size="12" text-anchor="middle" font-family="sans-serif" font-weight="700" fill="' + K + '">DORA</text>'],
     poster_baseball: [100, 130, r(6, 6, 88, 118, 4, '#9fd2ff') + p('M14 112 L74 24', 'none', ' stroke="#e0a868" stroke-width="10" stroke-linecap="round"') + c(66, 86, 16, '#fff') + p('M56 76 Q62 86 56 96 M76 76 Q70 86 76 96', 'none', ' stroke="#ff5a6e" stroke-width="2.5"') + star(28, 28, 8, '#ffd23c', 0)],
     frame_sun: [110, 90, r(5, 5, 100, 80, 6, '#e0a878') + r(14, 14, 82, 62, 2, '#bfe8ff', 0) + c(74, 32, 10, '#ffd23c', 0) + p('M14 76 L40 46 L58 64 L72 52 L96 76 Z', '#62d4a5', 0)],
     clock: [80, 80, c(40, 40, 34, '#fff') + c(40, 40, 34, 'none', ' stroke="#ff8fb1" stroke-width="6"') + p('M40 40 V20 M40 40 L54 48', 'none', ' stroke="' + K + '" stroke-width="4"') + c(40, 40, 3, K, 0)],
     shelf_wall: [120, 70, r(6, 52, 108, 10, 3, '#c98b5e') + p('M18 52 H40 L36 30 H22 Z', '#ff8a5a') + p('M29 30 C20 18 30 10 29 2 M29 30 C38 18 44 22 42 12', 'none', ' stroke="#43b98a" stroke-width="4"') + book(56, 52, 30, '#5aa9f0') + book(66, 52, 26, '#ffd23c') + book(76, 52, 32, '#ff8fb1') + c(100, 42, 9, '#cdb0ff')],
     fairylights: [130, 50, p('M4 10 Q36 40 66 14 Q96 40 126 10', 'none', ' stroke="#7a6a99" stroke-width="2"') + [[16, 22, '#ff8fb1'], [34, 30, '#ffd23c'], [52, 26, '#8fe3b0'], [66, 16, '#9fd2ff'], [80, 26, '#cdb0ff'], [98, 30, '#ff8fb1'], [116, 20, '#ffd23c']].map(function (b) { return c(b[0], b[1], 5, b[2], ' stroke="#fff" stroke-width="1.5" class="bulb"'); }).join('')],
-    pennant: [110, 60, p('M6 6 L104 28 L6 52 Z', '#3d8ef0') + '<text x="40" y="34" font-size="13" text-anchor="middle" font-family="sans-serif" font-weight="700" fill="#fff">GO BLOBS</text>'],
+    pennant: [110, 60, p('M6 6 L104 28 L6 52 Z', '#3d8ef0') + '<text x="40" y="34" font-size="13" text-anchor="middle" font-family="sans-serif" font-weight="700" fill="#fff">GO PALS!</text>'],
     mirror: [80, 110, e(40, 55, 32, 48, '#e0a878') + e(40, 55, 24, 40, '#dff3ff', 0) + p('M28 34 L40 22 M28 50 L48 30', 'none', ' stroke="#fff" stroke-width="4"')],
     star_big: [110, 110, star(55, 58, 50, '#ffd23c') + star(55, 58, 26, '#fff3a0', 0) + c(44, 50, 4, K, 0) + c(66, 50, 4, K, 0) + p('M48 64 Q55 70 62 64', 'none', ' stroke="' + K + '" stroke-width="3"')],
     hr_ball: [90, 90, r(5, 5, 80, 80, 8, '#7a5c9a') + c(45, 40, 20, '#fff') + p('M33 28 Q41 40 33 52 M57 28 Q49 40 57 52', 'none', ' stroke="#ff5a6e" stroke-width="2.5"') + '<text x="45" y="78" font-size="13" text-anchor="middle" font-family="sans-serif" font-weight="700" fill="#ffd23c">HOME RUN</text>']
@@ -115,10 +115,17 @@
     if (s.k === 'tiles') h += '<path d="M0 33H100M0 66H100M33 0V100M66 0V100" stroke="#fff" stroke-width="3"/>';
     return '<svg viewBox="0 0 100 100" aria-hidden="true">' + h + '<rect width="100" height="100" rx="12" fill="none" stroke="' + K + '" stroke-width="3"/></svg>';
   }
+  // Picnic Spot pieces (art/theme/room/pieces -> assets/picnic/room, built by tools/build-room-art.py): [file, px w, px h]
+  var PIC_DIR = '../../assets/picnic/room/';
+  var PIC = { rug_round: ['picnic_blanket', 480, 207], beanbag_pink: ['cushion_pink', 320, 196], beanbag_blue: ['cushion_mint', 320, 196], chair: ['stump_stool', 274, 215], table_round: ['low_table', 480, 257],
+    plant_flower: ['flower_pot', 212, 343], lamp_floor: ['lantern', 260, 456], toybox: ['picnic_basket', 320, 294], tent: ['parasol', 320, 395], snackcart: ['cupcake_stand', 320, 411], pennant: ['bunting', 480, 70],
+    frame_sun: ['wall_art', 294, 373], fruit_bowl: ['fruit_bowl', 320, 282], lemonade_jug: ['lemonade_jug', 241, 337], plates: ['plates', 320, 130], thermos: ['thermos', 176, 409] };
+  function picSvg(id, cls) { var a = PIC[id]; return '<svg class="' + (cls || 'it') + ' pic" viewBox="0 0 ' + a[1] + ' ' + a[2] + '" aria-hidden="true" focusable="false"><image href="' + PIC_DIR + a[0] + '.webp" width="' + a[1] + '" height="' + a[2] + '"/></svg>'; }
   function svg(id, cls) {
     if (STYLE[id]) return swatch(id);
+    if (PIC[id]) return picSvg(id, cls);
     var a = ART[id]; if (!a) return '';
     return '<svg class="' + (cls || 'it') + '" viewBox="' + (id.indexOf('rug') === 0 ? '0 0 ' : '-4 -12 ') + (a[0] + (id.indexOf('rug') === 0 ? 0 : 8)) + ' ' + (a[1] + (id.indexOf('rug') === 0 ? 0 : 16)) + '" aria-hidden="true" focusable="false">' + a[2] + '</svg>';
   }
-  A.RoomArt = { ART: ART, STYLE: STYLE, svg: svg, swatch: swatch, star: star };
+  A.RoomArt = { ART: ART, PIC: PIC, PIC_DIR: PIC_DIR, STYLE: STYLE, svg: svg, swatch: swatch, star: star };
 })(window.Arcade);
