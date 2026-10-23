@@ -45,10 +45,35 @@
   A.on = function (ev, fn) { (subs[ev] = subs[ev] || []).push(fn); };
   A.emit = function (ev, data) { (subs[ev] || []).slice().forEach(function (fn) { try { fn(data); } catch (e) { console.warn(e); } }); };
   A.off = function (ev, fn) { var a = subs[ev]; if (!a) return; var i = a.indexOf(fn); if (i >= 0) a.splice(i, 1); };
+  /* A.Age: the ONE place for age cut-offs (2026-10-21 ux3a). Everything that changes with age asks here.
+       toddler    age 2 and under  -> Toddler mode auto (Tiny Picnic)
+       little     age 4 and under  -> Gentle Munch auto (no hearts, no timer), 3 answer choices (Baseball, bonus), Little Steps story path,
+                                      no fluency timing, extra time, Questions.step never jumps to a new skill
+       preReader  age 5 and under  -> relaxed timer pace, stories read aloud, little-kid bonus questions
+     band(): 'none' (age not set, starts like age 5), 'toddler' (<=2), 'pre' (3), 'pk' (4), 'k' (5), 'g1' (6), 'g2' (7), 'g3' (8+)
+     boards(): Munch boards per level (ages 4-5: 2; 6-7: 2 at level 1, 3 at the top level; 8+: 3; toddlers / age 3: 1). */
+  function ageOf(p) { var a = p && typeof p === 'object' ? p.age : p; return a == null || a === '' || isNaN(+a) ? null : +a; }
+  A.Age = {
+    TODDLER_MAX: 2, LITTLE_MAX: 4, PREREADER_MAX: 5,
+    of: ageOf,
+    toddler: function (p) { var a = ageOf(p); return a != null && a <= 2; },
+    little: function (p) { var a = ageOf(p); return a != null && a <= 4; },
+    preReader: function (p) { var a = ageOf(p); return a != null && a <= 5; },
+    band: function (p) { var a = ageOf(p); if (a == null) return 'none'; if (a <= 2) return 'toddler'; if (a <= 3) return 'pre'; if (a <= 4) return 'pk'; if (a <= 5) return 'k'; if (a <= 6) return 'g1'; if (a <= 7) return 'g2'; return 'g3'; },
+    choices: function (p) { return A.Age.little(p) ? 3 : 4; },
+    boards: function (p, level, top) { var a = ageOf(p); if (a == null) a = 5; if (a <= 3) return 1; if (a <= 5) return 2; if (a <= 7) return level != null && top != null && level >= top ? 3 : 2; return 3; },
+    // correct cells per Munch board (20 cells): 6-7 at ages 4-5, 8-9 at 6-7, 9-10 at 8+ (5 for toddlers / age 3)
+    cellsPerBoard: function (p) { var a = ageOf(p); if (a == null) a = 5; if (a <= 3) return [5, 6]; if (a <= 5) return [6, 7]; if (a <= 7) return [8, 9]; return [9, 10]; }
+  };
   // Gentle Munch (per player, grown-up setting p.munchGentle: 'auto' | 'on' | 'off'): no hearts (misses never end the round)
-  // and no countdown. Auto = on for age 5 and under.
+  // and no countdown. Auto = on for age 4 and under (A.Age.little).
   // Toddler mode (per player, grown-up setting p.toddler: 'auto' | 'on' | 'off'): Tiny Picnic is the main game and the
   // grade-level games are tucked away. Auto: on for age 2 (and younger).
-  A.toddler = function (p) { if (!p) return false; var t = p.toddler || 'auto'; return t === 'on' || (t === 'auto' && p.age != null && p.age <= 2); };
-  A.gentleMunch = function (p) { if (!p) return false; var g = p.munchGentle || 'auto'; return g === 'on' || (g === 'auto' && p.age != null && p.age <= 5); };
+  A.toddler = function (p) { if (!p) return false; var t = p.toddler || 'auto'; return t === 'on' || (t === 'auto' && A.Age.toddler(p)); };
+  A.gentleMunch = function (p) { if (!p) return false; var g = p.munchGentle || 'auto'; return g === 'on' || (g === 'auto' && A.Age.little(p)); };
+  // after9 (2026-10-22) hint-before-heart: with hearts on (not Gentle Munch), at age 6 and under (or age not set) the FIRST
+  // wrong tap on each board costs no heart; it shows a hint instead (a snack that is right glows). Misses still count for
+  // stars and the coach. Was: 56% of age-5 rounds (35% at 6) ended in a Snack break; sim now ~20% at 5 / ~25-33% at 6 for an
+  // 80% kid (_review/after9). Returns the free misses per board (0 or 1).
+  A.munchFreeMisses = function (p) { if (!p || A.gentleMunch(p)) return 0; var a = ageOf(p); return a == null || a <= 6 ? 1 : 0; };
 })();

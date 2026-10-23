@@ -59,6 +59,7 @@
        hats     — Pop Quiz themes (Pop Quiz isn't built yet: data hook only, see hats + Rewards.popQuizTheme)
        weekly   — furniture + stickers for the forgiving weekly goal (play N of 7 days; never resets), reviews, bosses, effort
      No random draws, no expiring offers, no streak loss, no sibling leaderboards. Stars are never lost. */
+  var FRIEND_GAP = 4;            // play days per friend after the first (see characters below)
   var CONFIG = {
     uncommonPerSession: 2,        // uncommon unlocks earned per play session (day); extras wait for the next session
     cardsPerSession: 3,           // prizes shown on the end-of-session card in the hub; extras queue for next session
@@ -79,7 +80,9 @@
     characters: (function () {
       var FD = A.FoodData || {}, order = FD.order || ['mochi', 'banana', 'pear', 'carrot', 'broccoli', 'sushi', 'taco', 'pizza', 'pancake', 'cupcake'];
       return { starter: (FD.starters || ['strawberry', 'apple', 'corn', 'blueberry']).slice(),
-        unlockable: order.map(function (id, i) { return { id: id, need: { mastered: i + 1 } }; }) };
+        // spacing (2026-10-21): with the tuned mastery rule (coach.js) a fast kid can master a skill every couple of days, so every
+        // friend after the first also needs FRIEND_GAP play days per friend (friend #2 at 4 play days, #3 at 8 …): about one a week.
+        unlockable: order.map(function (id, i) { var n = { mastered: i + 1 }; if (i > 0) n.days = FRIEND_GAP * i; return { id: id, need: n }; }) };
     })(),
     // HATS track hook: Pop Quiz theme id → outfit id (granted when Rewards.popQuizTheme(p, theme) is called and that outfit exists).
     // Pop Quiz isn't built: until it is, each of these is earned by the existing milestone in outfitEarn below (either path unlocks it).
@@ -218,7 +221,7 @@
   // multi-week rules (weeks >= 2, 5+ mastered, 3-star areas, the island, 400+ stars, 20+ days) are epic, the rest rare
   function earnTier(id) { var n = (EARN[id] || {}).need || {}; return (n.weeks >= 2 || n.mastered >= 5 || 'area3at' in n || n.island || n.stars >= 400 || n.days >= 20) ? 'epic' : 'rare'; }
   /* ---------- FRIENDS track (data-driven, keyed by id) ---------- */
-  var NEED_TXT = { mastered: ['master', 'skill'], weeks: ['meet your weekly goal', 'time'], popquiz: ['finish', 'Pop Quiz theme'], reviews: ['finish', 'Memory Lane review'], bosses: ['beat', 'boss round'] };
+  var NEED_TXT = { mastered: ['master', 'skill'], days: ['play', 'day'], weeks: ['meet your weekly goal', 'time'], popquiz: ['finish', 'Pop Quiz theme'], reviews: ['finish', 'Memory Lane review'], bosses: ['beat', 'boss round'] };
   function charRule(id) { return cast().unlockable.filter(function (u) { return u.id === id; })[0] || null; }
   function charProgress(p, id, x) {
     var r = charRule(id); if (!r) return { ok: cast().starter.indexOf(id) >= 0, parts: [] };
@@ -263,7 +266,7 @@
     { id: 'rounds_10', name: '10 Rounds', hint: 'Play 10 rounds', art: 'cupcake', test: function (p) { return p.games.munch.rounds >= 10; } },
     { id: 'dress_up', name: 'Dress Up', hint: 'Change your friend in Dress Up', art: 'strawberry', test: function (p) { return !!p.flags.dressed; } },
     { id: 'master_1', name: 'Skill Master', hint: 'Master a new math skill', art: 'medal', test: function (p) { return mc().masteredCount(p) >= 1; } },
-    { id: 'perfect_3', name: 'Triple Perfect', hint: '3 perfect rounds in a row', art: 'icecream', test: function (p) { return (p.games.munch.best || 0) >= 3; } },
+    { id: 'perfect_3', name: 'Triple Perfect', hint: '3 perfect rounds', art: 'icecream', test: function (p) { return (p.games.munch.perfect || 0) >= 3; } },   // design2: any 3 perfect rounds (not in a row: no streak pressure)
     { id: 'days_3', name: '3 Play Days', hint: 'Play on 3 different days', art: 'ladybug', test: function (p) { return Object.keys(p.days).length >= 3; } },
     { id: 'stars_50', name: '50 Stars', hint: 'Earn 50 stars', art: 'rocket', test: function (p) { return p.stars >= 50; } },
     { id: 'grumbly', name: 'Cloud Dodger', hint: 'Finish a round with Grumbly on', art: 'cloud', test: function (p) { return (p.games.munch.grumblyWins || 0) >= 1; } },
@@ -290,7 +293,8 @@
   ];
   // tiers of the original stickers (new ones carry their own) and harder thresholds (ids kept, so old saves keep what they earned)
   var STK_TIER = { master_1: 'rare', perfect_3: 'rare', days_7: 'rare', master_3: 'epic', stars_100: 'rare', stars_200: 'rare', rounds_50: 'rare', master_all: 'epic', grumbly: 'rare', bb_homer: 'rare' };
-  var STK_FIX = { stars_25: 40, stars_50: 90, stars_100: 160, stars_200: 320, rounds_10: 15, rounds_25: 40, rounds_50: 90 };
+  // design2: stars_25 40 -> 60 stars, so the easier (not-in-a-row) Triple Perfect keeps week-1 pacing at 17 (reward-sim)
+  var STK_FIX = { stars_25: 60, stars_50: 90, stars_100: 160, stars_200: 320, rounds_10: 15, rounds_25: 40, rounds_50: 90 };
   STICKERS.forEach(function (s) {
     s.tier = s.tier || STK_TIER[s.id] || 'uncommon';
     var n = STK_FIX[s.id]; if (!n) return;

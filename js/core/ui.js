@@ -49,21 +49,24 @@
         '<button class="bigbtn ' + (o.btnCls || 'mint') + '">' + A.esc(o.btn || 'OK') + '</button>' +
         '<span class="kh">' + (A.isTouchOnly() ? '' : 'Press <kbd class="wide">Space</kbd> or <kbd class="wide">Enter</kbd>') + '</span>' + (A.Pad ? '<span class="ph">Press ' + A.Pad.g('a') + '</span>' : '') + '</div></div>');
       document.body.appendChild(ov); UI.cardOpen = true;
-      var btn = ov.querySelector('.bigbtn'), t0 = Date.now(), done = false;
+      var btn = ov.querySelector('.bigbtn'), done = false, lastTap = 0;
+      // the beat (js/core/pace.js): celebrations / results hold a moment; presses in the lock are dropped, never queued
+      var pm = A.Pace.forCard(o), L = A.Pace.lock(pm ? btn : null, Math.max(o.minMs || 450, pm), 'card:' + (o.cls || o.title || ''));   // menus/info cards: no cue, just the old short guard
+      ov.__pace = L;
       function close() {
-        if (done || Date.now() - t0 < (o.minMs || 450)) return; done = true;
+        if (done || !L.ready()) return; done = true; clearTimeout(L.timer);
         document.removeEventListener('keydown', onKey, true); A.Audio.sfx('tap');
         ov.remove(); UI.cardOpen = !!document.querySelector('.overlay.on'); resolve();
       }
       function onKey(e) {
-        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape' || e.key === 'f' || e.key === 'F') { e.preventDefault(); e.stopPropagation(); if (!e.repeat) { btn.classList.add('pressed'); setTimeout(close, 90); } }
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape' || e.key === 'f' || e.key === 'F') { e.preventDefault(); e.stopPropagation(); if (!done && L.press(e)) { btn.classList.add('pressed'); setTimeout(close, 90); } }
       }
       document.addEventListener('keydown', onKey, true);
-      btn.addEventListener('click', close);
+      btn.addEventListener('click', function (e) { var now = Date.now(); if (now - lastTap < A.Pace.CFG.TAP_DEBOUNCE) return; lastTap = now; if (L.press(null)) close(); });
       setTimeout(function () { try { btn.focus({ preventScroll: true }); } catch (e) {} }, 50);
       if (o.sfx) A.Audio.sfx(o.sfx);
       if (o.confetti) UI.rain(50);
-      if (o.voice) A.Voice.say(o.voice);
+      if (o.voiceMix) A.Voice.sayMix(o.voiceMix, { bubble: false }); else if (o.voice) A.Voice.say(o.voice, { kind: o.voiceKind || 'chatter', bubble: false });
     });
   };
 
@@ -76,26 +79,26 @@
       return new Promise(function (resolve) {
         var q = Q.make(skill, top, { choices: 3 });
         var ov = A.el('<div class="overlay on placement-card" role="dialog" aria-modal="true" aria-label="Quick check"><div class="card">' +
-          '<span class="tag">Quick check · ' + (i + 1) + ' of ' + n + '</span><div class="pc-dots">' + Array.apply(null, Array(n)).map(function (_, k) { return '<i class="' + (k < i ? 'done' : k === i ? 'now' : '') + '"></i>'; }).join('') + '</div>' +
+          '<span class="tag">Warm-up game · ' + (i + 1) + ' of ' + n + '</span><div class="pc-dots">' + Array.apply(null, Array(n)).map(function (_, k) { return '<i class="' + (k < i ? 'done' : k === i ? 'now' : '') + '"></i>'; }).join('') + '</div>' +
           '<div class="pc-q">' + q.text + '</div>' + (q.pic ? '<div class="pc-pic">' + q.pic + '</div>' : '') +
           '<div class="pc-opts">' + q.choices.map(function (c, k) { return '<button class="pc-opt" data-i="' + k + '"><kbd>' + (k + 1) + '</kbd>' + (c.html || A.esc(c.label)) + '</button>'; }).join('') + '</div></div></div>');
         document.body.appendChild(ov); ov.__q = q; UI.cardOpen = true;
         var btns = A.$$('.pc-opt', ov), done = false, t0 = Date.now();
         function pickIt(k) {
-          if (done || Date.now() - t0 < 300) return; done = true; var ok = k === q.answer;
+          if (done || Date.now() - t0 < A.Pace.CFG.FRESH_Q) return; done = true; var ok = k === q.answer;
           if (ok) score++;
           var key = String(q.text).replace(/<[^>]+>/g, '').replace(/^What’s /, '').replace(/\?$/, '').trim();
           C.recordAnswer(P, skill.id, ok, { key: key });
           btns[q.answer].classList.add('right'); if (!ok) btns[k].classList.add('picked'); A.Audio.sfx('tap');
           document.removeEventListener('keydown', onKey, true);
-          setTimeout(function () { ov.remove(); UI.cardOpen = !!document.querySelector('.overlay.on'); resolve(); }, ok ? 550 : 1100);
+          setTimeout(function () { ov.remove(); UI.cardOpen = !!document.querySelector('.overlay.on'); resolve(); }, ok ? 700 : Math.max(1100, A.Pace.ms('RESULT')));
         }
         function onKey(e) {
           var k = +e.key; if (k >= 1 && k <= btns.length) { e.preventDefault(); e.stopPropagation(); return pickIt(k - 1); }
           var at = btns.indexOf(document.activeElement);
           if (/Arrow(Right|Down)/.test(e.key)) { e.preventDefault(); e.stopPropagation(); btns[(at + 1) % btns.length].focus(); }
           else if (/Arrow(Left|Up)/.test(e.key)) { e.preventDefault(); e.stopPropagation(); btns[(at - 1 + btns.length) % btns.length].focus(); }
-          else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); pickIt(at < 0 ? 0 : at); }
+          else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); if (!e.repeat) pickIt(at < 0 ? 0 : at); }
         }
         document.addEventListener('keydown', onKey, true);
         btns.forEach(function (b, k) { b.addEventListener('click', function () { pickIt(k); }); });
@@ -104,11 +107,11 @@
       });
     }
     function loop() { if (i >= n) return Promise.resolve(); return one().then(function () { i++; return loop(); }); }
-    return UI.card({ cls: 'placement-intro', tag: 'New skill: ' + skill.name, title: 'Let’s see what you already know!', html: '<p class="pc-sub">5 quick questions. No hearts, no clock — just show what you know!</p>', btn: 'Let’s go! ▶', voice: ['place_intro'], minMs: 500 })
+    return UI.card({ cls: 'placement-intro', tag: 'Warm-up game: ' + skill.name, title: 'Let’s see what you already know!', html: '<p class="pc-sub">5 quick picks. No hearts, no clock. Just have fun!</p>', btn: 'Let’s go! ▶', voice: ['place_intro'], minMs: 500 })
       .then(loop).then(function () {
         var res = K.placementResult(P, skill.id, score); A.Store.save();
-        var nx = C.nextSkill(skill.id), msg = res === 'skip' ? 'You already know ' + skill.name + '! We’ll skip ahead' + (nx ? ' to ' + nx.name : '') + ' and check back on it later.' : res === 'higher' ? 'Great job! You’ll start ' + skill.name + ' a little higher.' : 'Thanks! Let’s learn ' + skill.name + ' together.';
-        return UI.card({ cls: 'placement-done', tag: 'Quick check: ' + score + ' of ' + n, title: res === 'skip' ? 'Wow, you know this!' : res === 'higher' ? 'Nice!' : 'Let’s learn it!', html: '<p>' + A.esc(msg) + '</p>', btn: '▶ Play', voice: [res === 'skip' ? 'place_skip' : res === 'higher' ? 'place_higher' : 'place_normal'], sfx: res === 'skip' ? 'fanfare' : null, confetti: res === 'skip', minMs: 500 })
+        var nx = C.nextSkill(skill.id), msg = res === 'skip' ? 'You already know ' + skill.name + '! We’ll skip ahead' + (nx ? ' to ' + nx.name : '') + ' and check back on it later.' : res === 'higher' ? 'Great job! You’ll start ' + skill.name + ' a little higher.' : res === 'back' ? 'Thanks! Let’s learn ' + C.current(P, C.subjectOf(skill)).name + ' together first.' : 'Thanks! Let’s learn ' + skill.name + ' together.';
+        return UI.card({ cls: 'placement-done', tag: 'Warm-up: ' + score + ' of ' + n + ' yum!', title: res === 'skip' ? 'Wow, you know this!' : res === 'higher' ? 'Great job!' : 'Let’s learn it together!', html: '<p>' + A.esc(msg) + '</p>', btn: '▶ Play', voice: [res === 'skip' ? 'place_skip' : res === 'higher' ? 'place_higher' : 'place_normal'], sfx: res === 'skip' ? 'fanfare' : null, confetti: res === 'skip', minMs: 500 })
           .then(function () { return { score: score, result: res }; });
       });
   };
@@ -169,7 +172,7 @@
       }
       function wait() {
         var box = ov.querySelector('.opts'); box.innerHTML = ''; var q = ov.querySelector('.q');
-        A.Voice.say(['hub_ask_grownup']);
+        A.Voice.say(['hub_ask_grownup'], { bubble: false });
         (function tick() {
           var left = Math.ceil(((UI.gateUntil || 0) - Date.now()) / 1000);
           if (left <= 0) { tmr = null; ov.classList.remove('cooling'); return ask(); }
@@ -182,7 +185,7 @@
       document.addEventListener('keydown', onKey, true);
       ov.querySelector('[data-x]').addEventListener('click', function () { done(false); });
       ask();
-      A.Voice.say(['hub_grownups']);
+      A.Voice.say(['hub_grownups'], { bubble: false });
     });
   };
 
@@ -207,7 +210,7 @@
       document.addEventListener('keydown', onKey, true);
       yes.addEventListener('click', function () { done(true); }); no.addEventListener('click', function () { done(false); });
       setTimeout(function () { try { (o.danger ? no : yes).focus({ preventScroll: true }); } catch (e) {} }, 30);
-      if (o.voice) A.Voice.say(o.voice);
+      if (o.voice) A.Voice.say(o.voice, { kind: o.voiceKind || 'chatter', bubble: false });
     });
   };
 
@@ -276,7 +279,82 @@
   var fsT = null;
   UI.focusSay = function (el) {
     clearTimeout(fsT);
-    fsT = setTimeout(function () { if (document.activeElement !== el) return; var parts = UI.sayFor(el); if (parts) { UI.focusSaid = parts; A.Voice.say(parts); } }, UI.FOCUS_SAY_MS);
+    // focus speech only at "Full" talking (2026-10-22 voice); the tooltip bubble shows the words instead
+    if (!A.Talk || !A.Talk.allows('focus')) return;
+    fsT = setTimeout(function () { if (document.activeElement !== el) return; var parts = UI.sayFor(el); if (parts) { UI.focusSaid = parts; A.Voice.say(parts, { kind: 'focus' }); } }, UI.FOCUS_SAY_MS);
   };
   UI.FOCUS_SAY_MS = 380;
+
+  /* ---------- food-friend speech bubble (2026-10-22 voice): the words a line would have said, for pages without their own bubble ---------- */
+  var fbT = null;
+  UI.friendBubble = function (text, ms) {
+    text = String(text || '').trim(); if (!text || !document.body) return null;
+    var el = document.getElementById('friendBubble');
+    if (!el) {
+      el = A.el('<div id="friendBubble" class="friend-bubble" role="status" aria-live="polite"><span class="fb-friend" aria-hidden="true"></span><span class="fb-say"><span class="fb-msg"></span></span></div>');
+      document.body.appendChild(el);
+      el.addEventListener('click', function () { el.classList.remove('on'); });
+    }
+    var p = A.Store && A.Store.active && A.Store.active();
+    try { el.querySelector('.fb-friend').innerHTML = p && A.Blobs ? A.Blobs.forProfile(p, { expr: 'happy' }) : ''; } catch (e) {}
+    el.querySelector('.fb-msg').textContent = text; el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
+    clearTimeout(fbT); fbT = setTimeout(function () { el.classList.remove('on'); }, ms || Math.max(2600, Math.min(6000, text.length * 70)));
+    UI.lastBubble = text; return el;
+  };
+
+  /* ---------- tooltips: short descriptions on hover, keyboard focus and long-press (touch), never spoken ----------
+     UI.tip(el, text) sets data-tip + aria-label/title. One shared bubble follows the element. A long-press (about 500 ms) shows
+     the tip and swallows the click that follows, so it never launches the game. (The context menu is already blocked in boot.) */
+  UI.LONG_PRESS_MS = 500;
+  UI.tip = function (el, text, opt) {
+    if (!el || !text) return el; opt = opt || {};
+    el.setAttribute('data-tip', text);
+    if (opt.label !== false) { var nm = opt.name || ''; el.setAttribute('aria-label', nm ? nm + '. ' + text : (el.getAttribute('aria-label') || text)); }
+    if (!el.hasAttribute('title') || opt.title !== false) el.setAttribute('title', text);
+    return el;
+  };
+  UI.tipAll = function (root, sel, fn) { A.$$(sel, root || document).forEach(function (el) { var t = fn(el); if (t) UI.tip(el, t.text || t, t.text ? t : {}); }); };
+  var tipEl = null, tipFor = null, tipT = null;
+  function tipBox() {
+    if (!tipEl) { tipEl = A.el('<div id="tipBubble" class="tip-bubble" role="tooltip" aria-hidden="true"></div>'); document.body.appendChild(tipEl); }
+    return tipEl;
+  }
+  UI.showTip = function (el, how) {
+    var t = el && el.getAttribute && el.getAttribute('data-tip'); if (!t) return;
+    // the native title would double up with ours: park it while ours shows
+    if (el.hasAttribute('title')) { el.setAttribute('data-title', el.getAttribute('title')); el.removeAttribute('title'); }
+    var b = tipBox(); b.textContent = t; b.className = 'tip-bubble on ' + (how || ''); tipFor = el;
+    var r = el.getBoundingClientRect(), bw = Math.min(280, innerWidth - 16); b.style.maxWidth = bw + 'px';
+    var w = b.offsetWidth, h = b.offsetHeight, x = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)), y = r.top - h - 12, below = false;
+    if (y < 6) { y = r.bottom + 12; below = true; }
+    b.style.left = x + 'px'; b.style.top = y + 'px'; b.classList.toggle('below', below);
+    b.style.setProperty('--ax', Math.max(14, Math.min(w - 14, r.left + r.width / 2 - x)) + 'px');
+    clearTimeout(tipT); if (how === 'press') tipT = setTimeout(UI.hideTip, 2600);
+    UI.tipShown = { text: t, how: how || '' };
+  };
+  UI.hideTip = function () {
+    clearTimeout(tipT); if (tipEl) tipEl.classList.remove('on');
+    if (tipFor && tipFor.hasAttribute('data-title')) { tipFor.setAttribute('title', tipFor.getAttribute('data-title')); tipFor.removeAttribute('data-title'); }
+    tipFor = null;
+  };
+  function tipTarget(e) { return e.target && e.target.closest ? e.target.closest('[data-tip]') : null; }
+  document.addEventListener('mouseover', function (e) { var el = tipTarget(e); if (el && el !== tipFor) UI.showTip(el, 'hover'); else if (!el && tipFor && !UI.pressTip) UI.hideTip(); });
+  document.addEventListener('mouseout', function (e) { var el = tipTarget(e); if (el && el === tipFor && !(e.relatedTarget && el.contains(e.relatedTarget)) && !UI.pressTip) UI.hideTip(); });
+  document.addEventListener('focusin', function (e) { var el = tipTarget(e); if (el && el === e.target && UI.navByKey) UI.showTip(el, 'focus'); });
+  document.addEventListener('focusout', function (e) { if (tipFor && tipFor === e.target && !UI.pressTip) UI.hideTip(); });
+  document.addEventListener('scroll', function () { if (!UI.pressTip) UI.hideTip(); }, true);
+  // long-press (touch / pen, and a held mouse button): ~500 ms shows the tip; the click after it is cancelled
+  var lp = null;
+  document.addEventListener('pointerdown', function (e) {
+    var el = tipTarget(e); if (!el || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    var x0 = e.clientX, y0 = e.clientY;
+    lp = { el: el, x: x0, y: y0, fired: false, t: setTimeout(function () { if (!lp || lp.el !== el) return; lp.fired = true; UI.pressTip = true; UI.showTip(el, 'press'); UI.longPressed = el; A.emit && A.emit('tip:longpress', el); }, UI.LONG_PRESS_MS) };
+  }, true);
+  document.addEventListener('pointermove', function (e) { if (lp && !lp.fired && Math.abs(e.clientX - lp.x) + Math.abs(e.clientY - lp.y) > 12) { clearTimeout(lp.t); lp = null; } }, true);
+  function lpEnd() { if (!lp) return; clearTimeout(lp.t); if (lp.fired) { var el = lp.el; UI.swallowClickUntil = Date.now() + 700; UI.swallowFor = el; setTimeout(function () { UI.pressTip = false; }, 2600); } lp = null; }
+  document.addEventListener('pointerup', lpEnd, true); document.addEventListener('pointercancel', function () { if (lp) { clearTimeout(lp.t); if (lp.fired) setTimeout(function () { UI.pressTip = false; }, 2600); lp = null; } }, true);
+  // the click (and Enter-free) activation after a long-press is swallowed in the capture phase, before any tile handler runs
+  document.addEventListener('click', function (e) {
+    if (UI.swallowClickUntil && Date.now() < UI.swallowClickUntil && UI.swallowFor && UI.swallowFor.contains(e.target)) { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); UI.swallowClickUntil = 0; UI.swallowFor = null; }
+  }, true);
 })(window.Arcade);

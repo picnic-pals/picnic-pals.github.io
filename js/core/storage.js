@@ -28,6 +28,7 @@
       id: 'p_' + A.uid(), name: name || 'Player', blob: blob || STARTER_BLOBS[0], color: 'classic', outfit: 'none', held: 'none',
       createdAt: Date.now(), lastPlayed: 0,
       age: null,                      // optional, years (makes the Munch timer more generous for little ones)
+      talk: 'auto',                   // "How much talking" (grown-up setting): 'auto' (by age) | 'full' | 'prompts' | 'tap' | 'off' (A.Talk in audio.js)
       timerPace: 'auto',              // Munch timer length: 'auto' (by age) | 'relaxed' | 'normal' | 'speedy'
       stars: 0,                       // total stars ever earned (never spent; unlocks are milestones)
       // spendable "star bits": every star earned also adds a bit here (via Store.earnStars). Reserved for the Blob Room
@@ -46,7 +47,7 @@
       bonus: { asked: 0, right: 0, recent: [] }, // bonus questions (recent = last ids asked, to avoid repeats)
       skills: {},                     // skillId -> state (see curriculum-math.js)
       math: { current: null, pin: false, rounds: 0, returnTo: null, timeBoost: {} }, // timeBoost: skillId -> extra-time factor (slow but accurate kids get more time)
-      story: { path: null, stops: {}, run: null, bestRun: 0, bestRunAt: 0, bestRunStops: 0, runs: 0, finished: 0, seen: {}, challenges: {} }, // Munch story mode (see story.js)
+      story: { path: null, stops: {}, run: null, bestRun: 0, bestRunAt: 0, bestRunStops: 0, runs: 0, finished: 0, seen: {}, challenges: {}, introSeen: 0, bookMode: null }, // Munch story mode (see story.js); introSeen: the intro picture book was shown (js/core/storybook.js), bookMode: 'read' | 'self' | null (default by reading level)
       sight: { words: {} },           // reserved for the Sight Words game
       flags: {}
     };
@@ -97,7 +98,7 @@
     if (!d || typeof d !== 'object') d = defaults();
     while (d.schema < SCHEMA && MIGRATE[d.schema]) { MIGRATE[d.schema](d); }
     fill(d, defaults());
-    d.profiles = (d.profiles || []).map(function (p) { if (!p.wallet) p.wallet = { bits: p.stars || 0, earned: p.stars || 0, spent: 0 }; fill(p, blankProfile(p.name, p.blob)); if (p.blob && !p.unlocks.blobs[p.blob]) p.unlocks.blobs[p.blob] = Date.now(); return p; }); // the blob in use always stays usable
+    d.profiles = (d.profiles || []).map(function (p) { if (!p.wallet) p.wallet = { bits: p.stars || 0, earned: p.stars || 0, spent: 0 }; fill(p, blankProfile(p.name, p.blob)); if (['auto', 'full', 'prompts', 'tap', 'off'].indexOf(p.talk) < 0) p.talk = 'auto'; if (p.blob && !p.unlocks.blobs[p.blob]) p.unlocks.blobs[p.blob] = Date.now(); return p; }); // the blob in use always stays usable
     D = d;
     if (!D.seeded) seed();
     if (A.Curriculum) D.profiles.forEach(function (p) { A.Curriculum.ensure(p); });
@@ -112,7 +113,6 @@
     A.Curriculum.ensure(p);
     // per-subject levels (p.levels: 'auto' = by age, or a grade) set where each ladder starts; see A.Levels in skills-grade1.js
     if (A.Levels) A.Levels.applyAll(p);
-    else if (p.age != null && p.age >= 6) A.Curriculum.place(p, 'add10');
     return p;
   }
   var saveT = null;
@@ -174,7 +174,7 @@
         // compact codes from before Picnic Pals left out the old blob defaults (blob 'mochi', starters mochi + poppy): put them back before migrating
         if (o.schema < 4) { if (!p.blob) p.blob = 'mochi'; p.unlocks = p.unlocks || {}; var ob = p.unlocks.blobs = p.unlocks.blobs || {}; if (o.schema >= 3) { ob.mochi = ob.mochi || 1; ob.poppy = ob.poppy || 1; } }
         if (o.schema < SCHEMA) { var tmp = { schema: o.schema, profiles: [p] }; while (tmp.schema < SCHEMA && MIGRATE[tmp.schema]) MIGRATE[tmp.schema](tmp); }
-        fill(p, blankProfile(p.name, p.blob)); if (A.Curriculum) A.Curriculum.ensure(p);
+        fill(p, blankProfile(p.name, p.blob)); if (['auto', 'full', 'prompts', 'tap', 'off'].indexOf(p.talk) < 0) p.talk = 'auto'; if (A.Curriculum) A.Curriculum.ensure(p);
         return { ok: true, player: p };
       } catch (e) { return { ok: false, error: 'That code could not be read. Copy all of it and try again.' }; }
     },
@@ -191,7 +191,7 @@
     remove: function (id) { var d = D || load(); d.profiles = d.profiles.filter(function (p) { return p.id !== id; }); if (d.activeId === id) d.activeId = null; save(); },
     resetProgress: function (id) {
       var d = D || load(), i = d.profiles.findIndex(function (p) { return p.id === id; }); if (i < 0) return;
-      var old = d.profiles[i], p = blankProfile(old.name, old.blob); p.id = old.id; p.flags.preset = old.flags.preset; p.age = old.age; p.timerPace = old.timerPace; if (old.toddler) p.toddler = old.toddler; p.unlocks.blobs[p.blob] = Date.now();
+      var old = d.profiles[i], p = blankProfile(old.name, old.blob); p.id = old.id; p.flags.preset = old.flags.preset; p.age = old.age; p.timerPace = old.timerPace; if (old.toddler) p.toddler = old.toddler; if (old.talk) p.talk = old.talk; p.unlocks.blobs[p.blob] = Date.now();
       startByAge(p);
       d.profiles[i] = p; save(); return p;
     },

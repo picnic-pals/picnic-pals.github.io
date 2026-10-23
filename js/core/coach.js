@@ -3,7 +3,7 @@
    - Per-item tracking: p.coach.items[skill][item] = { s: seen, c: correct, h: hint-assisted correct, m: misses, b: Leitner box 1-6,
      l: last seen (ms), due: next review (ms), d: [days answered correctly without a hint] }.
      An item is a fact ("3 + 4"), a word ("said") or a story passage ("rc_1_7").
-   - p.coach.log[skill] = the last answers [{ t, d: day, k: item, c: credit 0 / .5 / 1 }]: a correct answer after a hint is half credit.
+   - p.coach.log[skill] = the last answers [{ t, d: day, k: item, c: credit 0 / HINT_CREDIT (.9) / 1 }]: a correct answer after a miss or hint earns partial credit.
    - Leitner: a miss drops the item to box 1 (ask again this session); a correct, hint-free answer when the item is due moves it up one
      box. Box 1 = same session, then 1, 3, 7, 14 and 30 days.
    - Mastery (ready()) needs the accuracy threshold over enough items AND enough separate days, by skill type (TYPES below).
@@ -13,6 +13,8 @@
    Old saves: ensure() adds p.coach; nothing else in the save changes (schema stays v3, extra fields are ignored by older code). */
 (function (A) {
   'use strict';
+  var HINT_CREDIT = .9;   // mastery credit for a correct answer given after a miss / with a hint showing (was .5; with math at 90%
+                         // that kept a typical 85% kid from a first mastery for weeks, see /tmp/dora/sim.js — tuned 2026-10-21)
   var DAY = 864e5, BOX_DAYS = [0, 0, 1, 3, 7, 14, 30];   // index = box (1..6); box 1 = this session
   var clock = function () { return Date.now(); };
   function now() { return clock(); }
@@ -20,8 +22,8 @@
 
   // thresholds by skill type (review §4 "Thresholds by skill type")
   var TYPES = {
-    facts: { acc: .9, min: 30, days: 3, label: 'Add/sub facts: 90%+ over 30+ answers on 3 days' },
-    count: { acc: .9, min: 20, days: 2, label: 'Number sense: 90%+ over 20+ answers on 2 days' },
+    facts: { acc: .85, min: 30, days: 3, label: 'Add/sub facts: 85%+ over 30+ answers on 3 days' },
+    count: { acc: .85, min: 20, days: 2, label: 'Number sense: 85%+ over 20+ answers on 2 days' },
     letters: { acc: .85, min: 20, days: 2, label: 'Letters: 85%+ over 20+ answers on 2 days' },
     phonics: { acc: .9, min: 15, days: 2, label: 'Phonics: 90%+ over 15+ words on 2 days' },
     sight: { acc: .85, min: 15, days: 3, perItemDays: 3, itemShare: .8, minItems: 8, label: 'Sight words: each word right on 3 separate days' },
@@ -65,7 +67,7 @@
   // Returns the coaching signals for this answer.
   function answer(p, sid, key, ok, opt) {
     opt = opt || {}; key = String(key);
-    var t = now(), r = item(p, sid, key), S = sess(p), hint = !!opt.hint, credit = ok ? (hint ? .5 : 1) : 0, wasDue = !r.l || t >= r.due;
+    var t = now(), r = item(p, sid, key), S = sess(p), hint = !!opt.hint, credit = ok ? (hint ? Coach.HINT_CREDIT : 1) : 0, wasDue = !r.l || t >= r.due;
     r.s++; r.l = t;
     if (ok) {
       r.c++; if (hint) r.h++;
@@ -145,7 +147,7 @@
   function bumpItems(p, sid, box) { var m = items(p, sid), t = now(); Object.keys(m).forEach(function (k) { if (m[k].b < box) { m[k].b = box; m[k].due = t + BOX_DAYS[box] * DAY; } }); }
 
   var Coach = {
-    DAY: DAY, BOX_DAYS: BOX_DAYS, TYPES: TYPES, MIX: MIX, typeOf: typeOf, rule: rule, dayKey: dayKey,
+    DAY: DAY, BOX_DAYS: BOX_DAYS, TYPES: TYPES, HINT_CREDIT: HINT_CREDIT, MIX: MIX, typeOf: typeOf, rule: rule, dayKey: dayKey,
     setClock: function (fn) { clock = fn || function () { return Date.now(); }; }, now: now,
     data: data, item: item, items: items, answer: answer, session: sess, resetSession: resetSession, reaskDue: reaskDue, reaskTake: reaskTake,
     ready: ready, winnable: winnable, dueItems: dueItems, nextDue: nextDue, lastSeen: lastSeen, mostMissed: mostMissed, boxShare: boxShare,
@@ -300,16 +302,31 @@
   var PLACE_N = 5;
   // should the next round of this skill start with a placement check?
   function wantsPlacement(p, sid) { var st = p.skills && p.skills[sid]; return !!(st && st.placeOffer && !st.placeDone && st.status !== 'mastered' && !st.attempts); }
-  // score = right answers of 5. Returns 'skip' | 'higher' | 'normal'
+  // score = right answers of 5. Returns 'skip' | 'higher' | 'normal' | 'back'
+  //  5/5 -> skip the skill and check the next one (up to PLACE_CHAIN skills per subject in a row: the first session)
+  //  4/5 -> start at the top level · 3/5 -> as placed · 2 or fewer on the START skill -> step back one skill (its top level)
+  var PLACE_CHAIN = 4;
   function placementResult(p, sid, score) {
-    var C = A.Curriculum, s = C.byId[sid], st = C.state(p, sid), top = s.levels.length - 1, out;
+    var C = A.Curriculum, s = C.byId[sid], st = C.state(p, sid), top = s.levels.length - 1, out, T = C.track(p, C.subjectOf(s));
     st.placeOffer = false; st.placeDone = true; st.placeCheck = { at: K.now(), score: score, of: PLACE_N };
     if (score >= PLACE_N) {
-      out = 'skip'; C.markMastered(p, sid); st.placed = true; st.placedBy = 'check'; st.introduced = true;
+      out = 'skip'; C.markMastered(p, sid); st.placed = true; st.placedBy = 'check'; st.introduced = true; st.placeStart = false;
       K.bumpItems(p, sid, 2);   // the check's items stay in spaced review (due tomorrow)
-      var nx = C.nextSkill(sid); if (nx) { var ns = C.state(p, nx.id); if (!ns.attempts && !ns.placeDone && ns.status !== 'mastered') ns.placeOffer = true; }
+      T.placeSteps = (T.placeSteps || 0) + 1;
+      var nx = C.nextSkill(sid); if (nx && T.placeSteps < PLACE_CHAIN) { var ns = C.state(p, nx.id); if (!ns.attempts && !ns.placeDone && ns.status !== 'mastered') ns.placeOffer = true; }
     } else if (score === PLACE_N - 1) { out = 'higher'; st.level = Math.min(top, st.level + 1); if (st.level === 0 && top > 0) st.level = 1; }
+    else if (score <= 2 && st.placeStart) {
+      // the start was too high: one skill back (at its top level), or this skill's first level if it is the first rung / already at level 2
+      var pv = C.prevSkill ? C.prevSkill(sid) : null;
+      if (st.level > 0) { st.level = 0; out = 'back'; }
+      else if (pv) {
+        var ps = C.state(p, pv.id); ps.status = 'open'; ps.placed = false; ps.level = pv.levels.length - 1; ps.placeDone = true; ps.placeOffer = false;
+        if (!p.math.pin) { T.current = pv.id; T.returnTo = null; }
+        out = 'back';
+      } else out = 'normal';
+    }
     else out = 'normal';
+    st.placeStart = false;
     st.placeCheck.result = out; return out;
   }
 
@@ -359,6 +376,6 @@
 
   K.v2 = true; K.TARGET = TARGET; K.BAND = BAND; K.migrate = migrate; K.theta = theta; K.prob = prob; K.target = target; K.pickItem = pickItem; K.expected = expected;
   K.ERRORS = ERRORS; K.HINTS = HINTS; K.offByOneHint = offByOneHint; K.tag = tag; K.diagnose = diagnose; K.errorCounts = errorCounts; K.evalFact = evalFact;
-  K.PLACE_N = PLACE_N; K.wantsPlacement = wantsPlacement; K.placementResult = placementResult;
+  K.PLACE_N = PLACE_N; K.PLACE_CHAIN = PLACE_CHAIN; K.wantsPlacement = wantsPlacement; K.placementResult = placementResult;
   K.progressSummary = progressSummary; K.progressText = progressText;
 })(typeof window !== 'undefined' ? window.Arcade : global.Arcade);

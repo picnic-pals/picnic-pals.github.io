@@ -154,7 +154,7 @@
   var BY = {}; QS.forEach(function (q) { BY[q.id] = q; });
   // pick a question for a player: never one of their recent ones, easier ones for little kids
   function pick(p) {
-    var b = p.bonus || (p.bonus = { asked: 0, right: 0, recent: [] }), little = p.age != null ? p.age <= 5 : false;
+    var b = p.bonus || (p.bonus = { asked: 0, right: 0, recent: [] }), little = A.Age.preReader(p);
     var recent = b.recent || [], keep = Math.min(60, QS.length - 10);
     var pool = QS.filter(function (q) { return recent.indexOf(q.id) < 0 && (!little || q.d === 1); });
     if (!pool.length) pool = QS.filter(function (q) { return recent.slice(-20).indexOf(q.id) < 0; });

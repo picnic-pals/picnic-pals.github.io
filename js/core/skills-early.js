@@ -136,6 +136,9 @@
 
   /* ----- Sight words (Reading & Words) ----- */
   function swLine(w) { return A.SightWords.lineId(w); }
+  // the strategy hint after a miss: one fixed wording for every word (so it never gives the word away) that uses none of the 40
+  // pre-primer words itself (the old '…then look for the letter…' contained the target 'look'; 'the', 'it', 'for', 'to' too)
+  var SIGHT_HINT = 'Tap 🔊 once more. Which letter starts that sound?';
   SK.push({ id: 'sight', name: 'Sight words', short: 'Dolch pre-primer words', strand: 'Sight words', std: 'K.RF.3c', grade: 'PK–K', subject: 'reading', sayFact: true, listen: true, secs: [10, 11],
     levels: ['First 20 words', 'All 40 pre-primer words'],
     intro: { line: 'skill_sight', example: wordHtml('the') + ' ' + wordHtml('and') + ' ' + wordHtml('see') },
@@ -146,7 +149,7 @@
       var ok = pool.filter(function (w) { return !alike(w, T); });
       var like = ok.filter(function (w) { return w.charAt(0).toLowerCase() === T.charAt(0).toLowerCase() || w.length === T.length; });
       function mk(w) { return { label: w, html: wordHtml(w), fact: w === T ? ['sw_that_says', swLine(w)] : ['rule_sight', swLine(T)], name: [], k: w.toLowerCase() }; }
-      return { text: '<span class="listen">Listen and find the word</span>', listen: true, hint: 'Tap 🔊 to hear it again. Listen for the first sound, then look for the letter that makes it.', say: ['rule_sight', swLine(T)], target: T,
+      return { text: '<span class="listen">Listen and find the word</span>', listen: true, hint: SIGHT_HINT, say: ['rule_sight', swLine(T)], target: T,
         good: function () { return mk(T); }, bad: function () { return mk(like.length && Math.random() < (L ? .55 : .3) ? pick(like) : pick(ok)); } };
     } });
   SK[5].ask = askFrom(SK[5].gen, function (r) { return { text: '<span class="listen">Listen and find the word</span>', listen: true, say: ['sw_find', swLine(r.target)] }; });
@@ -166,7 +169,7 @@
   function plain(h) { return String(h || '').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim(); }
   function fromSkill(p, subj) {
     var s = C.current(p, subj), st = C.state(p, s.id), b = p.bonus || (p.bonus = { asked: 0, right: 0, recent: [] }), recent = b.recent || (b.recent = []), q, id, g = 0;
-    do { q = A.Questions.make(s, st.level, { choices: p.age != null && p.age <= 5 ? 3 : 4 }); id = 'skill:' + s.id + ':' + q.target + ':' + q.choices[q.answer].label; } while (recent.indexOf(id) >= 0 && g++ < 12);
+    do { q = A.Questions.make(s, st.level, { choices: A.Age.choices(p) }); id = 'skill:' + s.id + ':' + q.target + ':' + q.choices[q.answer].label; } while (recent.indexOf(id) >= 0 && g++ < 12);
     recent.push(id); while (recent.length > 60) recent.shift();   // not the same question again soon
     return { id: id, skill: s.id, level: st.level, cat: 'skill', d: 1, q: plain(q.text), line: null, parts: A.ReadAloud ? A.ReadAloud.auto(p, q) : q.say, partsAll: q.say, fact: q.fact || [], listen: !!q.listen, answer: q.answer,
       choices: q.choices.map(function (c) { return { emoji: c.html || A.esc(c.label), text: c.label, hideText: true, parts: c.say || [c.label] }; }) };

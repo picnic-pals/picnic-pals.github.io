@@ -61,7 +61,12 @@
     if (two) A.Pad.mountSeats($('#menuSeats'), function () { return [P.name, partner && s === 'mode' ? partner.p.name : 'friend']; }); else $('#menuSeats').innerHTML = '';
     var first = box.querySelector('[data-nav]'); setTimeout(function () { try { first.focus({ preventScroll: true }); } catch (e) {} }, 30);
   }
-  function wire(fns) { A.$$('#menuTiles .mtile').forEach(function (b) { b.addEventListener('click', function () { var f = fns[b.dataset.id]; if (f) f(); }); b.addEventListener('pointerenter', function () { B.anim(b, 'squish', 420); }); }); }
+  // short descriptions on hover / focus / long-press (never spoken; 2026-10-22)
+  var TIPS = { story: 'Follow the map from stop to stop on a picnic journey.', free: 'Munch the right answers at your own level.', two: 'Play with a friend on one keyboard.',
+    team: 'Work together and share the stars.', versus: 'A friendly race. Who finishes first?', back: 'Go back one step.',
+    'g:easy': 'Play with a guest who is learning to count.', 'g:medium': 'Play with a guest who adds to 10.', 'g:hard': 'Play with a guest who adds to 20.' };
+  function tipTiles() { A.$$('#menuTiles .mtile').forEach(function (b) { var id = b.dataset.id, t = TIPS[id] || (/^p:/.test(id) ? 'Play together with ' + (b.querySelector('.mt') || b).textContent.trim() + '.' : ''); if (t) UI.tip(b, t, { name: (b.querySelector('.mt') || b).textContent.trim() }); }); }
+  function wire(fns) { tipTiles(); A.$$('#menuTiles .mtile').forEach(function (b) { b.addEventListener('click', function () { var f = fns[b.dataset.id]; if (f) f(); }); b.addEventListener('pointerenter', function () { B.anim(b, 'squish', 420); }); }); }
   function show(p) {
     P = p; build(); A.Story.data(P);
     A.$$('.screen').forEach(function (s) { s.classList.toggle('on', s === sec); });

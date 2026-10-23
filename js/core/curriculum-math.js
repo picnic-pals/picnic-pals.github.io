@@ -186,12 +186,13 @@
     return t[subj];
   }
   function live() { return SUBJECTS.filter(function (x) { return list(x.id).length; }); }
-  // the subject mix: 'mixed' -> weights by age (5 and under: 40% early concepts, 30% letters & sounds, 30% math; 6+: 60% math, 30% reading, 10% concepts)
+  // the subject mix: 'mixed' -> weights by age band (3 and under: 40% concepts / 30% reading / 30% math; 4: 45/40/15 math/reading/concepts; 5: 50/45/5; 6+ and no age: 60/30/10)
   function mixWeights(p) {
     var m = p.mix || 'mixed', w = {}, have = live().map(function (x) { return x.id; });
     if (m !== 'mixed' && have.indexOf(m) >= 0) { w[m] = 1; return w; }
-    var little = p.age != null && p.age <= 5;
-    var base = little ? { concepts: .4, reading: .3, math: .3 } : { math: .6, reading: .3, concepts: .1 };
+    // by age band (A.Age): 3 and under the toddler mix; 4 more math & reading; 5 their own (school-ready) mix; 6+ (and no age) mostly math
+    var band = A.Age ? A.Age.band(p) : (p.age != null && p.age <= 5 ? 'pre' : 'g1');
+    var base = band === 'toddler' || band === 'pre' ? { concepts: .4, reading: .3, math: .3 } : band === 'pk' ? { math: .45, reading: .4, concepts: .15 } : band === 'k' ? { math: .5, reading: .45, concepts: .05 } : { math: .6, reading: .3, concepts: .1 };
     if (p.levels && p.levels.concepts === 'off') base.concepts = 0;   // grown-up setting: Early Concepts off
     var tot = 0; have.forEach(function (id) { w[id] = base[id] || 0; tot += w[id]; });
     if (!tot) { w.math = 1; return w; }
@@ -207,7 +208,7 @@
     return best;
   }
 
-  function blankState() { return { status: 'locked', level: 0, topPasses: 0, struggles: 0, attempts: 0, correct: 0, hist: [], timeMs: 0, introduced: false, placed: false, last: 0, needsPractice: false, offerTestOut: false }; }
+  function blankState() { return { status: 'locked', level: 0, lvN: 0, lvC: 0, pending: false, topPasses: 0, struggles: 0, attempts: 0, correct: 0, hist: [], timeMs: 0, introduced: false, placed: false, last: 0, needsPractice: false, offerTestOut: false }; }
 
   function ensure(p) {
     p.skills = p.skills || {};
@@ -262,12 +263,14 @@
     ensure(p);
     var subj = (opt && opt.subject) || p.nextSubject || chooseSubject(p); p.nextSubject = null;
     if (!list(subj).length) subj = 'math';
-    var T = track(p, subj), cur = T.current, st = p.skills[cur], K = A.Coach, top = BY[cur].levels.length - 1;
+    var T = track(p, subj), K = A.Coach;
+    var opened = openPendingNextDay(p, T);   // design2: a "mastery pending" skill opens the next one on the NEXT play day
+    var cur = T.current, st = p.skills[cur], top = BY[cur].levels.length - 1;
     T.rounds = (T.rounds || 0) + 1;
     // placement check: the first time a newly opened skill comes up, a 5-question "what do you already know?" check (coach.js; only callers that can run it ask: opt.placement)
     if (K && K.wantsPlacement && K.wantsPlacement(p, cur) && opt && opt.placement && !(A.Store && A.Store.data && A.Store.settings.placement === false)) return { skill: BY[cur], level: top, review: false, placement: true, nQ: K.PLACE_N };
     if (st.offerTestOut) { st.offerTestOut = false; return { skill: BY[cur], level: A.clamp(st.level, 0, top), review: false, testOut: true, nOk: 5 }; }
-    var mastered = list(subj).filter(function (s) { return p.skills[s.id].status === 'mastered' && s.id !== cur; });
+    var mastered = list(subj).filter(function (s) { return (p.skills[s.id].status === 'mastered' || p.skills[s.id].pending) && s.id !== cur; });
     if (!p.math.pin && mastered.length && st.introduced && T.rounds > 2) {
       var have = { recent: [], older: [] };
       mastered.forEach(function (s) { have[K ? K.bucket(p, s.id) : 'recent'].push(s); });
@@ -279,8 +282,18 @@
     }
     var lv = A.clamp(st.level, 0, top), eased = false;
     if (K && lv > 0 && K.winnable(p, cur) < 0) { lv--; eased = true; }   // keep ~75-85% winnable: one easier round, the level itself stays
-    return { skill: BY[cur], level: lv, review: false, eased: eased };
+    return { skill: BY[cur], level: lv, review: false, eased: eased, opened: opened || undefined };
   }
+  // design2: strong on the top level with only the separate-days rule left (finishRound marks st.pendDay): the next skill opens
+  // at the first round of a later play day, never in the same session
+  function openPendingNextDay(p, T) {
+    var id = T.current, st = p.skills[id]; if (!st || !st.pendDay || st.pendDay === A.today() || st.pending || st.status === 'mastered' || p.math.pin) return null;
+    var nx = nextSkill(id); st.pendDay = null; if (!nx) return null;
+    st.pending = true; var ns = state(p, nx.id); if (ns.status === 'locked') ns.status = 'open';
+    T.current = nx.id; return nx.id;
+  }
+  // design2: no fast track on the day a skill is first played (its first session); later days may fast-track a fresh level
+  function fastOk(p, id) { var st = state(p, id); return !!st.day0 && st.day0 !== A.today(); }
 
   // one answer. opt (optional): { key: item id, hint: bool, fast: bool } -> coaching signals from coach.js (or null)
   function recordAnswer(p, id, ok, opt) {
@@ -289,16 +302,32 @@
     return null;
   }
 
+  /* Level-up rule (ux3a, Learning Coach §3): at least 12 answers on the level at 85%+ (and the latest round/board at 80%+).
+     Fast track: on a fresh level, 8 of the first 10 right with no hints and quick answers (res.first10 = {n, right, hinted, fast},
+     from the game) moves up straight away. */
+  // design2 (2026-10-22): 24 answers (was 12) spread over 2+ rounds; no fast track in the skill's first session
+  var LEVEL_RULE = { min: 24, rounds: 2, acc: .85, fastRight: 8 };
+  // a placed skill is earned in play once the coach's mastery check passes on the kid's own played answers (needs answers in the log)
+  function earnedInPlay(p, id) { if (!A.Coach) return false; var lg = (A.Coach.data(p).log || {})[id] || []; return lg.length > 0 && A.Coach.ready(p, id).ok; }
+  // Coach.ready said "not yet" only because of the separate-days requirement
+  function daysOnly(rd) { return !!(rd && rd.why && rd.why.length) && rd.why.every(function (w) { return /separate days|right on \d+ days/.test(w); }); }
   // Call when a round ends. Returns {say:[parts], events:{...}}
   function finishRound(p, round, res) {
     var s = round.skill, st = state(p, s.id), top = s.levels.length - 1, T = track(p, subjOf(s));
     var tot = res.correct + res.wrong, acc = tot ? res.correct / tot : 1;
     st.hist.push({ t: Date.now(), c: res.correct, w: res.wrong, l: round.level, r: round.review ? 1 : 0, ms: res.ms || 0 });
     if (st.hist.length > 60) st.hist = st.hist.slice(-60);
-    st.timeMs += res.ms || 0; st.introduced = true;
+    st.timeMs += res.ms || 0; st.introduced = true; if (!st.day0) st.day0 = A.today();
     var ev = { acc: acc }, say;
     if (round.review) {
-      if (acc >= .8) return { say: ['fb_review_good'], events: ev };
+      if (acc >= .8) {
+        if (st.pending && st.status !== 'mastered' && (!A.Coach || A.Coach.ready(p, s.id).ok)) { st.pending = false; st.status = 'mastered'; st.placed = false; st.level = top; ev.mastered = s.id; return { say: ['fb_mastered'], events: ev }; }
+        // a placed skill (age start / warm-up skip) the kid then proves in PLAYED spaced reviews (coach.js ready(): accuracy over enough
+        // answers on separate days; warm-up answers are not in that log) counts as earned from now on: friends come from played mastery
+        if (st.placed && st.status === 'mastered' && earnedInPlay(p, s.id)) { st.placed = false; st.earnedBy = 'review'; ev.mastered = s.id; return { say: ['fb_mastered'], events: ev }; }
+        return { say: ['fb_review_good'], events: ev };
+      }
+      if (st.pending) return { say: ['fb_keep_going'], events: ev };   // a pending skill just stays in review
       // a failed spaced review reopens the skill: "needs practice" at its top level, practiced next, then back to the current skill
       if (st.status === 'mastered') {
         st.status = 'open'; st.needsPractice = true; st.topPasses = 0; st.level = top; ev.reopened = s.id;
@@ -325,21 +354,38 @@
       // otherwise: >= 75% munched and accurate counts like a finished round; low accuracy uses the normal rules below
     }
     if (acc < .8 || res.gaveUp) st.topPasses = 0;   // the pass streak resets on any weak round
-    if (res.gaveUp) { // ran out of hearts
-      if (st.level > 0) { st.level--; ev.levelDown = true; }
-      else st.struggles++;
+    // level evidence (ux3a): answers on the kid's own level add up across rounds/boards; reset whenever the level changes
+    if (st.lvL !== st.level || st.lvS !== s.id) { st.lvL = st.level; st.lvS = s.id; st.lvN = 0; st.lvC = 0; st.lvR = 0; }
+    var fresh = !st.lvN, onLevel = round.level === st.level && !round.eased;
+    if (onLevel) { st.lvN += tot; st.lvC += res.correct; if (tot) st.lvR = (st.lvR || 0) + 1; }
+    var evidence = onLevel && st.lvN >= LEVEL_RULE.min && (st.lvR || 0) >= LEVEL_RULE.rounds && st.lvC / st.lvN >= LEVEL_RULE.acc && acc >= .8;
+    var f10 = res.first10, fast = onLevel && fresh && !!f10 && f10.n >= 10 && f10.right >= LEVEL_RULE.fastRight && !f10.hinted && !!f10.fast && fastOk(p, s.id);
+    if (fast) ev.fastTrack = true;
+    var earned = evidence || fast;
+    if (res.gaveUp) { // ran out of hearts: design2: only the 2nd Snack break in a row drops a level
+      st.breaks = (st.breaks || 0) + 1;
+      if (st.breaks >= 2) { st.breaks = 0; if (st.level > 0) { st.level--; ev.levelDown = true; } else st.struggles++; }
+      else ev.snackBreak = 1;
     } else if (acc >= .8) {
+      st.breaks = 0;
       st.struggles = 0;
-      if (st.needsPractice && st.level >= top) { st.needsPractice = false; st.status = 'mastered'; ev.remastered = s.id; }
+      if (st.needsPractice && st.level >= top) { st.needsPractice = false; st.status = 'mastered'; ev.remastered = s.id; if (st.placed && earnedInPlay(p, s.id)) { st.placed = false; st.earnedBy = 'practice'; } }
       if (T.returnTo && T.returnTo !== s.id) { // back from a confidence-building detour
         T.current = T.returnTo; T.returnTo = null; ev.back = true; say = ['fb_back_now'];
-      } else if (st.level < top) { st.level++; ev.levelUp = true; say = ['fb_level_up', 'fb_trickier']; }
+      } else if (st.level < top) { if (earned) { st.level++; ev.levelUp = true; say = ['fb_level_up', 'fb_trickier']; } else say = ['fb_one_more']; }
       else {
-        st.topPasses++;
+        if (earned) st.topPasses = Math.max(st.topPasses + 1, 2); else st.topPasses = Math.min(st.topPasses + 1, 1);
         var rd = A.Coach ? A.Coach.ready(p, s.id) : { ok: true };
-        if (st.status !== 'mastered' && st.topPasses >= 2 && !rd.ok) { ev.notYet = rd.why; say = ['fb_great_job']; }   // strong rounds, but not enough items / days yet
+        if (st.status !== 'mastered' && st.topPasses >= 2 && !rd.ok && daysOnly(rd) && !st.pending && nextSkill(s.id) && !p.math.pin) {
+          // strong on the top level and only the separate-days rule says "not yet": open the next skill now (mastery pending),
+          // this one stays in the review slots until its days are met (then it is mastered from a review round)
+          // design2: not in the same session: mark the day; pickRound opens the next skill on a later play day
+          if (!st.pendDay) st.pendDay = A.today();
+          ev.notYet = rd.why; ev.pendingNextDay = s.id; say = ['fb_great_job'];
+        }
+        else if (st.status !== 'mastered' && st.topPasses >= 2 && !rd.ok) { ev.notYet = rd.why; say = ['fb_great_job']; }   // strong rounds, but not enough items / days yet
         else if (st.status !== 'mastered' && st.topPasses >= 2) {
-          st.status = 'mastered'; st.placed = false; ev.mastered = s.id;
+          st.status = 'mastered'; st.placed = false; st.pending = false; ev.mastered = s.id;
           var nx = nextSkill(s.id);
           if (nx && !p.math.pin) {
             var ns = state(p, nx.id); if (ns.status === 'locked') ns.status = 'open';
@@ -352,8 +398,9 @@
           else say = n2 ? ['fb_great_job'] : [subjOf(s) === 'math' ? 'fb_champion' : 'fb_star_learner'];
         } else say = ['fb_one_more'];
       }
-    } else if (acc >= .55) { st.struggles = 0; say = ['fb_practice_again']; }
+    } else if (acc >= .55) { st.breaks = 0; st.struggles = 0; say = ['fb_practice_again']; }
     else {
+      st.breaks = 0;
       if (st.level > 0) { st.level--; ev.levelDown = true; say = ['fb_easier']; }
       else st.struggles++;
     }
@@ -404,7 +451,7 @@
     current: function (p, subj) { ensure(p); return BY[track(p, subj || 'math').current]; },
     SKILLS: SKILLS, ACTIVE: ACTIVE, byId: BY, frame: frame,
     ensure: ensure, state: state, place: place, setCurrent: setCurrent, markMastered: markMastered, resetSkill: resetSkill,
-    pickRound: pickRound, recordAnswer: recordAnswer, finishRound: finishRound, summary: summary, nextSkill: nextSkill,
+    pickRound: pickRound, recordAnswer: recordAnswer, finishRound: finishRound, LEVEL_RULE: LEVEL_RULE, fastOk: fastOk, openPendingNextDay: openPendingNextDay, daysOnly: daysOnly, summary: summary, nextSkill: nextSkill, prevSkill: prevSkill,
     // (math stickers: these count math skills; subj gives another subject)
     masteredCount: function (p, subj) { ensure(p); return list(subj || 'math').filter(function (s) { return p.skills[s.id].status === 'mastered' && !p.skills[s.id].placed; }).length; },
     masteredAll: function (p, subj) { ensure(p); return list(subj || 'math').every(function (s) { return p.skills[s.id].status === 'mastered'; }); }

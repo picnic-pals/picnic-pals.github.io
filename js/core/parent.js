@@ -62,13 +62,13 @@
     var mixTxt = SUBJ.filter(function (x) { return W[x.id]; }).map(function (x) { return Math.round(W[x.id] * 100) + '% ' + x.name; }).join(' · ');
     h += '<div class="mixbox"><label><b>Subject mix</b> <select data-mix aria-label="Subject mix"><option value="mixed"' + (p.mix === 'mixed' || !p.mix ? ' selected' : '') + '>Mixed (by age)</option>' +
       SUBJ.map(function (x) { return '<option value="' + x.id + '"' + (p.mix === x.id ? ' selected' : '') + '>Only ' + x.name + '</option>'; }).join('') + '</select></label>' +
-      '<p class="muted">Free Play, 2 Players, ' + A.TITLES.baseball + ' and bonus questions: <b data-mixtxt>' + mixTxt + '</b>. Mixed: age 5 and under gets about 40% Early Concepts, 30% letters &amp; sounds, 30% math; age 6 and up gets about 60% math, 30% reading, 10% Early Concepts. Story mode keeps its own areas (Letter Lagoon and Word Woods have the reading skills).</p></div>';
+      '<p class="muted">Free Play, 2 Players, ' + A.TITLES.baseball + ' and bonus questions: <b data-mixtxt>' + mixTxt + '</b>. Mixed: age 3 and under gets about 40% Early Concepts, 30% letters &amp; sounds, 30% math; age 4 about 45% math, 40% reading, 15% Early Concepts; age 5 about 50% math, 45% reading, 5% Early Concepts; age 6 and up about 60% math, 30% reading, 10% Early Concepts. Story mode keeps its own areas (Letter Lagoon and Word Woods have the reading skills).</p></div>';
     if (A.Levels) {   // per-subject start level (grade); changing it moves that ladder's start, adaptive up / down from there
       h += '<div class="mixbox lvbox"><b>Levels</b> ' + SUBJ.map(function (x) {
-        var cur = (p.levels && p.levels[x.id]) || 'auto', opts = [['auto', 'Auto (by age: ' + A.Levels.GRADES.concat([['off', '']]).filter(function (g) { return g[0] === A.Levels.byAge(p, x.id); })[0][1] + ')']].concat(A.Levels.GRADES).concat(x.id === 'concepts' ? [['off', 'Off']] : []);
+        var cur = (p.levels && p.levels[x.id]) || 'auto', opts = [['auto', 'Auto (by age: ' + A.Levels.autoName(p, x.id) + ')']].concat(A.Levels.GRADES).concat(x.id === 'concepts' ? [['off', 'Off']] : []);
         return '<label class="lvsel">' + x.name + ' <select data-sublvl="' + x.id + '" aria-label="' + x.name + ' level">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cur ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
           (A.Levels.soon(p, x.id) ? ' <small class="soon" data-soon="' + x.id + '">starts at the top skill · more coming soon</small>' : '') + '</label>';
-      }).join(' ') + '<p class="muted">Sets where each subject starts (earlier skills count as placed). <b>Auto</b>: age 5 and under starts at Pre-K; age 6–7 starts Math at Adding to 10 and Reading at 2nd grade (long vowels); age 8+ starts Reading at 3rd grade (homophones). Too easy or too hard? The game still moves up and down on its own.</p></div>';
+      }).join(' ') + '<p class="muted">Sets where each subject starts (earlier skills count as placed). <b>Auto</b> starts about one level above the usual grade: age 2–3 at Pre-K; 4 at bigger &amp; smaller and beginning sounds; 5 at adding to 10 and first sight words; 6 at adding to 20 and short-vowel words; 7 at story problems and homophones; 8+ higher still. A quick 5-question check on the first skill moves the start up (up to 4 skills) or back one. Too easy or too hard? The game still moves up and down on its own.</p></div>';
     }
     h += '<p class="muted">Each subject is its own ladder. A skill is <b>mastered</b> after 2 rounds of 80%+ at its top level; then the next skill in that subject unlocks. Every 4th round of a subject is a quick review of a mastered skill. In ' + A.TITLES.baseball + ' each half-inning counts as one round.</p>';
     h += '<div class="togs" style="margin-bottom:12px">' +
@@ -300,6 +300,8 @@
   }
 
   /* ================= SETTINGS ================= */
+  function talkName(m) { return { full: 'Full', toddler: 'Toddler: short questions and names', prompts: 'Prompts only', tap: 'Tap to hear', off: 'Off' }[m] || m; }
+  function talkHelp(t) { return { full: 'Talks a lot: questions, cheers, tips.', prompts: 'Reads each question once.', tap: 'Quiet unless your child taps 🔊.', off: 'No voice. Words on screen only.' }[t] || ''; }
   function renderSettings(b) {
     var s = A.Store.settings;
     var kids = A.Store.profiles(), PT = A.PlayTime;
@@ -315,9 +317,16 @@
           '<select data-ptlimit="' + k.id + '" aria-label="Daily play-time limit for ' + A.esc(k.name) + '">' + (PT ? PT.LIMITS : [0]).map(function (m) { return '<option value="' + m + '"' + (m === L ? ' selected' : '') + '>' + (m ? m + ' minutes a day' : 'No limit') + '</option>'; }).join('') + '</select>' +
           '<button class="sbtn" data-ptadd="' + k.id + '" title="Add 15 minutes for today only">+15 min today</button></label>'; }).join('') : '<p class="muted">Add a player first.</p>') +
       tog('breakReminder', 'Stretch-break reminder', 'Every 20 minutes of play, at the end of a round, a friend says “Time for a stretch!” Your child taps OK to keep playing.', !!s.breakReminder) +
+      '</div><h3 id="talkHead">How much talking</h3><p class="muted">How much the game talks out loud, for each child. Words always show on screen in a speech bubble. ' +
+      '<b>Auto</b> picks by age: children who read (age 6 and up, or Reading level 1st grade and up) get <b>Tap to hear</b>; age 5 and under get <b>Prompts only</b>; toddlers (age 2) hear short questions and the names of things. ' +
+      '<b>Full</b>: talks a lot, like before. <b>Prompts only</b>: reads each question once, and the word or number a non-reader needs. ' +
+      '<b>Tap to hear</b>: quiet unless your child taps 🔊, taps the question, or presses R (“listen and find” word games still say the word). <b>Off</b>: no voice at all. Sound effects and music follow their own volume.</p><div class="togs">' +
+      (kids.length ? kids.map(function (k) { var t = A.Talk.setting(k), eff = A.Talk.mode(k);
+        return '<label class="tog talkrow" data-x="talk"><span>' + A.esc(k.name) + '<small data-talknow="' + k.id + '">' + (t === 'auto' ? 'Now: ' + talkName(eff) : talkHelp(t)) + '</small></span>' +
+          '<select data-talk="' + k.id + '" aria-label="How much talking for ' + A.esc(k.name) + '">' + A.Talk.MODES.map(function (m) { return '<option value="' + m + '"' + (m === t ? ' selected' : '') + '>' + A.Talk.LABELS[m] + '</option>'; }).join('') + '</select></label>'; }).join('') : '<p class="muted">Add a player first.</p>') +
       '</div><h3>Sound & voice</h3><div class="togs">' +
       tog('sound', 'Sound effects', 'Boops, chomps and cheers.', s.sound) +
-      tog('voice', 'Voice', 'Read the rules and feedback out loud.', s.voice) +
+      tog('voice', 'Voice (master switch)', 'Off: no voice for anyone. On: each child follows their “How much talking” setting above.', s.voice) +
       tog('recorded', 'Use your recordings', 'Play the lines you recorded in the Voice recorder, when there is one.', s.recorded !== false) +
       tog('ttsClips', 'Use the built-in voice', 'A friendly recorded computer voice that comes with the game. Off: your device’s own reading voice is used instead.', s.ttsClips !== false) +
       tog('mixVoice', 'Mix voices in one sentence', 'Off (recommended): a sentence uses your recordings only when you recorded every part of it, so the voice never switches halfway.', s.mixVoice) +
@@ -348,6 +357,10 @@
       mv.addEventListener('change', function () { if (k === 'sfxVol') A.Audio.sfx('pop'); if (k === 'voiceVol') A.Voice.say(['hub_looking_good'], { force: true }); });
       mv.addEventListener('click', function (e) { e.stopPropagation(); }); mv.addEventListener('keydown', function (e) { if (e.key !== 'Escape') e.stopPropagation(); });
     });
+    A.$$('[data-talk]', b).forEach(function (x) { x.addEventListener('click', function (e) { e.stopPropagation(); }); x.addEventListener('change', function () {
+      var k = A.Store.get(x.dataset.talk); if (!k) return; k.talk = x.value; save(); var eff = A.Talk.mode(k), sm = b.querySelector('[data-talknow="' + k.id + '"]');
+      if (sm) sm.textContent = x.value === 'auto' ? 'Now: ' + talkName(eff) : talkHelp(x.value);
+      A.UI.toast(k.name + ': ' + A.Talk.LABELS[x.value] + (x.value === 'auto' ? ' (' + talkName(eff) + ')' : '')); }); });
     A.$$('[data-ptlimit]', b).forEach(function (x) { x.addEventListener('click', function (e) { e.stopPropagation(); }); x.addEventListener('change', function () { PT.setLimit(x.dataset.ptlimit, +x.value); var k = A.Store.get(x.dataset.ptlimit); A.UI.toast(k.name + ': ' + x.options[x.selectedIndex].text); }); });
     A.$$('[data-ptadd]', b).forEach(function (x) { x.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); PT.addTime(x.dataset.ptadd, 15); var k = A.Store.get(x.dataset.ptadd); A.UI.toast('+15 minutes today for ' + k.name); render(); }); });
     b.querySelector('[data-rate]').addEventListener('change', function (e) { s.rate = +e.target.value; save(); });
@@ -385,8 +398,8 @@
         '<select data-blob aria-label="Blob">' + A.Blobs.CAST.map(function (c) { return '<option value="' + c.id + '"' + (c.id === k.blob ? ' selected' : '') + '>' + c.name + '</option>'; }).join('') + '</select>' +
         '<select data-age aria-label="Age">' + [['', 'Age: —'], [2, 'Age 2'], [3, 'Age 3'], [4, 'Age 4'], [5, 'Age 5'], [6, 'Age 6'], [7, 'Age 7'], [8, 'Age 8+']].map(function (o) { return '<option value="' + o[0] + '"' + (String(k.age == null ? '' : Math.min(k.age, 8)) === String(o[0]) ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
         '<select data-toddler aria-label="Toddler mode" title="Toddler mode: Tiny Picnic (big pictures, no wrong answers, no timer) becomes the main game and the school-level games are hidden. Auto: on for age 2.">' + [['auto', 'Toddler mode: Auto (age 2)'], ['on', 'Toddler mode: On'], ['off', 'Toddler mode: Off']].map(function (o) { return '<option value="' + o[0] + '"' + ((k.toddler || 'auto') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
-        '<select data-gentle aria-label="Gentle Munch" title="Gentle Munch: no hearts (misses never end the round) and no countdown. Auto: on for age 5 and under.">' + [['auto', 'Gentle Munch: Auto (5 and under)'], ['on', 'Gentle Munch: On'], ['off', 'Gentle Munch: Off (hearts + timer)']].map(function (o) { return '<option value="' + o[0] + '"' + ((k.munchGentle || 'auto') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
-        '<select data-pace aria-label="Munch timer pace" title="Munch timer pace. Auto: Relaxed for age 5 and under, Normal otherwise.">' + [['auto', 'Timer: Auto (by age)'], ['relaxed', 'Timer: Relaxed'], ['normal', 'Timer: Normal'], ['speedy', 'Timer: Speedy']].map(function (o) { return '<option value="' + o[0] + '"' + ((k.timerPace || 'auto') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
+        '<select data-gentle aria-label="Gentle Munch" title="Gentle Munch: no hearts (misses never end the round) and no countdown. Auto: on for age 4 and under.">' + [['auto', 'Gentle Munch: Auto (4 and under)'], ['on', 'Gentle Munch: On'], ['off', 'Gentle Munch: Off (hearts + timer)']].map(function (o) { return '<option value="' + o[0] + '"' + ((k.munchGentle || 'auto') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
+        '<select data-pace aria-label="Munch timer pace" title="Munch timer pace. Auto: no countdown at age 5 and under, Normal otherwise. Picking a pace turns the countdown on.">' + [['auto', 'Timer: Auto (off at 5 and under)'], ['relaxed', 'Timer: Relaxed'], ['normal', 'Timer: Normal'], ['speedy', 'Timer: Speedy']].map(function (o) { return '<option value="' + o[0] + '"' + ((k.timerPace || 'auto') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
         '<span class="muted">⭐ ' + k.stars + ' · ' + A.fmtTime(k.time.total) + (k.story && k.story.bestRun ? ' · 🏆 ' + k.story.bestRun : '') + ' · ✦ ' + ((k.wallet && k.wallet.bits) || 0) + ' star bits' + '</span><span style="flex:1"></span>' +
         '<button class="sbtn" data-unlockall title="Make every food friend selectable for this player">' + (A.Blobs.CAST.every(function (c) { return k.unlocks.blobs && k.unlocks.blobs[c.id]; }) ? '✓ All characters' : '🔓 Unlock all characters') + '</button>' +
         '<button class="sbtn" data-bits title="Give this player 10 star bits to spend in the Picnic Spot shop (stars and progress are not changed)">✦ +10 star bits</button><button class="sbtn" data-room title="Empty the Picnic Spot back to the starter spot. Everything bought stays in the kid\'s things box.">🏠 Reset room</button>' + '<button class="sbtn" data-move title="Export this player as a save code or .json file to move to another device">📦 Move to another device</button>' + '<button class="sbtn" data-rp>Reset progress</button><button class="sbtn red" data-del>🗑 Delete player</button></div>';
@@ -404,7 +417,12 @@
       row.querySelector('input').addEventListener('change', function (e) { A.Store.rename(id, e.target.value); save(); render(); });
       row.querySelector('[data-blob]').addEventListener('change', function (e) { p.blob = e.target.value; save(); render(); });
       row.querySelector('[data-unlockall]').addEventListener('click', function () { if (A.Story) A.Story.unlockAll(p); else A.Blobs.CAST.forEach(function (c) { p.unlocks.blobs[c.id] = Date.now(); }); save(); A.UI.toast('All characters unlocked for ' + p.name + '.'); render(); });
-      row.querySelector('[data-age]').addEventListener('change', function (e) { p.age = e.target.value === '' ? null : +e.target.value; save(); });
+      row.querySelector('[data-age]').addEventListener('change', function (e) {   // a new age: offer to move the starting point (soft confirm; stars and prizes stay)
+        var sel = e.target, age = sel.value === '' ? null : +sel.value, was = p.age;
+        if (!A.Levels || !A.Levels.reAge) { p.age = age; save(); return; }
+        A.UI.confirm({ title: 'Move ' + p.name + "'s starting point?", sub: 'Age ' + (age == null ? 'not set' : age >= 8 ? '8+' : age) + ' starts at ' + A.Levels.ageText(age) + '. Stars, prizes and skills already learned are kept, and a quick, playful check fine-tunes it.', yes: 'Yes, move it', no: 'Just change the age' })
+          .then(function (yes) { if (yes) { A.Levels.reAge(p, age); A.UI.toast(p.name + ' will start at ' + A.Levels.ageText(age) + '.'); } else p.age = age; if (was !== age || yes) save(); render(); });
+      });
       row.querySelector('[data-pace]').addEventListener('change', function (e) { p.timerPace = e.target.value; save(); });
       row.querySelector('[data-toddler]').addEventListener('change', function (e) { p.toddler = e.target.value; if (p.toddler === 'auto') delete p.toddler; save(); A.UI.toast(p.name + ': ' + e.target.options[e.target.selectedIndex].text); });
       row.querySelector('[data-gentle]').addEventListener('change', function (e) { p.munchGentle = e.target.value; if (p.munchGentle === 'auto') delete p.munchGentle; save(); });

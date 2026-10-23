@@ -70,7 +70,7 @@
 .keys .arrows .up { grid-column: 2; }
 .keys .arrows kbd:not(.up) { grid-row: 2; }
 .keys.touch { display: none; }
-@media (hover: none) and (pointer: coarse) { #keys { display: none; } .keys.touch { display: flex; } #munchBtn .k { display: none; } }
+@media (hover: none) and (pointer: coarse) { #keys, #map .mkeys { display: none; } .keys.touch { display: flex; } #munchBtn .k { display: none; } }
 
 .card .example { font-size: clamp(26px, 5vmin, 42px); font-weight: 700; margin: 8px 0 0; }
 .card .example .frame { font-size: 1.1em; }
@@ -234,6 +234,11 @@ body.two .keys { gap: 18px; }
 #map .stop { position: absolute; width: 4.4%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: #fff; box-shadow: 0 3px 0 #d9c89a, inset 0 0 0 3px #ffd88a;
   display: grid; place-items: center; font-weight: 700; font-size: clamp(11px, 1.7vmin, 20px); z-index: 2; transition: transform .15s; }
 #map .stop .n { line-height: 1; }
+/* game mix: a small icon on each stop for the game it plays (🍓 Picnic Munch / ⚾ Snack Slugger) */
+#map .stop .gm { position: absolute; top: -34%; right: -36%; width: 62%; aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%; background: #ffe3ec; box-shadow: 0 1px 2px #0000004d, inset 0 0 0 2px #ff8fb1; font-size: clamp(9px, 1.6vmin, 17px); line-height: 1; pointer-events: none; z-index: 1; }
+#map .stop .gm.g-slugger { background: #3d8ef0; box-shadow: 0 1px 2px #0000004d, inset 0 0 0 2px #fff; }
+#map .stop.locked .gm { opacity: .9; }
+#map #mapInfo small.game.g-slugger b { color: #2a6cc4; } #map #mapInfo small.game.g-munch b { color: #e0527d; }
 #map .stop .ss { position: absolute; bottom: -38%; left: 50%; transform: translateX(-50%); color: #ffc93c; font-size: .7em; white-space: nowrap; text-shadow: 0 1px 0 #a87d00; }
 #map .stop.passed { background: #ffe58a; box-shadow: 0 3px 0 #e5ab1f, inset 0 0 0 3px #fff; }
 #map .stop.locked { background: #eee9f3; box-shadow: 0 3px 0 #cfc6dc; font-size: clamp(9px, 1.3vmin, 15px); }
@@ -377,3 +382,50 @@ body.challenge .timer .clock::after { content: ' ⭐'; }
 #map .mlabels .aname.fest { fill: #8a5a3c; }
 #map .stop { min-width: 48px; min-height: 48px; }
 #map .hero { width: 7%; }
+
+/* ux3a: several boards per level: a fresh grid slides in, with a small "Board 2 of 3" toast (the level chip shows it too) */
+#boardWrap.slidein { animation: boardslide .55s cubic-bezier(.2,.9,.3,1.2); }
+@keyframes boardslide { from { transform: translateX(60%); opacity: 0; } }
+.boardToast { position: fixed; left: 50%; top: 18%; transform: translateX(-50%); z-index: 60; background: #fff; color: var(--ink, #3a2d4a); font-weight: 800; font-size: clamp(22px, 4vmin, 34px);
+  padding: 10px 26px; border-radius: 999px; box-shadow: 0 6px 0 #ffd2e4, 0 10px 30px rgba(0,0,0,.15); animation: btin .35s ease-out; pointer-events: none; transition: opacity .45s, transform .45s; }
+.boardToast.out { opacity: 0; transform: translate(-50%, -20px); }
+@keyframes btin { from { transform: translate(-50%, 20px) scale(.8); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { #boardWrap.slidein, .boardToast { animation: none; } }
+#map .mtop .chipbtn.book { background: #efe6ff; box-shadow: 0 4px 0 #c9b2ff; color: #4a3b6b; font-size: 18px; }
+
+/* 2026-10-22 voice: the food friend's face on its speech bubble */
+.bubble .bfriend { flex: none; width: 46px; height: 46px; margin: -8px 0 -8px -6px; }
+.bubble .bfriend svg, .bubble .bfriend img { width: 100%; height: 100%; display: block; }
+
+/* ptfix (playtest 1): portrait / tall screens.
+   Munch: the rule gets its own full-width row under home / music / stars, and the friend's bubble its own row under hearts + Munch!
+   Story map: the island keeps its 16:10 shape at the full height and scrolls sideways (map.js centres the picked stop),
+   so the stops don't pile up on top of each other. */
+@media (orientation: portrait) {
+  #game .top { flex-wrap: wrap; row-gap: 8px; }
+  #game .top .rule { order: 5; flex: 1 1 100%; margin-right: -52px; }
+  #game .bottom { flex-wrap: wrap; row-gap: 8px; }
+  #game .bottom .bubble { order: 5; flex: 1 1 100%; }
+  #game .bottom #munchBtn { margin-left: auto; }
+  #map .mwrap { overflow-x: auto; overflow-y: hidden; justify-content: flex-start; overscroll-behavior-x: contain; scrollbar-width: thin; }
+  #map .mbox { flex: none; height: 100%; width: auto; max-width: none; max-height: none; }
+  #map .stop { min-width: 42px; min-height: 42px; }
+}
+
+/* design1 (2026-10-22): a calmer story map. Side trips behind one signpost, High scores / New journey in a small ⋯ menu,
+   no badges on locked stops, the next stop clearly highlighted, open challenges only (a star, never a friend silhouette). */
+#map .sidelbl { display: none; } #map.sideopen .sidelbl { display: inline; }
+#map .signpost { position: absolute; transform: translate(-50%, -50%); z-index: 2; display: flex; align-items: center; gap: 4px; padding: 3px 10px 3px 6px; border-radius: 999px;
+  background: #e6f9ff; box-shadow: 0 3px 0 #7cc8e8; font-weight: 700; font-size: clamp(11px, 1.7vmin, 18px); color: #2a6c8c; white-space: nowrap; }
+#map .signpost span { font-size: 1.3em; line-height: 1; }
+#map .stop.locked { opacity: .55; color: #9a8fae; box-shadow: none; background: #f4f0f8; }
+#map .stop.cur { box-shadow: 0 3px 0 #e04f86, inset 0 0 0 4px #ff7aa6; }
+#map .chal .cb.star { display: grid; place-items: center; font-size: clamp(14px, 2.6vmin, 30px); line-height: 1; }
+#map .mtop .mmore { position: relative; }
+#map .mtop .chipbtn.more { font-size: 22px; padding: 6px 14px; }
+#map .mmenu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 20; display: flex; flex-direction: column; gap: 10px; padding: 10px; background: #fff; border-radius: 18px; box-shadow: 0 6px 20px #4a3b6b40; }
+#map .mmenu[hidden] { display: none; }
+
+/* after9 hint-before-heart: the free try (💡) in the hearts bar; dims once used on this board */
+.hearts .freetry { font-style: normal; font-size: 26px; line-height: 36px; margin-left: 2px; transition: opacity .3s, transform .3s; }
+.hearts .freetry.used { opacity: .25; filter: grayscale(1); transform: scale(.8); }

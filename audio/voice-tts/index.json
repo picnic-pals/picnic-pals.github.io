@@ -22573,5 +22573,75 @@
 "sig": "590814927d9f",
 "sec": 4.945,
 "lufs_raw": -23.6
+},
+"line:story_intro_1_simple": {
+"file": "story_intro_1_simple.mp3",
+"text": "The sun is out. Jammy and the friends have a big picnic.",
+"sig": "8c752dd4800d",
+"sec": 3.665,
+"lufs_raw": -23.5
+},
+"line:story_intro_1_rich": {
+"file": "story_intro_1_rich.mp3",
+"text": "It was a bright, sunny morning, and Jammy the strawberry had planned the biggest picnic ever.",
+"sig": "f2b5a33942b5",
+"sec": 5.935,
+"lufs_raw": -23.4
+},
+"line:story_intro_2_simple": {
+"file": "story_intro_2_simple.mp3",
+"text": "We eat and we play. It is so fun!",
+"sig": "2a394d6d03ac",
+"sec": 2.416,
+"lufs_raw": -23.8
+},
+"line:story_intro_2_rich": {
+"file": "story_intro_2_rich.mp3",
+"text": "The food friends munched, giggled, and played games on the checkered blanket. Niblet told a corny joke, and Bloop bounced with delight.",
+"sig": "133fda8e0947",
+"sec": 9.049,
+"lufs_raw": -23.5
+},
+"line:story_intro_3_simple": {
+"file": "story_intro_3_simple.mp3",
+"text": "Oh no! The sun went away. The sky is gray.",
+"sig": "d7a9f0478197",
+"sec": 3.298,
+"lufs_raw": -23.7
+},
+"line:story_intro_3_rich": {
+"file": "story_intro_3_rich.mp3",
+"text": "Then the sky turned gloomy and gray. A big whoosh tugged at hats and napkins.",
+"sig": "feba3a1912ef",
+"sec": 5.337,
+"lufs_raw": -23.6
+},
+"line:story_intro_4_simple": {
+"file": "story_intro_4_simple.mp3",
+"text": "Whoosh! Away go the friends and the picnic things!",
+"sig": "a6821de4f808",
+"sec": 3.135,
+"lufs_raw": -24.0
+},
+"line:story_intro_4_rich": {
+"file": "story_intro_4_rich.mp3",
+"text": "Whoosh! Balloons, books, and the picnic basket swirled into the air, and the friends tumbled away like dandelion fluff.",
+"sig": "f76b83407a5f",
+"sec": 8.857,
+"lufs_raw": -23.8
+},
+"line:story_intro_5_simple": {
+"file": "story_intro_5_simple.mp3",
+"text": "\"Come on! We can find them,\" said Jammy. \"Let's go!\"",
+"sig": "7cdf41c11b73",
+"sec": 3.69,
+"lufs_raw": -23.1
+},
+"line:story_intro_5_rich": {
+"file": "story_intro_5_rich.mp3",
+"text": "\"Let's go!\" said Jammy. \"We will follow the paths and find every single friend.\"",
+"sig": "30a578ebcf79",
+"sec": 5.543,
+"lufs_raw": -24.6
 }
 }

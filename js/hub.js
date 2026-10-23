@@ -7,16 +7,15 @@
 
   // games registry: future games plug in here
   var GAMES = [
-    { id: 'tiny', name: 'Tiny Picnic', sub: 'Find, tap and giggle', cls: 'tiny', href: 'games/tiny/index.html', ready: true, toddler: true, voice: ['tp_title'], say: ['tp_title'] },
-    { id: 'munch', name: A.TITLES.munch, sub: 'Number munching math', cls: 'munch', href: 'games/munch/index.html', ready: true, voice: ['hub_lets_go'], say: ['munch_title'] },
-    { id: 'baseball', name: A.TITLES.baseball, sub: 'Math at the ballpark', cls: 'base', href: 'games/baseball/index.html', ready: true, voice: ['bb_play_ball'], say: ['bb_title'] },
-    { id: 'room', name: A.TITLES.room, sub: 'Decorate & picnic friends', cls: 'room', href: 'games/room/index.html', ready: true, voice: ['rm_title'], say: ['rm_title'] },
-    { id: 'kicks', name: 'Penalty Kicks', sub: 'Coming soon', cls: 'kick', ready: false, voice: ['hub_coming_soon'] },
-    { id: 'words', name: 'Sight Words', sub: 'Coming soon', cls: 'words', ready: false, voice: ['hub_coming_soon'] }
+    { id: 'tiny', name: 'Tiny Picnic', sub: 'Find, tap and giggle', cls: 'tiny', href: 'games/tiny/index.html', ready: true, toddler: true, voice: ['tp_title'], say: ['tp_title'], tip: 'Tap the picture that matches. Big pictures, no wrong answers!' },
+    { id: 'munch', name: A.TITLES.munch, sub: 'Number munching math', cls: 'munch', href: 'games/munch/index.html', ready: true, voice: ['hub_lets_go'], say: ['munch_title'], tip: 'Walk around the picnic and munch the right answers. Math and words!' },
+    { id: 'baseball', name: A.TITLES.baseball, sub: 'Math at the ballpark', cls: 'base', href: 'games/baseball/index.html', ready: true, voice: ['bb_play_ball'], say: ['bb_title'], tip: 'Beat the Sprout Squad! Right answers are hits, misses are outs. Score more runs to win.' },
+    { id: 'room', name: A.TITLES.room, sub: 'Decorate & picnic friends', cls: 'room', href: 'games/room/index.html', ready: true, voice: ['rm_title'], say: ['rm_title'], tip: 'Your own picnic spot. Buy fun things with star bits and decorate!' },
+    // design1 (2026-10-22): no "Coming soon" tiles (Penalty Kicks, Sight Words): only games that are ready are shown
   ];
 
   // "Hi, <name>!" is spoken by the browser voice (names have no clips); without one: "Welcome back!"
-  function greet(p, tail, without) { return A.Voice.named(['hub_hi', A.Voice.name(p), tail], without); }
+  function greet(p, tail, without) { return A.Voice.named(['hub_hi', A.Voice.name(p)], without.slice(0, 1)); }   // 2026-10-22 voice: short intro (no "What do you want to play?" tail)
 
   /* ---------- scenes for tiles ---------- */
   function scene(g, p) {
@@ -77,7 +76,7 @@
       var sv = saveInfo(p);
       var b = A.el('<button class="kid save" data-nav data-id="' + p.id + '"><span class="av bd" style="' + B.backdrop(p.color) + '">' + B.forProfile(p) + '</span><span class="nm">' + A.esc(p.name) + '</span><span class="st">⭐ ' + p.stars + '</span>' +
         '<span class="sv"><span class="svl" data-k="math">🔢 ' + A.esc(sv.math) + '</span><span class="svl" data-k="reading">📖 ' + A.esc(sv.reading) + '</span>' +
-        '<span class="svl" data-k="story">🗺️ ' + A.esc(sv.story) + '</span><span class="svl" data-k="friends">💛 ' + sv.friends + ' of ' + sv.friendsAll + ' friends</span>' +
+        '<span class="svl" data-k="story">🗺️ ' + A.esc(sv.story) + '</span><span class="svl" data-k="friends">💛 ' + sv.friends + ' friend' + (sv.friends === 1 ? '' : 's') + '</span>' +
         (sv.goal ? '<span class="svg2" data-k="goal"><span class="gt2">' + sv.goal.icon + ' ' + A.esc(sv.goal.name) + ' ' + sv.goal.have + '/' + sv.goal.need + '</span><span class="gb"><i style="width:' + sv.goal.pct + '%"></i></span></span>' : '') + '</span>' +
         '<span class="del" aria-hidden="true">✏️ Edit</span></button>');
       b.setAttribute('aria-label', editing ? 'Edit ' + p.name : p.name + ', ' + p.stars + ' stars. ' + sv.say);
@@ -104,10 +103,13 @@
     var C = A.Curriculum, cur = function (subj) { try { if (!C.list(subj).length) return ''; var sk = C.current(p, subj); return sk ? sk.name : 'All done!'; } catch (e) { return ''; } };
     var ST = A.Story, sd = ST.data(p), stopN = 0; Object.keys(sd.stops || {}).forEach(function (k) { var i = +k.split(':')[1]; if (sd.stops[k].passed && !sd.stops[k].placed && !ST.isSide(i)) stopN++; });
     var at = ST.STOPS[ST.unlockedTo(p)], story = sd.finished ? 'Story finished!' : stopN ? at.area.name + ' · ' + stopN + ' stops' : 'Story not started';
-    var x = R.stats(p), g = R.longGoal(p), m = cur('math') || '—', rd = cur('reading') || '—';
+    var x = R.stats(p), g = weekGoal(p), m = cur('math') || '—', rd = cur('reading') || '—';
     return { math: m, reading: rd, story: story, friends: x.friends, friendsAll: x.friendsAll, goal: g,
-      say: 'Math: ' + m + '. Reading: ' + rd + '. ' + story + '. ' + x.friends + ' of ' + x.friendsAll + ' friends.' + (g ? ' Next goal: ' + g.name + ', ' + g.have + ' of ' + g.need + '.' : '') };
+      say: 'Math: ' + m + '. Reading: ' + rd + '. ' + story + '. ' + x.friends + ' friend' + (x.friends === 1 ? '' : 's') + '.' + (g ? ' ' + g.name + ', ' + g.have + ' of ' + g.need + '.' : '') };
   }
+  // design1: the only goal bar left is the weekly play-days goal (about playing, never about a prize or a friend to unlock)
+  function weekGoal(p) { var W = (R.CONFIG && R.CONFIG.weekly) || { days: 3 }, have = Math.min(R.weekDays ? R.weekDays(p) : (R.stats(p).weekDays || 0), W.days);
+    return { id: 'week', icon: '📅', name: 'Play days this week', have: have, need: W.days, pct: Math.round(100 * have / W.days), done: have >= W.days }; }
   // Edit players (rename / delete) is behind the grown-up gate; delete asks the grown-up again
   function editPlayer(p) {
     A.Audio.sfx('tap'); A.UI.cardOpen = true;
@@ -152,7 +154,8 @@
     function opts(box, items, kind) {
       box.innerHTML = '';
       items.forEach(function (it) {
-        if (kind === 'blob' && A.Store.STARTER_BLOBS.indexOf(it.id) < 0) {
+        if (kind === 'blob' && A.Store.STARTER_BLOBS.indexOf(it.id) < 0) return;   // design1: no locked "???" friends to hint at
+        if (false) {
           var lb = A.el('<button class="opt blocked" data-nav data-k="blob" data-v="' + it.id + '" aria-label="Locked friend"><span class="oa still">' + B.svg({ blob: it.id }) + '</span><span class="on2">???</span><span class="lock">🔒</span><span class="hintx">Master skills to meet</span></button>');
           lb.addEventListener('click', function () { lb.classList.remove('nudge'); void lb.offsetWidth; lb.classList.add('nudge'); A.Audio.sfx('locked'); A.Voice.say(['hub_locked_blob']); });
           box.appendChild(lb); return;
@@ -169,14 +172,17 @@
     var lv = $('#nkLv'); if (lv && A.Levels) { lv.innerHTML = '';   // per-subject start levels (Auto = by age)
       [['math', 'Math'], ['reading', 'Reading'], ['concepts', 'Early Concepts']].forEach(function (x) {
         if (!A.Curriculum.list(x[0]).length) return;
-        var cur = nk.levels[x[0]] || 'auto', opts = [['auto', 'Auto (age)']].concat(A.Levels.GRADES).concat(x[0] === 'concepts' ? [['off', 'Off']] : []);
+        var cur = nk.levels[x[0]] || 'auto', opts = [['auto', 'Auto: ' + A.Levels.autoName({ age: nk.age }, x[0])]].concat(A.Levels.GRADES).concat(x[0] === 'concepts' ? [['off', 'Off']] : []);
         var sel = A.el('<label class="lvsel">' + x[1] + ' <select data-nav data-nklv="' + x[0] + '">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cur ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>');
+        A.UI.tip(sel.querySelector('select'), { math: 'Where Math starts. Auto picks by age.', reading: 'Where Reading starts. Auto picks by age.', concepts: 'Colors and shapes. Auto picks by age, or turn them off.' }[x[0]], { name: x[1] + ' level' });
         sel.querySelector('select').addEventListener('change', function (e) { nk.levels[x[0]] = e.target.value; A.Audio.sfx('tap'); });
         lv.appendChild(sel);
-      }); }
+      });
+      var st = $('#nkStart'); if (st && A.Levels.ageText) st.textContent = 'Auto (by age): ' + (nk.age == null ? 'no age picked starts like age 5' : 'age ' + (nk.age >= 8 ? '8+' : nk.age) + ' starts at') + ' ' + A.Levels.ageText(nk.age) + '. A quick 5-question check fine-tunes it.'; }
     var ag = $('#nkAge'); ag.innerHTML = '';
     [null, 2, 3, 4, 5, 6, 7, 8].forEach(function (a) {
       var b = A.el('<button class="agechip' + (nk.age === a ? ' sel' : '') + '" data-nav>' + (a == null ? 'Skip' : a === 8 ? '8+' : a) + '</button>');
+      A.UI.tip(b, a == null ? 'Skip the age. The games start like for a 5-year-old.' : (a === 2 ? 'Age 2: Tiny Picnic, with big pictures and no wrong answers.' : 'Age ' + (a === 8 ? '8 and up' : a) + ': starts at ' + (A.Levels && A.Levels.ageText ? A.Levels.ageText(a) : 'the right level') + '.'), { name: a == null ? 'Skip age' : 'Age ' + (a === 8 ? '8 and up' : a) });
       b.addEventListener('click', function () { nk.age = a; A.Audio.sfx('tap'); renderNew(); var f = A.$('#nkAge .sel'); if (f) f.focus({ preventScroll: true }); });
       ag.appendChild(b);
     });
@@ -202,16 +208,11 @@
   function renderGames() {
     me = A.Store.active(); if (!me) return go('players');
     $('#meAv').innerHTML = B.forProfile(me); $('#meAv').setAttribute('style', B.backdrop(me.color)); $('#meAv').classList.add('bd'); $('#meHi').textContent = 'Hi, ' + me.name + '!'; $('#meStars').textContent = me.stars;
-    var g = R.nextGoal(me), gl = $('#goal'), nf = R.nextFriend(me), lg = R.longGoal(me), ng = $('#nextGoal');
-    if (ng) { ng.innerHTML = (nf ? '<div class="ngrow nf" data-nav tabindex="-1" role="button" aria-label="Next friend. ' + A.esc(nf.hint) + '"><span class="gi">' + B.svg({ blob: nf.id, expr: 'happy' }) + '</span><span><span class="gt">Next friend: ' + A.esc(nf.hint) + '</span><div class="gb"><i style="width:' + nf.pct + '%"></i></div></span></div>' : '') +
-        (lg ? '<div class="ngrow lg" aria-label="Next goal: ' + A.esc(lg.name) + ', ' + lg.have + ' of ' + lg.need + '"><span class="gi gic">' + lg.icon + '</span><span><span class="gt">Next goal: ' + A.esc(lg.name) + ' (' + lg.have + '/' + lg.need + ')</span><div class="gb"><i style="width:' + lg.pct + '%"></i></div></span></div>' : '');
-      var nfb = ng.querySelector('.nf'); if (nfb) nfb.addEventListener('click', function () { A.Audio.sfx('tap'); A.Voice.say(['rw_next_goal']); A.UI.toast(nf.hint); }); }
-    if (g) {
-      var art = g.kind === 'outfit' ? B.svg({ blob: me.blob, color: me.color, outfit: g.id }) : B.svg({ blob: me.blob, color: g.id, outfit: me.outfit });
-      var name = g.kind === 'outfit' ? B.outfitById[g.id].name : B.colorById[g.id].name + ' backdrop';
-      gl.innerHTML = '<span class="gi' + (g.kind === 'color' ? ' bd" style="' + B.backdrop(g.id) : '') + '">' + art + '</span><span><span class="gt">Next prize: ' + A.esc(name) + ' at ⭐' + g.cost + '</span><div class="gb"><i style="width:' + Math.round(100 * me.stars / g.cost) + '%"></i></div></span>';
-      gl.style.display = '';
-    } else gl.style.display = 'none';
+    // design1 (2026-10-22): no "Next friend" / "Next prize" bars (unlocks are a surprise). Only the weekly play-days goal stays.
+    var gl = $('#goal'), lg = weekGoal(me), ng = $('#nextGoal');
+    if (ng) { ng.innerHTML = '<div class="ngrow lg" aria-label="' + A.esc(lg.name) + ', ' + lg.have + ' of ' + lg.need + '"><span class="gi gic">' + lg.icon + '</span><span><span class="gt">' + A.esc(lg.name) + ' (' + lg.have + '/' + lg.need + ')</span><div class="gb"><i style="width:' + lg.pct + '%"></i></div></span></div>';
+      var lgr = ng.querySelector('.lg'); if (lgr) { lgr.setAttribute('tabindex', '-1'); A.UI.tip(lgr, lg.done ? 'You played ' + lg.need + ' days this week. Hooray!' : 'Days you played this week: ' + lg.have + ' of ' + lg.need + '.', { label: false }); } }
+    if (gl) { gl.innerHTML = ''; gl.style.display = 'none'; }
     var tiles = $('#tiles'); tiles.innerHTML = '';
     // toddler mode (age 2, or the grown-up setting): Tiny Picnic is the big first tile; grade-level games are tucked away
     var tod = A.toddler(me); $('#games').classList.toggle('toddler', tod); tiles.classList.toggle('toddler', tod);
@@ -223,11 +224,12 @@
         else { t.classList.remove('nudge'); void t.offsetWidth; t.classList.add('nudge'); A.Audio.sfx('locked'); A.Voice.say(gm.voice); }
       });
       t._say = gm.ready ? gm.say : [{ text: gm.name + ', coming soon' }];
+      A.UI.tip(t, gm.tip, { name: gm.name });
       tiles.appendChild(t);
     });
     $('#stickIc').innerHTML = R.stickerSVG('star');
     $('#closetIc').innerHTML = B.svg({ blob: me.blob, color: me.color, outfit: 'bow' });
-    $('#friendsIc').innerHTML = B.svg({ blob: 'mochi', expr: 'happy' });
+    $('#friendsIc').innerHTML = B.svg({ blob: 'strawberry', expr: 'happy' });   // design1: a starter friend (Mochi is still to meet)
     // play-time limit / stretch break: the hub is always a safe stopping point (between rounds)
     if (A.PlayTime) hubCheckpoint(0);
   }
@@ -244,10 +246,11 @@
     me = A.Store.active(); if (!me) return go('players');
     var n = Object.keys(me.stickers).length;
     $('#bookTitle').textContent = me.name + "'s Sticker Book";
-    $('#bookCnt').textContent = n + ' of ' + R.STICKERS.length + ' stickers';
+    // design1: only earned stickers (no empty "???" slots or hints for the rest), plus a friendly line
+    $('#bookCnt').textContent = n ? n + ' sticker' + (n === 1 ? '' : 's') + ' · Keep playing to find more!' : 'Keep playing to find stickers!';
     var sl = $('#slots'); sl.innerHTML = '';
     R.STICKERS.forEach(function (s) {
-      var got = !!me.stickers[s.id];
+      var got = !!me.stickers[s.id]; if (!got) return;
       var d = A.el('<div class="slot' + (got ? ' got' : '') + '"><div class="sk">' + (got ? R.stickerSVG(s.art) : '<div class="empty">?</div>') + '</div><div class="sn">' + (got ? A.esc(s.name) : '???') + '</div><div class="sh">' + A.esc(s.hint) + '</div></div>');
       d.addEventListener('click', function () { A.Blobs.anim(d, 'wig', 420); A.Audio.sfx(got ? 'pop' : 'locked'); });
       sl.appendChild(d);
@@ -267,6 +270,7 @@
         var locked = bl || (kind !== 'blob' && !R.unlocked(me, uk, it.id)), cost = uk === 'outfit' ? R.OUTFIT_COST[it.id] : R.COLOR_COST[it.id];
         var earn = locked && uk === 'outfit' && R.OUTFIT_EARN && R.OUTFIT_EARN[it.id] ? R.earnHint(me, it.id) : '';   // earn-rule hat/item: plain hint
         var sel = (kind === 'blob' ? me.blob : kind === 'color' ? me.color : kind === 'held' ? me.held || 'none' : me.outfit) === it.id;
+        if ((bl || locked) && !sel) return;   // design1: Dress Up shows only friends and things already earned (no "???", prices or hints)
         var art = kind === 'blob' ? B.svg({ blob: it.id, color: 'classic', outfit: 'none' }) : kind === 'color' ? B.svg({ blob: me.blob, color: it.id })
           : kind === 'held' ? B.svg({ blob: me.blob, color: me.color, held: it.id, balloon: me.balloon, heldZoom: ['balloon', 'kite', 'umbrella', 'net'].indexOf(it.id) >= 0 ? 1.3 : 1.6 })   // Dress Up tiles: the item drawn bigger (grows from the paw) so it reads at tile size
           : B.svg({ blob: me.blob, color: me.color, outfit: it.id });
@@ -313,10 +317,11 @@
   function renderFriends() {
     me = A.Store.active(); if (!me) return go('players');
     var ids = A.Store.STARTER_BLOBS.concat(B.ORDER || []), got = ids.filter(function (id) { return R.unlocked(me, 'blob', id); }).length;
-    $('#frTitle').textContent = me.name + "'s Picnic Pals"; $('#frCnt').textContent = got + ' of ' + ids.length + ' friends';
+    // design1: only friends already met, and just a count (no total, no locked "???" cards or hints)
+    $('#frTitle').textContent = me.name + "'s Picnic Pals"; $('#frCnt').textContent = got + ' friend' + (got === 1 ? '' : 's');
     var box = $('#frCards'); box.innerHTML = '';
     ids.forEach(function (id) {
-      var c = B.byId[id]; if (!c) return; var has = R.unlocked(me, 'blob', id), hint = has ? '' : R.charHint(me, id);
+      var c = B.byId[id]; if (!c) return; var has = R.unlocked(me, 'blob', id), hint = ''; if (!has) return;
       var d = A.el('<button class="frcard' + (has ? ' got' : ' locked') + '" data-nav data-id="' + id + '" aria-label="' + A.esc(has ? c.name + '. ' + c.personality : 'Locked friend. ' + hint) + '">' +
         (has || !R.lockedArt(id) ? '<span class="fa' + (has ? '' : ' sil') + '">' + B.svg({ blob: id, expr: has ? 'happy' : 'idle' }) + '</span>'
           : '<span class="fa lockart"><img src="' + R.lockedArt(id) + '" alt="" draggable="false"></span>') +   // basket-badge silhouette (art/theme/unlock)
@@ -349,6 +354,9 @@
   $('#meBtn').addEventListener('click', function () { A.Audio.sfx('tap'); go('players'); A.Voice.say(['hub_whos_playing']); });
   $('#stickBtn')._say = [{ text: 'Sticker Book' }]; $('#closetBtn')._say = [{ text: 'Dress Up' }]; $('#friendsBtn')._say = [{ text: 'Friends' }]; $('#meBtn')._say = [{ text: 'Switch player' }];
   $('#editKids')._say = [{ text: 'Edit players. For grown-ups.' }];
+  A.UI.tip($('#stickBtn'), 'See all the stickers you earned!', { name: 'Sticker Book' }); A.UI.tip($('#closetBtn'), 'Pick a friend, a color and fun things to wear.', { name: 'Dress Up' });
+  A.UI.tip($('#friendsBtn'), 'Meet your food friends!', { name: 'Friends' }); A.UI.tip($('#meBtn'), 'Pick a different player.', { name: 'Switch player' });
+  A.UI.tip($('#editKids'), 'For grown-ups: change a name or delete a player.', { name: 'Edit players' });
   $('#stickBtn').addEventListener('click', function () { A.Audio.sfx('pop'); go('stickers'); A.Voice.say(['hub_stickers']); });
   $('#friendsBtn').addEventListener('click', function () { A.Audio.sfx('pop'); go('friends'); A.Voice.say(['rm_friends']); });
   $('#closetBtn').addEventListener('click', function () { A.Audio.sfx('pop'); go('closet'); A.Voice.say(['hub_closet']); });

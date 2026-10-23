@@ -100,7 +100,7 @@
   function step(p, round, offset) {
     var sid = round.skill.id || round.skill, sk = C.byId[sid], L = ladder((sk && sk.subject) || 'math'), /* each subject is its own ladder */ idx = L.findIndex(function (x) { return x.skill.id === sid && x.level === round.level; });
     if (idx < 0) return { skill: C.byId[sid], level: round.level, hard: offset > 0, easy: offset < 0, atLevel: true, offset: offset };
-    var here = L[idx], little = p && p.age != null && p.age <= 4;
+    var here = L[idx], little = p && A.Age.little(p);
     if (offset < 0) { if (idx > 0 && !round.review) return { skill: L[idx - 1].skill, level: L[idx - 1].level, atLevel: false, offset: -1 }; return { skill: here.skill, level: here.level, easy: true, atLevel: true, offset: -1 }; }
     if (offset === 0) return { skill: here.skill, level: here.level, atLevel: true, offset: 0 };
     if (offset < 1) return { skill: here.skill, level: here.level, hard: true, atLevel: true, offset: .5 };

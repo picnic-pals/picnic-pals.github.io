@@ -182,47 +182,82 @@
 /* Per-subject starting levels (grown-up setting, also on the New player screen): p.levels = { math, reading, concepts }, each
    'auto' (by age) or a grade 'pk' 'k' '1' ... '5' (concepts also 'off'). A grade sets where that subject's ladder starts: earlier
    skills count as placed, and the normal adaptive rules move up / down from there. A grade above the highest content starts at the
-   top rung ("more coming soon"). Math by age is unchanged (6+ start at Adding to 10). */
+   top rung ("more coming soon"). 'auto' uses the per-age table AGE_START (2026-10-21 ux3a: about one level above grade). */
 (function (A) {
   'use strict';
   var C = A.Curriculum; if (!C) return;
   var GRADES = [['pk', 'Pre-K'], ['k', 'K'], ['1', '1st'], ['2', '2nd'], ['3', '3rd'], ['4', '4th'], ['5', '5th']];
-  // the first skill for each grade (missing grade = above the content: top rung)
-  var START = { math: { pk: 'count10', k: 'count10', 1: 'add10', 2: 'evenodd' },
+  // the first skill for each grade (missing grade = above the content: top rung). An entry is a skill id or { id, level } (level 0-based).
+  // A grown-up's explicit grade uses this table; 'auto' (by age) uses AGE_START below.
+  var START = { math: { pk: 'count10', k: 'compare', 1: 'add10', 2: 'evenodd' },
     reading: { pk: 'letters', k: 'begsound', 1: 'cvc', 2: 'longvowel', 3: 'homophones' },
     concepts: { pk: 'colors', k: 'shapes' } };
-  // by age: math as before (6+ at Adding to 10); reading 6-7 = 2nd grade (long vowels), 8+ = 3rd; concepts pre-K / K
-  function byAge(p, subj) { var a = p.age; if (a == null || a <= 5) return 'pk'; if (subj === 'math') return '1'; if (subj === 'concepts') return 'k'; return a <= 7 ? '2' : '3'; }
+  /* 'Auto (by age)': about one level above grade expectations (Learning Coach, age-start-and-pacing-2026-10-21 §2).
+     Bands come from A.Age.band (util.js). 'none' (age skipped) starts like age 5. 'top' = the top rung ("more coming soon"). */
+  var AGE_START = {
+    toddler: { math: { id: 'count10', level: 0 }, reading: { id: 'letters', level: 0 }, concepts: { id: 'colors', level: 0 } },
+    pre:     { math: { id: 'count10', level: 1 }, reading: { id: 'letters', level: 1 }, concepts: { id: 'colors', level: 1 } },
+    pk:      { math: { id: 'compare', level: 0 }, reading: { id: 'begsound', level: 0 }, concepts: { id: 'shapes', level: 1 } },
+    k:       { math: { id: 'add10', level: 0 }, reading: { id: 'sight', level: 0 }, concepts: { id: 'shapes', level: 1 } },
+    g1:      { math: { id: 'add20', level: 0 }, reading: { id: 'cvc', level: 1 }, concepts: { id: 'shapes', level: 1 } },
+    g2:      { math: { id: 'wordprob', level: 1 }, reading: { id: 'homophones', level: 0 }, concepts: { id: 'shapes', level: 1 } },
+    g3:      { math: 'top', reading: { id: 'affixes', level: 1 }, concepts: { id: 'shapes', level: 1 } }
+  };
+  AGE_START.none = AGE_START.k;
+  // short text for the new-player screen / grown-up area: what each age starts at
+  var AGE_TEXT = { 2: 'Tiny Picnic: numbers 1–5, big letters, colors', 3: 'numbers to 10, big & little letters, colors', 4: 'bigger & smaller, beginning sounds, shapes',
+    5: 'adding to 10, first sight words', 6: 'adding to 20, short-vowel words', 7: 'story problems, homophones', 8: 'even & odd to 20, prefixes & suffixes' };
+  AGE_TEXT.skip = AGE_TEXT[5];
+  function byAge(p, subj) { return 'age:' + A.Age.band(p); }   // a pseudo-grade: startFor() looks it up in AGE_START
   function grade(p, subj) { var v = p.levels && p.levels[subj]; return !v || v === 'auto' ? byAge(p, subj) : v; }
+  function norm(e) { return typeof e === 'string' ? { id: e, level: 0 } : e; }
   function startFor(subj, g) {
     var L = C.list(subj); if (!L.length) return null;
-    var m = START[subj] || {}, id = m[g];
-    if (id && C.byId[id]) return { id: id, soon: false };
+    if (/^age:/.test(g)) {
+      var e = (AGE_START[g.slice(4)] || AGE_START.none)[subj];
+      if (e === 'top') { var t = L[L.length - 1]; return { id: t.id, level: t.levels.length - 1, soon: true }; }
+      e = norm(e); if (e && C.byId[e.id]) return { id: e.id, level: e.level || 0, soon: false };
+      return { id: L[0].id, level: 0, soon: false };
+    }
+    var m = START[subj] || {}, id = m[g] && norm(m[g]);
+    if (id && C.byId[id.id]) return { id: id.id, level: id.level || 0, soon: false };
     var idx = GRADES.findIndex(function (x) { return x[0] === g; }), maxIdx = -1;
     Object.keys(m).forEach(function (k) { var i = GRADES.findIndex(function (x) { return x[0] === k; }); if (i > maxIdx) maxIdx = i; });
-    if (idx > maxIdx) return { id: L[L.length - 1].id, soon: true };
-    return { id: L[0].id, soon: false };
+    if (idx > maxIdx) return { id: L[L.length - 1].id, level: 0, soon: true };
+    return { id: L[0].id, level: 0, soon: false };
   }
-  // place one subject (used for new players and when a grown-up changes the level)
-  function apply(p, subj) {
+  // place one subject (used for new players, age changes and when a grown-up changes the level).
+  // opt.check (default true): offer the 5-question placement check on the starting skill (coach.js; can chain up 4 skills, or step back 1)
+  function apply(p, subj, opt) {
+    opt = opt || {};
     var g = grade(p, subj); if (g === 'off') return null;
     var s = startFor(subj, g); if (!s) return null;
     C.ensure(p);
-    // reset the ladder's "placed" marks, then place at the start rung
-    C.list(subj).forEach(function (sk) { var st = p.skills[sk.id]; if (st.placed && st.status === 'mastered') { st.status = 'locked'; st.placed = false; st.level = 0; } });
+    // reset the ladder's "placed" marks (never skills the kid earned in play), then place at the start rung
+    C.list(subj).forEach(function (sk) { var st = p.skills[sk.id]; if (st.placed && st.status === 'mastered' && !st.attempts) { st.status = 'locked'; st.placed = false; st.level = 0; st.placeOffer = false; st.placeStart = false; } });
     if (s.id === C.list(subj)[0].id) { C.track(p, subj).current = s.id; var st0 = p.skills[s.id]; if (st0.status === 'locked') st0.status = 'open'; }
     else C.place(p, s.id);
+    var cur = p.skills[s.id];
+    if (!cur.attempts && cur.status !== 'mastered') {
+      cur.level = Math.max(0, Math.min(s.level || 0, C.byId[s.id].levels.length - 1));
+      // the placement check on the start skill (not in toddler mode, and not for a top rung that has nothing above it)
+      if (opt.check !== false && !A.toddler(p) && !s.soon) { cur.placeOffer = true; cur.placeDone = false; cur.placeStart = true; var T = C.track(p, subj); T.placeSteps = 0; }
+    }
     return s;
   }
-  function applyAll(p) { ['math', 'reading', 'concepts'].forEach(function (s) { if (C.list(s).length) apply(p, s); }); return p; }
+  function applyAll(p, opt) { ['math', 'reading', 'concepts'].forEach(function (s) { if (C.list(s).length) apply(p, s, opt); }); return p; }
+  // the grown-up changed the age: move the starting point (stars, prizes and skills earned in play are kept)
+  function reAge(p, age, opt) { p.age = age; return applyAll(p, opt); }
   function set(p, subj, v) { p.levels = p.levels || {}; p.levels[subj] = v; return v === 'off' ? null : apply(p, subj); }
-  A.Levels = { GRADES: GRADES, START: START, byAge: byAge, grade: grade, startFor: startFor, apply: apply, applyAll: applyAll, set: set,
+  function autoName(p, subj) { var s = startFor(subj, byAge(p, subj)); if (!s) return ''; var sk = C.byId[s.id]; return sk.name + (s.soon ? ' (top)' : sk.levels.length > 1 ? ' · level ' + (s.level + 1) : ''); }
+  function ageText(age) { return AGE_TEXT[age == null ? 'skip' : Math.min(Math.max(age, 2), 8)]; }
+  A.Levels = { autoName: autoName, ageText: ageText, GRADES: GRADES, START: START, AGE_START: AGE_START, AGE_TEXT: AGE_TEXT, reAge: reAge, byAge: byAge, grade: grade, startFor: startFor, apply: apply, applyAll: applyAll, set: set,
     soon: function (p, subj) { var g = grade(p, subj); return g !== 'off' && !!(startFor(subj, g) || {}).soon; },
     off: function (p, subj) { return !!(p.levels && p.levels[subj] === 'off'); } };
 
   /* "Read stories aloud" (grown-up setting per player): auto = on for age 5 and under (or no age), off for 6+.
      Off: a story question only says the question; the passage is still read by the speaker button. */
-  function readOn(p) { if (!p) return true; if (p.readStories === true || p.readStories === false) return p.readStories; return p.age == null || p.age <= 5; }
+  function readOn(p) { if (!p) return true; if (p.readStories === true || p.readStories === false) return p.readStories; return p.age == null || A.Age.preReader(p); }
   A.ReadAloud = { on: readOn, set: function (p, v) { p.readStories = v; },
     // the parts to say automatically for a rule / question (the speaker button always uses .say)
     auto: function (p, r) { return r && r.sayAuto && !readOn(p) ? r.sayAuto : r && r.say; } };

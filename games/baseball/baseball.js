@@ -1,14 +1,28 @@
-/* Blob Baseball — offense-only math baseball on the Blob Arcade core.
-   Every pitch is a question from the kid's own skill & level (A.Questions, built on the shared curriculum registry).
-   Right answer = a hit: the faster the answer (scaled to skill, level and age), the bigger the hit
-   (single → double → triple → home run). Wrong answer = a strike (and the right answer is said); three strikes
-   is an out (struck out, or a pop fly the friendly fielder catches). 3 innings; a half-inning ends at 3 outs or when
-   the whole lineup has batted (6 batters; 4 for age 4 and under, 5 each in 2 players). Runners advance, runs score.
+/* Blob Baseball — math baseball on the Blob Arcade core.
+   SLUGGER 2 (2026-10-22, parent: "more variation and less automatic success"); the rules live in rules.js (A.SluggerRules):
+   · a wrong answer is an OUT (pop-up / foul tip / grounder caught by a friendly fielder; gentle text + the coach's fact);
+     a right answer is a hit most of the time, but a slow answer on an easy pitch can be a long fly ball that is caught.
+   · a half-inning ends at 3 outs (4 outs at age 4 and under) or the mercy rule (5 runs; 4 at age 4 and under). No lineup cap.
+   · solo games: the friendly rival Sprout Squad bats the top half (simulated, modest), real score by inning, win / tie /
+     loss cards (a loss is "Good game! Rematch?"); a walk-off ends the last inning once she's ahead. Once per inning when
+     behind or tied: a text-only scoreboard question (runs to tie / to win; age 4 and under count the runs as dots).
+   · about 1 in 4 hits: a text-only base-running question (where does the runner end up / how many runs / how many bases).
+     Bonus questions never change the score and are not coach answers.
+   · stretch pitches come from the coach (the hardest of several at-level facts, or a next-level item) and come more often
+     when she's cruising, less when it is hard (R.stretchRate). Stars: 1 + win + (win with the run goal and 2 stretch hits).
+   · occasional walks; hits go left / center / right; runners sometimes take an extra base.
+   Below is the older (ux3b) note, still true for the hit odds.
+   Every pitch is ONE question at the kid's coached level (A.Questions + the coach's item pick; now and then a "stretch"
+   pitch with bigger numbers at the same level). No swing picking (owner, ux3b): a right answer is always a hit and the
+   kind of hit is a surprise, like real baseball — single, double, triple or (rarely) a home run. The odds lean toward
+   bigger hits for a quick answer (scaled to age and her own usual time) and a harder question (stretch / tougher item /
+   higher level); age 4 and under get friendlier odds (more doubles). See HIT ODDS below. Stars do not use the dice:
+   stars and outs are now set by SLUGGER 2 above (no more strikes, no lineup cap).
    Controls: tap/click a big answer card, or keys 1–4, or arrows + Space/Enter (F works too). R repeats the question,
    M music. 2 players (same device): alternating half-innings, each kid with their own questions. */
 (function (A) {
   'use strict';
-  var $ = A.$, C = A.Curriculum, Q = A.Questions, V = A.Voice, SFX = A.Audio.SFX, UI = A.UI, M = A.Music, B = A.Blobs;
+  var R = A.SluggerRules, $ = A.$, C = A.Curriculum, Q = A.Questions, V = A.Voice, SFX = A.Audio.SFX, UI = A.UI, M = A.Music, B = A.Blobs;
   UI.boot();
   var P1 = A.Store.active();
   if (!P1) { location.replace(A.ROOT + 'index.html#players'); return; }
@@ -36,7 +50,8 @@
   function eio(t) { return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
   function eout(t) { return 1 - Math.pow(1 - t, 3); }
   function lerp(a, b, t) { return a + (b - a) * t; }
-  function sayWait(parts, cap) { return Promise.race([V.say(parts), wait(cap || 4000)]); }
+  function sayWait(parts, cap) { return Promise.race([V.say(parts, { bubble: false }), wait(cap || 4000)]); }
+  function sayWaitMix(list, cap, o) { return Promise.race([V.sayMix(list, o), wait(cap || 4000)]); }
 
   /* ================= sound effects (Web Audio, made on the fly) ================= */
   function ac() { if (!S.sound) return null; return A.Audio.context(); }
@@ -70,16 +85,37 @@
   if (TWO && !P2) TWO = false;
   var COLORS = [{ c: '#3d8ef0', d: '#2a6cc4', soft: '#e3efff', name: 'blue' }, { c: '#ff8a2a', d: '#d96a10', soft: '#ffeedd', name: 'orange' }];
   var INNINGS = 3;
-  function capFor(p) { if (TWO) return 5; return p.age != null && p.age <= 4 ? 4 : p.age === 5 ? 5 : 6; }
-  function nChoices(p) { return p.age != null && p.age <= 5 ? 3 : 4; }
-  // the four swings: the batter picks one before every pitch. The question's difficulty follows the swing (Questions.step);
-  // a right answer gives exactly that hit, a wrong one is a strike — so a bigger swing is a bigger risk.
-  var SWINGS = [
-    { k: 'sg', name: 'Single', sub: 'easy', icon: '⚾', bases: 1, off: -1, line: 'bb_sw_single', short: 'bb_single' },
-    { k: 'db', name: 'Double', sub: 'just right', icon: '⚾⚾', bases: 2, off: 0, line: 'bb_sw_double', short: 'bb_double' },
-    { k: 'tr', name: 'Triple', sub: 'tricky', icon: '🔥', bases: 3, off: .5, line: 'bb_sw_triple', short: 'bb_triple' },
-    { k: 'hr', name: 'Home Run', sub: 'challenge!', icon: '💥', bases: 4, off: 1, line: 'bb_sw_homer', short: 'bb_home_run' }
-  ];
+  /* story mode (game mix, 2026-10-22): a Picnic Island stop that plays Snack Slugger (?mode=story&stop=i, from the Munch map).
+     The stop's skill and level (Story.sluggerConfig), 2 short innings, goal = hits (3; 2 at age 4 and under via A.Age; one
+     fewer on a "helper" stop after two misses). Reaching the goal clears the stop at once. The stop is saved with
+     Story.record, the same as a Munch stop (journey score, stars, rewards, challenge unlocks). Every answer goes to the coach
+     (C.recordAnswer), as in Munch story stops, which also skip the free-play round scoring. Then back to the map. */
+  var ST = A.Story, STORYB = qs.mode === 'story', SI = STORYB ? +qs.stop : -1, SC = null;
+  if (STORYB) {
+    if (!ST || !ST.STOPS[SI] || ST.gameOf(P1, SI) !== 'slugger' || !ST.playable(P1, SI)) { location.replace('../munch/index.html?mode=story'); return; }
+    SC = ST.sluggerConfig(P1, SI); INNINGS = SC.innings; TWO = false; P2 = null;
+  }
+  var MAPURL = '../munch/index.html?mode=story';
+  function capFor(p) { if (TWO) return 5; return A.Age.little(p) ? 4 : A.Age.preReader(p) ? 5 : 6; }
+  function nChoices(p) { return A.Age.choices(p); }   // 3 choices at 4 and under (A.Age)
+  /* ================= HIT ODDS (ux3b) =================
+     A right answer is always a hit; WHICH hit is gameplay randomness (never a reward drop — stars/stickers don't roll dice).
+     power (0..1) = 0.55 × speed + 0.45 × difficulty
+       speed: 1 when the answer comes within "quick" seconds (2.5 s; 3.5 s age 5; 4.5 s age 4 and under — nudged toward her
+              own usual time on this skill), sliding to 0 at 3 × quick. Answering before the question is read out counts as quick.
+       difficulty: 1 for a stretch pitch (bigger numbers); otherwise from the coach's expected success for the item
+              (82.5 % target → 0, 60 % → 1), plus a little for higher levels (+0.15 per level, up to +0.3).
+     odds = blend of SLOW_EASY and FAST_HARD by power. Age 4 and under: 14 points move from singles to doubles. */
+  var HITS = R.HITS, ORDER = R.ORDER;
+  function quickSec(p, sid) {
+    var base = A.Age.little(p) ? 4.5 : A.Age.preReader(p) ? 3.5 : 2.5, rt = p && !p.guest && p.games && p.games.baseball && p.games.baseball.rt ? p.games.baseball.rt[sid] : null;
+    return rt ? Math.min(base * 1.6, Math.max(base * .6, rt * .85)) : base;
+  }
+  var speedOf = R.speedOf, hitOdds = R.hitOdds, rollHit = R.rollHit;
+  function diffOf(q) {
+    var d = q.hard || q.offset > 0 ? 1 : q.coachP != null ? Math.min(1, Math.max(0, (.825 - q.coachP) / .225)) : 0;
+    return Math.min(1, d + Math.min(.3, .15 * (q.level || 0)));
+  }
 
   /* ================= menu (1 player / 2 players / high scores) ================= */
   if (!qs.mode) return showMenu();
@@ -96,7 +132,7 @@
       step = s; var box = $('#menuTiles'), fns = {};
       if (s === 'main') {
         $('#menuQ').textContent = 'One player, or two players?';
-        box.innerHTML = tile('one', '1 Player', '3 innings · harder questions hit farther!', '<span class="one bat">' + B.forProfile(P1, { expr: 'bat', outfit: 'helmet', helmet: COLORS[0].c, helmetDark: COLORS[0].d }) + '</span>', 'onep') +
+        box.innerHTML = tile('one', '1 Player', '3 innings vs the Sprout Squad · Right answers hit, misses are outs!', '<span class="one bat">' + B.forProfile(P1, { expr: 'bat', outfit: 'helmet', helmet: COLORS[0].c, helmetDark: COLORS[0].d }) + '</span>', 'onep') +
           tile('two', '2 Players', 'Take turns at bat, each with your own questions', '<span class="pair">' + B.forProfile(P1, { expr: 'happy', outfit: 'helmet', helmet: COLORS[0].c, helmetDark: COLORS[0].d }) + B.svg({ blob: P1.blob === 'apple' ? 'strawberry' : 'apple', expr: 'happy', outfit: 'helmet', helmet: COLORS[1].c, helmetDark: COLORS[1].d }) + '</span>', 'two');
         fns = { one: function () { go('mode=solo'); }, two: function () { V.say(['hub_pick_friend']); render('partner'); } };
       } else {
@@ -113,6 +149,9 @@
         box.innerHTML = h + '<button class="mtile backt" data-nav data-id="back"><span class="mt">◀ Back</span></button>'; fns.back = back;
       }
       var one = A.$('#menuTiles .mtile[data-id=one]'); if (one) one._say = ['hub_one_player', 'bb_one_player_sub'];   // keyboard focus reads the tile
+      // short descriptions on hover / focus / long-press (never spoken; 2026-10-22)
+      var BTIPS = { one: 'Play the Sprout Squad! Right answers are hits, wrong ones are outs. Score more runs to win.', two: 'Take turns at bat with a friend.', back: 'Go back one step.', 'g:easy': 'Play with a guest who is learning to count.', 'g:medium': 'Play with a guest who adds to 10.', 'g:hard': 'Play with a guest who adds to 20.' };
+      A.$$('#menuTiles .mtile').forEach(function (b) { var id = b.dataset.id, nm = (b.querySelector('.mt') || b).textContent.trim(), t = BTIPS[id] || (/^p:/.test(id) ? 'Take turns at bat with ' + nm + '.' : ''); if (t) UI.tip(b, t, { name: nm }); });
       A.$$('#menuTiles .mtile').forEach(function (b) { b.addEventListener('click', function () { var f = fns[b.dataset.id]; if (f) f(); }); b.addEventListener('pointerenter', function () { B.anim(b, 'squish', 420); }); });
       // 2-player setup: controllers join with A, X swaps seats (js/core/gamepad.js)
       A.Pad.context({ setup: s === 'partner' });
@@ -145,14 +184,19 @@
         '<span class="ln">' + A.esc(p.name) + '</span><span class="lb"><b>' + (x.best || 0) + '</b> runs</span><span class="lh">⚾ ' + (x.homers || 0) + ' HR · ' + (x.games ? x.games + (x.games === 1 ? ' game' : ' games') : 'no games yet') + '</span></div>';
     }).join('') + '</div>';
   }
-  function scores() { V.say(['bb_high_scores']); return UI.card({ tag: 'Family', title: 'High scores', html: boardHTML([P1.id]) + '<p class="small">Most runs in one game. Home runs = answers that were super fast!</p>', btn: 'OK', cls: 'scores', minMs: 300 }); }
+  function scores() { V.say(['bb_high_scores']); return UI.card({ tag: 'Family', title: 'High scores', html: boardHTML([P1.id]) + '<p class="small">Most runs in one game. Fast, tricky answers hit the most home runs!</p>', btn: 'OK', cls: 'scores', minMs: 300 }); }
 
   /* ================= the game ================= */
   var sec = $('#game'); A.$$('.screen').forEach(function (s) { s.classList.toggle('on', s === sec); });
   document.body.classList.toggle('two', TWO);
-  function mkPlayer(P, i) { return { i: i, P: P, name: P.name, col: COLORS[i], runsBy: [], hits: 0, homers: 0, right: 0, wrong: 0, pitches: 0, outs: 0, round: null, hr: 0, hw: 0, sw: {}, sgRun: 0, lastSwing: null, log: [], t0: 0, cap: capFor(P), times: [] }; }
+  function mkPlayer(P, i) { return { i: i, P: P, name: P.name, col: COLORS[i], runsBy: [], hits: 0, homers: 0, right: 0, wrong: 0, pitches: 0, outs: 0, round: null, hr: 0, hw: 0, sw: {}, tricky: 0, log: [], t0: 0, cap: capFor(P), times: [] }; }
   var PL = [mkPlayer(P1, 0)]; if (TWO) PL.push(mkPlayer(P2, 1));
-  var G = { phase: 'intro', swing: null, swSel: 1, inning: 1, half: 0, outs: 0, strikes: 0, pa: 0, bases: [null, null, null], q: null, accept: false, busy: false, sel: 0, qT0: 0, voiceDone: false, over: false, t0: Date.now(), recent: [], pitchN: 0, clockT: null, timer: null };
+  // the friendly rival team (solo free play only; story stops and 2-player games have no rival)
+  var RIVALON = !TWO && !STORYB, RIV = { name: R.RIVAL.name, icon: R.RIVAL.icon, runsBy: [], hits: 0, col: { c: '#4caf50', d: '#2e7d32' } };
+  var LITTLE = A.Age.little(P1);
+  function maxOuts() { return STORYB && SC && SC.outs ? SC.outs : R.outsFor(A.Age.little(bat().P)); }   // after9: a story stop is one big inning with SC.outs (4) outs
+  function mercy() { return STORYB ? 99 : R.mercyFor(A.Age.little(bat().P)); }
+  var G = { phase: 'intro', inning: 1, half: 0, outs: 0, strikes: 0, pa: 0, halfRuns: 0, missLast: false, recentAt: [], scoreQ: {}, bonusN: 0, hitN: 0, walkoff: false, bases: [null, null, null], q: null, accept: false, busy: false, sel: 0, qT0: 0, voiceDone: false, over: false, t0: Date.now(), recent: [], pitchN: 0, clockT: null, timer: null };
   function bat() { return PL[G.half]; }
 
   /* ---------- the ballpark (one SVG, 1600 × 900; extends past its box so wide/tall screens show more sky and grass) ---------- */
@@ -201,7 +245,7 @@
     s += '<rect x="712" y="684" width="60" height="44" fill="none" stroke="#fff" stroke-width="3" opacity=".7"/><rect x="828" y="684" width="60" height="44" fill="none" stroke="#fff" stroke-width="3" opacity=".7"/>';
     s += '<path d="M786 696 H814 V706 L800 714 L786 706 Z" fill="#fff" stroke="#d8c7a8" stroke-width="2"/>';
     BASES.forEach(function (b, k) { s += '<rect class="base b' + k + '" x="' + (b.x - 15) + '" y="' + (b.y - 15) + '" width="30" height="30" rx="4" fill="#fff" stroke="#d8c7a8" stroke-width="2" transform="rotate(45 ' + b.x + ' ' + b.y + ') scale(1)" style="transform-origin:' + b.x + 'px ' + b.y + 'px"/>'; });
-    s += '<g id="fielders"></g><g id="runners"></g><g id="pitcherG"></g><g id="batterG"></g><g id="ballG"><ellipse id="ballShadow" rx="12" ry="5" fill="#2d2547" opacity="0"/><g id="ball" opacity="0"><circle r="13" fill="#fff" stroke="#d9d2c4" stroke-width="2"/><path d="M-7 -10 Q-2 0 -7 10 M7 -10 Q2 0 7 10" stroke="#ff5a6e" stroke-width="2.2" fill="none"/></g></g>';
+    s += '<g id="fielders"></g><g id="runners"></g><g id="pitcherG"></g><g id="batterG"></g><g id="trailG"></g><g id="ballG"><ellipse id="ballShadow" rx="12" ry="5" fill="#2d2547" opacity="0"/><g id="ball" opacity="0"><circle r="13" fill="#fff" stroke="#d9d2c4" stroke-width="2"/><path d="M-7 -10 Q-2 0 -7 10 M7 -10 Q2 0 7 10" stroke="#ff5a6e" stroke-width="2.2" fill="none"/></g></g>';
     return s + '</svg>';
   }
   var NS = 'http://www.w3.org/2000/svg';
@@ -247,11 +291,15 @@
     });
   }
   // ball flight after contact: quadratic arc with a ground shadow; size shrinks with distance
-  function fly(to, peak, ms, endScale, keep) {
-    var a = { x: 790, y: 660 };
+  var TRAIL = { sg: '#8fe3c0', db: '#9fd2ff', tr: '#ffb08a', hr: '#ffd23c' };
+  function fly(to, peak, ms, endScale, keep, kind) {
+    var a = { x: 790, y: 660 }, lastT = -1, tg = $('#trailG');
     return tween(ms, function (t) {
       var x = lerp(a.x, to.x, t), gy = lerp(706, to.y, t), y = gy - Math.sin(t * Math.PI) * peak - (1 - t) * 46, s = lerp(1.1, endScale, t);
       ballAt(x, y, s); shadowAt(x, gy, .22 * (1 - t * .5), lerp(1, endScale, t));
+      // a sparkly comet trail behind a hit (bigger hits = bigger, brighter trail)
+      if (kind && tg && t - lastT > .045 && t < .97) { lastT = t; var c = document.createElementNS(NS, 'circle'), rr = (kind === 'hr' ? 11 : kind === 'tr' ? 9 : 7) * s;
+        c.setAttribute('cx', x.toFixed(1)); c.setAttribute('cy', y.toFixed(1)); c.setAttribute('r', rr.toFixed(1)); c.setAttribute('fill', TRAIL[kind]); c.setAttribute('class', 'trail'); tg.appendChild(c); setTimeout(function () { c.remove(); }, 900 / SPEED); }
     }).then(function () { if (!keep) { ball.setAttribute('opacity', 0); shadow.setAttribute('opacity', 0); } });
   }
   function hideBall() { ball.setAttribute('opacity', 0); shadow.setAttribute('opacity', 0); }
@@ -272,22 +320,18 @@
     B.anim(r.firstChild, 'jump', 600);
     return wait(380).then(function () { return tween(320, function (t) { r.setAttribute('opacity', 1 - t); }); }).then(function () { r.remove(); });
   }
-  // advance everybody n bases (batter included). Returns the number of runs.
-  function advance(n, msPerBase) {
-    var pl = bat(), moves = [], runs = 0, nb = [null, null, null];
-    for (var b = 2; b >= 0; b--) {
-      var r = G.bases[b]; if (!r) continue;
-      var to = b + 1 + n;
-      if (to >= 4) { runs++; moves.push(runTo(r, b + 1, 4, msPerBase).then(scoreRun.bind(null, pl, r))); }
-      else { nb[to - 1] = r; moves.push(runTo(r, b + 1, to, msPerBase)); }
-    }
-    // the batter drops the bat and becomes a runner
-    var br = runnerEl(pl); var p0 = posOnPath(0); place(br, p0.x - 60, p0.y + 14);
-    batter.setAttribute('opacity', 0);
-    if (n >= 4) { runs++; moves.push(runTo(br, 0, 4, msPerBase).then(scoreRun.bind(null, pl, br))); }
-    else { nb[n - 1] = br; moves.push(runTo(br, 0, n, msPerBase)); }
-    G.bases = nb;
-    return { runs: runs, done: Promise.all(moves) };
+  // advance runners with the rules (R.advance: extra bases now and then, walks force runners). Returns { runs, done }.
+  function advance(n, msPerBase, opt) {
+    var pl = bat(), moves = [], plan = R.advance(G.bases, n, G.rnd || Math.random, opt), br = null;
+    if (plan.moves.some(function (m) { return m.r === 'B'; })) { br = runnerEl(pl); var p0 = posOnPath(0); place(br, p0.x - 60, p0.y + 14); batter.setAttribute('opacity', 0); }
+    plan.moves.forEach(function (m) {
+      var r = m.r === 'B' ? br : m.r;
+      if (m.to >= 4) moves.push(runTo(r, m.from, 4, msPerBase).then(scoreRun.bind(null, pl, r)));
+      else moves.push(runTo(r, m.from, m.to, msPerBase));
+    });
+    G.bases = plan.bases.map(function (r) { return r === 'B' ? br : r || null; });
+    G.halfRuns += plan.runs;
+    return { runs: plan.runs, done: Promise.all(moves), plan: plan };
   }
   function clearBases() { G.bases.forEach(function (r) { if (r) { tween(300, function (t) { r.setAttribute('opacity', 1 - t); }).then(function () { r.remove(); }); } }); G.bases = [null, null, null]; }
 
@@ -314,14 +358,16 @@
     var h = '<div class="sbt">' + A.TITLES.baseball.toUpperCase() + '</div><table><tr><th></th>';
     for (var i = 1; i <= INNINGS; i++) h += '<th class="' + (i === G.inning ? 'cur' : '') + '">' + i + '</th>';
     h += '<th class="tot">R</th><th>H</th></tr>';
-    PL.forEach(function (pl, k) {
-      var tot = pl.runsBy.reduce(function (a, b) { return a + (b || 0); }, 0);
-      h += '<tr class="' + (k === G.half && !G.over ? 'up' : '') + '"><td class="nm"><i style="background:' + pl.col.c + '"></i>' + A.esc(pl.name) + '</td>';
+    var rows = (RIVALON ? [RIV] : []).concat(PL);
+    rows.forEach(function (pl) {
+      var tot = totalRuns(pl), up = !G.over && (pl === RIV ? G.top : !G.top && pl === bat());
+      h += '<tr class="' + (up ? 'up' : '') + (pl === RIV ? ' riv' : '') + '"><td class="nm"><i style="background:' + pl.col.c + '"></i>' + (pl === RIV ? pl.icon + ' ' : '') + A.esc(pl.name) + '</td>';
       for (var j = 0; j < INNINGS; j++) h += '<td>' + (pl.runsBy[j] != null ? pl.runsBy[j] : '') + '</td>';
       h += '<td class="tot">' + tot + '</td><td>' + pl.hits + '</td></tr>';
     });
-    h += '</table><div class="sbf"><span>BATTER <b>' + Math.min(G.pa + 1, bat().cap) + '</b>/' + bat().cap + '</span><span class="lt">OUT ' + [0, 1, 2].map(function (i) { return '<i class="' + (i < G.outs ? 'on o' : '') + '"></i>'; }).join('') + '</span>' +
-      '<span class="lt">STRIKE ' + [0, 1].map(function (i) { return '<i class="' + (i < G.strikes ? 'on s' : '') + '"></i>'; }).join('') + '</span></div>';
+    var mo = maxOuts(), mc = mercy();
+    h += '</table>' + (STORYB ? '<div class="sgoal">🎯 ' + A.esc(SC.goalText) + ': <b>' + Math.min(totalRuns(PL[0]), SC.goal) + '</b>/' + SC.goal + '</div>' : '') + '<div class="sbf"><span class="lt">OUT ' + Array.apply(null, Array(mo)).map(function (_, i) { return '<i class="' + (i < G.outs ? 'on o' : '') + '"></i>'; }).join('') + '</span>' +
+      (mc < 99 ? '<span class="mercy" title="An inning ends at ' + mc + ' runs">max ' + mc + ' runs</span>' : '') + '</div>';
     $('#sboard').innerHTML = h;
   }
   function totalRuns(pl) { return pl.runsBy.reduce(function (a, b) { return a + (b || 0); }, 0); }
@@ -334,21 +380,39 @@
 
   /* ---------- the pitch: question + answer cards ---------- */
   function newQuestion() {
-    var pl = bat(), r = pl.round, q, g = 0, off = (G.swing || SWINGS[1]).off, n = nChoices(pl.P);
-    // a review round only sets the easy "single"; double and up are at the player's own level (current skill + level)
-    if (r.review && off >= 0) { var cs = C.current(pl.P, (r.skill && r.skill.subject) || 'math'); if (cs) r = { skill: cs, level: C.state(pl.P, cs.id).level, review: false }; }
-    var st = Q.step(pl.P, r, off);
-    if (st.easy) n = Math.max(2, n - 1);                       // very first step: "easier" = fewer choices
-    else if (st.hard && st.offset === 1) n = 4;                  // a challenge that can't climb (little ones / the very top): bigger numbers, all 4 choices
+    // her coached level; now and then (never right after a miss) a STRETCH pitch. Stretch odds follow her recent at-level
+    // answers (R.stretchRate: more when cruising, fewer when it's hard). A stretch is the coach's idea of "tricky": the
+    // hardest of several at-level facts by the coach's expected success (e.g. 7 + 5 over 10 + 4), or 1 time in 3 an item
+    // from the next level / skill (Q.step +1). Without a coach model it falls back to the old bigger-numbers step.
+    var pl = bat(), r = pl.round, q, g = 0, n = nChoices(pl.P);
+    var stretch = !G.missLast && (G.forceStretch != null ? !!G.forceStretch : Math.random() < R.stretchRate(G.recentAt.slice(-6)));
+    if (r.review) { var cs = C.current(pl.P, (r.skill && r.skill.subject) || 'math'); if (cs) r = { skill: cs, level: C.state(pl.P, cs.id).level, review: false }; }
+    var coach = A.Coach && A.Coach.pickItem && !pl.P.guest, st;
+    if (stretch && coach && G.forceStretch == null && Math.random() < 1 / 3) { st = Q.step(pl.P, r, 1); if (st.offset !== 1 || st.hard) st = Q.step(pl.P, r, .5); }
+    else st = Q.step(pl.P, r, stretch && !coach ? .5 : 0);
     do { q = Q.make(st.skill, st.level, { choices: n, hard: st.hard }); } while (G.recent.indexOf(q.key) >= 0 && g++ < 20);
-    // coach estimate: of a few candidates, the one whose expected success is nearest the coach's target (about 80-85 %)
-    if (!st.hard && A.Coach && A.Coach.pickItem && !pl.P.guest) {
-      var cands = [q]; for (var k = 0; k < 4; k++) { var c2 = Q.make(st.skill, st.level, { choices: n }); if (G.recent.indexOf(c2.key) < 0) cands.push(c2); }
-      q = A.Coach.pickItem(pl.P, st.skill.id, cands.map(function (c) { return { key: itemKey(c), q: c }; }), off < 0 ? { easeOff: true } : undefined).q;
+    if (!st.hard && coach) {
+      var cands = [q]; for (var k = 0; k < (stretch ? 8 : 4); k++) { var c2 = Q.make(st.skill, st.level, { choices: n }); if (G.recent.indexOf(c2.key) < 0) cands.push(c2); }
+      if (stretch && st.offset === 0) {   // the hardest fact by the coach's model
+        var best = null; cands.forEach(function (c) { var pr = A.Coach.prob(pl.P, st.skill.id, itemKey(c), factPrior(itemKey(c))); if (pr != null && (!best || pr < best.p)) best = { q: c, p: pr }; });
+        if (best) { q = best.q; q.coachP = best.p; } q.hard = true;
+      } else {
+        var pick = A.Coach.pickItem(pl.P, st.skill.id, cands.map(function (c) { return { key: itemKey(c), q: c }; }), G.missLast ? { easeOff: true } : undefined);   // after a miss the coach eases off
+        q = pick.q; if (pick.p != null) q.coachP = pick.p;
+        if (stretch) q.hard = true;
+      }
     }
-    q.atLevel = st.atLevel; q.offset = st.offset;
+    q.atLevel = st.atLevel; q.offset = stretch ? Math.max(st.offset, .5) : st.offset; q.stretch = stretch;
     G.recent.push(q.key); if (G.recent.length > 12) G.recent.shift();
     return q;
+  }
+  // a difficulty guess for a fact the coach hasn't seen yet (0 = average; bigger = harder): crossing ten / borrowing and
+  // bigger small-numbers are harder, doubles and +0/+1 are easier. Only used to rank stretch candidates.
+  function factPrior(key) {
+    var m = String(key).match(/^(\d+) ([+−]) (\d+)$/); if (!m) return 0;
+    var a = +m[1], b = +m[3], lo = Math.min(a, b);
+    if (m[2] === '+') return (a + b > 10 && a < 10 && b < 10 ? .8 : 0) + lo * .08 - (a === b ? .3 : 0) - (lo <= 1 ? .5 : 0);
+    return (a > 10 && b > a - 10 && b < 10 ? .8 : 0) + Math.min(b, a - b) * .07 - (b <= 1 ? .5 : 0) - (b === a - b ? .2 : 0);
   }
   // the coach's item id for a pitch: the fact / word (e.g. "3 + 4"), like Picnic Munch's cells
   function itemKey(q) { var t = String(q.text || '').replace(/<[^>]*>/g, ' '), m = t.match(/(\d+)\s*([+−-])\s*(\d+)/); return m ? m[1] + ' ' + (m[2] === '-' ? '−' : m[2]) + ' ' + m[3] : (t.replace(/\s+/g, ' ').trim() || q.key); }
@@ -364,7 +428,7 @@
   }
   function markSel(say) {
     A.$$('#cards .bcard').forEach(function (b, i) { b.classList.toggle('sel', i === G.sel); });
-    if (say && G.q && G.q.choices[G.sel].say) V.say(G.q.choices[G.sel].say);
+    if (say && G.q && G.q.choices[G.sel].say) V.say(G.q.choices[G.sel].say, { kind: 'name', bubble: false });
   }
   function elapsed() { return G.voiceDone ? (Date.now() - G.qT0) / 1000 : 0; }
   function tick() {
@@ -377,52 +441,28 @@
       if (e >= S.bbClock) timeout();
     }
   }
-  /* ---------- pick a swing ---------- */
-  function markSwing(say) {
-    A.$$('#cards .swbtn').forEach(function (b, i) { b.classList.toggle('sel', i === G.swSel); });
-    if (say) V.say([SWINGS[G.swSel].short]);
-  }
-  function pickSwing() {
+  /* ---------- next pitch (no swing picking: straight to the question) ---------- */
+  function nextPitch() {
     if (G.over) return;
-    var pl = bat(); G.phase = 'swing'; G.q = null; G.swing = null; G.accept = false; G.busy = false; clearInterval(G.timer);
-    renderBoard(); if (batEl) setBat(-118); $('#pitcherG').classList.remove('set');
-    $('#qTxt').innerHTML = (TWO ? '<b style="color:' + pl.col.d + '">' + A.esc(pl.name) + '</b>, pick' : 'Pick') + ' your swing!';
-    $('#qPic').innerHTML = ''; $('#qPic').classList.remove('on'); $('#swingTag').innerHTML = ''; $('#swingTag').className = 'swingtag'; $('#shot').textContent = '';
-    $('#sign').classList.remove('done'); B.anim($('#sign'), 'signpop', 400);
-    var box = $('#cards'); box.innerHTML = ''; box.classList.remove('n3'); box.classList.add('swings'); box.setAttribute('aria-label', 'Pick your swing');
-    SWINGS.forEach(function (w, i) {
-      var b = A.el('<button class="swbtn sw-' + w.k + '" data-i="' + i + '" aria-label="' + (i + 1) + ': ' + w.name + ', ' + w.sub + '"><span class="kk">' + (i + 1) + '</span><span class="si">' + w.icon + '</span><span class="sn">' + w.name + '</span><span class="ss">' + w.sub + '</span></button>');
-      b.addEventListener('click', function () { if (G.phase === 'swing' && !G.busy && !UI.cardOpen) { G.swSel = i; markSwing(false); chooseSwing(i, 'click'); } });
-      box.appendChild(b);
-    });
-    G.swSel = pl.lastSwing != null ? pl.lastSwing : 1; markSwing(false);
-    // a gentle nudge: after three Singles in a row the crowd cheers for a bigger swing (never required, never a penalty)
-    var line = G.strikes === 0 ? ['bb_pick_swing'] : [];
-    if (pl.sgRun >= 3) { pl.sgRun = 0; G.nudges = (G.nudges || 0) + 1; line = ['bb_nudge']; crowd(true, false); A.$$('#cards .sw-db, #cards .sw-tr, #cards .sw-hr').forEach(function (b) { B.anim(b, 'nudge', 1400); }); }
-    if (line.length) V.say(line);
-  }
-  function chooseSwing(i, how) {
-    if (G.phase !== 'swing' || G.busy || G.over) return;
-    var pl = bat(), w = SWINGS[i]; G.busy = true; G.swing = w; G.phase = 'pitch'; pl.lastSwing = i;
-    pl.sgRun = i === 0 ? pl.sgRun + 1 : 0;
-    var box = $('#cards'); box.classList.remove('swings'); box.setAttribute('aria-label', 'Answer choices');
-    A.$$('#cards .swbtn').forEach(function (b, k) { b.disabled = true; b.classList.toggle('picked', k === i); b.classList.toggle('dim', k !== i); });
-    $('#swingTag').innerHTML = w.icon + ' ' + w.name + ' swing'; $('#swingTag').className = 'swingtag on ' + w.k;
-    SFX.pop(); if (w.k === 'hr') { crowd(true, false); M.charge(); }
-    V.stop();
-    return sayWait([w.line], 3200).then(startPitch);
+    G.q = null; G.accept = false; G.busy = false; clearInterval(G.timer);
+    $('#shot').textContent = '';
+    // a new batter: now and then a walk (never the first batter of a half; tests can force it with G.forceWalk)
+    if (G.pa > 0 && !G.walkedPA && (G.forceWalk != null ? G.forceWalk : Math.random() < R.WALK)) { G.walkedPA = true; G.phase = 'walk'; return doWalk().then(afterPitch); }
+    G.walkedPA = false;
+    return startPitch();
   }
   function startPitch() {
     if (G.over) return;
-    G.phase = 'pitch'; $('#cards').classList.remove('swings');
+    G.phase = 'pitch';
     var q = G.q = newQuestion(); G.pitchN++;
+    if (!G.keepTag) { $('#swingTag').innerHTML = q.stretch ? '<small>🔥 Tricky pitch!</small>' : ''; $('#swingTag').className = 'swingtag' + (q.stretch ? ' on tricky' : ''); }
     renderQuestion(q); renderBoard(); if (batEl) setBat(-118);
     $('#sign').classList.remove('done'); B.anim($('#sign'), 'signpop', 400);
     // the pitcher gets set; the voice reads the question; the clock starts when it has been read
     $('#pitcherG').classList.add('set');
-    G.accept = true; G.busy = false; G.voiceDone = false; G.qT0 = Date.now(); $('#shot').textContent = S.bbClock > 0 ? '⏱ ' + S.bbClock : '';
+    G.accept = true; G.busy = false; G.voiceDone = false; G.qT0 = G.qShown = Date.now(); $('#shot').textContent = S.bbClock > 0 ? '⏱ ' + S.bbClock : '';
     var my = G.pitchN;
-    Promise.race([V.say(A.ReadAloud ? A.ReadAloud.auto(bat().P, q) : q.say), wait(6000)]).then(function () { if (G.pitchN === my && !G.voiceDone) { G.voiceDone = true; G.qT0 = Date.now(); } });
+    Promise.race([V.say(A.ReadAloud ? A.ReadAloud.auto(bat().P, q) : q.say, { kind: q.listen ? 'listen' : 'prompt' }), wait(6000)]).then(function () { if (G.pitchN === my && !G.voiceDone) { G.voiceDone = true; G.qT0 = Date.now(); } });
     clearInterval(G.timer); G.timer = setInterval(tick, 100); tick();
   }
   function lockCards(ok, i, q) {
@@ -431,130 +471,250 @@
   }
   function answer(i, how) {
     if (!G.q || !G.accept || G.busy || G.over || UI.cardOpen) return;
+    if (Date.now() - (G.qShown || 0) < A.Pace.CFG.FRESH_Q * A.Pace.scale) { A.Pace.log.push({ tag: 'bb:fresh', dropped: true }); return; }   // a press left over from the last pitch (js/core/pace.js)
+    if (G.q.bonus) return bonusAnswer(i);
     G.accept = false; G.busy = true; clearInterval(G.timer);
-    var q = G.q, pl = bat(), ok = i === q.answer, e = elapsed(), w = G.swing || SWINGS[1];
-    // logged against the skill actually asked (a Single may be the step below, a Home Run the next step up)…
+    var q = G.q, pl = bat(), ok = i === q.answer, e = elapsed();
     pl.pitches++; C.recordAnswer(pl.P, q.skill, ok, { key: itemKey(q) });
-    // …and only pitches at her own level count toward this half-inning's level-up round, so easier/harder swings don't skew it
     if (q.atLevel) { if (ok) pl.hr++; else pl.hw++; }
+    if (!q.stretch) { G.recentAt.push(ok); if (G.recentAt.length > 10) G.recentAt.shift(); }
+    G.missLast = !ok;
     if (ok) { pl.right++; pl.times.push(e); var rt = bb(pl.P).rt; if (!pl.P.guest) rt[q.skill] = rt[q.skill] ? +(rt[q.skill] * .8 + e * .2).toFixed(2) : +e.toFixed(2); }
     else pl.wrong++;
-    var sw = pl.sw[w.k] || (pl.sw[w.k] = { n: 0, ok: 0 }); sw.n++; if (ok) sw.ok++;
-    pl.log.push({ swing: w.k, skill: q.skill, level: q.level, hard: !!q.hard, atLevel: q.atLevel, ok: ok });
+    var tricky = !!q.hard;
+    if (ok && tricky) pl.tricky++;
+    // the surprise: which hit? (gameplay odds only — see HIT ODDS); a slow answer on an easy pitch is sometimes a caught fly
+    var odds = ok ? { sec: G.voiceDone ? e : 0, quick: quickSec(pl.P, q.skill), diff: diffOf(q), little: A.Age.little(pl.P), stretch: tricky, noFly: R.noFly(A.Age.of(pl.P)) } : null;   // design2: no fly-outs on right answers at 5 and under
+    var caught = ok && G.forceCatch == null ? (G.rnd || Math.random)() < R.caughtChance(odds) : ok && !!G.forceCatch;
+    var z = ok && !caught ? rollHit(odds, G.rnd) : null;
+    var key = z ? z.k : ok ? 'fly' : 'miss', sw = pl.sw[key] || (pl.sw[key] = { n: 0, ok: 0 }); sw.n++; if (ok) sw.ok++;
+    pl.log.push({ hit: key, skill: q.skill, level: q.level, hard: tricky, atLevel: q.atLevel, ok: ok });
     lockCards(ok, i, q); V.stop();
-    G.last = { ok: ok, sec: +e.toFixed(2), how: how, swing: w.k, zone: ok ? w.k : null, skill: q.skill, level: q.level, hard: !!q.hard, atLevel: q.atLevel, offset: q.offset };
-    var p = ok ? doHit(w, q) : doMiss(q, false, w.k === 'hr');
+    G.last = { ok: ok, sec: +e.toFixed(2), how: how, zone: z ? z.k : null, caught: caught, odds: ok ? hitOdds(odds) : null, skill: q.skill, level: q.level, hard: tricky, atLevel: q.atLevel, offset: q.offset, coachP: q.coachP };
+    var p = z ? doHit(z, q, odds) : doOut(q, false, caught);
     p.then(afterPitch);
   }
-  function timeout() { // optional shot clock ran out: a strike (not counted as a wrong answer for the skill)
-    if (!G.accept || G.busy) return;
+  function timeout() { // optional shot clock ran out: an out (not counted as a wrong answer for the skill)
+    if (!G.accept || G.busy || (G.q && G.q.bonus)) return;
     G.accept = false; G.busy = true; clearInterval(G.timer); bat().pitches++;
     lockCards(false, -1, G.q); V.stop(); G.last = { ok: false, timeout: true };
-    doMiss(G.q, true).then(afterPitch);
+    doOut(G.q, true, false).then(afterPitch);
+  }
+
+  /* ---------- bonus questions (text only, never change the score, not coach answers) ---------- */
+  function choiceSet(ans, n, lo, hi) {
+    var c = [ans], d = 1; while (c.length < n && d < 30) { [ans + d, ans - d].forEach(function (v) { if (c.length < n && v >= lo && v <= hi && c.indexOf(v) < 0) c.push(v); }); d++; }
+    c.sort(function (a, b) { return a - b; }); return c;
+  }
+  function dots(n, cls) { var h = ''; for (var i = 0; i < n; i++) h += '<i class="rdot ' + (cls || '') + '"></i>'; return '<span class="rdots">' + h + '</span>'; }
+  function ask(bq) {
+    // bq: { text, pic, choices: [labels], answer, explain, kind }
+    return new Promise(function (res) {
+      G.phase = 'pitch'; G.bonusN++;
+      // the question is read like a pitch: one unclipped line (the browser voice says it) when "How much talking" allows prompts;
+      // otherwise the friend's bubble shows these words (A.Voice.say), replacing the last pitch's words
+      var spoken = String(bq.text).replace(/<[^>]*>/g, ' ').replace(/ = /g, ' is ').replace(/\s+/g, ' ').trim();
+      var q = G.q = { bonus: true, kind: bq.kind, text: bq.text, pic: bq.pic || '', answer: bq.answer, explain: bq.explain, choices: bq.choices.map(function (l) { return { label: String(l) }; }), say: [{ id: 'bbq_' + bq.kind, text: spoken }] };
+      $('#swingTag').innerHTML = '<small>' + (bq.tag || '⚾ Baseball question!') + '</small>'; $('#swingTag').className = 'swingtag on bonusq';
+      renderQuestion(q); document.body.classList.add('bonusing'); $('#sign').classList.remove('done');
+      G._bonusRes = res; G.accept = true; G.busy = false; G.voiceDone = false; G.qT0 = G.qShown = Date.now();
+      var fb = A.$('#friendBubble'); if (fb) fb.classList.remove('on');   // never leave the last pitch's words up
+      V.say(q.say, { kind: 'prompt' });
+    });
+  }
+  function bonusAnswer(i) {
+    var q = G.q, ok = i === q.answer; G.accept = false; G.busy = true;
+    lockCards(ok, i, q); (ok ? SFX.star : SFX.tap)();
+    G.bonusLog = G.bonusLog || []; G.bonusLog.push({ kind: q.kind, ok: ok });
+    $('#swingTag').innerHTML = ok ? '✅ Yes! ' + A.esc(q.explain || '') : '💡 ' + A.esc(q.explain || ('It was ' + q.choices[q.answer].label + '.'));
+    $('#swingTag').className = 'swingtag on bonusq ' + (ok ? 'yes' : 'hint');
+    var res = G._bonusRes; G._bonusRes = null;
+    if (A.Age.preReader(bat().P) && q.explain) V.say([{ id: 'bbq_explain', text: (ok ? 'Yes! ' : '') + String(q.explain).replace(/<[^>]*>/g, ' ') }], { kind: ok ? 'chatter' : 'answer' });   // design2: read the answer aloud too
+    G.bonusWait = ok ? A.Pace.ms('RESULT') : A.Pace.ms('HINT', q.explain || ''); return wait(G.bonusWait).then(function () {   // the beat: long enough to read the explanation
+ document.body.classList.remove('bonusing'); G.q = null; G.busy = false; $('#cards').innerHTML = ''; $('#qTxt').innerHTML = ''; $('#qPic').innerHTML = ''; if (res) res(ok); });
+  }
+  var BASEN = ['home', '1st', '2nd', '3rd', 'home'];
+  function whereChoices(from) { return [1, 2, 3, 4].filter(function (x) { return x !== from; }); }   // 1st / 2nd / 3rd / Home minus the runner's base
+  // a base-running question about the hit that just happened (before the runners move for "where", after for the others)
+  function runQuestion(z, plan, before, little) {
+    var n = nChoices(bat().P);
+    if (before) {   // "where does the runner end up?" — a runner on base, plain rule (no extra base)
+      var lead = -1; for (var b = 2; b >= 0; b--) if (G.bases[b]) { lead = b; break; }
+      // always 1st / 2nd / 3rd / Home minus the base the runner starts on (3 cards, so a runner on 3rd never gets a lone "Home")
+      var from = lead + 1, to = Math.min(4, from + z.bases), ch = whereChoices(from);
+      return ask({ kind: 'where', text: 'A runner is on ' + BASEN[from] + '. ' + z.name + ' = ' + z.bases + (z.bases === 1 ? ' base' : ' bases') + '! Where does the runner end up?', choices: ch.map(function (x) { return x === 4 ? 'Home 🏠' : BASEN[x]; }), answer: ch.indexOf(to), explain: BASEN[from] + ' + ' + z.bases + ' = ' + (to === 4 ? 'home: a run!' : BASEN[to] + ' base.'), tag: '🏃 Base-running question!' });
+    }
+    var onb = G.bases.filter(Boolean).length;
+    if (little || (plan.runs === 0 && Math.random() < .5)) {
+      var ans = little && plan.runs > 0 && Math.random() < .5 ? plan.runs : onb, isRuns = little && plan.runs > 0 && ans === plan.runs;
+      if (isRuns) return ask({ kind: 'runs', text: 'How many runs scored? Count the stars!', pic: dots(plan.runs, 'run'), choices: choiceSet(plan.runs, n, 0, 8), answer: choiceSet(plan.runs, n, 0, 8).indexOf(plan.runs), explain: plan.runs + (plan.runs === 1 ? ' run!' : ' runs!'), tag: '⭐ Count the runs!' });
+      return ask({ kind: 'onbase', text: 'How many runners are on base now?', pic: dots(onb, 'runner'), choices: choiceSet(onb, n, 0, 3), answer: choiceSet(onb, n, 0, 3).indexOf(onb), explain: onb + (onb === 1 ? ' runner' : ' runners') + ' on base.', tag: '🏃 Count the runners!' });
+    }
+    if (plan.runs > 0) { var cs = choiceSet(plan.runs, n, 0, 4); return ask({ kind: 'runs', text: 'How many runs scored on that ' + z.name.toLowerCase() + '?', choices: cs, answer: cs.indexOf(plan.runs), explain: plan.runs + (plan.runs === 1 ? ' run scored.' : ' runs scored.'), tag: '🏃 Base-running question!' }); }
+    var left = 4 - z.bases, cl = choiceSet(left, n, 1, 4);
+    return ask({ kind: 'left', text: 'You hit a ' + z.name.toLowerCase() + ' and stand on ' + BASEN[z.bases] + '. How many more bases to get home?', choices: cl, answer: cl.indexOf(left), explain: z.bases + ' + ' + left + ' = 4 bases all the way around.', tag: '🏃 Base-running question!' });
+  }
+  // once per inning, behind or tied: a scoreboard question at her level (age 4 and under: count the rival's runs as dots)
+  function scoreQuestion() {
+    if (!RIVALON || G.scoreQ[G.inning]) return Promise.resolve();
+    var me = totalRuns(PL[0]), them = totalRuns(RIV), n = nChoices(P1);
+    if (them < me || them === 0) return Promise.resolve();
+    G.scoreQ[G.inning] = 1;
+    var tag = '📋 Scoreboard question!';
+    if (A.Age.preReader(P1)) {   // design2: 5 and under: count the dots (no "runs to tie / to win" arithmetic)
+      if (them > 10) return Promise.resolve();
+      var c0 = choiceSet(them, n, 0, 12); return ask({ kind: 'count', text: 'How many runs do the Sprouts have? Count them!', pic: dots(them, 'riv'), choices: c0, answer: c0.indexOf(them), explain: 'The Sprouts have ' + them + '.', tag: tag });
+    }
+    if (them === me) { var add = A.rnd(1, 3), c1 = choiceSet(me + add, n, 0, 30); return ask({ kind: 'tied', text: "It's tied, " + me + ' to ' + them + '. If you score ' + add + (add === 1 ? ' run' : ' runs') + ', how many will you have?', choices: c1, answer: c1.indexOf(me + add), explain: me + ' + ' + add + ' = ' + (me + add) + '.', tag: tag }); }
+    var win = Math.random() < .5, need = them - me + (win ? 1 : 0), c2 = choiceSet(need, n, 1, 30);
+    return ask({ kind: win ? 'towin' : 'totie', text: 'Sprouts ' + them + ', you ' + me + '. How many runs to ' + (win ? 'win' : 'tie') + '?', choices: c2, answer: c2.indexOf(need), explain: win ? 'To tie you need ' + (them - me) + ', and 1 more to win: ' + need + '.' : me + ' + ' + need + ' = ' + them + '. A tie!', tag: tag });
   }
 
   /* ---------- outcomes ---------- */
   var HITLINE = { sg: 'bb_single', db: 'bb_double', tr: 'bb_triple', hr: 'bb_home_run' };
   var HITNAME = { sg: 'SINGLE!', db: 'DOUBLE!', tr: 'TRIPLE!', hr: 'HOME RUN!' };
-  function doHit(z, q) {
-    var pl = bat(); pl.hits++; if (z.k === 'hr') pl.homers++;
-    var loaded = G.bases.every(Boolean);
+  var FIELD = ['left field', 'center field', 'right field'];
+  function doHit(z, q, o) {
+    var pl = bat(); pl.hits++; if (z.k === 'hr') pl.homers++; G.hitN++;
+    var why = o ? [speedOf(o.sec, o.quick) >= 1 ? '⚡ Fast!' : '', o.diff >= .7 ? '🔥 Tricky!' : ''].filter(Boolean).join(' ') : '';
+    $('#swingTag').innerHTML = z.icon + ' ' + z.name + ' = ' + z.bases + (z.bases === 1 ? ' base' : ' bases') + '!' + (why ? ' <small>' + why + '</small>' : ''); $('#swingTag').className = 'swingtag on ' + z.k;
+    var loaded = G.bases.every(Boolean), anyOn = G.bases.some(Boolean);
+    // about 1 in 4 hits gets a base-running question ("where" needs a runner on base and no home run)
+    var pre = A.Age.preReader(pl.P);   // design2: 5 and under: no "where does the runner end up?", only count-the-dots questions
+    var bq = G.forceBonus != null ? G.forceBonus : (STORYB ? .2 : .25) > Math.random() ? (anyOn && z.k !== 'hr' && !pre && Math.random() < .5 ? 'where' : 'after') : null;
+    if (bq === 'where' && (!anyOn || z.k === 'hr' || pre)) bq = 'after';
     return throwPitch().then(function () {
       FX.crack(); swing(true);
-      var side = Math.random() < .5 ? -1 : 1, to, peak, ms, sc;
-      if (z.k === 'sg') { to = { x: 800 + side * A.pick([150, 260, 0]), y: 470 }; peak = 70; ms = 700; sc = .7; }
-      else if (z.k === 'db') { to = { x: 800 + side * 420, y: 418 }; peak = 260; ms = 900; sc = .55; }
-      else if (z.k === 'tr') { to = { x: 800 + side * 640, y: 380 }; peak = 320; ms = 1000; sc = .5; }
+      var dir = A.rnd(0, 2), side = dir - 1, to, peak, ms, sc;
+      if (z.k === 'sg') { var gr = Math.random() < .5; to = { x: 800 + side * A.pick([200, 300]), y: gr ? 480 : 455 }; peak = gr ? 20 : 90; ms = gr ? 650 : 720; sc = .7; }
+      else if (z.k === 'db') { to = { x: 800 + side * (side ? 470 : 0) + (side ? 0 : A.pick([-120, 120])), y: 400 }; peak = 260; ms = 900; sc = .55; }
+      else if (z.k === 'tr') { to = { x: 800 + (side || A.pick([-1, 1])) * 640, y: 375 }; peak = 320; ms = 1000; sc = .5; }
       else { to = { x: 800 + side * A.rnd(80, 420), y: 120 }; peak = 560; ms = 1300; sc = .3; }
       banner(HITNAME[z.k], 'hit ' + z.k, z.k === 'hr' ? 2600 : 1400);
-      var flight = fly(to, peak, ms, sc);
-      if (z.k !== 'hr') flight = flight.then(function () { // a fielder runs over and tosses it back in
-        var f = fielders[to.x < 700 ? 0 : to.x > 900 ? 2 : 1]; B.anim(f.firstChild, 'hop', 500);
-      });
-      var ad = advance(z.bases, z.k === 'hr' ? 560 : 380);
-      var voice = [HITLINE[z.k]];
-      if (z.k === 'hr' && loaded) voice = ['bb_grand_slam'];
-      if (q && q.listen && q.fact && q.fact.length) voice = q.fact.concat(voice);   // word-reading: say the word after a right answer
-      if (ad.runs === 1 && z.k !== 'hr') voice.push('bb_run_scores'); else if (ad.runs >= 2) voice.push(ad.runs, 'bb_runs_score');
-      var vp = sayWait(voice, 4500);
-      if (z.k === 'hr') { crowd(true, true); fireworks(6); M.charge(); UI.rain(40); A.Pad.rumble(G.half, 'big'); } else if (z.k !== 'sg' || ad.runs) crowd(true, false);
-      return Promise.all([flight, ad.done, vp]).then(function () { return wait(250); }).then(function () { G.strikes = 0; return endPA(); });
+      popText(z.k === 'hr' ? 'Over the wall!' : 'To ' + FIELD[to.x < 700 ? 0 : to.x > 900 ? 2 : 1] + '!', to.x, Math.max(200, to.y - 40), 'dir');
+      var flight = fly(to, peak, ms, sc, false, z.k);
+      if (z.k !== 'hr') flight = flight.then(function () { var f = fielders[to.x < 700 ? 0 : to.x > 900 ? 2 : 1]; B.anim(f.firstChild, 'hop', 500); });
+      var pre = bq === 'where' ? flight.then(function () { return runQuestion(z, null, true); }) : Promise.resolve();
+      return pre.then(function () {
+        var ad = advance(z.bases, z.k === 'hr' ? 560 : 380, bq === 'where' ? { extra: false } : null);
+        var voice = [HITLINE[z.k]];
+        if (z.k === 'hr' && loaded) voice = ['bb_grand_slam'];
+        if (ad.runs === 1 && z.k !== 'hr') voice.push('bb_run_scores'); else if (ad.runs >= 2) voice.push(ad.runs, 'bb_runs_score');
+        var vp = bq === 'where' ? Promise.resolve() : sayWaitMix([[q && q.listen && q.fact ? q.fact : [], 'listen'], [voice, 'chatter']], 4500, { bubble: false });
+        if (z.k === 'hr') { crowd(true, true); fireworks(6); M.charge(); UI.rain(40); A.Pad.rumble(G.half, 'big'); } else if (z.k !== 'sg' || ad.runs) crowd(true, false);
+        return Promise.all([flight, ad.done, vp]).then(function () { return wait(250); }).then(function () {
+          if (bq === 'after' && !G.over) return runQuestion(z, ad.plan, false, pre);
+        });
+      }).then(function () { return endPA(); });
     });
   }
-  function doMiss(q, isTimeout, whiff) {
-    var pl = bat(); G.strikes++;
-    var out = G.strikes >= 3, caught = out && Math.random() < .5;
+  function doWalk() {
+    var pl = bat(); G.walks = (G.walks || 0) + 1; pl.walks = (pl.walks || 0) + 1;
+    banner('BALL FOUR!', 'hit walk', 1500);
+    $('#swingTag').innerHTML = '🚶 A walk! The pitch was too wide. Take your base!'; $('#swingTag').className = 'swingtag on walk';
     return throwPitch().then(function () {
-      if (caught) { // a pop fly: up, up… and the friendly fielder catches it
-        FX.crack(); swing(true); var f = fielders[A.rnd(0, 2)], fp = { x: f._x, y: f._y - 60 };
-        banner('CAUGHT!', 'out', 1500);
-        return fly({ x: fp.x, y: f._y }, 520, 1200, .45, true).then(function () { hideBall(); FX.mitt(); B.anim(f.firstChild, 'jump', 600); });
-      }
-      swing(false); if (whiff) { B.anim(batter.firstChild, 'whiff', 800); FX.whoosh(); }
-      return tween(220, function (t) { ballAt(lerp(790, 812, t), lerp(666, 760, t), lerp(1.15, 1.3, t), 1 - t); }).then(function () { FX.mitt(); hideBall(); banner(whiff && !out ? 'BIG WHIFF!' : out ? 'STRIKE THREE!' : 'STRIKE ' + G.strikes + '!', 'strike', 1300); });
+      return tween(260, function (t) { ballAt(lerp(790, 690, t), lerp(666, 720, t), 1.15, 1 - t); });
+    }).then(function () { hideBall(); var ad = advance(1, 420, { walk: true }); if (ad.runs) crowd(true, false); return ad.done; }).then(function () { return wait(500); }).then(endPA);
+  }
+  // an out: wrong answer (pop-up / foul tip / grounder) or a right answer hit softly and caught (a long fly ball)
+  var OUTKIND = ['pop', 'foul', 'ground'];
+  function doOut(q, isTimeout, rightCaught) {
+    var pl = bat(), kind = rightCaught ? 'deep' : isTimeout ? 'k' : A.pick(OUTKIND);
+    G.outs++; pl.outs++; G.lastOut = kind;
+    var f = fielders[A.rnd(0, 2)];
+    return throwPitch().then(function () {
+      if (kind === 'k') { swing(false); return tween(220, function (t) { ballAt(lerp(790, 812, t), lerp(666, 760, t), lerp(1.15, 1.3, t), 1 - t); }).then(function () { FX.mitt(); hideBall(); banner('STRIKE!', 'strike', 1300); }); }
+      FX.crack(); swing(true);
+      if (kind === 'deep') { banner('WHAT A CATCH!', 'out', 1600); B.anim(f.firstChild, 'hop', 400); return fly({ x: f._x, y: f._y - 20 }, 380, 1200, .45, true).then(function () { hideBall(); FX.mitt(); B.anim(f.firstChild, 'jump', 600); crowd(true, false); }); }
+      if (kind === 'pop') { var inf = { x: A.pick([700, 900]), y: 600 }; banner('POP-UP… CAUGHT!', 'out', 1500); return fly(inf, 560, 1200, .7, true).then(function () { hideBall(); FX.mitt(); B.anim(pitcher.firstChild, 'jump', 600); }); }
+      if (kind === 'foul') { banner('FOUL TIP… CAUGHT!', 'out', 1500); return tween(500, function (t) { ballAt(lerp(790, 760, t), lerp(660, 560, t) - Math.sin(t * Math.PI) * 140, lerp(1.1, 1.4, t)); }).then(function () { hideBall(); FX.mitt(); }); }
+      banner('GROUNDER… OUT!', 'out', 1500); return tween(600, function (t) { ballAt(lerp(790, MOUND.x + 20, t), lerp(690, MOUND.y + 10, t) - Math.abs(Math.sin(t * Math.PI * 3)) * 18 * (1 - t), lerp(1.1, .8, t)); }).then(function () { hideBall(); FX.mitt(); B.anim(pitcher.firstChild, 'hop', 500); });
     }).then(function () {
-      FX.aww(); B.anim(batter.firstChild, 'wobble', 600);
-      var voice = isTimeout ? ['bb_time_strike'] : [out ? (caught ? 'bb_caught' : 'bb_strike_three') : whiff ? 'bb_big_whiff' : G.strikes === 2 ? 'bb_strike_two' : 'bb_strike'];
-      voice = voice.concat(q.fact || []);
+      FX.aww(); B.anim(batter.firstChild, rightCaught ? 'jump' : 'wobble', 600);
+      var outTxt = 'Out ' + G.outs + (G.outs >= maxOuts() ? '' : ' of ' + maxOuts());
+      var right = q && !q.bonus && q.choices && q.choices[q.answer] ? q.choices[q.answer].label : '';
+      $('#swingTag').innerHTML = rightCaught ? '🧤 Right answer! It flew far, but the fielder caught it. <small>' + outTxt + '</small>' : isTimeout ? '⏱ Time ran out. <small>' + outTxt + '</small>' : '🙂 Nice try!' + (right ? ' It was <b>' + A.esc(right) + '</b>.' : '') + ' <small>' + outTxt + '</small>';
+      $('#swingTag').className = 'swingtag on outtag';
+      var voice = isTimeout ? ['bb_time_strike'] : ['bb_caught'];
       renderBoard();
-      return sayWait(voice, 6500).then(function () { return wait(350); });
+      return sayWaitMix([[voice, 'chatter'], [rightCaught ? [] : (q && q.fact) || [], q && q.listen ? 'listen' : 'answer']], 6500).then(function () { return wait(rightCaught ? 900 : 650); });
     }).then(function () {
-      if (!out) return 'again';
-      G.outs++; pl.outs++; G.strikes = 0; renderBoard();
       return tween(420, function (t) { batter.setAttribute('opacity', 1 - t); place(batter, lerp(712, 600, t), 720 + 30 * t); }).then(endPA);
     });
   }
-  function endPA() { G.pa++; renderBoard(); A.Store.save(); return G.outs >= 3 || G.pa >= bat().cap ? 'half' : 'next'; }
+  function endPA() {
+    G.pa++; renderBoard(); A.Store.save();
+    if (G.walkoffOn && totalRuns(PL[0]) > totalRuns(RIV)) { G.walkoff = true; return 'half'; }
+    return G.outs >= maxOuts() || G.halfRuns >= mercy() ? 'half' : 'next';
+  }
   function afterPitch(what) {
     if (G.over) return;
-    if (what === 'again') return pickSwing();
-    if (what === 'next') return newBatter(true).then(pickSwing);
+    if (STORYB && totalRuns(PL[0]) >= SC.goal) return endStory();   // story goal reached: the stop is cleared right away
+    if (what === 'next') return newBatter(true).then(nextPitch);
     return endHalf();
   }
 
   /* ---------- innings ---------- */
-  function startHalf() {
-    var pl = bat(); G.outs = 0; G.strikes = 0; G.pa = 0;
-    pl.round = C.pickRound(pl.P); pl.hr = 0; pl.hw = 0; pl.t0 = Date.now();
-    if (pl.runsBy[G.inning - 1] == null) pl.runsBy[G.inning - 1] = 0;
-    renderTurn(); renderBoard();
-    clearBases(); hideBall();
+  // the rival's top half: simulated with the same rules, shown as a quick count-up on the scoreboard (no questions)
+  function rivalHalf() {
+    G.top = true; G.outs = 0; RIV.runsBy[G.inning - 1] = 0; renderBoard(); clearBases(); hideBall();
     $('#qTxt').innerHTML = ''; $('#qPic').innerHTML = ''; $('#cards').innerHTML = '';
-    var last = G.inning === INNINGS && (!TWO || G.half === 0);
-    banner((last ? 'Last inning!' : 'Inning ' + G.inning) + (TWO ? '<small>' + A.esc(pl.name) + ' up to bat</small>' : ''), 'inning', 2000);
-    var voice = last && !TWO ? ['bb_last_inning'] : ['bb_inning', G.inning];
-    if (TWO || G.inning === 1) voice = voice.concat(['bb_batter_up', nameParts(pl.P)]);
-    if (G.inning === 1 && G.half === 0 && !G.tipped) { G.tipped = true; voice.push('bb_swing_tip'); }
-    if (G.inning === 1 || TWO) M.charge();
-    return Promise.all([newBatter(true), sayWait(voice, 7000)]).then(function () { return wait(200); }).then(pickSwing);
+    var sim = G.forceRival != null ? { runs: G.forceRival, hits: G.forceRival, events: [] } : R.simHalf({ acc: R.rivalAcc(LITTLE, A.Age.of(P1)), little: LITTLE });
+    RIV.hits += sim.hits;
+    banner('Inning ' + G.inning + '<small>' + RIV.icon + ' ' + A.esc(RIV.name) + ' at bat</small>', 'inning rivalb', 1800);
+    $('#swingTag').innerHTML = RIV.icon + ' The ' + A.esc(RIV.name) + ' are batting…'; $('#swingTag').className = 'swingtag on rival';
+    var chain = wait(1500);
+    for (var k = 0; k < sim.runs; k++) chain = chain.then(function () { RIV.runsBy[G.inning - 1]++; renderBoard(); SFX.tap(); popText('+1 Sprouts', HOME.x, HOME.y - 120, 'run riv'); B.anim(fielders[A.rnd(0, 2)].firstChild, 'hop', 400); return wait(420); });
+    return chain.then(function () {
+      var r = sim.runs;
+      $('#swingTag').innerHTML = RIV.icon + ' The ' + A.esc(RIV.name) + (r === 0 ? ' got no runs. Your turn!' : ' scored ' + r + (r === 1 ? ' run' : ' runs') + '. Your turn to bat!');
+      return wait(1400);
+    }).then(function () { G.top = false; });
+  }
+  function startHalf() {
+    var pl = bat(); G.outs = 0; G.strikes = 0; G.pa = 0; G.halfRuns = 0; G.walkoffOn = false;
+    var pre = RIVALON && G.half === 0 ? rivalHalf() : Promise.resolve();
+    return pre.then(function () {
+      pl.round = STORYB ? { skill: C.byId[SC.skill], level: SC.level, story: true, review: false } : C.pickRound(pl.P); pl.hr = 0; pl.hw = 0; pl.t0 = Date.now();
+      if (pl.runsBy[G.inning - 1] == null) pl.runsBy[G.inning - 1] = 0;
+      G.walkoffOn = RIVALON && G.inning === INNINGS && totalRuns(PL[0]) <= totalRuns(RIV);
+      renderTurn(); renderBoard();
+      clearBases(); hideBall();
+      $('#qTxt').innerHTML = ''; $('#qPic').innerHTML = ''; $('#cards').innerHTML = ''; $('#swingTag').innerHTML = ''; $('#swingTag').className = 'swingtag';
+      var last = G.inning === INNINGS && (!TWO || G.half === 0);
+      banner((last ? 'Last inning!' : 'Inning ' + G.inning) + (TWO ? '<small>' + A.esc(pl.name) + ' up to bat</small>' : RIVALON ? '<small>' + A.esc(pl.name) + ' at bat</small>' : ''), 'inning', 2000);
+      var voice = last && !TWO ? ['bb_last_inning'] : ['bb_inning', G.inning];
+      if (TWO || G.inning === 1) voice = voice.concat(['bb_batter_up', nameParts(pl.P)]);
+      if (G.inning === 1 || TWO) M.charge();
+      return Promise.all([newBatter(true), sayWait(voice, 7000)]).then(function () { return wait(200); }).then(scoreQuestion).then(nextPitch);
+    });
   }
   function endHalf() {
-    var pl = bat(), threeOuts = G.outs >= 3;
+    var pl = bat(), threeOuts = G.outs >= maxOuts();
     $('#cards').innerHTML = ''; $('#qTxt').innerHTML = ''; $('#qPic').innerHTML = '';
-    var ms = Date.now() - pl.t0, out = pl.hr + pl.hw ? C.finishRound(pl.P, pl.round, { correct: pl.hr, wrong: pl.hw, ms: ms }) : { say: [], events: {} };
+    var ms = Date.now() - pl.t0, out = !STORYB && pl.hr + pl.hw ? C.finishRound(pl.P, pl.round, { correct: pl.hr, wrong: pl.hw, ms: ms }) : { say: [], events: {} };
     if (!pl.P.guest) A.Store.addTime(pl.P, 'baseball', ms);
     A.Store.save();
-    banner(threeOuts ? 'THREE OUTS!' : 'INNING OVER', 'inning', 1700);
+    banner(G.walkoff ? 'WALK-OFF WIN!' : threeOuts ? (maxOuts() === 3 ? 'THREE OUTS!' : 'FOUR OUTS!') : G.halfRuns >= mercy() ? 'WHAT AN INNING!<small>' + mercy() + ' runs, switch sides</small>' : 'INNING OVER', 'inning', 1700);
     var line = threeOuts ? (TWO ? 'bb_three_outs' : 'bb_three_outs_next') : 'bb_inning_over';
-    var lastHalf = G.inning === INNINGS && (!TWO || G.half === 1);
-    if (lastHalf) line = threeOuts ? 'bb_out' : 'bb_inning_over';
+    var lastHalf = G.walkoff || (G.inning === INNINGS && (!TWO || G.half === 1));
+    if (lastHalf) line = 'bb_inning_over';
+    if (G.walkoff) { crowd(true, true); fireworks(4); }
     var chain = sayWait([line], 4000).then(function () { return wait(300); });
-    // new skill reached? show the shared "New skill!" card between innings (same mastery data as Mochi Munch)
     if (!pl.P.guest && out.events.newSkill) chain = chain.then(function () { return A.Rewards.celebrate(pl.P, [{ kind: 'skill', id: out.events.newSkill }], TWO ? pl.name : null); });
     else if (out.events.levelUp) chain = chain.then(function () { UI.toast((TWO ? pl.name + ': ' : '') + 'Level up! The next ones are a little trickier.'); });
     return chain.then(function () {
-      if (lastHalf) return endGame();
+      if (lastHalf) return STORYB ? endStory() : endGame();
       if (TWO && G.half === 0) G.half = 1; else { G.half = 0; G.inning++; }
       return startHalf();
     });
   }
 
   /* ---------- game over ---------- */
-  function starsFor(pl) {
-    var acc = pl.right + pl.wrong ? pl.right / (pl.right + pl.wrong) : 1, goal = pl.cap;
-    var big = ((pl.sw.tr || {}).ok || 0) + ((pl.sw.hr || {}).ok || 0);   // a kind nudge: one big hit also earns the third star
-    return 1 + (acc >= .7 ? 1 : 0) + (totalRuns(pl) >= goal || big > 0 ? 1 : 0);
-  }
+  // stars (R.stars): 1 for playing, +1 for a win, +1 more for a win that also reaches the run goal with 2+ right stretch
+  // pitches. In 2 players "win" = more runs than the other player (a tie counts for both). The hit dice never decide stars.
+  function wonBy(pl) { var other = RIVALON ? RIV : TWO ? PL[1 - pl.i] : null; return other ? totalRuns(pl) > totalRuns(other) || (TWO && totalRuns(pl) === totalRuns(other)) : true; }
+  function starsFor(pl) { return R.stars({ won: wonBy(pl), runs: totalRuns(pl), goal: R.runGoal(A.Age.little(pl.P), A.Age.of(pl.P)), tricky: pl.tricky }); }
   function endGame() {
     G.over = true; clearInterval(G.timer); renderBoard(); clearBases();
     var res = PL.map(function (pl) {
@@ -563,7 +723,8 @@
         A.Store.earnStars(P, st, 'baseball'); x.games++; x.runs += runs; x.hits += pl.hits; x.homers += pl.homers; x.outs += pl.outs; x.pitches += pl.pitches; x.right += pl.right;
         x.swings = x.swings || {}; Object.keys(pl.sw).forEach(function (k) { var a = x.swings[k] || (x.swings[k] = { n: 0, ok: 0 }); a.n += pl.sw[k].n; a.ok += pl.sw[k].ok; });
         if (newBest) { x.best = runs; x.bestAt = Date.now(); }
-        x.last = { at: Date.now(), runs: runs, hits: pl.hits, homers: pl.homers, byInning: pl.runsBy.slice(), right: pl.right, wrong: pl.wrong, swings: pl.sw, two: TWO, vs: TWO ? PL[1 - pl.i].name : null };
+        if (RIVALON) { x.vsGames = (x.vsGames || 0) + 1; if (runs > totalRuns(RIV)) x.vsWins = (x.vsWins || 0) + 1; }
+        x.last = { at: Date.now(), runs: runs, them: RIVALON ? totalRuns(RIV) : null, hits: pl.hits, homers: pl.homers, byInning: pl.runsBy.slice(), right: pl.right, wrong: pl.wrong, swings: pl.sw, tricky: pl.tricky, two: TWO, vs: TWO ? PL[1 - pl.i].name : null };
         if (TWO) x.twoGames++;
         A.Store.markPlayed(P);
       }
@@ -573,23 +734,26 @@
     if (TWO) { winner = res[0].runs > res[1].runs ? 0 : res[1].runs > res[0].runs ? 1 : null; if (winner != null && !PL[winner].P.guest) bb(PL[winner].P).twoWins++; }
     var rewards = res.map(function (r) { return r.pl.P.guest ? [] : A.Rewards.check(r.pl.P); });
     A.Store.save(); $('#starCount').textContent = P1.stars;
-    M.jingle(); crowd(true, true); fireworks(5);
-    var title, voice, sub;
+    var them = RIVALON ? totalRuns(RIV) : 0, soloRes = RIVALON ? (res[0].runs > them ? 'win' : res[0].runs === them ? 'tie' : 'loss') : null;
+    if (soloRes !== 'loss') { M.jingle(); crowd(true, true); fireworks(soloRes === 'win' || !RIVALON ? 5 : 2); } else crowd(true, false);
+    var title, voice, sub, btn = 'Play again ▶';
     if (!TWO) {
-      var r0 = res[0]; title = r0.runs + (r0.runs === 1 ? ' run!' : ' runs!');
+      var r0 = res[0];
+      if (soloRes === 'win') { title = 'You win! ' + r0.runs + ' to ' + them; sub = (G.walkoff ? 'A walk-off win! ' : '') + (r0.newBest ? 'And a new high score!' : 'Great game, ' + P1.name + '!'); }
+      else if (soloRes === 'tie') { title = 'Tie game! ' + r0.runs + ' to ' + them; sub = 'So close! The Sprout Squad says: rematch?'; btn = 'Rematch ▶'; }
+      else { title = 'Good game! ' + r0.runs + ' to ' + them; sub = 'The Sprout Squad won this time. Rematch?'; btn = 'Rematch ▶'; }
       voice = ['bb_you_scored', r0.runs, r0.runs === 1 ? 'bb_run' : 'bb_runs'].concat(r0.newBest ? ['bb_new_high'] : ['bb_good_game']);
-      sub = r0.newBest ? 'A new high score!' : 'Good game, ' + P1.name + '!';
     } else if (winner != null) { title = PL[winner].name + ' wins!'; voice = [nameParts(PL[winner].P), 'bb_wins_game', 'bb_good_game']; sub = 'Great batting, both of you!'; }
     else { title = 'Tie game!'; voice = ['bb_tie_game']; sub = 'You both did great!'; }
-    var html = '<div class="final">' + $('#sboard').innerHTML + '</div><div class="fcols">' + res.map(function (r, k) {
+    var html = '<div class="final">' + $('#sboard').innerHTML + '</div>' + (RIVALON ? '<p class="vsline">' + A.esc(P1.name) + ' <b>' + res[0].runs + '</b> · ' + RIV.icon + ' ' + A.esc(RIV.name) + ' <b>' + them + '</b></p>' : '') + '<div class="fcols">' + res.map(function (r, k) {
       return '<div class="fcol' + (winner === k ? ' win' : '') + '" style="--pc:' + r.pl.col.c + '"><div class="fa dance">' + blobOf(r.pl) + '</div>' + (winner === k ? '<span class="crownb">🏆</span>' : '') +
         '<div class="fi"><b>' + A.esc(r.pl.name) + '</b><span>' + r.runs + ' runs · ' + r.pl.hits + ' hits' + (r.pl.homers ? ' · ' + r.pl.homers + ' HR' : '') + '</span>' +
         '<span class="stars">' + [0, 1, 2].map(function (i) { return '<svg viewBox="0 0 24 24" class="' + (i < r.stars ? 'got' : '') + '" style="animation-delay:' + (.3 + i * .35 + k * .9) + 's"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg>'; }).join('') + '</span>' + (r.newBest ? '<span class="nb">New best!</span>' : '') + '</div></div>';
     }).join('') + '</div><h4>🏆 Family high scores</h4>' + boardHTML(PL.map(function (p) { return p.P.id; }));
     for (var s1 = 0; s1 < res[0].stars + (res[1] ? res[1].stars : 0); s1++) setTimeout(SFX.star, 400 + s1 * 300);
-    G.result = { res: res.map(function (r) { return { name: r.pl.name, runs: r.runs, stars: r.stars, newBest: r.newBest }; }), winner: winner };
+    G.result = { res: res.map(function (r) { return { name: r.pl.name, runs: r.runs, stars: r.stars, newBest: r.newBest }; }), winner: winner, them: RIVALON ? them : null, outcome: soloRes, walkoff: G.walkoff };
     return wait(1200).then(function () {
-      return UI.card({ tag: 'Final score', title: title, html: html, sub: sub, btn: 'Play again ▶', voice: voice, cls: 'celebrate bbend', confetti: true, minMs: 900 });
+      return UI.card({ tag: 'Final score', title: title, html: html, sub: sub, btn: btn, voice: voice, cls: 'celebrate bbend' + (soloRes ? ' ' + soloRes : ''), confetti: soloRes !== 'loss', sfx: soloRes === 'loss' ? 'soft' : undefined, minMs: 900 });
     }).then(function () {
       var chain = Promise.resolve();
       res.forEach(function (r, k) { chain = chain.then(function () { return A.Rewards.celebrate(r.pl.P, rewards[k], TWO ? r.pl.name : null); }); });
@@ -597,20 +761,50 @@
     }).then(function () { return A.PlayTime ? A.PlayTime.checkpoint().then(function (ok) { if (!ok) return new Promise(function () {}); }) : null; }).then(function () { location.reload(); });   // play-time limit: only after the game's end card
   }
 
+  /* ---------- story stop: result -> Story.record (same as a Munch stop) -> back to the map ---------- */
+  function endStory() {
+    if (G.over) return; G.over = true; clearInterval(G.timer); renderBoard(); clearBases();
+    var pl = PL[0], P = P1, st = ST.STOPS[SI], ms = Math.min(Date.now() - G.t0, 15 * 60000), fin = totalRuns(pl) >= SC.goal, frac = Math.min(1, totalRuns(pl) / SC.goal);
+    var R0 = ST.run(P), practice = !st.side && (R0.done || SI !== R0.stop), runBefore = R0.score;
+    // stars like a Munch stop: cleared = 3 (no misses) / 2 (1-2 misses) / 1; not cleared = 2 if close, else 1
+    var stars = fin ? (pl.wrong <= 1 ? 3 : pl.wrong <= 3 ? 2 : 1) : (frac >= .75 && pl.wrong <= 1 ? 2 : 1);
+    // score on the same scale as a Munch stop: the goal counts as the stop's snacks (6-7), so a Slugger stop is worth about the same
+    var out = ST.record(P, SI, { correct: Math.round(SC.nOk * frac), wrong: pl.wrong, finished: fin, frac: frac, gaveUp: false, secsLeft: 0, timerOn: false, stars: stars });
+    var x = bb(P); x.storyGames = (x.storyGames || 0) + 1; x.hits += pl.hits; x.homers += pl.homers; x.runs += totalRuns(pl); x.outs += pl.outs; x.pitches += pl.pitches; x.right += pl.right;
+    A.Store.addTime(P, 'baseball', ms); A.Store.markPlayed(P);
+    A.Store.earnStars(P, stars, 'story'); var rewards = A.Rewards.check(P); A.Store.save(); $('#starCount').textContent = P.stars;
+    if (out.passed) { M.jingle(); crowd(true, true); }
+    var R = ST.run(P), pts = out.pts, next = out.runAdded ? Math.min(SI + 1, ST.mainCount() - 1) : out.sideNext != null ? out.sideNext : SI;
+    G.result = { story: true, stop: SI, passed: out.passed, hits: pl.hits, runs: totalRuns(pl), goal: SC.goal, stars: stars, pts: pts.total, next: next, out: out };
+    var rows = [['⚾ Runs', pts.snacks], ['🎯 Accuracy', pts.accuracy], ['🏟️ Game bonus', pts.time], ['✨ Perfect', pts.perfect]].filter(function (r) { return r[1] > 0 || r[0].indexOf('Runs') >= 0; });
+    var html = '<p class="chgoal">' + A.esc(SC.goalText) + ': <b>' + Math.min(totalRuns(pl), SC.goal) + '</b> of ' + SC.goal + ' · ' + pl.hits + (pl.hits === 1 ? ' hit' : ' hits') + '</p>' +
+      '<div class="stars">' + [0, 1, 2].map(function (i) { return '<span>' + UI.STAR.replace('<svg', '<svg class="' + (i < stars ? 'got' : '') + '" style="animation-delay:' + (.3 + i * .3).toFixed(2) + 's"') + '</span>'; }).join('') + '</div>' +
+      '<div class="score"><table>' + rows.map(function (r) { return '<tr><td>' + r[0] + '</td><td class="v">' + r[1] + '</td></tr>'; }).join('') + '<tr class="tot"><td>Stop score</td><td class="v" data-v="' + pts.total + '">' + pts.total + '</td></tr></table>' +
+      (out.runAdded ? '<div class="journey">Journey score <b>' + R.score + '</b> <small>(+' + (R.score - runBefore) + ')</small></div>' : practice ? '<div class="journey soft">Practice round · best here ' + (ST.stopInfo(P, SI) || {}).best + '</div>' : '') +
+      (out.newBestRun ? '<div class="newbest">🏆 New high score!</div>' : out.newBestStop ? '<div class="newbest">🏅 New best for this stop!</div>' : '') + '</div>';
+    for (var s1 = 0; s1 < stars; s1++) setTimeout(SFX.star, 400 + s1 * 300);
+    var voice = out.passed ? ['fb_hooray', 'fb_you_got', stars, stars === 1 ? 'fb_star' : 'fb_stars'] : ['story_try_again'];   // existing lines only
+    return wait(900).then(function () {
+      return UI.card({ tag: st.area.emoji + (st.side ? ' ' + C.byId[SC.skill].name : ' Stop ' + st.n) + ' · ' + st.area.name, title: out.passed ? 'Stop cleared!' : 'So close!', html: html,
+        art: '<div class="' + (out.passed ? 'dance' : '') + '">' + blobOf(pl, { expr: out.passed ? 'happy' : 'sad' }) + '</div>', sub: out.passed ? '' : 'Try again! ' + SC.goalText + '.',
+        btn: out.passed ? 'Map ▶' : 'Try again ▶', sfx: out.passed ? 'win' : 'soft', confetti: out.passed, voice: voice, cls: 'celebrate storyres bbstory' + (out.passed ? '' : ' tryagain'), minMs: 900 });
+    }).then(function () { return A.Rewards.celebrate(P, rewards); })
+      .then(function () { return A.PlayTime ? A.PlayTime.checkpoint().then(function (ok) { if (!ok) return new Promise(function () {}); }) : null; })
+      .then(function () {
+        M.stop(); G.left = out.passed ? 'map' : 'retry';
+        if (window.__noNav) return;
+        if (!out.passed) { location.reload(); return; }   // "Try again": the same stop (a helper stop after two misses)
+        location.href = MAPURL + '&from=' + SI + '&to=' + next;
+      });
+  }
+
   /* ---------- input ---------- */
   document.addEventListener('keydown', function (e) {
     if (UI.cardOpen || A.Parent.isOpen() || A.$('#gate') || A.$('.overlay.on')) return;
     var k = e.key;
     if (k === 'm' || k === 'M') { M.toggle(); musicBtn(); return; }
-    if (k === 'r' || k === 'R') { if (G.phase === 'swing') V.say(['bb_pick_swing']); else if (G.q) V.say(G.q.say); return; }
-    if (k === 'Escape') { e.preventDefault(); UI.confirm({ title: 'Stop this game?', sub: 'You can play again any time.', yes: 'Stop', no: 'Keep playing' }).then(function (y) { if (y) { V.stop(); M.stop(); location.href = 'index.html'; } }); return; }
-    if (G.phase === 'swing' && !G.busy) {
-      if (/^[1-4]$/.test(k)) { e.preventDefault(); G.swSel = +k - 1; markSwing(false); chooseSwing(G.swSel, 'key'); return; }
-      if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'a' || k === 'A' || k === 'w' || k === 'W') { e.preventDefault(); G.swSel = (G.swSel + 3) % 4; markSwing(true); SFX.step(); return; }
-      if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'd' || k === 'D' || k === 's' || k === 'S') { e.preventDefault(); G.swSel = (G.swSel + 1) % 4; markSwing(true); SFX.step(); return; }
-      if (k === ' ' || k === 'Enter' || k === 'f' || k === 'F') { e.preventDefault(); if (!e.repeat) chooseSwing(G.swSel, 'key'); }
-      return;
-    }
+    if (k === 'r' || k === 'R') { if (G.q) V.say(G.q.say, { kind: 'tap' }); return; }
+    if (k === 'Escape') { e.preventDefault(); UI.confirm({ title: 'Stop this game?', sub: 'You can play again any time.', yes: 'Stop', no: 'Keep playing' }).then(function (y) { if (y) { V.stop(); M.stop(); location.href = STORYB ? MAPURL : 'index.html'; } }); return; }
     if (!G.q || !G.accept) { if (k === ' ' || k === 'Enter') e.preventDefault(); return; }
     var n = G.q.choices.length;
     if (/^[1-4]$/.test(k) && +k <= n) { e.preventDefault(); G.sel = +k - 1; markSel(); answer(G.sel, 'key'); return; }
@@ -620,8 +814,8 @@
   });
   function musicBtn() { var b = $('#musicBtn'); b.classList.toggle('off', S.music === false); b.setAttribute('aria-label', S.music === false ? 'Music is off (M)' : 'Music is on (M)'); }
   $('#musicBtn').addEventListener('click', function () { M.toggle(); musicBtn(); });
-  $('#speakBtn').addEventListener('click', function () { if (G.q) V.say(G.q.say); });
-  $('#homeBtn').addEventListener('click', function () { V.stop(); M.stop(); SFX.tap(); A.Store.save(); location.href = A.ROOT + 'index.html#games'; });
+  $('#speakBtn').addEventListener('click', function () { if (G.q) V.say(G.q.say, { kind: 'tap' }); });
+  $('#homeBtn').addEventListener('click', function () { V.stop(); M.stop(); SFX.tap(); A.Store.save(); location.href = STORYB ? MAPURL : A.ROOT + 'index.html#games'; });
   UI.gear({ onClose: function () { musicBtn(); M.apply(); } });
   musicBtn();
 
@@ -636,15 +830,26 @@
   renderTurn(); renderBoard(); newBatter(false);
   M.play('ballpark');
   window.__bb = {
-    G: G, PL: PL, two: TWO, SWINGS: SWINGS, chooseSwing: function (i) { G.swSel = i; markSwing(false); return chooseSwing(i, 'test'); },
-    swingReady: function () { return G.phase === 'swing' && !G.busy && !G.over && !UI.cardOpen; },
+    G: G, PL: PL, two: TWO, HITS: HITS, hitOdds: hitOdds, rollHit: rollHit, speedOf: speedOf, diffOf: diffOf, quickSec: quickSec,
+    swingReady: function () { return false; },   // there is no swing picker any more (ux3b); kept so older tests' helpers still run
     answer: answer, right: function () { return G.q ? G.q.answer : -1; }, wrongIdx: function () { return G.q ? (G.q.answer + 1) % G.q.choices.length : -1; },
     setElapsed: function (sec) { G.voiceDone = true; G.qT0 = Date.now() - sec * 1000; },
     ready: function () { return !!(G.phase === 'pitch' && G.q && G.accept && !G.busy); },
     set speed(v) { SPEED = v; }, get speed() { return SPEED; },
-    total: totalRuns, endGame: endGame, bases: function () { return G.bases.map(Boolean); }
+    total: totalRuns, endGame: endGame, R: R, RIV: RIV, rival: RIVALON, maxOuts: maxOuts, mercy: mercy, isBonus: function () { return !!(G.q && G.q.bonus); }, whereChoices: function (from) { return whereChoices(from).map(function (x) { return x === 4 ? 'Home 🏠' : BASEN[x]; }); }, story: STORYB ? { stop: SI, cfg: SC, end: endStory } : null, bases: function () { return G.bases.map(Boolean); }
   };
+  if (STORYB) {
+    document.body.classList.add('story');
+    var sst = ST.STOPS[SI], ssk = C.byId[SC.skill];
+    wait(400).then(function () { return UI.card({ tag: sst.area.emoji + (sst.side ? ' ' + ssk.name : ' Stop ' + sst.n) + ' · ' + sst.area.name, title: A.TITLES.baseball, art: '<div class="dance">' + blobOf(PL[0]) + '</div>',
+      html: '<p class="howto"><b class="sgoalbig">🎯 ' + A.esc(SC.goalText) + '!</b><br>Answer the pitch to swing. Right answers are hits, misses are outs. ' + (SC.outs || R.outsFor(LITTLE)) + ' outs and the inning is over.</p><p class="small">' + A.esc(ssk.name) + ' · ' + A.esc(ssk.levels[SC.level]) + (SC.helper ? ' · a little easier' : '') + '</p>',
+      sub: SC.innings === 1 ? 'One big inning' : SC.innings + ' short innings', btn: 'Play ball! ▶', voice: ['bb_title'], cls: 'bbintro bbstory', minMs: 500 }); }).then(startHalf);
+  } else
   wait(400).then(function () { return UI.card({ tag: TWO ? PL[0].name + ' vs ' + PL[1].name : 'Batter up!', title: A.TITLES.baseball, art: '<div class="dance">' + blobOf(PL[0]) + '</div>',
-    html: '<p class="howto">Pick your swing, then answer the pitch!<br><span class="zchip sg">⚾ single · easy</span> <span class="zchip db">⚾⚾ double</span> <span class="zchip tr">🔥 triple · tricky</span> <span class="zchip hr">💥 home run · challenge</span><br>Get it right and you hit it!</p>' + (TWO && (A.Pad.seats()[0] || A.Pad.seats()[1]) ? '<p class="small">' + A.esc(PL[0].name) + ': ' + A.Pad.label(0, '⌨ keyboard') + ' · ' + A.esc(PL[1].name) + ': ' + A.Pad.label(1, '⌨ keyboard') + '</p>' : ''),
-    sub: INNINGS + ' innings · 3 outs or ' + PL[0].cap + ' batters each inning', btn: 'Play ball! ▶', voice: ['bb_title', 'bb_intro_howto'], cls: 'bbintro', minMs: 500 }); }).then(startHalf);
+    html: '<p class="howto">' + (RIVALON ? 'Beat the ' + RIV.icon + ' <b>' + A.esc(RIV.name) + '</b>! They bat first, then you.<br>' : '') + 'Answer the pitch to swing! Get it right and you hit it:<br><span class="zchip sg">⚾ single</span> <span class="zchip db">⚾⚾ double</span> <span class="zchip tr">🔥 triple</span> <span class="zchip hr">💥 home run</span><br>Fast, tricky answers hit farther! A miss is an out.</p>' + (TWO && (A.Pad.seats()[0] || A.Pad.seats()[1]) ? '<p class="small">' + A.esc(PL[0].name) + ': ' + A.Pad.label(0, '⌨ keyboard') + ' · ' + A.esc(PL[1].name) + ': ' + A.Pad.label(1, '⌨ keyboard') + '</p>' : ''),
+    sub: INNINGS + ' innings · ' + R.outsFor(LITTLE) + ' outs (or ' + R.mercyFor(LITTLE) + ' runs) each inning', btn: 'Play ball! ▶', voice: ['bb_title'], cls: 'bbintro', minMs: 500 }); }).then(startHalf);
+  // design1: keep the friend's speech bubble above the answer cards in landscape (baseball.css uses --bbCardsTop)
+  (function () { var cs = document.getElementById('cards'); if (!cs) return;
+    function upd() { var t = cs.getBoundingClientRect().top; if (t > 0) document.documentElement.style.setProperty('--bbCardsTop', Math.round(t) + 'px'); }
+    upd(); window.addEventListener('resize', upd); if (window.ResizeObserver) new ResizeObserver(upd).observe(cs); setInterval(upd, 1000); })();
 })(window.Arcade);

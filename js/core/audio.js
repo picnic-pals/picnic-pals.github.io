@@ -338,11 +338,60 @@
     sources.forEach(function (s) { try { s.stop(); } catch (e) {} }); sources = [];
     if (hasSpeech) try { speechSynthesis.cancel(); } catch (e) {}
   }
+  /* ================= "How much talking" (per player, grown-up setting p.talk; 2026-10-22 voice) =================
+     p.talk: 'auto' (by age) | 'full' | 'prompts' | 'tap' | 'off'. Effective modes: 'full' | 'toddler' | 'prompts' | 'tap' | 'off'.
+     Auto: Toddler mode -> 'toddler' (short prompts + item names); readers (age 6+, or reading level 1st grade and up) -> 'tap';
+     pre-readers (age 5 and under, or age not set) -> 'prompts'. No player picked yet -> 'prompts'.
+     Every A.Voice.say() call names its kind (opts.kind, default 'chatter'):
+       chatter  greetings, praise, how-to, cheers, menu lines   -> full only
+       focus    keyboard / controller focus reads a tile           -> full only
+       name     item / choice names (toddler taps, baseball cards) -> full, toddler
+       prompt   the question / prompt when it appears              -> full, toddler, prompts
+       target   the target word or number a pre-reader needs       -> full, toddler, prompts
+       answer   the right answer / fact after a miss               -> full, toddler, prompts
+       listen   audio-only tests (sight-word "listen and find"), and the word after a miss there -> every mode but off
+       tap      the kid asked (🔊 button, R key, tapping the prompt bubble) -> every mode but off
+     opts.force (grown-up area test buttons, storybook word taps the kid asked for) skips this check; the master Voice switch still applies. */
+  var TALK_MODES = ['auto', 'full', 'prompts', 'tap', 'off'];
+  var ALLOW = { full: 'chatter focus name prompt target answer listen tap', toddler: 'name prompt target answer listen tap',
+    prompts: 'prompt target answer listen tap', tap: 'listen tap', off: '' };
+  function reader(p) {
+    var a = A.Age ? A.Age.of(p) : null, lv = p && p.levels && p.levels.reading;
+    return (a != null && a >= 6) || (!!lv && lv !== 'auto' && /^[1-9]$/.test(String(lv)));
+  }
+  var Talk = {
+    MODES: TALK_MODES, ALLOW: ALLOW,
+    LABELS: { auto: 'Auto (by age)', full: 'Full', prompts: 'Prompts only', tap: 'Tap to hear', off: 'Off' },
+    setting: function (p) { var t = p && p.talk; return TALK_MODES.indexOf(t) >= 0 ? t : 'auto'; },
+    reader: reader,
+    // effective mode for a player (default: the active player)
+    mode: function (p) {
+      if (p === undefined) p = A.Store && A.Store.active ? A.Store.active() : null;
+      if (!p) return 'prompts';
+      var t = Talk.setting(p);
+      if (t !== 'auto') return t;
+      if (A.toddler && A.toddler(p)) return 'toddler';
+      return reader(p) ? 'tap' : 'prompts';
+    },
+    allows: function (kind, p) { var m = Talk.mode(p); return (' ' + ALLOW[m] + ' ').indexOf(' ' + (kind || 'chatter') + ' ') >= 0; },
+    // concat only the allowed pieces: list of [parts, kind]
+    pick: function (list, p) { return list.reduce(function (a, x) { return x && x[0] && x[0].length && Talk.allows(x[1], p) ? a.concat(x[0]) : a; }, []); }
+  };
+  A.Talk = Talk;
+  var LOG = [];   // what was actually spoken (after the talking check) — read by the tests
   function say(parts, opts) {
     opts = opts || {};
+    if (!parts || !parts.length) { stop(); return Promise.resolve(); }
+    var kind = opts.kind || 'chatter';
+    if (!opts.force && !opts.picked && !Talk.allows(kind)) {
+      // not spoken at this talking level: a page that has no text of its own for this line gets a food-friend bubble
+      LOG.push({ kind: kind, said: false, text: textOf(parts) });
+      if (opts.bubble !== false && kind !== 'focus' && A.UI && A.UI.friendBubble && !A.Voice.ownBubble) A.UI.friendBubble(textOf(parts));
+      return Promise.resolve();
+    }
     stop(); var tok = TOK;
-    if (!parts || !parts.length) return Promise.resolve();
     if (!S().voice && !opts.force) return Promise.resolve();
+    LOG.push({ kind: kind, said: true, text: textOf(parts) }); if (LOG.length > 200) LOG.splice(0, 100);
     parts = resolveNames(parts); if (!parts.length) return Promise.resolve();
     A.emit('voice:start'); speaking = true;
     return plan(parts).then(function (pl) {
@@ -367,7 +416,13 @@
     sfx: function (name) { if (SFX[name]) SFX[name](); }
   };
   A.Voice = {
-    say: say, stop: stop, text: textOf, norm: norm, srcFor: srcFor, sourceOf: sourceOf, plan: plan, last: {},
+    say: say, stop: stop, text: textOf, log: LOG,
+    // say the allowed pieces of [[parts, kind], ...] in one go (e.g. a miss: 'Oops' (chatter) + the fact (answer))
+    sayMix: function (list, opts) {
+      var parts = Talk.pick(list), all = list.reduce(function (a, x) { return x && x[0] ? a.concat(x[0]) : a; }, []);
+      if (parts.length < all.length) { LOG.push({ kind: 'mix', said: false, text: textOf(all.filter(function (x) { return parts.indexOf(x) < 0; })) });
+        if ((!opts || opts.bubble !== false) && A.UI && A.UI.friendBubble && !A.Voice.ownBubble) A.UI.friendBubble(textOf(all)); }
+      if (!parts.length) return Promise.resolve(); var o = {}; for (var k in (opts || {})) o[k] = opts[k]; o.picked = true; o.kind = list.filter(function (x) { return Talk.allows(x[1]); }).map(function (x) { return x[1]; }).join('+'); return A.Voice.say(parts, o); }, norm: norm, srcFor: srcFor, sourceOf: sourceOf, plan: plan, last: {},
     hasSpeech: hasSpeech, canSayNames: canSayNames, name: nameOf, named: function (withName, without) { return canSayNames() ? withName : without; }, isSpeaking: function () { return speaking; },
     voiceName: function () { return VOICE ? VOICE.name : (hasSpeech ? 'default voice' : 'none'); },
     fileFor: fileFor, fileUrl: fileUrl, ttsFor: ttsFor, ttsUrl: ttsUrl, hasPhrase: hasPhrase, manifest: manifest, tts: TTS, scanFiles: scanFiles,

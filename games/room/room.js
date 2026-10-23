@@ -334,7 +334,7 @@
   }
   function shopItem(it) {
     var n = (P.inventory[it.id] || {}).n || 0, art = '<div class="bigthumb">' + ART.svg(it.id, 'thumb') + '</div>';
-    V.say(['it_' + it.id]);
+    V.say(['it_' + it.id], { kind: 'name' });
     if (it.badge && !CAT.earned(P, it)) { A.Audio.sfx('locked'); return UI.card({ tag: '🏅 Badge item · ✦ ' + it.price, title: it.name, art: art, sub: '🔒 ' + it.hint + ' to open it up, then it costs ✦ ' + it.price + '.', btn: 'OK', voice: ['it_' + it.id, 'rm_locked_item'], cls: 'shopcard' }).then(function () { focusItem(it.id); }); }
     if (it.need && !it.badge && !CAT.earned(P, it)) { A.Audio.sfx('locked'); return UI.card({ tag: 'Special prize', title: it.name, art: art, sub: '🔒 ' + it.hint + ' to win it!', btn: 'OK', voice: ['it_' + it.id, 'rm_locked_item'], cls: 'shopcard' }).then(function () { focusItem(it.id); }); }
     if (it.need && !it.badge) return UI.card({ tag: 'Special prize', title: it.name, art: art, sub: 'You won this! It\'s in your things.', btn: 'OK', voice: ['it_' + it.id, 'rm_owned'], cls: 'shopcard' }).then(function () { focusItem(it.id); });
@@ -369,15 +369,17 @@
   function openShelf(tab) {
     shelfTab = tab || shelfTab;
     var tabs = [['trophies', '🏆 Trophies'], ['stickers', '⭐ Stickers'], ['friends', '💗 Picnic friends']].map(function (t) { return '<button class="ptab' + (t[0] === shelfTab ? ' on' : '') + '" data-nav data-tab="' + t[0] + '">' + t[1] + '</button>'; }).join(''), body = '';
-    if (shelfTab === 'trophies') body = '<div class="trgrid">' + trophies().map(function (t) {
+    // design1 (2026-10-22): the shelf shows only what was earned / met (no "???", hints or totals for what is still ahead)
+    var MORE = '<p class="pcount more">Keep playing to find more!</p>';
+    if (shelfTab === 'trophies') body = '<div class="trgrid">' + trophies().filter(function (t) { return t.got; }).map(function (t) {
       return '<div class="trophy' + (t.got ? ' got' : '') + '" data-nav tabindex="0" data-tr="' + t.id + '" aria-label="' + A.esc(t.name) + (t.got ? '' : ', not yet: ' + A.esc(t.hint)) + '"><span class="cup">' + cupSvg(t.got ? t.col : 'none') + '</span><b>' + (t.got ? A.esc(t.name) : '???') + '</b><small>' + (t.got ? A.esc(t.val || '🎉') : A.esc(t.hint)) + '</small></div>';
-    }).join('') + '</div>';
-    if (shelfTab === 'stickers') { var got = Object.keys(P.stickers || {}).length; body = '<p class="pcount">' + got + ' of ' + R.STICKERS.length + ' stickers</p><div class="stgrid">' + R.STICKERS.map(function (s) { var g = !!P.stickers[s.id]; return '<div class="stk' + (g ? ' got' : '') + '" data-nav tabindex="0" aria-label="' + (g ? A.esc(s.name) : 'Not yet: ' + A.esc(s.hint)) + '">' + (g ? R.stickerSVG(s.art) : '<span class="q">?</span>') + '<small>' + (g ? A.esc(s.name) : A.esc(s.hint)) + '</small></div>'; }).join('') + '</div>'; }
-    if (shelfTab === 'friends') body = '<div class="frgrid">' + B.CAST.map(function (c) {
+    }).join('') + '</div>' + MORE;
+    if (shelfTab === 'stickers') { var got = Object.keys(P.stickers || {}).length; body = '<p class="pcount">' + got + ' sticker' + (got === 1 ? '' : 's') + '</p><div class="stgrid">' + R.STICKERS.filter(function (s) { return !!P.stickers[s.id]; }).map(function (s) { var g = !!P.stickers[s.id]; return '<div class="stk' + (g ? ' got' : '') + '" data-nav tabindex="0" aria-label="' + (g ? A.esc(s.name) : 'Not yet: ' + A.esc(s.hint)) + '">' + (g ? R.stickerSVG(s.art) : '<span class="q">?</span>') + '<small>' + (g ? A.esc(s.name) : A.esc(s.hint)) + '</small></div>'; }).join('') + '</div>' + MORE; }
+    if (shelfTab === 'friends') body = '<div class="frgrid">' + B.CAST.filter(function (c) { return F.of(P).indexOf(c.id) >= 0; }).map(function (c) {
       var has = F.of(P).indexOf(c.id) >= 0, inf = has ? F.info(P, c.id) : null;
       return '<button class="fcard' + (has ? '' : ' locked') + (inf && inf.lvl >= 5 ? ' gold' : '') + '" data-nav data-b="' + c.id + '" aria-label="' + (has ? c.name + ', ' + inf.name : 'Secret friend') + '"><span class="fa">' + (has ? friendSvg(c.id, 'happy') : B.svg({ blob: c.id })) + '</span><b>' + (has ? c.name : '???') + '</b>' +
         (has ? '<span class="hearts">' + heartsHTML(inf.lvl) + '</span><small>' + inf.name + '</small>' : '<small>🔒 Secret friend</small>') + '</button>';
-    }).join('') + '</div>';
+    }).join('') + '</div>' + MORE;
     var pn = openPanel('shelf', '<div class="phead"><h2>🏆 Trophy shelf</h2><button class="iconbtn px" data-x aria-label="Close (Esc)">✕</button></div><div class="ptabs">' + tabs + '</div><div class="pbody scroll">' + body + '</div>');
     A.$$('.ptab', pn).forEach(function (b) { b.addEventListener('click', function () { A.Audio.sfx('tap'); openShelf(b.dataset.tab); focusFirst('.ptab.on'); }); });
     A.$$('.fcard', pn).forEach(function (b) { b.addEventListener('click', function () { var id = b.dataset.b; if (b.classList.contains('locked')) { A.Audio.sfx('locked'); B.anim(b, 'nudge', 500); V.say(['rm_locked_friend']); UI.toast('🔒 ' + (A.Story && A.Story.chHint ? A.Story.chHint(P, id) : 'Win a Story challenge')); return; } openBio(id).then(function () { openShelf('friends'); var f = panel && panel.querySelector('.fcard[data-b="' + id + '"]'); if (f) f.focus({ preventScroll: true }); }); }); });
@@ -438,7 +440,7 @@
     if (avail(id) <= 0) return;
     if (D.hold) cancelHold(true);
     var it = CAT.byId[id]; D.hold = { id: id, f: 0, from: null }; D.cur = firstFree(it.kind);
-    A.Audio.sfx('pop'); renderTray(); renderThings(); drawCursor(); V.say(['it_' + id]);
+    A.Audio.sfx('pop'); renderTray(); renderThings(); drawCursor(); V.say(['it_' + id], { kind: 'name' });
   }
   function pickUp(x) {
     pushUndo(); RM.items = RM.items.filter(function (y) { return y !== x; });
@@ -584,7 +586,7 @@
   makeFriends(); requestAnimationFrame(step);
   M.play('cozy');
   var intro = firstVisit
-    ? UI.card({ tag: 'Welcome!', title: P.name + "'s Picnic Spot", art: '<div class="dance">' + B.forProfile(P, { expr: 'love' }) + '</div>', html: '<p class="howto">This is <b>your</b> picnic spot! Your food friends picnic here.<br>Earn <b>✦ star bits</b> in any game (1 for every star) and spend them in the <b>🛍️ Shop</b>.<br>Then <b>🎨 Decorate</b>: pick a thing, then pick a spot!</p>', btn: "Let's go! ▶", voice: ['rm_welcome'], cls: 'roomintro', minMs: 500 })
+    ? UI.card({ tag: 'Welcome!', title: P.name + "'s Picnic Spot", art: '<div class="dance">' + B.forProfile(P, { expr: 'love' }) + '</div>', html: '<div class="welcomepics" aria-hidden="true"><span>⭐</span><i>➜</i><span>✦</span><i>➜</i><span>🛍️</span><i>➜</i><span>🎨</span></div><p class="howto short">Play, get <b>✦</b>, shop, decorate!</p>', btn: "Let's go! ▶", voice: ['rm_welcome'], cls: 'roomintro picintro', minMs: 500 })
     : (V.say(['rm_welcome_back']), Promise.resolve());
   intro.then(function () {
     var chain = Promise.resolve();

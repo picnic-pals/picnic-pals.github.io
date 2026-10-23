@@ -59,7 +59,51 @@
   }
   var PATHS = { little: { id: 'little', name: 'Little Steps', emoji: '🐣' }, big: { id: 'big', name: 'Big Steps', emoji: '🚀' } };
 
-  function data(p) { var s = p.story; if (!s.stops) s.stops = {}; if (!s.seen) s.seen = {}; if (!s.challenges) s.challenges = {}; return s; }
+  // mixV 1 (2026-10-22, game mix): nothing in old saves moves. Stops are still saved by index and path, so passed stops stay
+  // passed. Each stop's game comes from gameOf(), worked out from the player id, so an old save gets its mix with no rewrite.
+  function data(p) { var s = p.story || (p.story = {}); if (!s.stops) s.stops = {}; if (!s.seen) s.seen = {}; if (!s.challenges) s.challenges = {}; if (!s.mixV) s.mixV = 1; return s; }
+
+  /* ---------- game mix (owner, 2026-10-22: "the levels should be random… automatically, so the user's not picking") ----------
+     Each stop plays Picnic Munch or Snack Slugger, picked for the kid (never a choice), and it is the same every time:
+       · a seeded pick per player and stop (hash of player id + stop index), so replays, reloads and new journeys never reroll it
+       · 30% raw chance of Slugger on a free stop; never 3 of the same game in a row on a trail (the 3rd one flips)
+       · stop 1 of every trail (main trail, each side trip) and the last main stop (the finale) are always Munch
+       → about 60% Munch / 40% Slugger on the main trail
+     Friend challenges stay Munch (they are timed snack-munching races). Tiny Picnic is not in the mix: toddlers never see the
+     story map (the hub hides Picnic Munch in toddler mode). */
+  var GAMES = { munch: { id: 'munch', icon: '🍓', label: 'Munch' }, slugger: { id: 'slugger', icon: '⚾', label: 'Slugger' } };
+  var SLUG_P = 0.3, mixCache = {};
+  function seed01(str) { var x = 2166136261 >>> 0; for (var i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619) >>> 0; }
+    x ^= x >>> 13; x = Math.imul(x, 0x5bd1e995) >>> 0; x ^= x >>> 15; return (x >>> 0) / 4294967296; }
+  function trailOf(st) { return st.side ? 'side:' + st.ai : 'main'; }
+  function gameMix(p) {
+    var id = String((p && (p.id || p.name)) || 'player'), key = id + '#' + STOPS.length; if (mixCache[key]) return mixCache[key];
+    var out = [], last = {}, M = mainCount();
+    STOPS.forEach(function (st, i) {
+      var tr = trailOf(st), prev = last[tr] || [], t;
+      if (prev.length === 0 || (!st.side && i === M - 1)) t = 'munch';
+      else {
+        t = seed01(id + '|' + i) < SLUG_P ? 'slugger' : 'munch';
+        if (prev.length >= 2 && prev[prev.length - 1] === t && prev[prev.length - 2] === t) t = t === 'munch' ? 'slugger' : 'munch';
+        // the one before the (always Munch) finale: no Munch-Munch-Munch at the end
+        if (!st.side && i === M - 2 && t === 'munch' && prev[prev.length - 1] === 'munch') t = 'slugger';
+      }
+      prev.push(t); last[tr] = prev; out.push(t);
+    });
+    return (mixCache[key] = out);
+  }
+  function gameOf(p, i) { return gameMix(p)[i] || 'munch'; }
+  // a Snack Slugger stop (slugger2, 2026-10-22): the stop's skill and level, 2 innings (wrong answer = an out, 3 outs an
+  // inning; 4 at age 4 and under), goal = RUNS: 5 (design2: 6 at age 5 and 8 at 4 and under, where right answers are never caught; 4 outs at 4 and under), one fewer
+  // on a "helper" stop after two misses. Sim (_test/slugger2-test.js): cleared ~80% at 80% accuracy (age 5-6), ~30% at 60%.
+  function sluggerConfig(p, i) {
+    // after9: ONE big inning with 4 outs at every age (was 2 innings, 3 outs / 4 at 4 and under: an 80% kid cleared 94-99%
+    // and a 65% kid 67-85% on the first try). Goal 8 runs at 5 and under (no fly-outs there), 6 at 6+; a helper stop (after
+    // two tries that didn't clear) is 2 runs fewer. Sim (_review/after9/sim/story-sim.js): first try ~80% kid 75-85%, 65% kid ~45%.
+    var c = config(p, i), goal = A.Age && A.Age.preReader(p) ? 8 : 6;
+    if (c.helper) goal = Math.max(3, goal - 2);
+    c.game = 'slugger'; c.innings = 1; c.outs = 4; c.goal = goal; c.goalText = 'Score ' + goal + ' runs'; return c;
+  }
 
   /* ---------- friend challenges: beat an area's challenge level under a target time to unlock a new blob ----------
      The challenge opens once both stops of its area are passed (on either path). Win = munch every snack before the clock
@@ -74,15 +118,15 @@
   ];
   var CH_PER = { count10: [9, 10], compare: [10, 11], add10: [11, 12], sub10: [12, 13], make10: [12, 13], teen: [10, 11], missing: [13, 14], add20: [13, 14], sub20: [14, 15], evenodd: [9, 10] };
   var PACE = { relaxed: 1.4, normal: 1, speedy: 0.75 };
-  function paceOf(p) { var x = p.timerPace; if (!x || x === 'auto') x = p.age != null && p.age <= 5 ? 'relaxed' : 'normal'; return x; }
+  function paceOf(p) { var x = p.timerPace; if (!x || x === 'auto') x = A.Age.preReader(p) ? 'relaxed' : 'normal'; return x; }
   CH.forEach(function (c) { c.ai = AREAS.findIndex(function (a) { return a.id === c.area; }); c.a = AREAS[c.ai]; });
   function chFor(blob) { return CH.filter(function (c) { return c.blob === blob; })[0] || null; }
   function chConfig(p, k) {
-    var c = CH[k], little = path(p) === 'little', lv = little ? 0 : 1, nOk = little ? 5 : 7, sid = c.a.skill;
-    var secs = (8 + CH_PER[sid][lv] * .6 * nOk) * PACE[paceOf(p)] * (p.age != null && p.age <= 4 ? 1.15 : 1);
+    var c = CH[k], little = path(p) === 'little', lv = little ? 0 : 1, nOk = little ? 5 : 7, sid = c.a.skill;   // challenges stay on the area's own skill (a timed race on a fluent skill; design1 lifts only the stops)
+    var secs = (8 + (CH_PER[sid] || [12, 13])[lv] * .6 * nOk) * PACE[paceOf(p)] * (A.Age.little(p) ? 1.15 : 1);
     return { k: k, ch: c, skill: sid, level: lv, nOk: nOk, target: Math.max(25, Math.round(secs / 5) * 5), maxWrong: 1 };
   }
-  function chOpen(p, k) { var c = CH[k], s = data(p); return [c.ai * 2, c.ai * 2 + 1].every(function (i) { return ['big', 'little'].some(function (pa) { var r = s.stops[pa + ':' + i]; return r && r.passed && !r.placed; }); }); }
+  function chOpen(p, k) { var c = CH[k], s = data(p); return [c.ai * 2, c.ai * 2 + 1].every(function (i) { return ['big', 'little'].some(function (pa) { var r = s.stops[pa + ':' + i]; return r && r.passed; }); }); }   // passed by playing OR by placement at the player's level (placeAtLevel)
   function chHint(p, blob) { var c = chFor(blob); if (!c) return ''; var cfg = chConfig(p, CH.indexOf(c)); return 'Beat the ' + c.a.name + ' challenge in under ' + cfg.target + ' seconds!'; }
   // record a challenge try; returns {won, firstWin, secs, newBest}
   function chRecord(p, k, r) {
@@ -95,7 +139,7 @@
     return out;
   }
   function unlockAll(p) { var b = p.unlocks.blobs || (p.unlocks.blobs = {}); A.Blobs.CAST.forEach(function (c) { if (!b[c.id]) b[c.id] = Date.now(); }); }
-  function defaultPath(p) { return p.age != null && p.age <= 5 ? 'little' : 'big'; }
+  function defaultPath(p) { return A.Age.little(p) ? 'little' : 'big'; }   // Little Steps by default at 4 and under (A.Age)
   function path(p) { var s = data(p); return s.path || defaultPath(p); }
   function setPath(p, id) { var s = data(p); if (s.path === id) return; s.path = id; s.run = null; }   // a new path starts a new journey
   function stopInfo(p, i) { return data(p).stops[path(p) + ':' + i] || null; }
@@ -108,8 +152,23 @@
   // what a stop plays: skill, level, number of snacks, extra time
   function config(p, i) {
     var st = STOPS[i], little = path(p) === 'little', info = stopInfo(p, i) || {}, helper = (info.fails || 0) >= 2 && !info.passed;
-    if (st.side) return { skill: st.skill, level: little ? 0 : 1, nOk: little ? 5 : 7, helper: helper, side: true, timeX: (helper ? 1.3 : 1) * (little ? 1.1 : 1) };
-    return { skill: st.area.skill, level: little ? 0 : st.lv, nOk: little ? 5 : 6 + st.lv, helper: helper, timeX: (helper ? 1.3 : 1) * (little ? 1.1 : 1) };
+    // after9: Big Steps stops have 8 snacks (was 6-7; the hint-before-heart free try made 6-7 too easy for an 80% kid);
+    // a helper stop (2 tries that didn't clear) now really has fewer snacks: 6 (Little Steps stays 5)
+    var nBig = helper ? 6 : 8;
+    if (st.side) return { skill: st.skill, level: little ? 0 : 1, nOk: little ? 5 : nBig, helper: helper, side: true, timeX: (helper ? 1.3 : 1) * (little ? 1.1 : 1) };
+    var sk = skillFor(p, st.area.skill);
+    return { skill: sk, lifted: sk !== st.area.skill, level: little ? 0 : st.lv, nOk: little ? 5 : nBig, helper: helper, timeX: (helper ? 1.3 : 1) * (little ? 1.1 : 1) };
+  }
+  /* design1 (2026-10-22, parent-approved): the story is a multi-day journey for every age. Placement skips at most ONE area
+     (PLACE_MAX_AREAS), so a 6-year-old starts near the beginning of the trail instead of at stop 15 of 20. So those early
+     stops are not babyish, a main stop whose area skill is below the player's own current math skill plays the player's
+     current skill instead ("lifted"; the area keeps its name, story card and friend). Once the trail reaches the player's
+     skill, every stop plays its own area skill as before. */
+  var PLACE_MAX_AREAS = 1;
+  function curMath(p) { var C = A.Curriculum; if (!C || !C.current || !C.list) return null; try { var list = C.list('math').map(function (k) { return k.id; }), cur = C.current(p, 'math'); return cur ? { id: cur.id, ix: list.indexOf(cur.id), list: list } : null; } catch (e) { return null; } }
+  function skillFor(p, sid) {
+    var cm = curMath(p); if (!cm || cm.ix < 0) return sid;
+    var ix = cm.list.indexOf(sid); return ix >= 0 && ix < cm.ix ? cm.id : sid;
   }
   function scoreFor(r) { // r: {correct, wrong, finished, secsLeft, timerOn}
     var att = r.correct + r.wrong, acc = att ? r.correct / att : 0;
@@ -121,7 +180,11 @@
   // record a played stop; returns {pts, passed, runAdded, newBestStop, newBestRun, finale, firstPass}
   function record(p, i, r) {
     var s = data(p), key = path(p) + ':' + i, info = s.stops[key] || (s.stops[key] = { best: 0, stars: 0, passed: false, fails: 0, plays: 0 });
-    var pts = scoreFor(r), passed = !!(r.finished || (r.frac >= .75 && !r.gaveUp)), out = { pts: pts, passed: passed };
+    var pts = scoreFor(r), passed = !!(r.finished || (r.frac >= .75 && !r.gaveUp));
+    // design2: Gentle Munch can't run out of hearts or time, so a gentle stop only clears with misses <= half the snacks
+    // (a "helper" stop, after 2 tries that didn't clear, allows up to one miss per snack, so a little one is never stuck)
+    if (r.gentle && passed && r.wrong > (r.nOk || r.correct || 0) * ((info.fails || 0) >= 2 ? 1 : .5)) passed = false;
+    var out = { pts: pts, passed: passed };
     info.plays++; out.firstPass = passed && !info.passed;
     if (passed) { info.passed = true; info.fails = 0; delete info.placed; } else info.fails = (info.fails || 0) + 1;
     if (pts.total > info.best) { out.newBestStop = info.best > 0; info.best = pts.total; }
@@ -147,7 +210,7 @@
     for (var i = 0; i < M; i++) {
       var st = STOPS[i], key = path(p) + ':' + i, info = s.stops[key], ix = list.indexOf(st.area.skill), sst = p.skills && p.skills[st.area.skill];
       var ahead = ix >= 0 && (ix < curIx || (sst && sst.status === 'mastered'));
-      if (!ahead) break;
+      if (!ahead || st.ai >= PLACE_MAX_AREAS) break;   // design1: skip at most PLACE_MAX_AREAS areas (the rest play at the player's level, config)
       if (info && info.passed) continue;
       if (R.stop > i) continue;
       s.stops[key] = Object.assign(info || { best: 0, stars: 0, fails: 0, plays: 0 }, { passed: true, placed: true });
@@ -160,7 +223,8 @@
     return profiles.map(function (p) { var s = data(p); return { p: p, score: s.bestRun || 0, stops: s.bestRunStops || 0, path: s.bestRunPath || path(p), finished: s.finished || 0 }; })
       .sort(function (a, b) { return b.score - a.score || b.stops - a.stops || a.p.name.localeCompare(b.p.name); });
   }
-  A.Story = { placeAtLevel: placeAtLevel, WORLD: WORLD, FESTIVAL: FESTIVAL, addArea: addArea, mainCount: mainCount, isSide: isSide, playable: playable, AREAS: AREAS, STOPS: STOPS, PATHS: PATHS, PROLOGUE: PROLOGUE, FINALE: FINALE, data: data, path: path, defaultPath: defaultPath, setPath: setPath,
+  A.Story = { placeAtLevel: placeAtLevel, PLACE_MAX_AREAS: PLACE_MAX_AREAS, skillFor: skillFor, WORLD: WORLD, FESTIVAL: FESTIVAL, addArea: addArea, mainCount: mainCount, isSide: isSide, playable: playable, AREAS: AREAS, STOPS: STOPS, PATHS: PATHS, PROLOGUE: PROLOGUE, FINALE: FINALE, data: data, path: path, defaultPath: defaultPath, setPath: setPath,
     CH: CH, chFor: chFor, chConfig: chConfig, chOpen: chOpen, chHint: chHint, chRecord: chRecord, unlockAll: unlockAll,
+    GAMES: GAMES, SLUG_P: SLUG_P, gameMix: gameMix, gameOf: gameOf, sluggerConfig: sluggerConfig, seed01: seed01,
     stopInfo: stopInfo, unlockedTo: unlockedTo, run: run, newRun: newRun, config: config, scoreFor: scoreFor, record: record, board: board };
 })(window.Arcade);

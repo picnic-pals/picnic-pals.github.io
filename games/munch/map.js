@@ -32,6 +32,8 @@
     return out;
   })();
   var SIDE_ICON = { colors: '🎨', shapes: '🔺', letters: '🔤', begsound: '🐝', rhymes: '🎵', sight: '👀', cvc: '🐱', digraph: '🚢', sight2: '📖', opposites: '🔥', nounverb: '🏃', longvowel: '🎂', sight3: '📚', homophones: '👂', affixes: '🧩', comprehension: '📜' };
+  // which game a stop plays (story.js gameOf: seeded per player, never picked by the kid)
+  function gameName(id) { return id === 'slugger' ? A.TITLES.baseball : A.TITLES.munch; }
   function stopFace(st) { return st.side ? (SIDE_ICON[st.skill] || st.n) : st.n; }
   var FEST = { x: 80.6, y: 49.2 }; // the big basket on the blanket
   // put each area's emoji + name beside the trail (the side farthest from every stop)
@@ -64,7 +66,7 @@
     // the landmarks are in the art, so each area only gets its name (under its landmark, from stops.json)
     ST.AREAS.forEach(function (a, i) { var c = LP[i];
       var an = (ART[a.id] && ART[a.id].lb[2]) || 'middle';
-      s += '<text class="aname" x="' + c.x.toFixed(1) + '" y="' + c.y.toFixed(1) + '" font-size="2.7" text-anchor="' + an + '">' + A.esc(a.name) + '</text>'; });
+      s += '<text class="aname' + (a.side ? ' sidelbl' : '') + '" x="' + c.x.toFixed(1) + '" y="' + c.y.toFixed(1) + '" font-size="2.7" text-anchor="' + an + '">' + A.esc(a.name) + '</text>'; });
     s += '<text class="aname fest" x="' + FEST.x + '" y="' + (FEST.y + 9.5) + '" font-size="3" text-anchor="middle">' + A.esc(ST.FESTIVAL) + '</text>';
     return s + '</svg>';
   }
@@ -96,18 +98,24 @@
     sec = A.el('<section class="screen" id="map">' +
       '<div class="mtop"><button class="iconbtn" id="mapHome" aria-label="Back to the Munch menu">◀</button>' +
       '<div class="mtitle"><b>' + A.esc(ST.WORLD) + '</b><span id="mapRun"></span></div>' +
-      '<button class="chipbtn" id="mapPath" data-mnav></button><button class="chipbtn gold" id="mapScores" data-mnav>🏆 High scores <kbd>H</kbd></button><button class="chipbtn" id="mapNew" data-mnav>↻ New journey</button></div>' +
+      '<button class="chipbtn" id="mapPath" data-mnav></button><button class="chipbtn book" id="mapBook" data-mnav aria-label="Read the story again (B)">📖 Story</button>' +
+      // design1: High scores + New journey live in one small ⋯ menu (a calmer top bar)
+      '<span class="mmore"><button class="chipbtn more" id="mapMore" data-mnav aria-label="More: high scores, new journey" aria-expanded="false">⋯</button>' +
+      '<span class="mmenu" id="mapMenu" hidden><button class="chipbtn gold" id="mapScores">🏆 High scores <kbd>H</kbd></button><button class="chipbtn" id="mapNew">↻ New journey</button></span></span></div>' +
       '<div class="mwrap"><div class="mbox">' + islandSVG() + '<div class="stops"></div><div class="hero" id="mapHero"></div>' + labelsSVG() + '</div></div>' +
       '<div class="mbot"><div class="info" id="mapInfo"></div><button class="bigbtn mint" id="mapPlay">▶ Play</button></div>' +
-      '<div class="keys mkeys"><span class="grp"><kbd>←</kbd><kbd>→</kbd> pick a stop</span>' + (MAIN < ST.STOPS.length ? '<span class="grp"><kbd>↓</kbd> ' + A.esc(ST.AREAS.filter(function (a) { return a.side; }).map(function (a) { return a.name; }).join(' / ')) + ' <kbd>↑</kbd> trail</span>' : '') + '<span class="grp"><kbd class="wide">Space</kbd> play</span><span class="grp"><kbd>H</kbd> high scores</span><span class="grp"><kbd>Esc</kbd> menu</span></div></section>');
+      '<div class="keys mkeys"><span class="grp"><kbd>←</kbd><kbd>→</kbd> pick a stop</span>' + (MAIN < ST.STOPS.length ? '<span class="grp"><kbd>↓</kbd> ' + A.esc(ST.AREAS.filter(function (a) { return a.side; }).map(function (a) { return a.name; }).join(' / ')) + ' <kbd>↑</kbd> trail</span>' : '') + '<span class="grp"><kbd class="wide">Space</kbd> play</span><span class="grp"><kbd>H</kbd> high scores</span><span class="grp"><kbd>B</kbd> story</span><span class="grp"><kbd>Esc</kbd> menu</span></div></section>');
     document.body.insertBefore(sec, document.body.firstChild);
     $('#mapHome').addEventListener('click', function () { SFX.tap(); location.href = 'index.html'; });
     $('#mapPlay').addEventListener('click', function () { play(sel); });
     window.__map = { items: ITEMS, sel: function () { return sel; }, select: function (j) { sel = j; render(); }, play: function (j) { play(j); } };
-    $('#mapScores').addEventListener('click', function () { scores(P); });
+    $('#mapScores').addEventListener('click', function () { menu(false); scores(P); });
+    $('#mapMore').addEventListener('click', function (e) { e.stopPropagation(); SFX.tap(); menu($('#mapMenu').hidden); });
+    document.addEventListener('click', function (e) { if (!e.target.closest || !e.target.closest('.mmore')) menu(false); });
     $('#mapPath').addEventListener('click', togglePath);
+    $('#mapBook').addEventListener('click', function () { if (busy || !A.StoryBook) return; SFX.pop(); V.stop(); A.StoryBook.open(P); });
     $('#mapNew').addEventListener('click', function () {
-      if (busy) return; var R = ST.run(P);
+      menu(false); if (busy) return; var R = ST.run(P);
       if (R.stop === 0 && !R.done) { UI.toast('Your journey is just starting!'); return; }
       UI.confirm({ title: 'Start a new journey?', sub: 'Your high score stays on the board. The new journey starts at stop 1, and every unlocked stop stays open for practice.', yes: 'New journey', no: 'Keep going' }).then(function (ok) {
         if (!ok) return; ST.newRun(P); A.Store.save(); sel = itemOf(0); render(); V.say(['story_new_journey']);
@@ -115,6 +123,10 @@
     });
     document.addEventListener('keydown', onKey);
   }
+  function menu(on) { var m = $('#mapMenu'); if (!m) return; m.hidden = !on; $('#mapMore').setAttribute('aria-expanded', on ? 'true' : 'false'); }
+  // design1: side trips sit behind one signpost; their stops show only while the signpost is open or a side stop is picked
+  var sideOpen = false, SIGN = { x: 66, y: 88 };
+  function sideShown() { return (ITEMS[sel] && ITEMS[sel].t === 's' && ST.isSide(ITEMS[sel].i)); }
   function togglePath() {
     if (busy) return; var cur = ST.path(P), nx = cur === 'big' ? 'little' : 'big';
     ST.setPath(P, nx); A.Store.save(); sel = itemOf(ST.run(P).done ? 0 : ST.run(P).stop); render(); SFX.pop(); V.say([nx === 'big' ? 'story_big' : 'story_little']);
@@ -126,36 +138,50 @@
     $('#mapPath').title = ST.path(P) === 'little' ? 'Little Steps: easier levels, fewer snacks. Click for Big Steps.' : 'Big Steps: every level. Click for Little Steps.';
     box.innerHTML = '';
     ST.STOPS.forEach(function (s, i) {
-      var info = ST.stopInfo(P, i) || {}, locked = !ST.playable(P, i), cur = !R.done && i === R.stop;
-      var b = A.el('<button class="stop' + (s.side ? ' side' : '') + (locked ? ' locked' : '') + (info.passed ? ' passed' : '') + (cur ? ' cur' : '') + (ITEMS[sel].t === 's' && i === ITEMS[sel].i ? ' sel' : '') + '" style="' + pct(POS[i]) + '" data-i="' + i + '" aria-label="' + (s.side ? A.esc(A.Curriculum.byId[s.skill].name) : 'Stop ' + s.n) + ', ' + A.esc(s.area.name) + (locked ? ', locked' : '') + '">' +
-        '<span class="n">' + (locked ? '🔒' : stopFace(s)) + '</span>' + (info.stars ? '<span class="ss">' + '★★★'.slice(0, info.stars) + '</span>' : '') + '</button>');
-      b.addEventListener('click', function () { if (busy) return; if (locked) { lockedNudge(b); return; } var j = itemOf(i); if (sel === j) play(j); else { sel = j; render(); SFX.step(); } });
+      var info = ST.stopInfo(P, i) || {}, locked = !ST.playable(P, i), cur = !R.done && i === R.stop, gm = ST.GAMES[ST.gameOf(P, i)];
+      if (s.side && !sideShown()) return;   // design1: side trips collapsed behind the signpost
+      var b = A.el('<button class="stop' + (s.side ? ' side' : '') + ' g-' + gm.id + (locked ? ' locked' : '') + (info.passed ? ' passed' : '') + (cur ? ' cur' : '') + (ITEMS[sel].t === 's' && i === ITEMS[sel].i ? ' sel' : '') + '" style="' + pct(POS[i]) + '" data-i="' + i + '" data-game="' + gm.id + '" aria-label="' + (s.side ? A.esc(A.Curriculum.byId[s.skill].name) : 'Stop ' + s.n) + ', ' + A.esc(s.area.name) + ', ' + A.esc(gameName(gm.id)) + (locked ? ', locked' : '') + '">' +
+        '<span class="n">' + (locked ? (s.side ? '' : s.n) : stopFace(s)) + '</span>' + (locked ? '' : '<span class="gm g-' + gm.id + '" title="' + A.esc(gameName(gm.id)) + '">' + gm.icon + '</span>') + (info.stars ? '<span class="ss">' + '★★★'.slice(0, info.stars) + '</span>' : '') + '</button>');
+      b.addEventListener('click', function () { if (busy) return; if (locked) { lockedNudge(b); return; } var j = itemOf(i); if (sel === j) play(j); else { sel = j; if (!s.side) sideOpen = false; render(); SFX.step(); } });
       box.appendChild(b);
     });
     ST.CH.forEach(function (c, k) {
       var j = ITEMS.findIndex(function (it) { return it.t === 'c' && it.k === k; }), open = ST.chOpen(P, k), got = A.Rewards.unlocked(P, 'blob', c.blob), x = ST.data(P).challenges[c.area] || {};
-      var b = A.el('<button class="chal' + (open ? ' open' : ' locked') + (got ? ' got' : '') + (j === sel ? ' sel' : '') + '" style="' + pct(chPos(k)) + '" data-c="' + k + '" aria-label="Friend challenge, ' + A.esc(c.a.name) + (open ? '' : ', locked') + '">' +
-        '<span class="cb' + (got ? '' : ' sil') + '">' + B.svg({ blob: c.blob, expr: got ? 'happy' : 'idle' }) + '</span><span class="cl">' + (got ? (x.best ? '⏱ ' + Math.round(x.best) + 's' : '✓') : open ? '⏱ Challenge' : '🔒') + '</span></button>');
+      if (!open) return;   // design1: a challenge appears on the map only once it is open (no hints about what is ahead)
+      var b = A.el('<button class="chal' + (open ? ' open' : ' locked') + (got ? ' got' : '') + (j === sel ? ' sel' : '') + '" style="' + pct(chPos(k)) + '" data-c="' + k + '" aria-label="Challenge, ' + A.esc(c.a.name) + (open ? '' : ', locked') + '">' +
+        '<span class="cb' + (got ? '' : ' star') + '">' + (got ? B.svg({ blob: c.blob, expr: 'happy' }) : '⭐') + '</span><span class="cl">' + (got ? (x.best ? '⏱ ' + Math.round(x.best) + 's' : '✓') : open ? '⏱ Challenge' : '🔒') + '</span></button>');
       b.addEventListener('click', function () { if (busy) return; if (!open) { lockedNudge(b, true); return; } if (sel === j) play(j); else { sel = j; render(); SFX.step(); } });
       box.appendChild(b);
     });
+    sec.classList.toggle('sideopen', !!sideShown());
+    if (MAIN < ST.STOPS.length && !sideShown()) {
+      var sp = A.el('<button class="signpost" style="' + pct(SIGN) + '" aria-label="Side trips: ' + A.esc(ST.AREAS.filter(function (a) { return a.side; }).map(function (a) { return a.name; }).join(', ')) + '"><span>🪧</span><b>Side trips</b></button>');
+      sp.addEventListener('click', function () { if (busy) return; sideOpen = true; var ns = sideItem(); if (ns >= 0) sel = ns; render(); SFX.step(); });
+      box.appendChild(sp);
+    }
     var done = ST.unlockedTo(P), tr = sec.querySelector('#trailDone'), L = tr.getTotalLength ? tr.getTotalLength() : 0;
     if (L) tr.setAttribute('stroke-dasharray', (L * (done / MAIN)).toFixed(1) + ' 9999');
     placeHero(R.done ? FEST : POS[Math.min(R.stop, POS.length - 1)], false);
-    info();
+    info(); centerSel();
+  }
+  // portrait: the island scrolls sideways (munch.css); keep the picked stop / challenge in view
+  function centerSel() {
+    var w = sec.querySelector('.mwrap'), el = sec.querySelector('.stops .sel'); if (!w || !el || w.scrollWidth <= w.clientWidth + 2) return;
+    var wr = w.getBoundingClientRect(), er = el.getBoundingClientRect(); w.scrollLeft += (er.left + er.width / 2) - (wr.left + wr.width / 2);
   }
   function info() {
     var it = ITEMS[sel];
     if (it.t === 'c') {
       var c = ST.CH[it.k], cc = ST.chConfig(P, it.k), got = A.Rewards.unlocked(P, 'blob', c.blob), x = ST.data(P).challenges[c.area] || {}, nm = B.byId[c.blob].name;
-      $('#mapInfo').innerHTML = '<span class="ie chb' + (got ? '' : ' sil') + '">' + B.svg({ blob: c.blob, expr: 'happy' }) + '</span><span class="it"><b>⭐ Friend challenge · ' + A.esc(c.a.name) + '</b>' +
-        '<small>Munch all ' + cc.nOk + ' in under <b>' + cc.target + ' seconds</b>, with at most 1 oops' + (got ? '' : ', to meet <b>' + nm + '</b>!') + '</small>' +
-        '<small>' + (ST.chOpen(P, it.k) ? (x.best ? 'Best time: <b>' + x.best + 's</b>' : got ? nm + ' is already on your team' : 'Not won yet') : '🔒 Pass both ' + A.esc(c.a.name) + ' stops first') + '</small></span>';
+      $('#mapInfo').innerHTML = '<span class="ie' + (got ? ' chb">' + B.svg({ blob: c.blob, expr: 'happy' }) : '">⭐') + '</span><span class="it"><b>⭐ Challenge · ' + A.esc(c.a.name) + '</b>' +
+        '<small>Munch all ' + cc.nOk + ' in under <b>' + cc.target + ' seconds</b>, with at most 1 oops</small>' +   // design1: never names a friend still to meet
+        '<small>' + (ST.chOpen(P, it.k) ? (x.best ? 'Best time: <b>' + x.best + 's</b>' : got ? nm + ' is on your team' : 'A speedy snack race!') : 'Keep going on the trail!') + '</small></span>';
       return;
     }
-    var s = ST.STOPS[it.i], cfg = ST.config(P, it.i), inf = ST.stopInfo(P, it.i) || {}, R = ST.run(P), skill = A.Curriculum.byId[cfg.skill];
+    var s = ST.STOPS[it.i], cfg = ST.config(P, it.i), gid = ST.gameOf(P, it.i), inf = ST.stopInfo(P, it.i) || {}, R = ST.run(P), skill = A.Curriculum.byId[cfg.skill];
     var tag = s.side ? 'Side trip' : R.done ? 'Practice' : it.i === R.stop ? 'Journey stop' : it.i < R.stop ? 'Practice' : '';
     $('#mapInfo').innerHTML = '<span class="ie">' + s.area.emoji + '</span><span class="it"><b>' + (s.side ? stopFace(s) + ' ' + A.esc(skill.name) : 'Stop ' + s.n) + ' · ' + A.esc(s.area.name) + '</b>' +
+      '<small class="game g-' + gid + '">' + ST.GAMES[gid].icon + ' <b>' + A.esc(gameName(gid)) + '</b>' + (gid === 'slugger' ? ' · ' + A.esc(ST.sluggerConfig(P, it.i).goalText) : '') + '</small>' +
       '<small>' + A.esc(skill.name) + ' · ' + A.esc(skill.levels[cfg.level]) + (cfg.helper ? ' · a little easier' : '') + (tag ? ' · ' + tag : '') + '</small>' +
       '<small>' + (inf.best ? 'Best here: <b>' + inf.best + '</b> ' + '★★★'.slice(0, inf.stars || 0) : 'Not played yet') + '</small></span>';
   }
@@ -192,15 +218,16 @@
     if (/^(ArrowDown|s|S)$/.test(k) && MAIN < ST.STOPS.length) { // jump to the side trip (Letter Lagoon) / back to the trail
       e.preventDefault(); var inSide = ITEMS[sel].t === 's' && ST.isSide(ITEMS[sel].i);
       var ns = inSide ? nextSideItem() : sideItem();
-      if (ns >= 0) { sel = ns; render(); SFX.step(); V.say(['area_' + ST.STOPS[ITEMS[sel].i].area.id]); } else lockedNudge();
+      if (ns >= 0) { sel = ns; sideOpen = true; render(); SFX.step(); V.say(['area_' + ST.STOPS[ITEMS[sel].i].area.id]); } else lockedNudge();
     }
     else if (/^(ArrowUp|w|W)$/.test(k) && MAIN < ST.STOPS.length && ITEMS[sel].t === 's' && ST.isSide(ITEMS[sel].i)) {
-      e.preventDefault(); var R0 = ST.run(P); sel = itemOf(R0.done ? ST.unlockedTo(P) : R0.stop); render(); SFX.step();
+      e.preventDefault(); var R0 = ST.run(P); sideOpen = false; sel = itemOf(R0.done ? ST.unlockedTo(P) : R0.stop); render(); SFX.step();
     }
     else if (/^(ArrowRight|ArrowDown|d|D|s|S)$/.test(k)) { e.preventDefault(); var n = sel + 1; while (n < ITEMS.length && !playable(n) && ITEMS[n].t === 'c') n++; if (n < ITEMS.length && playable(n)) { sel = n; render(); SFX.step(); } else lockedNudge(); }
     else if (/^(ArrowLeft|ArrowUp|a|A|w|W)$/.test(k)) { e.preventDefault(); var m = sel - 1; while (m >= 0 && !playable(m)) m--; if (m >= 0) { sel = m; render(); SFX.step(); } }
     else if (k === ' ' || k === 'Enter' || k === 'f' || k === 'F') { e.preventDefault(); if (!e.repeat) play(sel); }
     else if (k === 'h' || k === 'H') { e.preventDefault(); scores(P); }
+    else if ((k === 'b' || k === 'B') && A.StoryBook) { e.preventDefault(); V.stop(); A.StoryBook.open(P); }
     else if (k === 'Escape') { e.preventDefault(); location.href = 'index.html'; }
     else if (k === 'm' || k === 'M') { A.Music.toggle(); }
   }
@@ -220,7 +247,8 @@
         bounce(o.from, o.to).then(function () { busy = false; var newArea = ST.STOPS[o.to].ai !== ST.STOPS[o.from].ai; V.say([ST.isSide(o.to) ? 'story_next' : newArea ? 'story_area_done' : 'story_one_more']); render(); });
       } else if (o.from != null && R.done) {
         busy = true; bounce(MAIN - 1, POS.length + 1).then(function () { busy = false; render(); });
-      } else if (firstOpen) { V.say(['story_title', 'story_pick']); }
+      } else if (A.StoryBook && !A.StoryBook.seen(P)) { A.StoryBook.maybeAuto(P); }   // the intro picture book, once per player (no extra voice lines)
+      else if (firstOpen) { V.say(['story_title']); }   // 2026-10-22 voice: short intro ("Pick a stop" is on screen)
       firstOpen = false;
     });
   }

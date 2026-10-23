@@ -138,6 +138,16 @@ math progress lives where it always did (`p.math`), the others in `p.tracks.read
   Letter Lagoon, ↓ again to Word Woods (← → also walk from one to the other).
 - Voice: rules and words are short clips stitched together (`rule_begins` + letter, `pw_<word>`, `lt_<letter>`); no new sentence clips.
 
+### Intro picture book ("The Picnic Storm", js/core/storybook.js + css/storybook.css)
+Five picture-book pages that open by themselves the first time a player opens the story map (`p.story.introSeen`, filled in for
+older saves), and again from the **📖 Story** button on the map (or the B key). Art: `assets/story/intro/intro_01..05.webp`
+(1280x800 web copies of the approved static pages). Text sits in the art's text-safe box (x140 y858 w1320 h104 of 1600x1000),
+auto-fitted. Simple text for pre-readers / K, rich text for readers (1st grade and up: a grown-up's reading level, else the current
+reading skill, else age). Modes: **Read to me** (calm narration clip `story_intro_N_simple|rich`, words highlighted as they are read)
+and **I'll read** (no narration; tap a word to hear it: its `word_*` clip, else the browser voice). Default: I'll read for readers,
+Read to me otherwise; a tap on the toggle is remembered (`p.story.bookMode`). Keys: ←/→, Space/Enter, Esc = skip; swipe on touch.
+Tests: `node _test/story-test.js` (own server, port 8769; also saves review shots to `_review/after3/`).
+
 ## Blob Baseball
 Offense only: every pitch is a question (read aloud, 3 big answer cards for age ≤ 5, else 4, exactly one right) from the kid's
 current math skill and level — the same mastery data as Mochi Munch (each answer is logged; each half-inning counts as a round).

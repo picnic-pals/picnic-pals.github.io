@@ -153,6 +153,8 @@ body:not(.two) .turn { display: none; }
 
 @media (max-height: 600px) { #game .top { min-height: 58px; padding-top: 4px; } .turn .tav { width: 44px; height: 44px; } .sign .qrow { min-height: 42px; } #game .keys { display: none; } .swbtn .ss { display: none; } }
 @media (orientation: portrait) { .cards { flex-wrap: wrap; } .bcard { flex: 1 1 40%; min-height: 16vh; } }
+/* ptfix: portrait: the question sign gets its own full-width row under home / music / stars (it used to cover the music button) */
+@media (orientation: portrait) { #game .top { flex-wrap: wrap; row-gap: 8px; } #game .top .sign { order: 5; flex: 1 1 100%; margin-right: -58px; } }
 
 /* end card: compact so it fits a laptop screen without scrolling */
 .bbend .final .sbf { display: none; }
@@ -186,3 +188,36 @@ body:not(.two) .turn { display: none; }
 /* reading & early-concepts answer cards (pictures, swatches, shapes, letters, words) */
 .bcard.rich .ea-emo { font-size: 1.15em; } .bcard.rich .ea-svg { width: 1.5em; height: 1.5em; } .bcard.rich .ea-ltr { font-size: 1.2em; }
 #qTxt .ea-mini { width: 1em; height: 1em; }
+/* ux3b: surprise hits — comet trail behind the ball, and the "why it flew" tag */
+#trailG .trail { animation: trailfade .9s ease-out forwards; }
+@keyframes trailfade { from { opacity: .85; } to { opacity: 0; transform-box: fill-box; transform-origin: center; transform: scale(.2); } }
+.swingtag small { font-size: .8em; margin-left: 6px; color: #7a6a99; }
+
+/* story stop (game mix): the hits goal under the scoreboard */
+.sboard .sgoal { margin: 4px 0 2px; font-weight: 800; font-size: .95em; color: #2a6cc4; text-align: center; }
+.sboard .sgoal b { color: #ff7a2a; }
+.bbstory .sgoalbig { font-size: 1.35em; color: #2a6cc4; }
+.bbstory .score table { margin: 6px auto; border-collapse: collapse; } .bbstory .score td { padding: 2px 10px; } .bbstory .score .tot td { font-weight: 800; border-top: 2px solid #e6dcc4; }
+.bbstory .journey { font-weight: 700; margin-top: 4px; } .bbstory .newbest { color: #d98a00; font-weight: 800; }
+/* slugger2 (2026-10-22): rival row, mercy note, bonus (base-running / scoreboard) questions, out text, dots */
+.sboard tr.riv td.nm { color: #a8f0b0; }
+.sbf .mercy { font-size: .9em; color: #8f9bc4; }
+.swingtag.bonusq, .swingtag.outtag, .swingtag.rival, .swingtag.walk { font-size: 17px; white-space: normal; max-width: min(92vw, 640px); width: max-content; text-align: center; line-height: 1.25; padding: 3px 14px; }
+.swingtag.bonusq { color: #6a3fb0; border-color: #d9c8ff; } .swingtag.bonusq.yes { color: #2c9a5c; border-color: #a8e6c2; } .swingtag.bonusq.hint { color: #7a5a00; border-color: #ffe08a; }
+.swingtag.outtag { color: #5a4a7a; } .swingtag.rival { color: #2e7d32; } .swingtag.tricky { color: #d9582a; } .swingtag.walk { color: #2a6cc4; }
+body.bonusing .sign .qtxt { font-size: clamp(16px, 2.6vh, 24px); line-height: 1.25; }
+body.bonusing .sign { border-color: #c9b2ff; }
+.rdots { display: inline-flex; flex-wrap: wrap; gap: 6px; max-width: 7.5em; justify-content: center; vertical-align: middle; }
+.rdot { display: inline-block; width: .5em; height: .5em; border-radius: 50%; background: #ffd23c; border: 2px solid #b07800; }
+.rdot.riv { background: #6fcf73; border-color: #2e7d32; } .rdot.runner { background: #9fd2ff; border-color: #2a6cc4; }
+.pop.dir { font-size: calc(var(--u) * 1.9); color: #fff; }
+.pop.riv { color: #a8f0b0; }
+.vsline { text-align: center; font-weight: 700; font-size: 1.1em; margin: .3em 0; }
+.bbend.loss h2, .bbend.tie h2 { color: #6a5a9a; }
+/* ptfix: touch-only screens: no keyboard legend (it sat under the friend's bubble), like Picnic Munch's #keys */
+@media (hover: none) and (pointer: coarse) { #game #keys { display: none; } }
+/* ptfix: portrait: the friend's speech bubble sits over the ball field, not on the answer cards */
+@media (orientation: portrait) { .friend-bubble { bottom: auto; top: 30vh; } }
+/* design1 (2026-10-22): landscape: the friend's speech bubble sits just above the answer cards (never over card 1 / 2);
+   --bbCardsTop is the cards row's top edge in px, kept up to date by baseball.js */
+@media (orientation: landscape) { .friend-bubble { bottom: calc(100vh - var(--bbCardsTop, 76vh) + 8px); } }

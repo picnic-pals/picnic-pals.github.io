@@ -1,0 +1,32 @@
+/* Picnic Pals: "The Picnic Storm" intro picture book (js/core/storybook.js) */
+.sbk { position: fixed; inset: 0; z-index: 900; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  background: radial-gradient(ellipse at 50% 40%, #fff8ec 0%, #f6e7ff 70%, #e9dcff 100%); padding: 8px; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.sbk.on { display: flex; animation: sbkIn .35s ease-out; }
+@keyframes sbkIn { from { opacity: 0; transform: scale(.98); } to { opacity: 1; transform: none; } }
+.sbk-top { width: 100%; max-width: 1280px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.sbk-mode { display: inline-flex; background: #fff; border-radius: 999px; padding: 4px; box-shadow: 0 3px 0 #e4d8f5; }
+.sbk-mb { border-radius: 999px; padding: 7px 14px; font-size: 16px; font-weight: 700; color: #7a6a99; }
+.sbk-mb.on { background: #ffe9a8; color: #3b2d55; box-shadow: inset 0 -2px 0 #f0d27a; }
+.sbk-skip { border-radius: 999px; padding: 9px 20px; font-size: 18px; font-weight: 700; background: #fff; color: #3b2d55; box-shadow: 0 4px 0 #e4d8f5; }
+.sbk-skip:active, .sbk-mb:active { transform: translateY(2px); }
+.sbk-stage { position: relative; border-radius: 18px; overflow: hidden; box-shadow: 0 10px 30px rgba(74, 59, 107, .25); background: #cfe9ff; flex: none; }
+.sbk-img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+.sbk-txt { position: absolute; box-sizing: border-box; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden;
+  background: rgba(255, 248, 236, .9); border-radius: 14px; color: #3b2d55; font-weight: 600; line-height: 1.18; }
+.sbk-line { display: block; }
+.sbk-txt .w { display: inline; border-radius: 6px; padding: 0 .04em; cursor: pointer; transition: background .12s, color .12s; }
+.sbk-txt .w.known { color: #2f6f5e; background: rgba(143, 227, 192, .28); }
+.sbk-txt .w.hl { background: #ffd84d; color: #3b2d55; box-shadow: 0 0 0 .08em #ffd84d; }
+.sbk-txt .w.tap { background: #bfe3ff; color: #3b2d55; }
+.sbk-arrow { position: absolute; top: 50%; transform: translateY(-60%); width: clamp(52px, 8vw, 84px); height: clamp(52px, 8vw, 84px); border-radius: 50%;
+  background: rgba(255, 255, 255, .92); color: #7a5cc4; font-size: clamp(24px, 3.6vw, 38px); box-shadow: 0 5px 0 rgba(122, 106, 153, .35); display: flex; align-items: center; justify-content: center; }
+.sbk-arrow.prev { left: 10px; } .sbk-arrow.next { right: 10px; }
+.sbk-arrow.off { visibility: hidden; }
+.sbk-arrow.last { width: auto; border-radius: 999px; padding: 0 20px; font-size: clamp(18px, 2.4vw, 26px); font-weight: 700; background: #8fe3c0; color: #234a3e; box-shadow: 0 5px 0 #5fbf98; }
+.sbk-arrow.pulse { animation: sbkPulse 1.2s ease-in-out infinite; }
+@keyframes sbkPulse { 0%, 100% { transform: translateY(-60%) scale(1); } 50% { transform: translateY(-60%) scale(1.1); } }
+.sbk-dots { display: flex; gap: 12px; }
+.sbk-dot { width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: inset 0 0 0 3px #c9b2ff; padding: 0; }
+.sbk-dot.on { background: #8f6ff0; box-shadow: none; transform: scale(1.15); }
+body.pad .sbk-skip::after { content: ' (B)'; font-size: 13px; opacity: .7; }
+@media (prefers-reduced-motion: reduce) { .sbk.on, .sbk-arrow.pulse { animation: none; } }
