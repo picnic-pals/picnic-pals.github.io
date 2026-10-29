@@ -94,6 +94,7 @@
   function buildLevel(cont) {
     var cells = [];
     PL.forEach(function (pl) {
+      if (A.Steps) A.Steps.ctx.p = pl.P;
       var R = pl.round.skill.gen(pl.round.level), mine = TWO ? N / 2 : N, cpb = A.Age.cellsPerBoard(pl.P), nOk = TWO ? A.rnd(5, 6) : pl.round.nOk || A.rnd(cpb[0], cpb[1]), i;
       var pickable = A.Coach && A.Coach.pickItem && !R.rc && R.hom == null && typeof R.target !== 'string' && !pl.P.guest;
       for (i = 0; i < nOk; i++) {
@@ -102,7 +103,7 @@
         g.ok = true; g.owner = pl.i; cells.push(g);
       }
       for (i = nOk; i < mine; i++) { var b = R.bad(); b.ok = false; b.owner = pl.i; cells.push(b); }
-      pl.workedShown = false; pl.easedOff = false; pl.workedOpen = false; pl.lastAns = 0; pl.diag = null; pl.diagSeen = {};
+      pl.workedShown = false; pl.easedOff = false; pl.workedOpen = false; pl.lastAns = 0; pl.diag = null; pl.diagSeen = {}; pl.lastMiss = null;
       pl.rule = R; pl.nOk = nOk; pl.remaining = nOk; pl.correct = 0; pl.wrong = 0; pl.done = false; pl.doneAt = 0; pl.busy = false;
       pl.target = null; clearTimeout(pl.walkT); pl.walkT = null; if (!cont) pl.bonusStar = false;
     });
@@ -140,9 +141,9 @@
     if (!TWO) {
       var pl = PL[0];
       // strategy hint only after a mistake (never up front)
-      $('#ruleTxt').innerHTML = pl.rule.text + (pl.rule.hint && pl.wrong > 0 ? '<span class="hint">' + pl.rule.hint + '</span>' : '');
+      $('#ruleTxt').innerHTML = pl.rule.text + (pl.rule.stepHint && pl.wrong > 0 ? '<span class="hint st">' + pl.rule.stepHint(pl.lastMiss, pl.wrong >= 2 ? 2 : 1) + '</span>' : pl.rule.hint && pl.wrong > 0 ? '<span class="hint">' + pl.rule.hint + '</span>' : '');   // v2p2a: a step shows a picture hint (ten-frame / number line) after a miss, to the answer after 2
       var chip = $('#levelChip'), s = pl.round.skill;
-      chip.textContent = pl.round.story ? pl.round.stop.area.emoji + ' Stop ' + pl.round.stop.n + ' · ' + pl.round.stop.area.name : pl.round.review ? 'Review: ' + s.name : pl.round.testOut ? 'Test-out: ' + s.name + ' · 5 to skip ahead' : s.name + ' · Level ' + (pl.round.level + 1) + (pl.round.boards > 1 ? ' · Board ' + pl.round.board + ' of ' + pl.round.boards : '');
+      chip.textContent = pl.round.story ? pl.round.stop.area.emoji + ' Stop ' + pl.round.stop.n + ' · ' + pl.round.stop.area.name : pl.round.review ? 'Review: ' + s.name : pl.round.testOut ? 'Test-out: ' + s.name + ' · 5 to skip ahead' : s.name + (s.isStep ? '' : ' · Level ' + (pl.round.level + 1)) + (pl.round.boards > 1 ? ' · Board ' + pl.round.board + ' of ' + pl.round.boards : '');
       chip.classList.toggle('review', !!pl.round.review);
       return;
     }
@@ -276,7 +277,7 @@
       if (PL.every(function (p) { return p.done; })) { endRound('done'); } else maybeBonus();
     } else {
       var wsig = null;
-      if (!cell.tried) { cell.tried = true; pl.wrong++; wsig = C.recordAnswer(P, sid, false, ansOpt(pl, cell)); if (!TWO) { if (!GENTLE) { if (G.free > 0) { G.free--; renderHearts(); freeHint(pl); } else { G.hearts--; renderHearts(true); } } if (pl.wrong === 1) renderRule(); } diagnoseMiss(pl, cell); }
+      if (!cell.tried) { cell.tried = true; pl.wrong++; wsig = C.recordAnswer(P, sid, false, ansOpt(pl, cell)); if (!TWO) { if (!GENTLE) { if (G.free > 0) { G.free--; renderHearts(); freeHint(pl); } else { G.hearts--; renderHearts(true); } } pl.lastMiss = cell; if (pl.wrong === 1 || pl.rule.stepHint) renderRule(); } diagnoseMiss(pl, cell); }
       el.classList.add('tried'); el.classList.remove('nope'); void el.offsetWidth; el.classList.add('nope');
       setTimeout(function () { pl.el.classList.remove('chomp'); anim(pl, 'wobble', 800); }, 140); SFX.oops();
       // word-reading rules: say the re-prompt, but don't print it (the bubble would show the answer's spelling)
@@ -322,7 +323,7 @@
      new board's time added. The level is scored once, over all boards (curriculum-math.js finishRound: 12+ answers at 85%+, or fast track). */
   function setupBoards(pl) {
     var r = pl.round; if (!r) return;
-    var multi = !TWO && !STORY && !r.review && !r.testOut && !r.placement && !r.story && !r.challenge && !pl.P.guest;
+    var multi = !TWO && !STORY && !r.review && !r.testOut && !r.placement && !r.dropBack && !r.check && !r.topic && !r.story && !r.challenge && !pl.P.guest;
     r.boards = multi ? A.Age.boards(pl.P, r.level, r.skill.levels.length - 1) : 1; r.board = 1;
     r.tot = { correct: 0, wrong: 0, nOk: 0, hinted: false }; r.first = []; r.folded = false; r.fastTrack = false;
   }
@@ -363,6 +364,7 @@
     if (sig.streak) celebrateStreak(sig.streak);
     if (sig.easeOff) easeOff(pl);
     if (sig.worked) { workedExample(pl); return; }
+    if (sig.speedy) { UI.rain(50); SFX.yay(); talk(['st_speedy']); }
     if (sig.speedUp && !pl.round.testOut && !pl.round.review) { C.state(P, sid).offerTestOut = true; talk(['coach_test_out']); }
     // re-ask: a cell munched by mistake comes back 2-3 munches later (judge it again: leaving it is the right answer)
     var k = A.Coach && A.Coach.reaskDue(P, sid);
@@ -391,6 +393,7 @@
   }
   // 3 misses in a row: a short worked example (number line / count-on dots, sound it out, or the answer sentence highlighted)
   function workedHtml(pl) {
+    if (pl.rule.worked) return pl.rule.worked(pl.lastMiss);   // v2p2a: a fresh, similar fact walked through (strategy, then the answer)
     var dg = pl.diag && pl.diag.hint ? pl.diag.hint.html(pl.diag.ctx) : '';
     if (pl.rule.wp) { var w = pl.rule.wp; return dg + '<div class="worked story-math">' + A.Coach.HINTS.story_picture.html({ op: w.op, a: w.a, b: w.b, em: w.em }) + '<p class="wa">' + w.a + (w.op === '+' ? ' + ' : ' − ') + w.b + ' = <b>' + w.ans + '</b></p></div>'; }
     if (dg) return dg + workedHtml0(pl);
@@ -572,7 +575,7 @@
       for (var j = 0; j < r0.stars; j++) setTimeout(SFX.star, 300 + j * 350);
       var calm = GENTLE && r0.stars <= 2, nice = calm;   // design2: Gentle Munch with misses: calm words, no fanfare
       var say = (timed ? ['munch_times_up'] : calm ? [{ id: nice ? 'munch_nice_try' : 'munch_good_munching', text: nice ? 'Nice try!' : 'Good munching!' }] : ['fb_hooray']).concat(r0.stars ? ['fb_you_got', r0.stars, r0.stars === 1 ? 'fb_star' : 'fb_stars'] : []).concat(!timed && pl.wrong === 0 ? ['fb_perfect'] : []).concat(r0.out.say);
-      var tag = r0.out.events.mastered ? 'Skill mastered!' : r0.out.events.fastTrack && r0.out.events.levelUp ? 'Fast track! Level up!' : r0.out.events.levelUp ? 'Level up!' : pl.round.review ? 'Review' : '';
+      var tag = r0.out.events.speedy ? 'Speedy! Skipped ahead!' : r0.out.events.dropBack ? 'Great warm-up!' : r0.out.events.mastered && r0.out.events.step ? 'Step done! ⭐' : r0.out.events.mastered ? 'Skill mastered!' : r0.out.events.fastTrack && r0.out.events.levelUp ? 'Fast track! Level up!' : r0.out.events.levelUp ? 'Level up!' : pl.round.review ? 'Review' : '';
       card = UI.card({ tag: tag, title: timed ? "Time's up!" : nice ? 'Nice try!' : calm ? 'Good munching!' : 'Hooray!', html: (timed || calm ? '<p class="munched">You munched <b>' + pl.correct + '</b> snack' + (pl.correct === 1 ? '' : 's') + '!' + (calm ? ' Fewer oopsies = more stars.' : '') + '</p>' : '') + starRow(r0.stars, .3),
         art: '<div class="dance">' + A.Blobs.forProfile(pl.P) + '</div>', sub: V.text(r0.out.say), btn: 'Next ▶', sfx: timed ? null : 'win', confetti: true, voice: say, cls: 'celebrate' + (timed ? ' timeup' : ''), minMs: 700 });
     } else {
@@ -741,7 +744,12 @@
     stopTimer(); G.active = false; M.play('hub');
     $('#game').classList.remove('on');
     if (ST.placeAtLevel(P1)) { A.Store.save(); if (from == null) { from = to = ST.unlockedTo(P1); } }   // story starts at the player's level
-    return A.MunchMap.open(P1, { from: from, to: to }).then(function (i) {
+    // story2: the world map + place maps (games/munch/story2-map.js); ?map=1 keeps the old single island map (tests, comparisons)
+    // ?map=1 is remembered for this tab (sessionStorage) so trips to Slugger/Stand/Bubble stops come back to the same map; ?map=2 clears it
+    var OLDMAP = false; try { if (/[?&]map=1\b/.test(location.search)) sessionStorage.setItem('blobArcade.map1', '1'); if (/[?&]map=2\b/.test(location.search)) sessionStorage.removeItem('blobArcade.map1'); OLDMAP = sessionStorage.getItem('blobArcade.map1') === '1'; } catch (e) { OLDMAP = /[?&]map=1\b/.test(location.search); }
+    var MAP = A.StoryMap2 && !OLDMAP ? A.StoryMap2 : A.MunchMap;
+    return MAP.open(P1, { from: from, to: to }).then(function (i) {
+      if (i === 'back') { location.href = A.ROOT + 'index.html' + (A.toddler && A.toddler(P1) ? '#games' : '#mode'); return; }   // toddlers have no Story / Free Play screen
       $('#game').classList.add('on');
       if (typeof i === 'string') return startChallenge(+i.slice(1));
       return playStop(i);
@@ -755,7 +763,8 @@
       PL[0].round = { skill: C.byId[cfg.skill], level: cfg.level, nOk: cfg.nOk, timeX: cfg.timeX, story: true, stop: stop, review: false };
       var chain = Promise.resolve(), sd0 = ST.data(P1); sd0.seen = sd0.seen || {};
       var slug = ST.gameOf(P1, i) === 'slugger';   // game mix: this stop is a Snack Slugger game (story.js gameOf)
-      if (retry) { if (slug) return goSlugger(i); M.play('game'); startLevel(); return Promise.resolve(); }
+      var stand = ST.gameOf(P1, i) === 'stand', bub = ST.gameOf(P1, i) === 'bubble';   // stand1: a Lemonade Stand stop (games/stand, ?mode=story&stop=i)
+      if (retry) { if (bub) return goBubble(i); if (stand) return goStand(i); if (slug) return goSlugger(i); M.play('game'); startLevel(); return Promise.resolve(); }
       if (!practice && !sd0.seen.prologue && (i === 0 || (ST.stopInfo(P1, i - 1) || {}).placed)) chain = chain.then(function () { sd0.seen.prologue = Date.now(); A.Store.save();
         return UI.card({ cls: 'storycard', tag: ST.WORLD, title: 'The Missing Star-Snacks', art: '<div class="jump">' + A.Blobs.svg({ blob: 'strawberry', expr: 'sad' }) + '</div>', sub: ST.PROLOGUE, btn: "Let's go ▶", voice: ['story_prologue'], minMs: 600 });
       });
@@ -766,19 +775,22 @@
         var a = stop.area; sd0.seen['beat:' + a.id] = Date.now(); A.Store.save();
         // design1: an area guide the player hasn't met yet (e.g. Crunch, Vinnie) stays a surprise: Jammy tells that area's story
         // instead, without the guide's name (read by the browser voice; the recorded beat line names the guide)
-        var gf = met([a.friend])[0] === a.friend ? a.friend : 'strawberry', gName = A.Blobs.byId[a.friend].name, beat = a.beat, bv = ['area_' + a.id, 'beat_' + a.id];
+        var gf = met([a.friend])[0] === a.friend ? a.friend : (A.Story2 ? A.Story2.hero(P1) : 'strawberry'), gName = A.Blobs.byId[a.friend].name, beat = a.beat, bv = ['area_' + a.id, 'beat_' + a.id];
         if (gf !== a.friend) { beat = beat.split(/(?<=[.!?])\s+/).filter(function (x) { return x.indexOf(gName) < 0 && !/^(Hi|Hello)\b/.test(x); }).join(' ') || 'Let\'s find the star-snacks here!'; bv = ['area_' + a.id, { text: beat }]; }
         return UI.card({ cls: 'storycard beat', tag: a.emoji + ' ' + a.name, title: A.Blobs.byId[gf].name + ' says…', art: '<div class="jump">' + A.Blobs.svg({ blob: gf, expr: 'happy' }) + '</div>', sub: beat, btn: 'OK ▶', voice: bv, minMs: 600 });
       });
       return chain.then(function () {
         var parts = stop.side ? ['area_' + stop.area.id].concat(cfg.helper ? ['story_helper'] : []) : ['story_stop', stop.n].concat(cfg.helper ? ['story_helper'] : practice ? ['story_practice'] : []);
+        if (stop.side && cfg.boss) return cutscene({ title: 'Mini boss!', sub: stop.area.emoji + ' ' + cfg.bossName + ' · ' + C.byId[cfg.skill].name, voice: ['s2_boss'], heroes: [P1], friends: met(A.Story2 ? [A.Story2.hero(P1)] : ['strawberry']) });
         if (stop.side) return cutscene({ title: C.byId[cfg.skill].name + '!', sub: stop.area.emoji + ' ' + stop.area.name + (cfg.helper ? ' · a little easier' : ''), voice: parts, heroes: [P1], friends: met([stop.area.friend, 'mochi', 'strawberry', 'carrot', 'grapes']) });
-        return cutscene({ title: 'Stop ' + stop.n + '!', sub: (slug ? '⚾ ' + A.TITLES.baseball + ' · ' : '') + stop.area.emoji + ' ' + stop.area.name + (cfg.helper ? ' · a little easier' : practice ? ' · practice' : ''), voice: parts, heroes: [P1], friends: met([stop.area.friend, 'mochi', 'strawberry', 'carrot', 'grapes']) });
-      }).then(function () { if (slug) return goSlugger(i); M.play('game'); startLevel(); });
+        return cutscene({ title: 'Stop ' + stop.n + '!', sub: (slug ? '⚾ ' + A.TITLES.baseball + ' · ' : stand ? '🍋 ' + A.TITLES.stand + ' · ' : '') + stop.area.emoji + ' ' + stop.area.name + (cfg.helper ? ' · a little easier' : practice ? ' · practice' : ''), voice: parts, heroes: [P1], friends: met([stop.area.friend, 'mochi', 'strawberry', 'carrot', 'grapes']) });
+      }).then(function () { if (bub) return goBubble(i); if (stand) return goStand(i); if (slug) return goSlugger(i); M.play('game'); startLevel(); });
     }
   }
   // a Snack Slugger stop: the short story game lives on the Slugger page (games/baseball, ?mode=story&stop=i); it records the
   // stop with Story.record like a Munch stop and comes back here with ?mode=story&from=i&to=next
+  function goBubble(i) { A.Store.save(); M.stop(); if (window.__munch) window.__munch.bubbleGo = i; if (!window.__noNav) location.href = '../bubble/index.html?mode=story&stop=' + i; return Promise.resolve(); }
+  function goStand(i) { A.Store.save(); M.stop(); if (window.__munch) window.__munch.standGo = i; if (!window.__noNav) location.href = '../stand/index.html?mode=story&stop=' + i; return Promise.resolve(); }
   function goSlugger(i) { A.Store.save(); M.stop(); if (window.__munch) window.__munch.sluggerGo = i; if (!window.__noNav) location.href = '../baseball/index.html?mode=story&stop=' + i; return Promise.resolve(); }
   /* ---------- friend challenges (unlock a new blob) ---------- */
   function startChallenge(k) {
@@ -807,7 +819,7 @@
       art: '<div class="' + (out.won ? 'dance' : '') + '">' + A.Blobs.forProfile(P, { expr: out.won ? 'happy' : 'sad' }) + '</div>',
       html: '<p class="chgoal">' + (fin ? 'Your time: <b>' + secs + 's</b> (goal ' + cc.target + 's)' : 'You munched <b>' + pl.correct + '</b> of ' + pl.nOk) + (fin && pl.wrong > cc.maxWrong ? '<br>Oops: ' + pl.wrong + ' (1 is OK)' : '') + (out.newBest ? '<br>🏅 New best time!' : '') + '</p>',
       sub: out.won ? '' : (A.Rewards.unlocked(P, 'blob', c.blob) ? 'Try again for a faster time!' : 'Good try! You can race again any time.'),
-      btn: 'Map ▶', sfx: out.won ? 'win' : 'soft', confetti: out.won, voice: out.won ? ['ch_won_again'] : fin && pl.wrong > cc.maxWrong ? ['ch_fail_acc'] : ['fb_so_close', 'fb_try_again'], minMs: 800 });   // design1: not ch_fail_time (its clip says "…to meet your new friend")
+      btn: 'Map ▶', sfx: out.won ? 'win' : 'soft', confetti: out.won, voice: out.won ? (out.wins > 1 ? ['ch_won_again'] : ['fb_great_job']) : fin && pl.wrong > cc.maxWrong ? ['ch_fail_acc'] : ['fb_so_close', 'fb_try_again'], minMs: 800 });   // design1: not ch_fail_time (its clip says "…to meet your new friend")
     chain.then(function () { return A.Rewards.celebrate(P, rewards); }).then(ptGate).then(function () { A.MunchMap.preselect('c' + cc.k); storyMap(); });
   }
   // the big moment: a new blob joins the team
@@ -929,7 +941,7 @@
   function toggleMusic() { var on = M.toggle(); renderMusicBtn(); bubble(on ? 'Music on 🎵' : 'Music off'); }
   function renderMusicBtn() { var b = $('#musicBtn'); b.classList.toggle('off', S.music === false); b.setAttribute('aria-label', S.music === false ? 'Music is off (M)' : 'Music is on (M)'); }
   $('#musicBtn').addEventListener('click', function (e) { e.stopPropagation(); toggleMusic(); });
-  $('#homeBtn').addEventListener('click', function () { V.stop(); M.stop(); SFX.tap(); A.Store.save(); location.href = A.ROOT + 'index.html#games'; });
+  $('#homeBtn').addEventListener('click', function () { V.stop(); M.stop(); SFX.tap(); A.Store.save(); location.href = A.ROOT + 'index.html' + (STORY && !(A.toddler && A.toddler(P1)) ? '#mode' : '#games'); });
   A.on('voice:start', function () { $('#speakBtn').classList.add('talking'); });
   A.on('voice:end', function () { $('#speakBtn').classList.remove('talking'); });
   window.addEventListener('resize', layout);

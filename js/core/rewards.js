@@ -69,11 +69,15 @@
     rareAt: 100,                  // star-cost unlocks at/above this count as rare (not limited by the per-session cap)
     outfitNeed: { crown: 'weeks4' }, colorNeed: { rainbow: 'master3' },    // badge needed on top of the stars
     weekly: { days: 3, of: 7 },   // weekly goal: play on 3 days in a Mon–Sun week. Missing a day never resets anything.
-    // room furniture: star-bit price from its old base price on a curve (cheap starter pieces → expensive showpieces)
-    furniture: { curve: [[5, 15], [9, 30], [14, 55], [18, 85], [24, 120], [99, 150]],   // [old base price up to, new price]
-      firstWin: { plates: 5, plant_cactus: 25 },   // one tiny first-session buy (plates, ✦ 5; with the 10-star Sun hat) and the 10 bits it saves added to the cactus, so week 1 / month 1 pacing stays the same
+    // room furniture (v2p1b, 2026-10-25): star bits come 1 per star, about 2-3 a round (~12 on a 5-round day, ~54 in a 5-day week,
+    // ~224 in a month: tools/reward-sim.js). Three bands: CHEAP fixed prices 4-20 (one is buyable after a game or two; every shop item
+    // can be bought again, so there is always a cheap buy), MID 22-65 on the curve (a few days of play), SHOWPIECES 100-150 (big
+    // goals for the savings jar). The cheap ladder is spaced so reward-sim stays at day 1 <= 3, week 1 <= 17, month 1 <= 51.
+    furniture: { curve: [[5, 22], [9, 25], [14, 35], [18, 50], [24, 65], [99, 80]],   // [old base price up to, new price]
+      fixed: { plates: 4, soccerball: 9, blocks: 12, poster_mochi: 15, pennant: 18, plant_flower: 18, poster_space: 20, poster_baseball: 20 },
+      firstWin: { plant_cactus: 25 },
       gates: { bed_cloud: 'week1', plant_tree: 'week1', fishtank: 'master1', telescope: 'area1', tent: 'perfectCh', piano: 'weeks4', lemonade_jug: 'week1', thermos: 'area1' },  // badge AND price
-      showpieces: { bed_cloud: 160, fishtank: 180, telescope: 200, tent: 220, piano: 240 } },
+      showpieces: { bed_cloud: 100, fishtank: 120, telescope: 130, tent: 140, piano: 150 } },
     // FRIENDS track — data only, keyed by character id; add more entries to extend. need: { mastered | weeks | popquiz | reviews | bosses : n }
     // Picnic Pals food friends (ids/order from art/foods/cast.json via js/core/foods-data.js): 4 starters, then one new friend per
     // mastered skill, in cast.json unlock order (Dora Dumpling first). Existing players keep everything they had (unlocks are never removed).
@@ -251,7 +255,7 @@
     var RC = A.RoomCatalog; if (!RC || RC.paced) return; RC.paced = true; var F = CONFIG.furniture;
     RC.ITEMS.forEach(function (it) {
       if (it.starter || it.need) return;
-      it.base = it.price; it.price = (F.firstWin && F.firstWin[it.id]) || F.showpieces[it.id] || furniturePrice(it.base);
+      it.base = it.price; it.price = (F.fixed && F.fixed[it.id]) || (F.firstWin && F.firstWin[it.id]) || F.showpieces[it.id] || furniturePrice(it.base);
       var g = F.gates[it.id]; if (g && BADGES[g]) { it.badge = g; it.hint = BADGES[g].hint; it.tier = F.showpieces[it.id] ? 'epic' : 'rare'; }
       else it.tier = it.price <= 30 ? 'uncommon' : 'rare';
     });

@@ -156,7 +156,9 @@
   function pick(p) {
     var b = p.bonus || (p.bonus = { asked: 0, right: 0, recent: [] }), little = A.Age.preReader(p);
     var recent = b.recent || [], keep = Math.min(60, QS.length - 10);
-    var pool = QS.filter(function (q) { return recent.indexOf(q.id) < 0 && (!little || q.d === 1); });
+    var big = !little && A.Age.band && /^g/.test(A.Age.band(p));   // v2p1a: 6 and up get the harder (d 2) questions
+    var pool = QS.filter(function (q) { return recent.indexOf(q.id) < 0 && (!little || q.d === 1) && (!big || q.d === 2); });
+    if (!pool.length && big) pool = QS.filter(function (q) { return recent.indexOf(q.id) < 0; });   // all the harder ones asked lately: any not asked lately
     if (!pool.length) pool = QS.filter(function (q) { return recent.slice(-20).indexOf(q.id) < 0; });
     var q = pool[Math.floor(Math.random() * pool.length)];
     recent.push(q.id); while (recent.length > keep) recent.shift(); b.recent = recent; b.asked = (b.asked || 0) + 1;

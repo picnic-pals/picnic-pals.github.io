@@ -232,7 +232,7 @@
     var L = list(subjOf(BY[id])), idx = L.findIndex(function (s) { return s.id === id; }); if (idx < 0) return;
     L.forEach(function (s, i) {
       var st = p.skills[s.id];
-      if (i < idx) { st.status = 'mastered'; st.placed = true; st.level = s.levels.length - 1; st.introduced = true; }
+      if (i < idx) { st.status = 'mastered'; st.placed = true; st.level = Math.max(s.levels.length, s.subLevels || 0) - 1; st.introduced = true; }
     });
     var cur = p.skills[id]; if (cur.status !== 'mastered') cur.status = 'open';
     var T = track(p, subjOf(BY[id])); T.current = id; T.returnTo = null;
@@ -242,12 +242,12 @@
   function setCurrent(p, id, level) {
     var s = BY[id]; if (!s || s.status !== 'active') return;
     var st = state(p, id); if (st.status === 'locked') st.status = 'open';
-    if (level != null) st.level = A.clamp(level, 0, s.levels.length - 1);
+    if (level != null) st.level = A.clamp(level, 0, Math.max(s.levels.length, s.subLevels || 0) - 1);   // v2p2b: an old two-level skill is one step with sub-levels; keep its level
     var T = track(p, subjOf(s)); T.current = id; T.returnTo = null;
     p.nextSubject = subjOf(s);   // the very next round practices it (then the mix carries on)
   }
-  function markMastered(p, id) {
-    var st = state(p, id); st.status = 'mastered'; st.introduced = true; st.level = BY[id].levels.length - 1; st.placed = st.attempts === 0;
+  function markMastered(p, id) { if (!BY[id]) return;   // v2p2b: unknown or retired id: ignore
+    var st = state(p, id); st.status = 'mastered'; st.introduced = true; st.level = Math.max(BY[id].levels.length, BY[id].subLevels || 0) - 1; st.placed = st.attempts === 0;
     var T = track(p, subjOf(BY[id])), nx = nextSkill(id); if (nx) { var ns = state(p, nx.id); if (ns.status === 'locked') ns.status = 'open'; if (T.current === id && !p.math.pin) T.current = nx.id; }
   }
   function resetSkill(p, id) { var T = track(p, subjOf(BY[id])), L = list(subjOf(BY[id])); p.skills[id] = blankState(); p.skills[id].status = T.current === id ? 'open' : 'locked'; if (L[0] && L[0].id === id) p.skills[id].status = 'open'; }
@@ -297,7 +297,8 @@
 
   // one answer. opt (optional): { key: item id, hint: bool, fast: bool } -> coaching signals from coach.js (or null)
   function recordAnswer(p, id, ok, opt) {
-    var st = state(p, id); st.attempts++; if (ok) st.correct++; st.last = Date.now();
+    if (!BY[id] || !p || !p.skills) return null;   // v2p2b: an unknown or retired skill id (old save) is ignored, never a crash
+    var st = state(p, id); if (!st) return null; st.attempts++; if (ok) st.correct++; st.last = Date.now();
     if (A.Coach && opt && opt.key != null) return A.Coach.answer(p, id, opt.key, ok, opt);
     return null;
   }
@@ -408,7 +409,7 @@
       var pv = prevSkill(s.id);
       if (st.struggles >= 2 && pv && !p.math.pin) {
         st.struggles = 0; T.returnTo = s.id; T.current = pv.id;
-        var ps = state(p, pv.id); ps.level = pv.levels.length - 1; if (ps.status === 'locked') ps.status = 'open';
+        var ps = state(p, pv.id); ps.level = Math.max(pv.levels.length, pv.subLevels || 0) - 1; if (ps.status === 'locked') ps.status = 'open';
         ev.detour = pv.id; say = ['fb_detour'];
       } else say = ev.levelDown ? ['fb_easier'] : ['fb_practice_more'];
     }

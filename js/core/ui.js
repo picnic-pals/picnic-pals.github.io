@@ -74,6 +74,7 @@
   /* ---------- placement check (coach v2): 5 quick, low-stakes questions when a skill first opens ----------
      Resolves { score, result: 'skip' | 'higher' | 'normal' }. No hearts, no timer, no "wrong" sound: a missed one just glows the answer. */
   UI.placement = function (P, skill) {
+    if (skill && skill.isStep && A.Steps) return UI.warmup(P, skill);
     var C = A.Curriculum, K = A.Coach, Q = A.Questions, top = skill.levels.length - 1, n = K.PLACE_N, score = 0, i = 0;
     function one() {
       return new Promise(function (resolve) {
@@ -113,6 +114,48 @@
         var nx = C.nextSkill(skill.id), msg = res === 'skip' ? 'You already know ' + skill.name + '! We’ll skip ahead' + (nx ? ' to ' + nx.name : '') + ' and check back on it later.' : res === 'higher' ? 'Great job! You’ll start ' + skill.name + ' a little higher.' : res === 'back' ? 'Thanks! Let’s learn ' + C.current(P, C.subjectOf(skill)).name + ' together first.' : 'Thanks! Let’s learn ' + skill.name + ' together.';
         return UI.card({ cls: 'placement-done', tag: 'Warm-up: ' + score + ' of ' + n + ' yum!', title: res === 'skip' ? 'Wow, you know this!' : res === 'higher' ? 'Great job!' : 'Let’s learn it together!', html: '<p>' + A.esc(msg) + '</p>', btn: '▶ Play', voice: [res === 'skip' ? 'place_skip' : res === 'higher' ? 'place_higher' : 'place_normal'], sfx: res === 'skip' ? 'fanfare' : null, confetti: res === 'skip', minMs: 500 })
           .then(function () { return { score: score, result: res }; });
+      });
+  };
+  /* v2p2a warm-up probe for a step ladder (js/core/steps-math.js): about 6 picks, one per step (a long ladder strides),
+     easiest first; it stops at the first miss. No hearts, no clock, no "wrong" sound. Resolves { result: 'skip' | 'normal' }. */
+  UI.warmup = function (P, skill) {
+    var S = A.Steps, Q = A.Questions, pr = S.probePlan(P, skill.id), n = pr.plan.length, i = 0;
+    function one(step) {
+      return new Promise(function (resolve) {
+        S.ctx.p = P; var q = Q.make(step, 0, { choices: 3 });
+        var ov = A.el('<div class="overlay on placement-card" role="dialog" aria-modal="true" aria-label="Warm-up"><div class="card">' +
+          '<span class="tag">Warm-up</span><div class="pc-dots">' + Array.apply(null, Array(n)).map(function (_, k) { return '<i class="' + (k < i ? 'done' : k === i ? 'now' : '') + '"></i>'; }).join('') + '</div>' +
+          '<div class="pc-q">' + q.text + '</div>' + (q.pic ? '<div class="pc-pic">' + q.pic + '</div>' : '') +
+          '<div class="pc-opts">' + q.choices.map(function (c, k) { return '<button class="pc-opt" data-i="' + k + '"><kbd>' + (k + 1) + '</kbd>' + (c.html || A.esc(c.label)) + '</button>'; }).join('') + '</div></div></div>');
+        document.body.appendChild(ov); ov.__q = q; UI.cardOpen = true;
+        var btns = A.$$('.pc-opt', ov), done = false, t0 = Date.now();
+        function pickIt(k) {
+          if (done || Date.now() - t0 < A.Pace.CFG.FRESH_Q) return; done = true; var ok = k === q.answer;
+          S.probeAnswer(pr, ok); A.Audio.sfx('tap');
+          if (ok) btns[k].classList.add('right'); else btns[k].classList.add('picked', 'fade');   // a miss just fades (no red, the answer is not shown)
+          document.removeEventListener('keydown', onKey, true);
+          setTimeout(function () { ov.remove(); UI.cardOpen = !!document.querySelector('.overlay.on'); resolve(); }, ok ? 650 : 900);
+        }
+        function onKey(e) {
+          var k = +e.key; if (k >= 1 && k <= btns.length) { e.preventDefault(); e.stopPropagation(); return pickIt(k - 1); }
+          var at = btns.indexOf(document.activeElement);
+          if (/Arrow(Right|Down)/.test(e.key)) { e.preventDefault(); e.stopPropagation(); btns[(at + 1) % btns.length].focus(); }
+          else if (/Arrow(Left|Up)/.test(e.key)) { e.preventDefault(); e.stopPropagation(); btns[(at - 1 + btns.length) % btns.length].focus(); }
+          else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); if (!e.repeat) pickIt(at < 0 ? 0 : at); }
+        }
+        document.addEventListener('keydown', onKey, true);
+        btns.forEach(function (b, k) { b.addEventListener('click', function () { pickIt(k); }); });
+        setTimeout(function () { try { btns[0].focus({ preventScroll: true }); } catch (e) {} }, 50);
+        if (q.say) A.Voice.say(q.say);
+      });
+    }
+    function loop() { var st = S.probeNext(pr); if (!st) return Promise.resolve(); return one(st).then(function () { i++; return loop(); }); }
+    return UI.card({ cls: 'placement-intro', tag: 'Warm-up', title: 'Warm-up time!', html: '<p class="pc-sub">A few quick picks. No hearts, no clock. Just have fun!</p>', btn: 'Let’s go! ▶', voice: ['st_warmup'], minMs: 500 })
+      .then(loop).then(function () {
+        var out = S.probeFinish(P, pr); A.Store.save();
+        var many = out.placed.length > 0;
+        return UI.card({ cls: 'placement-done', tag: 'Warm-up done', title: many ? 'Wow, you know lots!' : 'Great warm-up!', html: '<p>' + (many ? 'You can skip ahead. Let’s play!' : 'Let’s play together!') + '</p>', btn: '▶ Play', voice: [many ? 'place_skip' : 'place_normal'], sfx: many ? 'fanfare' : null, confetti: many, minMs: 500 })
+          .then(function () { return { score: pr.asked, result: many ? 'skip' : 'normal', start: out.start }; });
       });
   };
   /* a small, non-blocking mini-lesson for a diagnosed mistake (coach v2 ERRORS/HINTS): shows over the game for a few seconds */

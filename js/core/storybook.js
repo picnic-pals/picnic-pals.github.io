@@ -107,7 +107,7 @@
     ov.classList.toggle('reading', mode === 'read');
     A.$$('.sbk-mb', ov).forEach(function (b) { var on = b.dataset.mode === mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
     stopNarr(); if (mode === 'read') narrate(); else A.Voice.stop();
-    if (ov.classList.contains('on')) { var pc = PAGES[page][ver]; lockTurn(mode === 'read' ? Math.min(A.Pace.CFG.BOOK_READ_MAX, Math.max(A.Pace.CFG.BOOK_SELF, (pc.sec || 0) * 1000 * A.Pace.CFG.BOOK_READ)) * A.Pace.scale : user ? 0 : A.Pace.ms('BOOK_SELF')); }
+    if (ov.classList.contains('on')) { var pc = pageOf(page, ver); lockTurn(mode === 'read' ? Math.min(A.Pace.CFG.BOOK_READ_MAX, Math.max(A.Pace.CFG.BOOK_SELF, (pc.sec || 0) * 1000 * A.Pace.CFG.BOOK_READ)) * A.Pace.scale : user ? 0 : A.Pace.ms('BOOK_SELF')); }
   }
   // fit the text inside the art's text-safe box (scaled to the stage), biggest font that fits
   function layout() {
@@ -122,8 +122,17 @@
     for (; f >= FONT_MIN; f -= 1) { tx.style.fontSize = (f * s) + 'px'; if (ln.offsetHeight <= tx.clientHeight - 2 && ln.scrollWidth <= tx.clientWidth - pad + 1) break; }
     ov.dataset.font = f;
   }
+  /* story2: pages 1, 4, 5 use the v2 text (A.StoryBook2Text) with the hero filled in ({hero} {food} {pals}); those pages have no
+     recorded clip yet, so Read to me uses the device voice (estimated word timings when the voice is off). */
+  function pageOf(i, v) {
+    var base = PAGES[i][v], t2 = A.StoryBook2Text && A.StoryBook2Text[i] && A.StoryBook2Text[i][v]; if (!t2 || !A.Story2 || !P) return base;
+    var text = A.Story2.fill(t2, P); if (base && text === base.text) return base;   // same words as the recorded page: keep its clip
+    var words = text.split(' '), w = [], t = .1;
+    words.forEach(function (x) { var d = .16 + .055 * x.replace(/[^a-z]/gi, '').length + (/[.!?,"]$/.test(x) ? .3 : 0); w.push([t, t + d - .05]); t += d; });
+    return { id: 'story2_intro_' + (i + 1) + '_' + v, text: text, sec: t + .2, w: w, v2: true };
+  }
   function render() {
-    var pg = PAGES[page][ver], tx = ov.querySelector('#sbkTxt'), known = knownWords(P);
+    var pg = pageOf(page, ver), tx = ov.querySelector('#sbkTxt'), known = knownWords(P);
     ov.querySelector('#sbkImg').src = A.ROOT + 'assets/story/intro/intro_0' + (page + 1) + '.webp';
     ov.querySelector('#sbkImg').alt = 'Picture ' + (page + 1) + ' of ' + PAGES.length;
     tx.innerHTML = '<span class="sbk-line">' + pg.text.split(' ').map(function (w, i) { return '<span class="w' + (known[clean(w)] ? ' known' : '') + '" data-i="' + i + '" role="button" tabindex="-1">' + A.esc(w) + '</span>'; }).join(' ') + '</span>';
@@ -134,7 +143,7 @@
     ov.dataset.page = page + 1;
     layout();
     stopNarr(); if (mode === 'read') narrate();
-    var pc = PAGES[page][ver]; lockTurn(mode === 'read' ? Math.min(A.Pace.CFG.BOOK_READ_MAX, Math.max(A.Pace.CFG.BOOK_SELF, (pc.sec || 0) * 1000 * A.Pace.CFG.BOOK_READ)) * A.Pace.scale : A.Pace.ms('BOOK_SELF'));
+    var pc = pageOf(page, ver); lockTurn(mode === 'read' ? Math.min(A.Pace.CFG.BOOK_READ_MAX, Math.max(A.Pace.CFG.BOOK_SELF, (pc.sec || 0) * 1000 * A.Pace.CFG.BOOK_READ)) * A.Pace.scale : A.Pace.ms('BOOK_SELF'));
   }
   function go(i) { if (!isOpen() || i < 0 || i >= PAGES.length || i === page) return; page = i; A.Audio.sfx('step'); render(); }
   /* the beat (js/core/pace.js): a page turn waits ~1.5 s in "I'll read", and until most of the narration has played in "Read to me".
@@ -156,7 +165,7 @@
   }
   function doneNarr() { if (turnAt > Date.now()) { turnAt = Date.now(); if (nextLock) { clearTimeout(nextLock.timer); var b = ov.querySelector('#sbkNext'); b.classList.remove('pace-wait'); b.classList.add('pace-ready'); b.removeAttribute('aria-disabled'); } } hl(-1); A.$$('.w', ov).forEach(function (w) { w.classList.remove('read'); }); var nb = ov.querySelector('#sbkNext'); nb.classList.add('pulse'); A.StoryBook.narrations++; }
   function narrate() {
-    var pg = PAGES[page][ver], tok = ++narrTok, W = pg.w;
+    var pg = pageOf(page, ver), tok = ++narrTok, W = pg.w;
     A.StoryBook.lastNarration = pg.id;
     var silent = (A.Store.settings && A.Store.settings.voice === false) || (A.Talk && A.Talk.mode() === 'off');   // "How much talking: Off" = no voice
     var f = !silent && A.Voice.ttsFor(pg.id), url = f ? A.Voice.ttsUrl(f) : null;
@@ -210,7 +219,7 @@
   }
   function maybeAuto(p) { if (!p || seen(p)) return null; return open(p, { auto: true }); }
 
-  A.StoryBook = { PAGES: PAGES, SAFE: SAFE, open: open, close: close, maybeAuto: maybeAuto, seen: seen, isOpen: isOpen, isReader: isReader, textVersion: textVersion, defaultMode: defaultMode,
+  A.StoryBook = { pageOf: function (i, v) { return pageOf(i, v || ver); }, PAGES: PAGES, SAFE: SAFE, open: open, close: close, maybeAuto: maybeAuto, seen: seen, isOpen: isOpen, isReader: isReader, textVersion: textVersion, defaultMode: defaultMode,
     knownWords: knownWords, speakWord: speakWord, page: function () { return page; }, turnReady: function () { return turnReady(); }, turnLeft: function () { return Math.max(0, turnAt - Date.now()); }, turnDropped: function () { return turnDropped; }, mode: function () { return mode; }, version: function () { return ver; },
     opens: 0, narrations: 0, lastWord: null, lastNarration: null };
 })(window.Arcade);

@@ -53,6 +53,8 @@
 .tile .tsub { font-size: 15px; color: var(--ink2); font-weight: 600; }
 .tile.munch .scene { background: linear-gradient(#fff4c9, #ffe0ec); }
 .tile.base .scene { background: linear-gradient(#cfeaff, #c8f2d4 70%); }
+.tile.stand .scene { background: linear-gradient(#d8f0ff, #fff6d1); }
+.tile.bubble .scene { background: linear-gradient(#bfe6ff, #e6f6ff); }
 .tile.room .scene { background: linear-gradient(#fff1de, #ffe2c4); position: relative; }
 .tile.room .bitchip { position: absolute; left: 8px; top: 8px; background: #fff; border-radius: 999px; padding: 2px 10px; font-weight: 800; font-size: 15px; color: #b07800; box-shadow: 0 2px 0 #0001; }
 .tile.kick .scene { background: linear-gradient(#dff5ff, #bff0cf 62%); }
@@ -274,3 +276,56 @@
 #games.toddler .goal, #games.toddler .nextgoal { display: none !important; }
 @media (orientation: portrait) { .tiles.toddler { grid-template-columns: 1fr; } }
 @media (orientation: portrait) { .tiles.toddler .tile.room .scene { aspect-ratio: 16 / 7; } }
+/* v2p1a: New player in landscape: the form is its own touch-scroll box that fits the screen (the grid row could grow past
+   the screen, so the bottom of the form and "Make my player" were cut off and the page itself would not scroll) */
+#newkid { overflow: hidden; height: 100%; height: 100dvh; box-sizing: border-box; }
+#newkid .topbar { flex: none; }
+#newkid .nk { grid-template-rows: minmax(0, 1fr); align-items: stretch; }
+#newkid .nkprev { min-height: 0; overflow: hidden; }
+#newkid .nkform { min-height: 0; max-height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; padding-bottom: 24px; }
+#newkid .nkform > * { flex: none; }
+#newkid #nkGo { margin-top: 10px; align-self: flex-start; }
+@media (max-height: 500px) { #newkid { padding: 6px 12px; } #newkid .nk { margin-top: 4px; gap: 12px; } #newkid .nkprev .big { width: min(100%, 150px); } }
+/* v2p1a: Story or Free Play: two big bright buttons (side by side in landscape, stacked in portrait) */
+#mode .topbar { width: 100%; display: flex; align-items: center; gap: 14px; padding-right: 140px; box-sizing: border-box; }
+.modeq { margin: clamp(8px, 3vh, 28px) 0 clamp(8px, 2vh, 18px); font-size: clamp(26px, 5vmin, 46px); color: var(--ink, #4a3b6b); text-align: center; }
+.modes { display: flex; gap: clamp(16px, 3vw, 40px); width: 100%; max-width: 1100px; flex: 1; min-height: 0; max-height: 560px; padding: 0 8px 12px; box-sizing: border-box; }
+.modebtn { flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-radius: 44px; padding: 18px; color: #fff; text-shadow: 0 3px 0 #0003; transition: transform .12s; min-height: 200px; }
+.modebtn.story { background: linear-gradient(160deg, #6fd0ff, #3d8ef0); box-shadow: 0 10px 0 #2a6cc4, 0 18px 30px #3d8ef055; }
+.modebtn.free { background: linear-gradient(160deg, #ffb36b, #ff6f91); box-shadow: 0 10px 0 #d9466c, 0 18px 30px #ff6f9155; }
+.modebtn:active, .modebtn.pressed { transform: translateY(6px) scale(.98); }
+.modebtn:focus-visible { outline: 6px solid #ffe066; outline-offset: 4px; }
+.modebtn .mic { font-size: clamp(80px, 22vmin, 190px); line-height: 1; text-shadow: none; filter: drop-shadow(0 6px 0 #0002); }
+.modebtn .ml { font-size: clamp(40px, 8vmin, 78px); font-weight: 800; line-height: 1; }
+.modebtn .ms { font-size: clamp(17px, 2.8vmin, 26px); font-weight: 700; opacity: .95; }
+.modebtn .spk { position: absolute; top: 14px; right: 18px; font-size: 30px; background: #fff8; border-radius: 50%; width: 52px; height: 52px; display: grid; place-items: center; text-shadow: none; }
+@media (orientation: portrait) { .modes { flex-direction: column; max-height: none; } }
+@media (max-height: 500px) { .modebtn { min-height: 0; } .modebtn .mic { font-size: 70px; } .modeq { margin: 4px 0 8px; } }
+#games .topbar #gamesBack { flex: none; }
+/* v2p1a: Dress Up scrolls by touch too (same cause as New player: the touchmove guard needs .scroll, and the grid row could
+   grow past the screen). Landscape: the racks scroll beside the preview; portrait: a compact preview on top, racks scroll below. */
+#closet { overflow: hidden; height: 100%; height: 100dvh; box-sizing: border-box; }
+#closet .topbar { flex: none; }
+#closet .closet { grid-template-rows: minmax(0, 1fr); }
+#closet .preview { min-height: 0; overflow: hidden; }
+#closet .racks { min-height: 0; max-height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; padding-bottom: 28px; }
+#closet .racks > * { flex: none; }
+@media (max-width: 820px) { #closet .closet { grid-template-rows: auto minmax(0, 1fr); } #closet .preview { padding: 8px; border-radius: 26px; } #closet .preview .big { width: min(42vw, 26vh, 200px); } #closet .preview .bl { display: none; } }
+@media (max-height: 500px) { #closet { padding: 6px 12px; } #closet .closet { margin-top: 4px; gap: 12px; } #closet .preview .big { width: min(100%, 150px); } #closet .preview .bl { display: none; } }
+
+/* story2: toddler Story tile (big, next to Tiny Picnic) */
+.tiles.toddler { grid-template-columns: repeat(6, 1fr); }   /* Tiny Picnic + Story big (half each), the rest smaller (a third each) */
+.tiles.toddler .tile.big { grid-column: span 3; } .tiles.toddler .tile:not(.big) { grid-column: span 2; }
+.tile.story.big { min-height: clamp(260px, 46vmin, 420px); }
+.tile.story .scene { background: linear-gradient(#e3f6ff, #dff5d8); position: relative; }
+.tile.story .tn { font-size: clamp(30px, 5vmin, 46px); }
+.storysc { position: absolute; inset: 0; }
+.storysc span { position: absolute; font-size: clamp(34px, 7vmin, 64px); }
+.storysc .sp1 { left: 8%; top: 10%; } .storysc .sp2 { right: 10%; top: 14%; } .storysc .sp3 { left: 14%; bottom: 10%; }
+@media (orientation: portrait) { .tiles.toddler .tile.room .scene { aspect-ratio: 4 / 3; } }   /* story2: the toddler grid is no longer one column */
+/* p4: Coloring tile */
+.tile.color .scene { background: linear-gradient(#fff3d6, #ffe0ec); }
+.colorsc { position: absolute; inset: 8% 8% 12% 8%; display: flex; align-items: center; justify-content: center; }
+.colorsc svg { width: 78%; height: auto; transform: rotate(-3deg); filter: drop-shadow(0 4px 0 #0000001a); }
+.colorsc .crayons { position: absolute; right: 2%; bottom: 0; display: flex; gap: 4px; transform: rotate(8deg); }
+.colorsc .crayons i { display: block; width: 12px; height: 54px; border-radius: 6px 6px 3px 3px; clip-path: polygon(50% 0, 100% 18%, 100% 100%, 0 100%, 0 18%); }

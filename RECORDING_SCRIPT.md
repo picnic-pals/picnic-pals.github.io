@@ -4,7 +4,7 @@ Hi grown-up! The arcade already talks, using friendly built-in voice clips (comp
 
 ## The short version
 
-1. Start with the **Record first** sections: **1092 lines** (roughly 20–30 minutes). Everything else is for upcoming games and can wait.
+1. Start with the **Record first** sections: **1121 lines** (roughly 20–30 minutes). Everything else is for upcoming games and can wait.
 2. Record **one line per file**, using the exact **file name** in the table (e.g. `munch_rule_make.m4a`).
 3. Say it **cheerfully**, a little slower than normal, and leave a **short pause** (about half a second) before and after.
 
@@ -51,7 +51,7 @@ A sentence plays in your voice once every piece of it is recorded. Until then it
 | Colors, shapes, letters & words (new skills) | **Record first** | 686 |
 | Picnic Munch: timer, bonus questions & two players | **Record first** | 25 |
 | Picnic Munch: menu, levels & high scores | **Record first** | 33 |
-| Picnic Munch story: Picnic Island | Later | 35 |
+| Picnic Munch story: Picnic Island | Later | 55 |
 | Numbers 0–20 | **Record first** | 21 |
 | Numbers 21–100 (optional, for later) | Later | 80 |
 | Sight Words game (coming soon) | Later | 8 |
@@ -60,7 +60,7 @@ A sentence plays in your voice once every piece of it is recorded. Until then it
 | Snack Slugger | **Record first** | 47 |
 | Snack Slugger questions (sentence parts) | **Record first** | 9 |
 | Penalty Kicks (coming soon) | Later | 15 |
-| Picnic Spot | **Record first** | 38 |
+| Picnic Spot | **Record first** | 47 |
 | Coach v2: placement check, mistake hints, picnic story problems | **Record first** | 36 |
 | Picnic friends: bios and room chatter | Later | 216 |
 | Picnic Spot things (68) | Later | 68 |
@@ -70,9 +70,15 @@ A sentence plays in your voice once every piece of it is recorded. Until then it
 | Bonus question answers (232) | Later | 232 |
 | Tiny Picnic (toddler mode) | **Record first** | 66 |
 | Play-time limit & stretch breaks | **Record first** | 3 |
-| **Record first, total** | | **1092** |
-| Later (optional, upcoming games), total | | 933 |
-| **Everything** | | **2025** |
+| Number steps (counting, facts to 20) | **Record first** | 20 |
+| Topic questions (animals, colors & shapes, seasons & weather, letters) | Later | 622 |
+| Lemonade Stand | Later | 134 |
+| Bubble Pop | Later | 87 |
+| Story mode v2 | Later | 33 |
+| Fun breaks and coloring | Later | 161 |
+| **Record first, total** | | **1121** |
+| Later (optional, upcoming games), total | | 1990 |
+| **Everything** | | **3111** |
 
 ## Arcade home & menus — record first (20)
 
@@ -1012,7 +1018,7 @@ Short, bright and friendly.
 | 871 | `unlock_pick.m4a` | You can be your new friend in Dress Up! |  |
 | 872 | `hub_locked_blob.m4a` | That friend is still on the way. Keep learning to meet them! |  |
 
-## Picnic Munch story: Picnic Island — later (35)
+## Picnic Munch story: Picnic Island — later (55)
 
 Story-book voice, warm and excited. The built-in voice already covers these.
 
@@ -1033,26 +1039,46 @@ Story-book voice, warm and excited. The built-in voice already covers these.
 | 885 | `area_lighthouse.m4a` | Even-Odd Cookie Caves! | Area name on the island map |
 | 886 | `area_lagoon.m4a` | Letter Lemonade Lagoon! | Area name on the island map |
 | 887 | `area_wordwoods.m4a` | Word Waffle Woods! | Area name on the island map |
-| 888 | `beat_meadow.m4a` | Hi, I'm Jammy! The star-snacks landed in the corn. Let's count and find them! | Said by Strawberry when you arrive at Counting Cornfield |
-| 889 | `beat_cliffs.m4a` | Crunch here! On Berry Beach, big and small numbers are hiding in the sand. Which one is bigger? | Said by Carrot when you arrive at Compare Berry Beach |
-| 890 | `beat_beach.m4a` | Boing! I'm Bloop. The wind blew snacks under the broccoli trees. Let's add them up! | Said by Blueberry when you arrive at Add-Up Broccoli Woods |
-| 891 | `beat_woods.m4a` | Hee hee! I'm Niblet. The squirrels nibbled some snacks. Take away and see what's left! | Said by Corn when you arrive at Take-Away Muffin Town |
-| 892 | `beat_grove.m4a` | I'm Vinnie. The pancake gate only opens for numbers that make ten together! | Said by Grapes when you arrive at Make-Ten Pancake Peaks |
-| 893 | `beat_town.m4a` | Welcome to the cocoa volcano! Every number here is ten and some more. | Said by Carrot when you arrive at Teen Cocoa Volcano |
-| 894 | `beat_caves.m4a` | Ooh, a mystery at Melon Bay! A number is missing. Can you find the hidden one? | Said by Blueberry when you arrive at Mystery Melon Bay |
-| 895 | `beat_bay.m4a` | The lolly lighthouse keeps lots of snacks. Time for bigger adding! | Said by Strawberry when you arrive at Big Sum Lolly Lighthouse |
-| 896 | `beat_volcano.m4a` | So many apples! Take away big numbers to help the apple trees rest. | Said by Corn when you arrive at Take-Away Apple Grove |
-| 897 | `beat_lighthouse.m4a` | The cookie caves echo even, odd, even, odd. This is the last area! | Said by Grapes when you arrive at Even-Odd Cookie Caves |
-| 898 | `beat_lagoon.m4a` | Splish splash! Welcome to Letter Lemonade Lagoon. Colors, shapes, letters and words are floating in the lemonade. Let's munch them! | Said by Blueberry when you arrive at Letter Lemonade Lagoon |
-| 899 | `beat_wordwoods.m4a` | Hello, reader! Welcome to Word Waffle Woods. Every waffle tree here has a word on it. Let's read them and munch them! | Said by Corn when you arrive at Word Waffle Woods |
-| 900 | `unlock_mochi.m4a` | Dora Dumpling joined the team! |  |
-| 901 | `hi_mochi.m4a` | Hi hi! I'm Dora Dumpling! Squishy hugs for everyone! Let's munch some snacks together! | Said by Dora Dumpling when they join the team (in their own personality) |
-| 902 | `unlock_banana.m4a` | Peel joined the team! |  |
-| 903 | `hi_banana.m4a` | Woo hoo! I'm Peel! Let's go bananas and munch together! | Said by Peel when they join the team (in their own personality) |
-| 904 | `unlock_pear.m4a` | Petey Pear joined the team! |  |
-| 905 | `hi_pear.m4a` | Hello, I'm Petey Pear. We make a great pair! Let's be friends. | Said by Petey Pear when they join the team (in their own personality) |
-| 906 | `unlock_carrot.m4a` | Crunch joined the team! |  |
-| 907 | `hi_carrot.m4a` | Crunch time! I'm Crunch! Ready, set, go! Let's run and munch together! | Said by Crunch when they join the team (in their own personality) |
+| 888 | `area_trail_meadow.m4a` | Berry Meadow! | Area name on the island map |
+| 889 | `area_boss_meadow.m4a` | Berry Meadow! | Area name on the island map |
+| 890 | `area_trail_hills.m4a` | Muffin Hills! | Area name on the island map |
+| 891 | `area_boss_hills.m4a` | Muffin Hills! | Area name on the island map |
+| 892 | `area_trail_peaks.m4a` | Pancake Peaks! | Area name on the island map |
+| 893 | `area_boss_peaks.m4a` | Pancake Peaks! | Area name on the island map |
+| 894 | `area_trail_bay.m4a` | Melon Bay! | Area name on the island map |
+| 895 | `area_boss_bay.m4a` | Melon Bay! | Area name on the island map |
+| 896 | `area_trail_caves.m4a` | Cookie Caves! | Area name on the island map |
+| 897 | `area_boss_caves.m4a` | Cookie Caves! | Area name on the island map |
+| 898 | `beat_meadow.m4a` | Hi, I'm Jammy! The star-snacks landed in the corn. Let's count and find them! | Said by Strawberry when you arrive at Counting Cornfield |
+| 899 | `beat_cliffs.m4a` | Crunch here! On Berry Beach, big and small numbers are hiding in the sand. Which one is bigger? | Said by Carrot when you arrive at Compare Berry Beach |
+| 900 | `beat_beach.m4a` | Boing! I'm Bloop. The wind blew snacks under the broccoli trees. Let's add them up! | Said by Blueberry when you arrive at Add-Up Broccoli Woods |
+| 901 | `beat_woods.m4a` | Hee hee! I'm Niblet. The squirrels nibbled some snacks. Take away and see what's left! | Said by Corn when you arrive at Take-Away Muffin Town |
+| 902 | `beat_grove.m4a` | I'm Vinnie. The pancake gate only opens for numbers that make ten together! | Said by Grapes when you arrive at Make-Ten Pancake Peaks |
+| 903 | `beat_town.m4a` | Welcome to the cocoa volcano! Every number here is ten and some more. | Said by Carrot when you arrive at Teen Cocoa Volcano |
+| 904 | `beat_caves.m4a` | Ooh, a mystery at Melon Bay! A number is missing. Can you find the hidden one? | Said by Blueberry when you arrive at Mystery Melon Bay |
+| 905 | `beat_bay.m4a` | The lolly lighthouse keeps lots of snacks. Time for bigger adding! | Said by Strawberry when you arrive at Big Sum Lolly Lighthouse |
+| 906 | `beat_volcano.m4a` | So many apples! Take away big numbers to help the apple trees rest. | Said by Corn when you arrive at Take-Away Apple Grove |
+| 907 | `beat_lighthouse.m4a` | The cookie caves echo even, odd, even, odd. This is the last area! | Said by Grapes when you arrive at Even-Odd Cookie Caves |
+| 908 | `beat_lagoon.m4a` | Splish splash! Welcome to Letter Lemonade Lagoon. Colors, shapes, letters and words are floating in the lemonade. Let's munch them! | Said by Blueberry when you arrive at Letter Lemonade Lagoon |
+| 909 | `beat_wordwoods.m4a` | Hello, reader! Welcome to Word Waffle Woods. Every waffle tree here has a word on it. Let's read them and munch them! | Said by Corn when you arrive at Word Waffle Woods |
+| 910 | `beat_trail_meadow.m4a` |  | Said by Strawberry when you arrive at Berry Meadow |
+| 911 | `beat_boss_meadow.m4a` |  | Said by Strawberry when you arrive at Berry Meadow |
+| 912 | `beat_trail_hills.m4a` |  | Said by Strawberry when you arrive at Muffin Hills |
+| 913 | `beat_boss_hills.m4a` |  | Said by Strawberry when you arrive at Muffin Hills |
+| 914 | `beat_trail_peaks.m4a` |  | Said by Strawberry when you arrive at Pancake Peaks |
+| 915 | `beat_boss_peaks.m4a` |  | Said by Strawberry when you arrive at Pancake Peaks |
+| 916 | `beat_trail_bay.m4a` |  | Said by Strawberry when you arrive at Melon Bay |
+| 917 | `beat_boss_bay.m4a` |  | Said by Strawberry when you arrive at Melon Bay |
+| 918 | `beat_trail_caves.m4a` |  | Said by Strawberry when you arrive at Cookie Caves |
+| 919 | `beat_boss_caves.m4a` |  | Said by Strawberry when you arrive at Cookie Caves |
+| 920 | `unlock_mochi.m4a` | Dora Dumpling joined the team! |  |
+| 921 | `hi_mochi.m4a` | Hi hi! I'm Dora Dumpling! Squishy hugs for everyone! Let's munch some snacks together! | Said by Dora Dumpling when they join the team (in their own personality) |
+| 922 | `unlock_banana.m4a` | Peel joined the team! |  |
+| 923 | `hi_banana.m4a` | Woo hoo! I'm Peel! Let's go bananas and munch together! | Said by Peel when they join the team (in their own personality) |
+| 924 | `unlock_pear.m4a` | Petey Pear joined the team! |  |
+| 925 | `hi_pear.m4a` | Hello, I'm Petey Pear. We make a great pair! Let's be friends. | Said by Petey Pear when they join the team (in their own personality) |
+| 926 | `unlock_carrot.m4a` | Crunch joined the team! |  |
+| 927 | `hi_carrot.m4a` | Crunch time! I'm Crunch! Ready, set, go! Let's run and munch together! | Said by Crunch when they join the team (in their own personality) |
 
 ## Numbers 0–20 — record first (21)
 
@@ -1060,27 +1086,27 @@ Say each number on its own, clearly and cheerfully (not like a question).
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 908 | `num_0.m4a` | 0 |  |
-| 909 | `num_1.m4a` | 1 |  |
-| 910 | `num_2.m4a` | 2 |  |
-| 911 | `num_3.m4a` | 3 |  |
-| 912 | `num_4.m4a` | 4 |  |
-| 913 | `num_5.m4a` | 5 |  |
-| 914 | `num_6.m4a` | 6 |  |
-| 915 | `num_7.m4a` | 7 |  |
-| 916 | `num_8.m4a` | 8 |  |
-| 917 | `num_9.m4a` | 9 |  |
-| 918 | `num_10.m4a` | 10 |  |
-| 919 | `num_11.m4a` | 11 |  |
-| 920 | `num_12.m4a` | 12 |  |
-| 921 | `num_13.m4a` | 13 |  |
-| 922 | `num_14.m4a` | 14 |  |
-| 923 | `num_15.m4a` | 15 |  |
-| 924 | `num_16.m4a` | 16 |  |
-| 925 | `num_17.m4a` | 17 |  |
-| 926 | `num_18.m4a` | 18 |  |
-| 927 | `num_19.m4a` | 19 |  |
-| 928 | `num_20.m4a` | 20 |  |
+| 928 | `num_0.m4a` | 0 |  |
+| 929 | `num_1.m4a` | 1 |  |
+| 930 | `num_2.m4a` | 2 |  |
+| 931 | `num_3.m4a` | 3 |  |
+| 932 | `num_4.m4a` | 4 |  |
+| 933 | `num_5.m4a` | 5 |  |
+| 934 | `num_6.m4a` | 6 |  |
+| 935 | `num_7.m4a` | 7 |  |
+| 936 | `num_8.m4a` | 8 |  |
+| 937 | `num_9.m4a` | 9 |  |
+| 938 | `num_10.m4a` | 10 |  |
+| 939 | `num_11.m4a` | 11 |  |
+| 940 | `num_12.m4a` | 12 |  |
+| 941 | `num_13.m4a` | 13 |  |
+| 942 | `num_14.m4a` | 14 |  |
+| 943 | `num_15.m4a` | 15 |  |
+| 944 | `num_16.m4a` | 16 |  |
+| 945 | `num_17.m4a` | 17 |  |
+| 946 | `num_18.m4a` | 18 |  |
+| 947 | `num_19.m4a` | 19 |  |
+| 948 | `num_20.m4a` | 20 |  |
 
 ## Numbers 21–100 (optional, for later) — later (80)
 
@@ -1088,99 +1114,99 @@ Only needed once games go past 20.
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 929 | `num_21.m4a` | 21 |  |
-| 930 | `num_22.m4a` | 22 |  |
-| 931 | `num_23.m4a` | 23 |  |
-| 932 | `num_24.m4a` | 24 |  |
-| 933 | `num_25.m4a` | 25 |  |
-| 934 | `num_26.m4a` | 26 |  |
-| 935 | `num_27.m4a` | 27 |  |
-| 936 | `num_28.m4a` | 28 |  |
-| 937 | `num_29.m4a` | 29 |  |
-| 938 | `num_30.m4a` | 30 |  |
-| 939 | `num_31.m4a` | 31 |  |
-| 940 | `num_32.m4a` | 32 |  |
-| 941 | `num_33.m4a` | 33 |  |
-| 942 | `num_34.m4a` | 34 |  |
-| 943 | `num_35.m4a` | 35 |  |
-| 944 | `num_36.m4a` | 36 |  |
-| 945 | `num_37.m4a` | 37 |  |
-| 946 | `num_38.m4a` | 38 |  |
-| 947 | `num_39.m4a` | 39 |  |
-| 948 | `num_40.m4a` | 40 |  |
-| 949 | `num_41.m4a` | 41 |  |
-| 950 | `num_42.m4a` | 42 |  |
-| 951 | `num_43.m4a` | 43 |  |
-| 952 | `num_44.m4a` | 44 |  |
-| 953 | `num_45.m4a` | 45 |  |
-| 954 | `num_46.m4a` | 46 |  |
-| 955 | `num_47.m4a` | 47 |  |
-| 956 | `num_48.m4a` | 48 |  |
-| 957 | `num_49.m4a` | 49 |  |
-| 958 | `num_50.m4a` | 50 |  |
-| 959 | `num_51.m4a` | 51 |  |
-| 960 | `num_52.m4a` | 52 |  |
-| 961 | `num_53.m4a` | 53 |  |
-| 962 | `num_54.m4a` | 54 |  |
-| 963 | `num_55.m4a` | 55 |  |
-| 964 | `num_56.m4a` | 56 |  |
-| 965 | `num_57.m4a` | 57 |  |
-| 966 | `num_58.m4a` | 58 |  |
-| 967 | `num_59.m4a` | 59 |  |
-| 968 | `num_60.m4a` | 60 |  |
-| 969 | `num_61.m4a` | 61 |  |
-| 970 | `num_62.m4a` | 62 |  |
-| 971 | `num_63.m4a` | 63 |  |
-| 972 | `num_64.m4a` | 64 |  |
-| 973 | `num_65.m4a` | 65 |  |
-| 974 | `num_66.m4a` | 66 |  |
-| 975 | `num_67.m4a` | 67 |  |
-| 976 | `num_68.m4a` | 68 |  |
-| 977 | `num_69.m4a` | 69 |  |
-| 978 | `num_70.m4a` | 70 |  |
-| 979 | `num_71.m4a` | 71 |  |
-| 980 | `num_72.m4a` | 72 |  |
-| 981 | `num_73.m4a` | 73 |  |
-| 982 | `num_74.m4a` | 74 |  |
-| 983 | `num_75.m4a` | 75 |  |
-| 984 | `num_76.m4a` | 76 |  |
-| 985 | `num_77.m4a` | 77 |  |
-| 986 | `num_78.m4a` | 78 |  |
-| 987 | `num_79.m4a` | 79 |  |
-| 988 | `num_80.m4a` | 80 |  |
-| 989 | `num_81.m4a` | 81 |  |
-| 990 | `num_82.m4a` | 82 |  |
-| 991 | `num_83.m4a` | 83 |  |
-| 992 | `num_84.m4a` | 84 |  |
-| 993 | `num_85.m4a` | 85 |  |
-| 994 | `num_86.m4a` | 86 |  |
-| 995 | `num_87.m4a` | 87 |  |
-| 996 | `num_88.m4a` | 88 |  |
-| 997 | `num_89.m4a` | 89 |  |
-| 998 | `num_90.m4a` | 90 |  |
-| 999 | `num_91.m4a` | 91 |  |
-| 1000 | `num_92.m4a` | 92 |  |
-| 1001 | `num_93.m4a` | 93 |  |
-| 1002 | `num_94.m4a` | 94 |  |
-| 1003 | `num_95.m4a` | 95 |  |
-| 1004 | `num_96.m4a` | 96 |  |
-| 1005 | `num_97.m4a` | 97 |  |
-| 1006 | `num_98.m4a` | 98 |  |
-| 1007 | `num_99.m4a` | 99 |  |
-| 1008 | `num_100.m4a` | 100 |  |
+| 949 | `num_21.m4a` | 21 |  |
+| 950 | `num_22.m4a` | 22 |  |
+| 951 | `num_23.m4a` | 23 |  |
+| 952 | `num_24.m4a` | 24 |  |
+| 953 | `num_25.m4a` | 25 |  |
+| 954 | `num_26.m4a` | 26 |  |
+| 955 | `num_27.m4a` | 27 |  |
+| 956 | `num_28.m4a` | 28 |  |
+| 957 | `num_29.m4a` | 29 |  |
+| 958 | `num_30.m4a` | 30 |  |
+| 959 | `num_31.m4a` | 31 |  |
+| 960 | `num_32.m4a` | 32 |  |
+| 961 | `num_33.m4a` | 33 |  |
+| 962 | `num_34.m4a` | 34 |  |
+| 963 | `num_35.m4a` | 35 |  |
+| 964 | `num_36.m4a` | 36 |  |
+| 965 | `num_37.m4a` | 37 |  |
+| 966 | `num_38.m4a` | 38 |  |
+| 967 | `num_39.m4a` | 39 |  |
+| 968 | `num_40.m4a` | 40 |  |
+| 969 | `num_41.m4a` | 41 |  |
+| 970 | `num_42.m4a` | 42 |  |
+| 971 | `num_43.m4a` | 43 |  |
+| 972 | `num_44.m4a` | 44 |  |
+| 973 | `num_45.m4a` | 45 |  |
+| 974 | `num_46.m4a` | 46 |  |
+| 975 | `num_47.m4a` | 47 |  |
+| 976 | `num_48.m4a` | 48 |  |
+| 977 | `num_49.m4a` | 49 |  |
+| 978 | `num_50.m4a` | 50 |  |
+| 979 | `num_51.m4a` | 51 |  |
+| 980 | `num_52.m4a` | 52 |  |
+| 981 | `num_53.m4a` | 53 |  |
+| 982 | `num_54.m4a` | 54 |  |
+| 983 | `num_55.m4a` | 55 |  |
+| 984 | `num_56.m4a` | 56 |  |
+| 985 | `num_57.m4a` | 57 |  |
+| 986 | `num_58.m4a` | 58 |  |
+| 987 | `num_59.m4a` | 59 |  |
+| 988 | `num_60.m4a` | 60 |  |
+| 989 | `num_61.m4a` | 61 |  |
+| 990 | `num_62.m4a` | 62 |  |
+| 991 | `num_63.m4a` | 63 |  |
+| 992 | `num_64.m4a` | 64 |  |
+| 993 | `num_65.m4a` | 65 |  |
+| 994 | `num_66.m4a` | 66 |  |
+| 995 | `num_67.m4a` | 67 |  |
+| 996 | `num_68.m4a` | 68 |  |
+| 997 | `num_69.m4a` | 69 |  |
+| 998 | `num_70.m4a` | 70 |  |
+| 999 | `num_71.m4a` | 71 |  |
+| 1000 | `num_72.m4a` | 72 |  |
+| 1001 | `num_73.m4a` | 73 |  |
+| 1002 | `num_74.m4a` | 74 |  |
+| 1003 | `num_75.m4a` | 75 |  |
+| 1004 | `num_76.m4a` | 76 |  |
+| 1005 | `num_77.m4a` | 77 |  |
+| 1006 | `num_78.m4a` | 78 |  |
+| 1007 | `num_79.m4a` | 79 |  |
+| 1008 | `num_80.m4a` | 80 |  |
+| 1009 | `num_81.m4a` | 81 |  |
+| 1010 | `num_82.m4a` | 82 |  |
+| 1011 | `num_83.m4a` | 83 |  |
+| 1012 | `num_84.m4a` | 84 |  |
+| 1013 | `num_85.m4a` | 85 |  |
+| 1014 | `num_86.m4a` | 86 |  |
+| 1015 | `num_87.m4a` | 87 |  |
+| 1016 | `num_88.m4a` | 88 |  |
+| 1017 | `num_89.m4a` | 89 |  |
+| 1018 | `num_90.m4a` | 90 |  |
+| 1019 | `num_91.m4a` | 91 |  |
+| 1020 | `num_92.m4a` | 92 |  |
+| 1021 | `num_93.m4a` | 93 |  |
+| 1022 | `num_94.m4a` | 94 |  |
+| 1023 | `num_95.m4a` | 95 |  |
+| 1024 | `num_96.m4a` | 96 |  |
+| 1025 | `num_97.m4a` | 97 |  |
+| 1026 | `num_98.m4a` | 98 |  |
+| 1027 | `num_99.m4a` | 99 |  |
+| 1028 | `num_100.m4a` | 100 |  |
 
 ## Sight Words game (coming soon) — later (8)
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 1009 | `sw_title.m4a` | Sight Words! |  |
-| 1010 | `sw_find.m4a` | Find the word | + word |
-| 1011 | `sw_read.m4a` | Can you read this word? |  |
-| 1012 | `sw_listen.m4a` | Listen! |  |
-| 1013 | `sw_that_says.m4a` | That word says | + word |
-| 1014 | `sw_new_words.m4a` | Here are some new words! |  |
-| 1015 | `sw_great_reading.m4a` | Great reading! |  |
-| 1016 | `sw_sound_it.m4a` | Let's say it together. |  |
+| 1029 | `sw_title.m4a` | Sight Words! |  |
+| 1030 | `sw_find.m4a` | Find the word | + word |
+| 1031 | `sw_read.m4a` | Can you read this word? |  |
+| 1032 | `sw_listen.m4a` | Listen! |  |
+| 1033 | `sw_that_says.m4a` | That word says | + word |
+| 1034 | `sw_new_words.m4a` | Here are some new words! |  |
+| 1035 | `sw_great_reading.m4a` | Great reading! |  |
+| 1036 | `sw_sound_it.m4a` | Let's say it together. |  |
 
 ## Sight words: Dolch Pre-Primer (40) — later (40)
 
@@ -1188,103 +1214,103 @@ Say each word once, clearly, the way you would read it to a little one.
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 1017 | `word_a.m4a` | a |  |
-| 1018 | `word_and.m4a` | and |  |
-| 1019 | `word_away.m4a` | away |  |
-| 1020 | `word_big.m4a` | big |  |
-| 1021 | `word_blue.m4a` | blue |  |
-| 1022 | `word_can.m4a` | can |  |
-| 1023 | `word_come.m4a` | come |  |
-| 1024 | `word_down.m4a` | down |  |
-| 1025 | `word_find.m4a` | find |  |
-| 1026 | `word_for.m4a` | for |  |
-| 1027 | `word_funny.m4a` | funny |  |
-| 1028 | `word_go.m4a` | go |  |
-| 1029 | `word_help.m4a` | help |  |
-| 1030 | `word_here.m4a` | here |  |
-| 1031 | `word_i.m4a` | I |  |
-| 1032 | `word_in.m4a` | in |  |
-| 1033 | `word_is.m4a` | is |  |
-| 1034 | `word_it.m4a` | it |  |
-| 1035 | `word_jump.m4a` | jump |  |
-| 1036 | `word_little.m4a` | little |  |
-| 1037 | `word_look.m4a` | look |  |
-| 1038 | `word_make.m4a` | make |  |
-| 1039 | `word_me.m4a` | me |  |
-| 1040 | `word_my.m4a` | my |  |
-| 1041 | `word_not.m4a` | not |  |
-| 1042 | `word_one.m4a` | one |  |
-| 1043 | `word_play.m4a` | play |  |
-| 1044 | `word_red.m4a` | red |  |
-| 1045 | `word_run.m4a` | run |  |
-| 1046 | `word_said.m4a` | said |  |
-| 1047 | `word_see.m4a` | see |  |
-| 1048 | `word_the.m4a` | the |  |
-| 1049 | `word_three.m4a` | three |  |
-| 1050 | `word_to.m4a` | to |  |
-| 1051 | `word_two.m4a` | two |  |
-| 1052 | `word_up.m4a` | up |  |
-| 1053 | `word_we.m4a` | we |  |
-| 1054 | `word_where.m4a` | where |  |
-| 1055 | `word_yellow.m4a` | yellow |  |
-| 1056 | `word_you.m4a` | you |  |
+| 1037 | `word_a.m4a` | a |  |
+| 1038 | `word_and.m4a` | and |  |
+| 1039 | `word_away.m4a` | away |  |
+| 1040 | `word_big.m4a` | big |  |
+| 1041 | `word_blue.m4a` | blue |  |
+| 1042 | `word_can.m4a` | can |  |
+| 1043 | `word_come.m4a` | come |  |
+| 1044 | `word_down.m4a` | down |  |
+| 1045 | `word_find.m4a` | find |  |
+| 1046 | `word_for.m4a` | for |  |
+| 1047 | `word_funny.m4a` | funny |  |
+| 1048 | `word_go.m4a` | go |  |
+| 1049 | `word_help.m4a` | help |  |
+| 1050 | `word_here.m4a` | here |  |
+| 1051 | `word_i.m4a` | I |  |
+| 1052 | `word_in.m4a` | in |  |
+| 1053 | `word_is.m4a` | is |  |
+| 1054 | `word_it.m4a` | it |  |
+| 1055 | `word_jump.m4a` | jump |  |
+| 1056 | `word_little.m4a` | little |  |
+| 1057 | `word_look.m4a` | look |  |
+| 1058 | `word_make.m4a` | make |  |
+| 1059 | `word_me.m4a` | me |  |
+| 1060 | `word_my.m4a` | my |  |
+| 1061 | `word_not.m4a` | not |  |
+| 1062 | `word_one.m4a` | one |  |
+| 1063 | `word_play.m4a` | play |  |
+| 1064 | `word_red.m4a` | red |  |
+| 1065 | `word_run.m4a` | run |  |
+| 1066 | `word_said.m4a` | said |  |
+| 1067 | `word_see.m4a` | see |  |
+| 1068 | `word_the.m4a` | the |  |
+| 1069 | `word_three.m4a` | three |  |
+| 1070 | `word_to.m4a` | to |  |
+| 1071 | `word_two.m4a` | two |  |
+| 1072 | `word_up.m4a` | up |  |
+| 1073 | `word_we.m4a` | we |  |
+| 1074 | `word_where.m4a` | where |  |
+| 1075 | `word_yellow.m4a` | yellow |  |
+| 1076 | `word_you.m4a` | you |  |
 
 ## Sight words: Dolch Primer (52) — later (52)
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 1057 | `word_all.m4a` | all |  |
-| 1058 | `word_am.m4a` | am |  |
-| 1059 | `word_are.m4a` | are |  |
-| 1060 | `word_at.m4a` | at |  |
-| 1061 | `word_ate.m4a` | ate |  |
-| 1062 | `word_be.m4a` | be |  |
-| 1063 | `word_black.m4a` | black |  |
-| 1064 | `word_brown.m4a` | brown |  |
-| 1065 | `word_but.m4a` | but |  |
-| 1066 | `word_came.m4a` | came |  |
-| 1067 | `word_did.m4a` | did |  |
-| 1068 | `word_do.m4a` | do |  |
-| 1069 | `word_eat.m4a` | eat |  |
-| 1070 | `word_four.m4a` | four |  |
-| 1071 | `word_get.m4a` | get |  |
-| 1072 | `word_good.m4a` | good |  |
-| 1073 | `word_have.m4a` | have |  |
-| 1074 | `word_he.m4a` | he |  |
-| 1075 | `word_into.m4a` | into |  |
-| 1076 | `word_like.m4a` | like |  |
-| 1077 | `word_must.m4a` | must |  |
-| 1078 | `word_new.m4a` | new |  |
-| 1079 | `word_no.m4a` | no |  |
-| 1080 | `word_now.m4a` | now |  |
-| 1081 | `word_on.m4a` | on |  |
-| 1082 | `word_our.m4a` | our |  |
-| 1083 | `word_out.m4a` | out |  |
-| 1084 | `word_please.m4a` | please |  |
-| 1085 | `word_pretty.m4a` | pretty |  |
-| 1086 | `word_ran.m4a` | ran |  |
-| 1087 | `word_ride.m4a` | ride |  |
-| 1088 | `word_saw.m4a` | saw |  |
-| 1089 | `word_say.m4a` | say |  |
-| 1090 | `word_she.m4a` | she |  |
-| 1091 | `word_so.m4a` | so |  |
-| 1092 | `word_soon.m4a` | soon |  |
-| 1093 | `word_that.m4a` | that |  |
-| 1094 | `word_there.m4a` | there |  |
-| 1095 | `word_they.m4a` | they |  |
-| 1096 | `word_this.m4a` | this |  |
-| 1097 | `word_too.m4a` | too |  |
-| 1098 | `word_under.m4a` | under |  |
-| 1099 | `word_want.m4a` | want |  |
-| 1100 | `word_was.m4a` | was |  |
-| 1101 | `word_well.m4a` | well |  |
-| 1102 | `word_went.m4a` | went |  |
-| 1103 | `word_what.m4a` | what |  |
-| 1104 | `word_white.m4a` | white |  |
-| 1105 | `word_who.m4a` | who |  |
-| 1106 | `word_will.m4a` | will |  |
-| 1107 | `word_with.m4a` | with |  |
-| 1108 | `word_yes.m4a` | yes |  |
+| 1077 | `word_all.m4a` | all |  |
+| 1078 | `word_am.m4a` | am |  |
+| 1079 | `word_are.m4a` | are |  |
+| 1080 | `word_at.m4a` | at |  |
+| 1081 | `word_ate.m4a` | ate |  |
+| 1082 | `word_be.m4a` | be |  |
+| 1083 | `word_black.m4a` | black |  |
+| 1084 | `word_brown.m4a` | brown |  |
+| 1085 | `word_but.m4a` | but |  |
+| 1086 | `word_came.m4a` | came |  |
+| 1087 | `word_did.m4a` | did |  |
+| 1088 | `word_do.m4a` | do |  |
+| 1089 | `word_eat.m4a` | eat |  |
+| 1090 | `word_four.m4a` | four |  |
+| 1091 | `word_get.m4a` | get |  |
+| 1092 | `word_good.m4a` | good |  |
+| 1093 | `word_have.m4a` | have |  |
+| 1094 | `word_he.m4a` | he |  |
+| 1095 | `word_into.m4a` | into |  |
+| 1096 | `word_like.m4a` | like |  |
+| 1097 | `word_must.m4a` | must |  |
+| 1098 | `word_new.m4a` | new |  |
+| 1099 | `word_no.m4a` | no |  |
+| 1100 | `word_now.m4a` | now |  |
+| 1101 | `word_on.m4a` | on |  |
+| 1102 | `word_our.m4a` | our |  |
+| 1103 | `word_out.m4a` | out |  |
+| 1104 | `word_please.m4a` | please |  |
+| 1105 | `word_pretty.m4a` | pretty |  |
+| 1106 | `word_ran.m4a` | ran |  |
+| 1107 | `word_ride.m4a` | ride |  |
+| 1108 | `word_saw.m4a` | saw |  |
+| 1109 | `word_say.m4a` | say |  |
+| 1110 | `word_she.m4a` | she |  |
+| 1111 | `word_so.m4a` | so |  |
+| 1112 | `word_soon.m4a` | soon |  |
+| 1113 | `word_that.m4a` | that |  |
+| 1114 | `word_there.m4a` | there |  |
+| 1115 | `word_they.m4a` | they |  |
+| 1116 | `word_this.m4a` | this |  |
+| 1117 | `word_too.m4a` | too |  |
+| 1118 | `word_under.m4a` | under |  |
+| 1119 | `word_want.m4a` | want |  |
+| 1120 | `word_was.m4a` | was |  |
+| 1121 | `word_well.m4a` | well |  |
+| 1122 | `word_went.m4a` | went |  |
+| 1123 | `word_what.m4a` | what |  |
+| 1124 | `word_white.m4a` | white |  |
+| 1125 | `word_who.m4a` | who |  |
+| 1126 | `word_will.m4a` | will |  |
+| 1127 | `word_with.m4a` | with |  |
+| 1128 | `word_yes.m4a` | yes |  |
 
 ## Snack Slugger — record first (47)
 
@@ -1292,53 +1318,53 @@ The umpire lines ("Strike!", "You're out!", "Home run!") can be big and loud, li
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 1109 | `bb_title.m4a` | Snack Slugger! |  |
-| 1110 | `bb_play_ball.m4a` | Play ball! |  |
-| 1111 | `bb_batter_up.m4a` | Batter up! | Also followed by a name: "Batter up," + "Player 1!" |
-| 1112 | `bb_swing.m4a` | Swing! |  |
-| 1113 | `bb_strike.m4a` | Strike! |  |
-| 1114 | `bb_strike_two.m4a` | Strike two! |  |
-| 1115 | `bb_strike_three.m4a` | Strike three! You're out! |  |
-| 1116 | `bb_ball.m4a` | Ball! |  |
-| 1117 | `bb_foul.m4a` | Foul ball! |  |
-| 1118 | `bb_hit.m4a` | It's a hit! |  |
-| 1119 | `bb_single.m4a` | Single! |  |
-| 1120 | `bb_double.m4a` | Double! |  |
-| 1121 | `bb_triple.m4a` | Triple! |  |
-| 1122 | `bb_home_run.m4a` | Home run! |  |
-| 1123 | `bb_grand_slam.m4a` | A grand slam! |  |
-| 1124 | `bb_run_scores.m4a` | A run scores! |  |
-| 1125 | `bb_runs_score.m4a` | runs score! | After a number: "Two" + "runs score!" |
-| 1126 | `bb_safe.m4a` | Safe! |  |
-| 1127 | `bb_out.m4a` | You're out! |  |
-| 1128 | `bb_caught.m4a` | Caught it! That's an out! |  |
-| 1129 | `bb_three_outs.m4a` | Three outs! Switch sides! |  |
-| 1130 | `bb_three_outs_next.m4a` | Three outs! On to the next inning! |  |
-| 1131 | `bb_inning_over.m4a` | That's the inning! Great batting! |  |
-| 1132 | `bb_inning.m4a` | Inning | + number, e.g. "Inning" + "2" |
-| 1133 | `bb_last_inning.m4a` | Last inning! |  |
-| 1134 | `bb_next_inning.m4a` | Next inning! |  |
-| 1135 | `bb_great_swing.m4a` | Great swing! |  |
-| 1136 | `bb_swing_tip.m4a` | Pick your swing! A single is easy. A home run is a challenge. Get it right, and you hit it! |  |
-| 1137 | `bb_pick_swing.m4a` | Pick your swing! |  |
-| 1138 | `bb_intro_howto.m4a` | Pick your swing, then answer the pitch! Harder questions hit farther! |  |
-| 1139 | `bb_one_player_sub.m4a` | Three innings. Harder questions hit farther! |  |
-| 1140 | `bb_sw_single.m4a` | A single! Nice and easy. |  |
-| 1141 | `bb_sw_double.m4a` | A double! Just right. |  |
-| 1142 | `bb_sw_triple.m4a` | A triple! Here comes a tricky one. |  |
-| 1143 | `bb_sw_homer.m4a` | Going for a home run! Here comes a challenge! |  |
-| 1144 | `bb_big_whiff.m4a` | Whoosh! What a big swing! That is just one strike. |  |
-| 1145 | `bb_nudge.m4a` | The crowd wants a big swing! Want to try a double or a triple? |  |
-| 1146 | `bb_time_strike.m4a` | Out of time! That's a strike. |  |
-| 1147 | `bb_you_scored.m4a` | You scored | + number + "runs!" |
-| 1148 | `bb_runs.m4a` | runs! |  |
-| 1149 | `bb_run.m4a` | run! |  |
-| 1150 | `bb_wins_game.m4a` | wins the game! | After a name: "Player 1" + "wins the game!" |
-| 1151 | `bb_tie_game.m4a` | It's a tie game! What a game! |  |
-| 1152 | `bb_you_win.m4a` | You win the game! |  |
-| 1153 | `bb_good_game.m4a` | Good game! |  |
-| 1154 | `bb_new_high.m4a` | A new high score! |  |
-| 1155 | `bb_high_scores.m4a` | High scores! |  |
+| 1129 | `bb_title.m4a` | Snack Slugger! |  |
+| 1130 | `bb_play_ball.m4a` | Play ball! |  |
+| 1131 | `bb_batter_up.m4a` | Batter up! | Also followed by a name: "Batter up," + "Player 1!" |
+| 1132 | `bb_swing.m4a` | Swing! |  |
+| 1133 | `bb_strike.m4a` | Strike! |  |
+| 1134 | `bb_strike_two.m4a` | Strike two! |  |
+| 1135 | `bb_strike_three.m4a` | Strike three! You're out! |  |
+| 1136 | `bb_ball.m4a` | Ball! |  |
+| 1137 | `bb_foul.m4a` | Foul ball! |  |
+| 1138 | `bb_hit.m4a` | It's a hit! |  |
+| 1139 | `bb_single.m4a` | Single! |  |
+| 1140 | `bb_double.m4a` | Double! |  |
+| 1141 | `bb_triple.m4a` | Triple! |  |
+| 1142 | `bb_home_run.m4a` | Home run! |  |
+| 1143 | `bb_grand_slam.m4a` | A grand slam! |  |
+| 1144 | `bb_run_scores.m4a` | A run scores! |  |
+| 1145 | `bb_runs_score.m4a` | runs score! | After a number: "Two" + "runs score!" |
+| 1146 | `bb_safe.m4a` | Safe! |  |
+| 1147 | `bb_out.m4a` | You're out! |  |
+| 1148 | `bb_caught.m4a` | Caught it! That's an out! |  |
+| 1149 | `bb_three_outs.m4a` | Three outs! Switch sides! |  |
+| 1150 | `bb_three_outs_next.m4a` | Three outs! On to the next inning! |  |
+| 1151 | `bb_inning_over.m4a` | That's the inning! Great batting! |  |
+| 1152 | `bb_inning.m4a` | Inning | + number, e.g. "Inning" + "2" |
+| 1153 | `bb_last_inning.m4a` | Last inning! |  |
+| 1154 | `bb_next_inning.m4a` | Next inning! |  |
+| 1155 | `bb_great_swing.m4a` | Great swing! |  |
+| 1156 | `bb_swing_tip.m4a` | Pick your swing! A single is easy. A home run is a challenge. Get it right, and you hit it! |  |
+| 1157 | `bb_pick_swing.m4a` | Pick your swing! |  |
+| 1158 | `bb_intro_howto.m4a` | Pick your swing, then answer the pitch! Harder questions hit farther! |  |
+| 1159 | `bb_one_player_sub.m4a` | Three innings. Harder questions hit farther! |  |
+| 1160 | `bb_sw_single.m4a` | A single! Nice and easy. |  |
+| 1161 | `bb_sw_double.m4a` | A double! Just right. |  |
+| 1162 | `bb_sw_triple.m4a` | A triple! Here comes a tricky one. |  |
+| 1163 | `bb_sw_homer.m4a` | Going for a home run! Here comes a challenge! |  |
+| 1164 | `bb_big_whiff.m4a` | Whoosh! What a big swing! That is just one strike. |  |
+| 1165 | `bb_nudge.m4a` | The crowd wants a big swing! Want to try a double or a triple? |  |
+| 1166 | `bb_time_strike.m4a` | Out of time! That's a strike. |  |
+| 1167 | `bb_you_scored.m4a` | You scored | + number + "runs!" |
+| 1168 | `bb_runs.m4a` | runs! |  |
+| 1169 | `bb_run.m4a` | run! |  |
+| 1170 | `bb_wins_game.m4a` | wins the game! | After a name: "Player 1" + "wins the game!" |
+| 1171 | `bb_tie_game.m4a` | It's a tie game! What a game! |  |
+| 1172 | `bb_you_win.m4a` | You win the game! |  |
+| 1173 | `bb_good_game.m4a` | Good game! |  |
+| 1174 | `bb_new_high.m4a` | A new high score! |  |
+| 1175 | `bb_high_scores.m4a` | High scores! |  |
 
 ## Snack Slugger questions (sentence parts) — record first (9)
 
@@ -1346,80 +1372,89 @@ Question starters, joined with numbers: "What's" + "5" + "plus" + "7" → "What'
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 1156 | `bbq_whats.m4a` | What's |  |
-| 1157 | `bbq_how_many_dots.m4a` | How many dots? |  |
-| 1158 | `bbq_find.m4a` | Find the number | + number |
-| 1159 | `bbq_biggest.m4a` | Which number is the biggest? |  |
-| 1160 | `bbq_smallest.m4a` | Which number is the smallest? |  |
-| 1161 | `bbq_even.m4a` | Which number is even? |  |
-| 1162 | `bbq_odd.m4a` | Which number is odd? |  |
-| 1163 | `bbq_what_makes_ten.m4a` | what makes ten? | After a number: "6 plus" + "what makes ten?" |
-| 1164 | `bbq_what_makes.m4a` | what makes | In the middle: "3 plus" + "what makes" + "7?" |
+| 1176 | `bbq_whats.m4a` | What's |  |
+| 1177 | `bbq_how_many_dots.m4a` | How many dots? |  |
+| 1178 | `bbq_find.m4a` | Find the number | + number |
+| 1179 | `bbq_biggest.m4a` | Which number is the biggest? |  |
+| 1180 | `bbq_smallest.m4a` | Which number is the smallest? |  |
+| 1181 | `bbq_even.m4a` | Which number is even? |  |
+| 1182 | `bbq_odd.m4a` | Which number is odd? |  |
+| 1183 | `bbq_what_makes_ten.m4a` | what makes ten? | After a number: "6 plus" + "what makes ten?" |
+| 1184 | `bbq_what_makes.m4a` | what makes | In the middle: "3 plus" + "what makes" + "7?" |
 
 ## Penalty Kicks (coming soon) — later (15)
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 1165 | `pk_title.m4a` | Penalty Kicks! |  |
-| 1166 | `pk_your_kick.m4a` | Your turn to kick! |  |
-| 1167 | `pk_pick_spot.m4a` | Pick a spot to aim! |  |
-| 1168 | `pk_goal.m4a` | Goal! |  |
-| 1169 | `pk_blocked.m4a` | The goalie blocked it! |  |
-| 1170 | `pk_save.m4a` | What a save! |  |
-| 1171 | `pk_missed.m4a` | Just missed! |  |
-| 1172 | `pk_off_post.m4a` | Off the post! |  |
-| 1173 | `pk_your_goalie.m4a` | Now you're the goalie! |  |
-| 1174 | `pk_dive.m4a` | Dive! |  |
-| 1175 | `pk_great_kick.m4a` | Great kick! |  |
-| 1176 | `pk_score_is.m4a` | The score is | + number + "to" + number |
-| 1177 | `w_to.m4a` | to | as in "3 to 2" |
-| 1178 | `pk_you_win.m4a` | You won the shootout! |  |
-| 1179 | `pk_tie.m4a` | It's a tie! One more kick! |  |
+| 1185 | `pk_title.m4a` | Penalty Kicks! |  |
+| 1186 | `pk_your_kick.m4a` | Your turn to kick! |  |
+| 1187 | `pk_pick_spot.m4a` | Pick a spot to aim! |  |
+| 1188 | `pk_goal.m4a` | Goal! |  |
+| 1189 | `pk_blocked.m4a` | The goalie blocked it! |  |
+| 1190 | `pk_save.m4a` | What a save! |  |
+| 1191 | `pk_missed.m4a` | Just missed! |  |
+| 1192 | `pk_off_post.m4a` | Off the post! |  |
+| 1193 | `pk_your_goalie.m4a` | Now you're the goalie! |  |
+| 1194 | `pk_dive.m4a` | Dive! |  |
+| 1195 | `pk_great_kick.m4a` | Great kick! |  |
+| 1196 | `pk_score_is.m4a` | The score is | + number + "to" + number |
+| 1197 | `w_to.m4a` | to | as in "3 to 2" |
+| 1198 | `pk_you_win.m4a` | You won the shootout! |  |
+| 1199 | `pk_tie.m4a` | It's a tie! One more kick! |  |
 
-## Picnic Spot — record first (38)
+## Picnic Spot — record first (47)
 
 Cozy and warm, like showing a friend around your room.
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 1180 | `rm_title.m4a` | My Picnic Spot! |  |
-| 1181 | `rm_it_costs.m4a` | It costs | Followed by a number, then "star bits. You have" + number |
-| 1182 | `rm_bits_you_have.m4a` | star bits. You have |  |
-| 1183 | `rm_welcome.m4a` | Welcome to your very own picnic spot! |  |
-| 1184 | `rm_welcome_back.m4a` | Welcome home! |  |
-| 1185 | `rm_shop.m4a` | Let's go shopping! What would you like? |  |
-| 1186 | `rm_decorate.m4a` | Let's decorate! Pick a thing, then pick a spot. |  |
-| 1187 | `rm_pick_spot.m4a` | Pick a spot! |  |
-| 1188 | `rm_placed.m4a` | There! It looks great! |  |
-| 1189 | `rm_bought.m4a` | It's yours! Hooray! |  |
-| 1190 | `rm_need_more.m4a` | You need a few more star bits. Play a game to earn some! |  |
-| 1191 | `rm_costs.m4a` | It costs | + number + "star bits." |
-| 1192 | `rm_star_bits.m4a` | star bits. |  |
-| 1193 | `rm_put_away.m4a` | Put away! |  |
-| 1194 | `rm_undo.m4a` | Undo! |  |
-| 1195 | `rm_flip.m4a` | Flip! |  |
-| 1196 | `rm_spot_taken.m4a` | That spot is taken. Try another one! |  |
-| 1197 | `rm_new_wall.m4a` | Ooh, new wallpaper! |  |
-| 1198 | `rm_new_floor.m4a` | Ooh, a new floor! |  |
-| 1199 | `rm_trophies.m4a` | Here is your trophy shelf! |  |
-| 1200 | `rm_friends.m4a` | Here are your picnic friends! |  |
-| 1201 | `rm_locked_friend.m4a` | This friend is still a secret! Win a story challenge to meet them. |  |
-| 1202 | `rm_locked_item.m4a` | This one is a special prize! Keep playing to win it. |  |
-| 1203 | `rm_prize_won.m4a` | You won a special prize for your room! |  |
-| 1204 | `rm_friend_up.m4a` | You're even better friends now! |  |
-| 1205 | `rm_shh.m4a` | Shh... they're napping. |  |
-| 1206 | `rm_bye.m4a` | Bye bye! See you soon! |  |
-| 1207 | `rm_owned.m4a` | You have this one! |  |
-| 1208 | `rm_nothing.m4a` | Your things box is empty. Visit the shop! |  |
-| 1209 | `fr_unlock_likes.m4a` | Now you know what I like! |  |
-| 1210 | `fr_unlock_face.m4a` | I learned a new face! Look! |  |
-| 1211 | `fr_unlock_more.m4a` | Now you know all about me! |  |
-| 1212 | `fr_unlock_gift.m4a` | I made you a present for your room! |  |
-| 1213 | `fr_lvl1.m4a` | New friend! |  |
-| 1214 | `fr_lvl2.m4a` | Pal! |  |
-| 1215 | `fr_lvl3.m4a` | Good friend! |  |
-| 1216 | `fr_lvl4.m4a` | Best friend! |  |
-| 1217 | `fr_lvl5.m4a` | Forever friend! |  |
+| 1200 | `rm_title.m4a` | My Picnic Spot! |  |
+| 1201 | `rm_it_costs.m4a` | It costs | Followed by a number, then "star bits. You have" + number |
+| 1202 | `rm_bits_you_have.m4a` | star bits. You have |  |
+| 1203 | `rm_welcome.m4a` | Welcome to your very own picnic spot! |  |
+| 1204 | `rm_welcome_back.m4a` | Welcome home! |  |
+| 1205 | `rm_shop.m4a` | Let's go shopping! What would you like? |  |
+| 1206 | `rm_decorate.m4a` | Let's decorate! Pick a thing, then pick a spot. |  |
+| 1207 | `rm_pick_spot.m4a` | Pick a spot! |  |
+| 1208 | `rm_placed.m4a` | There! It looks great! |  |
+| 1209 | `rm_bought.m4a` | It's yours! Hooray! |  |
+| 1210 | `rm_need_more.m4a` | You need a few more star bits. Play a game to earn some! |  |
+| 1211 | `rm_costs.m4a` | It costs | + number + "star bits." |
+| 1212 | `rm_star_bits.m4a` | star bits. |  |
+| 1213 | `rm_put_away.m4a` | Put away! |  |
+| 1214 | `rm_undo.m4a` | Undo! |  |
+| 1215 | `rm_flip.m4a` | Flip! |  |
+| 1216 | `rm_spot_taken.m4a` | That spot is taken. Try another one! |  |
+| 1217 | `rm_new_wall.m4a` | Ooh, new wallpaper! |  |
+| 1218 | `rm_new_floor.m4a` | Ooh, a new floor! |  |
+| 1219 | `rm_trophies.m4a` | Here is your trophy shelf! |  |
+| 1220 | `rm_friends.m4a` | Here are your picnic friends! |  |
+| 1221 | `rm_locked_friend.m4a` | This friend is still a secret! Win a story challenge to meet them. |  |
+| 1222 | `rm_locked_item.m4a` | This one is a special prize! Keep playing to win it. |  |
+| 1223 | `rm_prize_won.m4a` | You won a special prize for your room! |  |
+| 1224 | `rm_friend_up.m4a` | You're even better friends now! |  |
+| 1225 | `rm_shh.m4a` | Shh... they're napping. |  |
+| 1226 | `rm_bye.m4a` | Bye bye! See you soon! |  |
+| 1227 | `rm_owned.m4a` | You have this one! |  |
+| 1228 | `rm_nothing.m4a` | Your things box is empty. Visit the shop! |  |
+| 1229 | `rm_demo.m4a` | Tap a thing to pick it. Then drag it where you want! |  |
+| 1230 | `rm_drag.m4a` | Drag it where you want! |  |
+| 1231 | `rm_things.m4a` | Here are your things! Tap one to put it out. |  |
+| 1232 | `rm_jar_set.m4a` | Saving up for it! Your jar fills up as you play. |  |
+| 1233 | `rm_jar_ready.m4a` | Your jar is full! You can buy it now! |  |
+| 1234 | `rm_jar_empty.m4a` | Pick something in the shop to save up for! |  |
+| 1235 | `rm_no_room.m4a` | Your picnic spot is full! Put something away first. |  |
+| 1236 | `rm_buy_it.m4a` | Do you want to buy it? |  |
+| 1237 | `rm_new_shop.m4a` | Something new is in the shop! Come and see! |  |
+| 1238 | `fr_unlock_likes.m4a` | Now you know what I like! |  |
+| 1239 | `fr_unlock_face.m4a` | I learned a new face! Look! |  |
+| 1240 | `fr_unlock_more.m4a` | Now you know all about me! |  |
+| 1241 | `fr_unlock_gift.m4a` | I made you a present for your room! |  |
+| 1242 | `fr_lvl1.m4a` | New friend! |  |
+| 1243 | `fr_lvl2.m4a` | Pal! |  |
+| 1244 | `fr_lvl3.m4a` | Good friend! |  |
+| 1245 | `fr_lvl4.m4a` | Best friend! |  |
+| 1246 | `fr_lvl5.m4a` | Forever friend! |  |
 
 ## Coach v2: placement check, mistake hints, picnic story problems — record first (36)
 
@@ -1427,42 +1462,42 @@ Story problems are built from short parts, e.g. "Biscuit" + "found" + 3 + "apple
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 1218 | `skill_wordprob.m4a` | Story problems! Listen to the picnic story, then find how many. |  |
-| 1219 | `place_intro.m4a` | Let's see what you already know! |  |
-| 1220 | `place_skip.m4a` | Wow! You already know this one. Let's skip ahead! |  |
-| 1221 | `place_higher.m4a` | Great job! Let's start a little higher. |  |
-| 1222 | `place_normal.m4a` | Thanks! Let's learn it together. |  |
-| 1223 | `err_teen.m4a` | Teen numbers start with one ten. Tens first, then ones. |  |
-| 1224 | `err_count_on.m4a` | Start from the number, then count up. |  |
-| 1225 | `err_count_dots.m4a` | Touch each dot and count them. One, two, three! |  |
-| 1226 | `err_count_back.m4a` | Start from the big number, then count back. |  |
-| 1227 | `err_make_ten.m4a` | How many more make ten? Count up to ten on your fingers. |  |
-| 1228 | `err_number_line.m4a` | Say the numbers in order. Which one is missing? |  |
-| 1229 | `err_bed.m4a` | Make a bed with your hands. B comes first, d comes last. |  |
-| 1230 | `err_story.m4a` | Let's picture the story. Are we putting together, or taking away? |  |
-| 1231 | `err_first_letter.m4a` | Look at the first letter. |  |
-| 1232 | `pet_biscuit.m4a` | Biscuit | The default pet name |
-| 1233 | `wp_your_pet.m4a` | Your pet | Said instead of a custom pet name when there is no speech voice |
-| 1234 | `wp_found.m4a` | found |  |
-| 1235 | `wp_f_apples.m4a` | apples |  |
-| 1236 | `wp_f_strawberries.m4a` | strawberries |  |
-| 1237 | `wp_f_blueberries.m4a` | blueberries |  |
-| 1238 | `wp_f_carrots.m4a` | carrots |  |
-| 1239 | `wp_in_basket_and.m4a` | in the picnic basket, and |  |
-| 1240 | `wp_more_blanket.m4a` | more under the blanket. |  |
-| 1241 | `wp_how_many.m4a` | How many |  |
-| 1242 | `wp_friends_sat.m4a` | food friends sat on the picnic blanket. |  |
-| 1243 | `wp_more_came.m4a` | more came to the picnic. |  |
-| 1244 | `wp_how_many_friends.m4a` | How many food friends are there now? |  |
-| 1245 | `wp_had.m4a` | had |  |
-| 1246 | `wp_in_basket.m4a` | in the picnic basket. |  |
-| 1247 | `wp_ate.m4a` | ate |  |
-| 1248 | `wp_left.m4a` | are left? |  |
-| 1249 | `wp_there_were.m4a` | There were |  |
-| 1250 | `wp_on_blanket.m4a` | on the blanket. |  |
-| 1251 | `wp_took.m4a` | took |  |
-| 1252 | `wp_away.m4a` | away. |  |
-| 1253 | `wp_how_many_left.m4a` | How many are left? |  |
+| 1247 | `skill_wordprob.m4a` | Story problems! Listen to the picnic story, then find how many. |  |
+| 1248 | `place_intro.m4a` | Let's see what you already know! |  |
+| 1249 | `place_skip.m4a` | Wow! You already know this one. Let's skip ahead! |  |
+| 1250 | `place_higher.m4a` | Great job! Let's start a little higher. |  |
+| 1251 | `place_normal.m4a` | Thanks! Let's learn it together. |  |
+| 1252 | `err_teen.m4a` | Teen numbers start with one ten. Tens first, then ones. |  |
+| 1253 | `err_count_on.m4a` | Start from the number, then count up. |  |
+| 1254 | `err_count_dots.m4a` | Touch each dot and count them. One, two, three! |  |
+| 1255 | `err_count_back.m4a` | Start from the big number, then count back. |  |
+| 1256 | `err_make_ten.m4a` | How many more make ten? Count up to ten on your fingers. |  |
+| 1257 | `err_number_line.m4a` | Say the numbers in order. Which one is missing? |  |
+| 1258 | `err_bed.m4a` | Make a bed with your hands. B comes first, d comes last. |  |
+| 1259 | `err_story.m4a` | Let's picture the story. Are we putting together, or taking away? |  |
+| 1260 | `err_first_letter.m4a` | Look at the first letter. |  |
+| 1261 | `pet_biscuit.m4a` | Biscuit | The default pet name |
+| 1262 | `wp_your_pet.m4a` | Your pet | Said instead of a custom pet name when there is no speech voice |
+| 1263 | `wp_found.m4a` | found |  |
+| 1264 | `wp_f_apples.m4a` | apples |  |
+| 1265 | `wp_f_strawberries.m4a` | strawberries |  |
+| 1266 | `wp_f_blueberries.m4a` | blueberries |  |
+| 1267 | `wp_f_carrots.m4a` | carrots |  |
+| 1268 | `wp_in_basket_and.m4a` | in the picnic basket, and |  |
+| 1269 | `wp_more_blanket.m4a` | more under the blanket. |  |
+| 1270 | `wp_how_many.m4a` | How many |  |
+| 1271 | `wp_friends_sat.m4a` | food friends sat on the picnic blanket. |  |
+| 1272 | `wp_more_came.m4a` | more came to the picnic. |  |
+| 1273 | `wp_how_many_friends.m4a` | How many food friends are there now? |  |
+| 1274 | `wp_had.m4a` | had |  |
+| 1275 | `wp_in_basket.m4a` | in the picnic basket. |  |
+| 1276 | `wp_ate.m4a` | ate |  |
+| 1277 | `wp_left.m4a` | are left? |  |
+| 1278 | `wp_there_were.m4a` | There were |  |
+| 1279 | `wp_on_blanket.m4a` | on the blanket. |  |
+| 1280 | `wp_took.m4a` | took |  |
+| 1281 | `wp_away.m4a` | away. |  |
+| 1282 | `wp_how_many_left.m4a` | How many are left? |  |
 
 ## Picnic friends: bios and room chatter — later (216)
 
@@ -1470,222 +1505,222 @@ Read by the browser voice until recorded. Each food friend talks about themselve
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 1254 | `fr_strawberry_hi.m4a` | This is Jammy! Jammy is sunny, sweet and always ready to start the fun. |  |
-| 1255 | `fr_strawberry_likes.m4a` | Jammy's favorite thing is leading the picnic parade. |  |
-| 1256 | `fr_strawberry_dislikes.m4a` | Jammy always says: Berry good job! |  |
-| 1257 | `fr_strawberry_food.m4a` | Jammy is a strawberry and loves a good picnic. |  |
-| 1258 | `fr_strawberry_tap1.m4a` | Berry good job! | When tapped in the room |
-| 1259 | `fr_strawberry_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1260 | `fr_strawberry_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1261 | `fr_strawberry_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1262 | `fr_apple_hi.m4a` | This is Crisp! Crisp is calm and confident; a steady helper. |  |
-| 1263 | `fr_apple_likes.m4a` | Crisp's favorite thing is crunchy autumn walks. |  |
-| 1264 | `fr_apple_dislikes.m4a` | Crisp always says: Nice and crisp! |  |
-| 1265 | `fr_apple_food.m4a` | Crisp is a apple and loves a good picnic. |  |
-| 1266 | `fr_apple_tap1.m4a` | Nice and crisp! | When tapped in the room |
-| 1267 | `fr_apple_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1268 | `fr_apple_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1269 | `fr_apple_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1270 | `fr_corn_hi.m4a` | This is Niblet! Niblet is goofy, toothy and full of giggles. |  |
-| 1271 | `fr_corn_likes.m4a` | Niblet's favorite thing is telling corny jokes. |  |
-| 1272 | `fr_corn_dislikes.m4a` | Niblet always says: Aw, shucks! |  |
-| 1273 | `fr_corn_food.m4a` | Niblet is a corn on the cob and loves a good picnic. |  |
-| 1274 | `fr_corn_tap1.m4a` | Aw, shucks! | When tapped in the room |
-| 1275 | `fr_corn_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1276 | `fr_corn_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1277 | `fr_corn_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1278 | `fr_blueberry_hi.m4a` | This is Bloop! Bloop is tiny, curious and amazed by everything. |  |
-| 1279 | `fr_blueberry_likes.m4a` | Bloop's favorite thing is asking "why?. |  |
-| 1280 | `fr_blueberry_dislikes.m4a` | Bloop always says: Bloop bloop, I did it! |  |
-| 1281 | `fr_blueberry_food.m4a` | Bloop is a blueberry and loves a good picnic. |  |
-| 1282 | `fr_blueberry_tap1.m4a` | Bloop bloop, I did it! | When tapped in the room |
-| 1283 | `fr_blueberry_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1284 | `fr_blueberry_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1285 | `fr_blueberry_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1286 | `fr_mochi_hi.m4a` | This is Dora Dumpling! Dora Dumpling is soft, cheerful and a little bit hungry. |  |
-| 1287 | `fr_mochi_likes.m4a` | Dora Dumpling's favorite thing is snack time. |  |
-| 1288 | `fr_mochi_dislikes.m4a` | Dora Dumpling always says: Squishy hugs for everyone! |  |
-| 1289 | `fr_mochi_food.m4a` | Dora Dumpling is a rice dumpling and loves a good picnic. |  |
-| 1290 | `fr_mochi_tap1.m4a` | Squishy hugs for everyone! | When tapped in the room |
-| 1291 | `fr_mochi_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1292 | `fr_mochi_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1293 | `fr_mochi_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1294 | `fr_banana_hi.m4a` | This is Peel! Peel is silly and bendy; loves a good laugh. |  |
-| 1295 | `fr_banana_likes.m4a` | Peel's favorite thing is bouncing on trampolines. |  |
-| 1296 | `fr_banana_dislikes.m4a` | Peel always says: Let's go bananas! |  |
-| 1297 | `fr_banana_food.m4a` | Peel is a banana and loves a good picnic. |  |
-| 1298 | `fr_banana_tap1.m4a` | Let's go bananas! | When tapped in the room |
-| 1299 | `fr_banana_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1300 | `fr_banana_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1301 | `fr_banana_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1302 | `fr_pear_hi.m4a` | This is Petey Pear! Petey Pear is dreamy and gentle; thinks before he speaks. |  |
-| 1303 | `fr_pear_likes.m4a` | Petey Pear's favorite thing is cozy naps in the shade. |  |
-| 1304 | `fr_pear_dislikes.m4a` | Petey Pear always says: We make a great pear! |  |
-| 1305 | `fr_pear_food.m4a` | Petey Pear is a pear and loves a good picnic. |  |
-| 1306 | `fr_pear_tap1.m4a` | We make a great pear! | When tapped in the room |
-| 1307 | `fr_pear_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1308 | `fr_pear_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1309 | `fr_pear_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1310 | `fr_carrot_hi.m4a` | This is Crunch! Crunch is sporty and determined; never gives up. |  |
-| 1311 | `fr_carrot_likes.m4a` | Crunch's favorite thing is racing to the finish line. |  |
-| 1312 | `fr_carrot_dislikes.m4a` | Crunch always says: Crunch time! |  |
-| 1313 | `fr_carrot_food.m4a` | Crunch is a carrot and loves a good picnic. |  |
-| 1314 | `fr_carrot_tap1.m4a` | Crunch time! | When tapped in the room |
-| 1315 | `fr_carrot_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1316 | `fr_carrot_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1317 | `fr_carrot_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1318 | `fr_broccoli_hi.m4a` | This is Brock! Brock is kind and strong, like a little tree. |  |
-| 1319 | `fr_broccoli_likes.m4a` | Brock's favorite thing is climbing real trees. |  |
-| 1320 | `fr_broccoli_dislikes.m4a` | Brock always says: Stand tall! |  |
-| 1321 | `fr_broccoli_food.m4a` | Brock is a broccoli and loves a good picnic. |  |
-| 1322 | `fr_broccoli_tap1.m4a` | Stand tall! | When tapped in the room |
-| 1323 | `fr_broccoli_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1324 | `fr_broccoli_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1325 | `fr_broccoli_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1326 | `fr_sushi_hi.m4a` | This is Umi! Umi is polite, tidy and quietly clever. |  |
-| 1327 | `fr_sushi_likes.m4a` | Umi's favorite thing is ocean waves. |  |
-| 1328 | `fr_sushi_dislikes.m4a` | Umi always says: Roll with it! |  |
-| 1329 | `fr_sushi_food.m4a` | Umi is a sushi and loves a good picnic. |  |
-| 1330 | `fr_sushi_tap1.m4a` | Roll with it! | When tapped in the room |
-| 1331 | `fr_sushi_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1332 | `fr_sushi_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1333 | `fr_sushi_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1334 | `fr_taco_hi.m4a` | This is Guac! Guac is wild, wacky and fun at parties. |  |
-| 1335 | `fr_taco_likes.m4a` | Guac's favorite thing is taco Tuesday dance. |  |
-| 1336 | `fr_taco_dislikes.m4a` | Guac always says: Let's taco 'bout it! |  |
-| 1337 | `fr_taco_food.m4a` | Guac is a taco and loves a good picnic. |  |
-| 1338 | `fr_taco_tap1.m4a` | Let's taco 'bout it! | When tapped in the room |
-| 1339 | `fr_taco_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1340 | `fr_taco_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1341 | `fr_taco_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1342 | `fr_pizza_hi.m4a` | This is Slice! Slice is cool and confident; shares every slice. |  |
-| 1343 | `fr_pizza_likes.m4a` | Slice's favorite thing is pizza parties with friends. |  |
-| 1344 | `fr_pizza_dislikes.m4a` | Slice always says: You're a-pizza-zing! |  |
-| 1345 | `fr_pizza_food.m4a` | Slice is a pizza slice and loves a good picnic. |  |
-| 1346 | `fr_pizza_tap1.m4a` | You're a-pizza-zing! | When tapped in the room |
-| 1347 | `fr_pizza_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1348 | `fr_pizza_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1349 | `fr_pizza_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1350 | `fr_pancake_hi.m4a` | This is Maple! Maple is warm and cozy, like a sunny morning. |  |
-| 1351 | `fr_pancake_likes.m4a` | Maple's favorite thing is breakfast in bed. |  |
-| 1352 | `fr_pancake_dislikes.m4a` | Maple always says: Stack it up! |  |
-| 1353 | `fr_pancake_food.m4a` | Maple is a pancake stack and loves a good picnic. |  |
-| 1354 | `fr_pancake_tap1.m4a` | Stack it up! | When tapped in the room |
-| 1355 | `fr_pancake_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1356 | `fr_pancake_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1357 | `fr_pancake_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1358 | `fr_cupcake_hi.m4a` | This is Sprinkles! Sprinkles is sweet and sparkly; loves to celebrate. |  |
-| 1359 | `fr_cupcake_likes.m4a` | Sprinkles's favorite thing is birthday candles. |  |
-| 1360 | `fr_cupcake_dislikes.m4a` | Sprinkles always says: Sprinkle some joy! |  |
-| 1361 | `fr_cupcake_food.m4a` | Sprinkles is a cupcake and loves a good picnic. |  |
-| 1362 | `fr_cupcake_tap1.m4a` | Sprinkle some joy! | When tapped in the room |
-| 1363 | `fr_cupcake_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1364 | `fr_cupcake_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1365 | `fr_cupcake_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1366 | `fr_avocado_hi.m4a` | This is Avo! Avo is super chill; calm in any storm. |  |
-| 1367 | `fr_avocado_likes.m4a` | Avo's favorite thing is lazy hammock days. |  |
-| 1368 | `fr_avocado_dislikes.m4a` | Avo always says: Avo great day! |  |
-| 1369 | `fr_avocado_food.m4a` | Avo is a avocado and loves a good picnic. |  |
-| 1370 | `fr_avocado_tap1.m4a` | Avo great day! | When tapped in the room |
-| 1371 | `fr_avocado_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1372 | `fr_avocado_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1373 | `fr_avocado_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1374 | `fr_watermelon_hi.m4a` | This is Mellie! Mellie is sunny and splashy; the life of the picnic. |  |
-| 1375 | `fr_watermelon_likes.m4a` | Mellie's favorite thing is summer water fights. |  |
-| 1376 | `fr_watermelon_dislikes.m4a` | Mellie always says: One in a melon! |  |
-| 1377 | `fr_watermelon_food.m4a` | Mellie is a watermelon slice and loves a good picnic. |  |
-| 1378 | `fr_watermelon_tap1.m4a` | One in a melon! | When tapped in the room |
-| 1379 | `fr_watermelon_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1380 | `fr_watermelon_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1381 | `fr_watermelon_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1382 | `fr_pretzel_hi.m4a` | This is Twist! Twist is cool and clever; loves a good puzzle. |  |
-| 1383 | `fr_pretzel_likes.m4a` | Twist's favorite thing is brain teasers. |  |
-| 1384 | `fr_pretzel_dislikes.m4a` | Twist always says: Let's twist again! |  |
-| 1385 | `fr_pretzel_food.m4a` | Twist is a soft pretzel and loves a good picnic. |  |
-| 1386 | `fr_pretzel_tap1.m4a` | Let's twist again! | When tapped in the room |
-| 1387 | `fr_pretzel_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1388 | `fr_pretzel_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1389 | `fr_pretzel_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1390 | `fr_grapes_hi.m4a` | This is Vinnie! Vinnie is friendly and loyal; always brings friends. |  |
-| 1391 | `fr_grapes_likes.m4a` | Vinnie's favorite thing is big group hugs. |  |
-| 1392 | `fr_grapes_dislikes.m4a` | Vinnie always says: Grape to see you! |  |
-| 1393 | `fr_grapes_food.m4a` | Vinnie is a grapes and loves a good picnic. |  |
-| 1394 | `fr_grapes_tap1.m4a` | Grape to see you! | When tapped in the room |
-| 1395 | `fr_grapes_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1396 | `fr_grapes_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1397 | `fr_grapes_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1398 | `fr_onigiri_hi.m4a` | This is Nori! Nori is quiet and steady; a really good friend. |  |
-| 1399 | `fr_onigiri_likes.m4a` | Nori's favorite thing is lunchbox adventures. |  |
-| 1400 | `fr_onigiri_dislikes.m4a` | Nori always says: Rice and easy! |  |
-| 1401 | `fr_onigiri_food.m4a` | Nori is a onigiri and loves a good picnic. |  |
-| 1402 | `fr_onigiri_tap1.m4a` | Rice and easy! | When tapped in the room |
-| 1403 | `fr_onigiri_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1404 | `fr_onigiri_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1405 | `fr_onigiri_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1406 | `fr_pineapple_hi.m4a` | This is Spike! Spike is brave and bouncy; spiky outside, sweet inside. |  |
-| 1407 | `fr_pineapple_likes.m4a` | Spike's favorite thing is tropical islands. |  |
-| 1408 | `fr_pineapple_dislikes.m4a` | Spike always says: Stay sharp, stay sweet! |  |
-| 1409 | `fr_pineapple_food.m4a` | Spike is a pineapple and loves a good picnic. |  |
-| 1410 | `fr_pineapple_tap1.m4a` | Stay sharp, stay sweet! | When tapped in the room |
-| 1411 | `fr_pineapple_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1412 | `fr_pineapple_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1413 | `fr_pineapple_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1414 | `fr_waffle_hi.m4a` | This is Wally! Wally is tidy and dependable; loves a plan. |  |
-| 1415 | `fr_waffle_likes.m4a` | Wally's favorite thing is neat little squares. |  |
-| 1416 | `fr_waffle_dislikes.m4a` | Wally always says: No waffling, let's go! |  |
-| 1417 | `fr_waffle_food.m4a` | Wally is a waffle and loves a good picnic. |  |
-| 1418 | `fr_waffle_tap1.m4a` | No waffling, let's go! | When tapped in the room |
-| 1419 | `fr_waffle_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1420 | `fr_waffle_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1421 | `fr_waffle_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1422 | `fr_lemon_hi.m4a` | This is Zest! Zest is a little sour, a lot of fun. |  |
-| 1423 | `fr_lemon_likes.m4a` | Zest's favorite thing is lemonade stands. |  |
-| 1424 | `fr_lemon_dislikes.m4a` | Zest always says: Easy peasy, lemon squeezy! |  |
-| 1425 | `fr_lemon_food.m4a` | Zest is a lemon and loves a good picnic. |  |
-| 1426 | `fr_lemon_tap1.m4a` | Easy peasy, lemon squeezy! | When tapped in the room |
-| 1427 | `fr_lemon_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1428 | `fr_lemon_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1429 | `fr_lemon_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1430 | `fr_donut_hi.m4a` | This is Minty! Minty is sweet and goofy; first to laugh. |  |
-| 1431 | `fr_donut_likes.m4a` | Minty's favorite thing is fresh minty breezes. |  |
-| 1432 | `fr_donut_dislikes.m4a` | Minty always says: Donut give up! |  |
-| 1433 | `fr_donut_food.m4a` | Minty is a donut and loves a good picnic. |  |
-| 1434 | `fr_donut_tap1.m4a` | Donut give up! | When tapped in the room |
-| 1435 | `fr_donut_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1436 | `fr_donut_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1437 | `fr_donut_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1438 | `fr_popcorn_hi.m4a` | This is Popper! Popper is bursting with energy all day long. |  |
-| 1439 | `fr_popcorn_likes.m4a` | Popper's favorite thing is movie night. |  |
-| 1440 | `fr_popcorn_dislikes.m4a` | Popper always says: Pop pop hooray! |  |
-| 1441 | `fr_popcorn_food.m4a` | Popper is a popcorn box and loves a good picnic. |  |
-| 1442 | `fr_popcorn_tap1.m4a` | Pop pop hooray! | When tapped in the room |
-| 1443 | `fr_popcorn_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1444 | `fr_popcorn_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1445 | `fr_popcorn_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1446 | `fr_peach_hi.m4a` | This is Peachy! Peachy is gentle and kind; gives the best hugs. |  |
-| 1447 | `fr_peach_likes.m4a` | Peachy's favorite thing is sunny orchards. |  |
-| 1448 | `fr_peach_dislikes.m4a` | Peachy always says: Everything's peachy! |  |
-| 1449 | `fr_peach_food.m4a` | Peachy is a peach and loves a good picnic. |  |
-| 1450 | `fr_peach_tap1.m4a` | Everything's peachy! | When tapped in the room |
-| 1451 | `fr_peach_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1452 | `fr_peach_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1453 | `fr_peach_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1454 | `fr_cheese_hi.m4a` | This is Gouda! Gouda is funny and full of surprises (and holes!). |  |
-| 1455 | `fr_cheese_likes.m4a` | Gouda's favorite thing is saying "cheese" for photos. |  |
-| 1456 | `fr_cheese_dislikes.m4a` | Gouda always says: Gouda job! |  |
-| 1457 | `fr_cheese_food.m4a` | Gouda is a cheese wedge and loves a good picnic. |  |
-| 1458 | `fr_cheese_tap1.m4a` | Gouda job! | When tapped in the room |
-| 1459 | `fr_cheese_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1460 | `fr_cheese_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1461 | `fr_cheese_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
-| 1462 | `fr_cookie_hi.m4a` | This is Chip! Chip is crunchy, cheerful and always shares. |  |
-| 1463 | `fr_cookie_likes.m4a` | Chip's favorite thing is milk and cookie dunks. |  |
-| 1464 | `fr_cookie_dislikes.m4a` | Chip always says: That's the way the cookie crumbles! |  |
-| 1465 | `fr_cookie_food.m4a` | Chip is a chocolate-chip cookie and loves a good picnic. |  |
-| 1466 | `fr_cookie_tap1.m4a` | That's the way the cookie crumbles! | When tapped in the room |
-| 1467 | `fr_cookie_tap2.m4a` | Hi, friend! | When tapped in the room |
-| 1468 | `fr_cookie_tap3.m4a` | It's picnic time! | When tapped in the room |
-| 1469 | `fr_cookie_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1283 | `fr_strawberry_hi.m4a` | This is Jammy! Jammy is sunny, sweet and always ready to start the fun. |  |
+| 1284 | `fr_strawberry_likes.m4a` | Jammy's favorite thing is leading the picnic parade. |  |
+| 1285 | `fr_strawberry_dislikes.m4a` | Jammy always says: Berry good job! |  |
+| 1286 | `fr_strawberry_food.m4a` | Jammy is a strawberry and loves a good picnic. |  |
+| 1287 | `fr_strawberry_tap1.m4a` | Berry good job! | When tapped in the room |
+| 1288 | `fr_strawberry_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1289 | `fr_strawberry_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1290 | `fr_strawberry_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1291 | `fr_apple_hi.m4a` | This is Crisp! Crisp is calm and confident; a steady helper. |  |
+| 1292 | `fr_apple_likes.m4a` | Crisp's favorite thing is crunchy autumn walks. |  |
+| 1293 | `fr_apple_dislikes.m4a` | Crisp always says: Nice and crisp! |  |
+| 1294 | `fr_apple_food.m4a` | Crisp is a apple and loves a good picnic. |  |
+| 1295 | `fr_apple_tap1.m4a` | Nice and crisp! | When tapped in the room |
+| 1296 | `fr_apple_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1297 | `fr_apple_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1298 | `fr_apple_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1299 | `fr_corn_hi.m4a` | This is Niblet! Niblet is goofy, toothy and full of giggles. |  |
+| 1300 | `fr_corn_likes.m4a` | Niblet's favorite thing is telling corny jokes. |  |
+| 1301 | `fr_corn_dislikes.m4a` | Niblet always says: Aw, shucks! |  |
+| 1302 | `fr_corn_food.m4a` | Niblet is a corn on the cob and loves a good picnic. |  |
+| 1303 | `fr_corn_tap1.m4a` | Aw, shucks! | When tapped in the room |
+| 1304 | `fr_corn_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1305 | `fr_corn_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1306 | `fr_corn_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1307 | `fr_blueberry_hi.m4a` | This is Bloop! Bloop is tiny, curious and amazed by everything. |  |
+| 1308 | `fr_blueberry_likes.m4a` | Bloop's favorite thing is asking "why?. |  |
+| 1309 | `fr_blueberry_dislikes.m4a` | Bloop always says: Bloop bloop, I did it! |  |
+| 1310 | `fr_blueberry_food.m4a` | Bloop is a blueberry and loves a good picnic. |  |
+| 1311 | `fr_blueberry_tap1.m4a` | Bloop bloop, I did it! | When tapped in the room |
+| 1312 | `fr_blueberry_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1313 | `fr_blueberry_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1314 | `fr_blueberry_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1315 | `fr_mochi_hi.m4a` | This is Dora Dumpling! Dora Dumpling is soft, cheerful and a little bit hungry. |  |
+| 1316 | `fr_mochi_likes.m4a` | Dora Dumpling's favorite thing is snack time. |  |
+| 1317 | `fr_mochi_dislikes.m4a` | Dora Dumpling always says: Squishy hugs for everyone! |  |
+| 1318 | `fr_mochi_food.m4a` | Dora Dumpling is a rice dumpling and loves a good picnic. |  |
+| 1319 | `fr_mochi_tap1.m4a` | Squishy hugs for everyone! | When tapped in the room |
+| 1320 | `fr_mochi_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1321 | `fr_mochi_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1322 | `fr_mochi_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1323 | `fr_banana_hi.m4a` | This is Peel! Peel is silly and bendy; loves a good laugh. |  |
+| 1324 | `fr_banana_likes.m4a` | Peel's favorite thing is bouncing on trampolines. |  |
+| 1325 | `fr_banana_dislikes.m4a` | Peel always says: Let's go bananas! |  |
+| 1326 | `fr_banana_food.m4a` | Peel is a banana and loves a good picnic. |  |
+| 1327 | `fr_banana_tap1.m4a` | Let's go bananas! | When tapped in the room |
+| 1328 | `fr_banana_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1329 | `fr_banana_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1330 | `fr_banana_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1331 | `fr_pear_hi.m4a` | This is Petey Pear! Petey Pear is dreamy and gentle; thinks before he speaks. |  |
+| 1332 | `fr_pear_likes.m4a` | Petey Pear's favorite thing is cozy naps in the shade. |  |
+| 1333 | `fr_pear_dislikes.m4a` | Petey Pear always says: We make a great pear! |  |
+| 1334 | `fr_pear_food.m4a` | Petey Pear is a pear and loves a good picnic. |  |
+| 1335 | `fr_pear_tap1.m4a` | We make a great pear! | When tapped in the room |
+| 1336 | `fr_pear_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1337 | `fr_pear_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1338 | `fr_pear_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1339 | `fr_carrot_hi.m4a` | This is Crunch! Crunch is sporty and determined; never gives up. |  |
+| 1340 | `fr_carrot_likes.m4a` | Crunch's favorite thing is racing to the finish line. |  |
+| 1341 | `fr_carrot_dislikes.m4a` | Crunch always says: Crunch time! |  |
+| 1342 | `fr_carrot_food.m4a` | Crunch is a carrot and loves a good picnic. |  |
+| 1343 | `fr_carrot_tap1.m4a` | Crunch time! | When tapped in the room |
+| 1344 | `fr_carrot_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1345 | `fr_carrot_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1346 | `fr_carrot_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1347 | `fr_broccoli_hi.m4a` | This is Brock! Brock is kind and strong, like a little tree. |  |
+| 1348 | `fr_broccoli_likes.m4a` | Brock's favorite thing is climbing real trees. |  |
+| 1349 | `fr_broccoli_dislikes.m4a` | Brock always says: Stand tall! |  |
+| 1350 | `fr_broccoli_food.m4a` | Brock is a broccoli and loves a good picnic. |  |
+| 1351 | `fr_broccoli_tap1.m4a` | Stand tall! | When tapped in the room |
+| 1352 | `fr_broccoli_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1353 | `fr_broccoli_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1354 | `fr_broccoli_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1355 | `fr_sushi_hi.m4a` | This is Umi! Umi is polite, tidy and quietly clever. |  |
+| 1356 | `fr_sushi_likes.m4a` | Umi's favorite thing is ocean waves. |  |
+| 1357 | `fr_sushi_dislikes.m4a` | Umi always says: Roll with it! |  |
+| 1358 | `fr_sushi_food.m4a` | Umi is a sushi and loves a good picnic. |  |
+| 1359 | `fr_sushi_tap1.m4a` | Roll with it! | When tapped in the room |
+| 1360 | `fr_sushi_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1361 | `fr_sushi_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1362 | `fr_sushi_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1363 | `fr_taco_hi.m4a` | This is Guac! Guac is wild, wacky and fun at parties. |  |
+| 1364 | `fr_taco_likes.m4a` | Guac's favorite thing is taco Tuesday dance. |  |
+| 1365 | `fr_taco_dislikes.m4a` | Guac always says: Let's taco 'bout it! |  |
+| 1366 | `fr_taco_food.m4a` | Guac is a taco and loves a good picnic. |  |
+| 1367 | `fr_taco_tap1.m4a` | Let's taco 'bout it! | When tapped in the room |
+| 1368 | `fr_taco_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1369 | `fr_taco_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1370 | `fr_taco_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1371 | `fr_pizza_hi.m4a` | This is Slice! Slice is cool and confident; shares every slice. |  |
+| 1372 | `fr_pizza_likes.m4a` | Slice's favorite thing is pizza parties with friends. |  |
+| 1373 | `fr_pizza_dislikes.m4a` | Slice always says: You're a-pizza-zing! |  |
+| 1374 | `fr_pizza_food.m4a` | Slice is a pizza slice and loves a good picnic. |  |
+| 1375 | `fr_pizza_tap1.m4a` | You're a-pizza-zing! | When tapped in the room |
+| 1376 | `fr_pizza_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1377 | `fr_pizza_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1378 | `fr_pizza_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1379 | `fr_pancake_hi.m4a` | This is Maple! Maple is warm and cozy, like a sunny morning. |  |
+| 1380 | `fr_pancake_likes.m4a` | Maple's favorite thing is breakfast in bed. |  |
+| 1381 | `fr_pancake_dislikes.m4a` | Maple always says: Stack it up! |  |
+| 1382 | `fr_pancake_food.m4a` | Maple is a pancake stack and loves a good picnic. |  |
+| 1383 | `fr_pancake_tap1.m4a` | Stack it up! | When tapped in the room |
+| 1384 | `fr_pancake_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1385 | `fr_pancake_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1386 | `fr_pancake_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1387 | `fr_cupcake_hi.m4a` | This is Sprinkles! Sprinkles is sweet and sparkly; loves to celebrate. |  |
+| 1388 | `fr_cupcake_likes.m4a` | Sprinkles's favorite thing is birthday candles. |  |
+| 1389 | `fr_cupcake_dislikes.m4a` | Sprinkles always says: Sprinkle some joy! |  |
+| 1390 | `fr_cupcake_food.m4a` | Sprinkles is a cupcake and loves a good picnic. |  |
+| 1391 | `fr_cupcake_tap1.m4a` | Sprinkle some joy! | When tapped in the room |
+| 1392 | `fr_cupcake_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1393 | `fr_cupcake_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1394 | `fr_cupcake_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1395 | `fr_avocado_hi.m4a` | This is Avo! Avo is super chill; calm in any storm. |  |
+| 1396 | `fr_avocado_likes.m4a` | Avo's favorite thing is lazy hammock days. |  |
+| 1397 | `fr_avocado_dislikes.m4a` | Avo always says: Avo great day! |  |
+| 1398 | `fr_avocado_food.m4a` | Avo is a avocado and loves a good picnic. |  |
+| 1399 | `fr_avocado_tap1.m4a` | Avo great day! | When tapped in the room |
+| 1400 | `fr_avocado_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1401 | `fr_avocado_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1402 | `fr_avocado_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1403 | `fr_watermelon_hi.m4a` | This is Mellie! Mellie is sunny and splashy; the life of the picnic. |  |
+| 1404 | `fr_watermelon_likes.m4a` | Mellie's favorite thing is summer water fights. |  |
+| 1405 | `fr_watermelon_dislikes.m4a` | Mellie always says: One in a melon! |  |
+| 1406 | `fr_watermelon_food.m4a` | Mellie is a watermelon slice and loves a good picnic. |  |
+| 1407 | `fr_watermelon_tap1.m4a` | One in a melon! | When tapped in the room |
+| 1408 | `fr_watermelon_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1409 | `fr_watermelon_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1410 | `fr_watermelon_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1411 | `fr_pretzel_hi.m4a` | This is Twist! Twist is cool and clever; loves a good puzzle. |  |
+| 1412 | `fr_pretzel_likes.m4a` | Twist's favorite thing is brain teasers. |  |
+| 1413 | `fr_pretzel_dislikes.m4a` | Twist always says: Let's twist again! |  |
+| 1414 | `fr_pretzel_food.m4a` | Twist is a soft pretzel and loves a good picnic. |  |
+| 1415 | `fr_pretzel_tap1.m4a` | Let's twist again! | When tapped in the room |
+| 1416 | `fr_pretzel_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1417 | `fr_pretzel_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1418 | `fr_pretzel_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1419 | `fr_grapes_hi.m4a` | This is Vinnie! Vinnie is friendly and loyal; always brings friends. |  |
+| 1420 | `fr_grapes_likes.m4a` | Vinnie's favorite thing is big group hugs. |  |
+| 1421 | `fr_grapes_dislikes.m4a` | Vinnie always says: Grape to see you! |  |
+| 1422 | `fr_grapes_food.m4a` | Vinnie is a grapes and loves a good picnic. |  |
+| 1423 | `fr_grapes_tap1.m4a` | Grape to see you! | When tapped in the room |
+| 1424 | `fr_grapes_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1425 | `fr_grapes_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1426 | `fr_grapes_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1427 | `fr_onigiri_hi.m4a` | This is Nori! Nori is quiet and steady; a really good friend. |  |
+| 1428 | `fr_onigiri_likes.m4a` | Nori's favorite thing is lunchbox adventures. |  |
+| 1429 | `fr_onigiri_dislikes.m4a` | Nori always says: Rice and easy! |  |
+| 1430 | `fr_onigiri_food.m4a` | Nori is a onigiri and loves a good picnic. |  |
+| 1431 | `fr_onigiri_tap1.m4a` | Rice and easy! | When tapped in the room |
+| 1432 | `fr_onigiri_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1433 | `fr_onigiri_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1434 | `fr_onigiri_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1435 | `fr_pineapple_hi.m4a` | This is Spike! Spike is brave and bouncy; spiky outside, sweet inside. |  |
+| 1436 | `fr_pineapple_likes.m4a` | Spike's favorite thing is tropical islands. |  |
+| 1437 | `fr_pineapple_dislikes.m4a` | Spike always says: Stay sharp, stay sweet! |  |
+| 1438 | `fr_pineapple_food.m4a` | Spike is a pineapple and loves a good picnic. |  |
+| 1439 | `fr_pineapple_tap1.m4a` | Stay sharp, stay sweet! | When tapped in the room |
+| 1440 | `fr_pineapple_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1441 | `fr_pineapple_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1442 | `fr_pineapple_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1443 | `fr_waffle_hi.m4a` | This is Wally! Wally is tidy and dependable; loves a plan. |  |
+| 1444 | `fr_waffle_likes.m4a` | Wally's favorite thing is neat little squares. |  |
+| 1445 | `fr_waffle_dislikes.m4a` | Wally always says: No waffling, let's go! |  |
+| 1446 | `fr_waffle_food.m4a` | Wally is a waffle and loves a good picnic. |  |
+| 1447 | `fr_waffle_tap1.m4a` | No waffling, let's go! | When tapped in the room |
+| 1448 | `fr_waffle_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1449 | `fr_waffle_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1450 | `fr_waffle_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1451 | `fr_lemon_hi.m4a` | This is Zest! Zest is a little sour, a lot of fun. |  |
+| 1452 | `fr_lemon_likes.m4a` | Zest's favorite thing is lemonade stands. |  |
+| 1453 | `fr_lemon_dislikes.m4a` | Zest always says: Easy peasy, lemon squeezy! |  |
+| 1454 | `fr_lemon_food.m4a` | Zest is a lemon and loves a good picnic. |  |
+| 1455 | `fr_lemon_tap1.m4a` | Easy peasy, lemon squeezy! | When tapped in the room |
+| 1456 | `fr_lemon_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1457 | `fr_lemon_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1458 | `fr_lemon_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1459 | `fr_donut_hi.m4a` | This is Minty! Minty is sweet and goofy; first to laugh. |  |
+| 1460 | `fr_donut_likes.m4a` | Minty's favorite thing is fresh minty breezes. |  |
+| 1461 | `fr_donut_dislikes.m4a` | Minty always says: Donut give up! |  |
+| 1462 | `fr_donut_food.m4a` | Minty is a donut and loves a good picnic. |  |
+| 1463 | `fr_donut_tap1.m4a` | Donut give up! | When tapped in the room |
+| 1464 | `fr_donut_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1465 | `fr_donut_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1466 | `fr_donut_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1467 | `fr_popcorn_hi.m4a` | This is Popper! Popper is bursting with energy all day long. |  |
+| 1468 | `fr_popcorn_likes.m4a` | Popper's favorite thing is movie night. |  |
+| 1469 | `fr_popcorn_dislikes.m4a` | Popper always says: Pop pop hooray! |  |
+| 1470 | `fr_popcorn_food.m4a` | Popper is a popcorn box and loves a good picnic. |  |
+| 1471 | `fr_popcorn_tap1.m4a` | Pop pop hooray! | When tapped in the room |
+| 1472 | `fr_popcorn_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1473 | `fr_popcorn_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1474 | `fr_popcorn_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1475 | `fr_peach_hi.m4a` | This is Peachy! Peachy is gentle and kind; gives the best hugs. |  |
+| 1476 | `fr_peach_likes.m4a` | Peachy's favorite thing is sunny orchards. |  |
+| 1477 | `fr_peach_dislikes.m4a` | Peachy always says: Everything's peachy! |  |
+| 1478 | `fr_peach_food.m4a` | Peachy is a peach and loves a good picnic. |  |
+| 1479 | `fr_peach_tap1.m4a` | Everything's peachy! | When tapped in the room |
+| 1480 | `fr_peach_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1481 | `fr_peach_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1482 | `fr_peach_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1483 | `fr_cheese_hi.m4a` | This is Gouda! Gouda is funny and full of surprises (and holes!). |  |
+| 1484 | `fr_cheese_likes.m4a` | Gouda's favorite thing is saying "cheese" for photos. |  |
+| 1485 | `fr_cheese_dislikes.m4a` | Gouda always says: Gouda job! |  |
+| 1486 | `fr_cheese_food.m4a` | Gouda is a cheese wedge and loves a good picnic. |  |
+| 1487 | `fr_cheese_tap1.m4a` | Gouda job! | When tapped in the room |
+| 1488 | `fr_cheese_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1489 | `fr_cheese_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1490 | `fr_cheese_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
+| 1491 | `fr_cookie_hi.m4a` | This is Chip! Chip is crunchy, cheerful and always shares. |  |
+| 1492 | `fr_cookie_likes.m4a` | Chip's favorite thing is milk and cookie dunks. |  |
+| 1493 | `fr_cookie_dislikes.m4a` | Chip always says: That's the way the cookie crumbles! |  |
+| 1494 | `fr_cookie_food.m4a` | Chip is a chocolate-chip cookie and loves a good picnic. |  |
+| 1495 | `fr_cookie_tap1.m4a` | That's the way the cookie crumbles! | When tapped in the room |
+| 1496 | `fr_cookie_tap2.m4a` | Hi, friend! | When tapped in the room |
+| 1497 | `fr_cookie_tap3.m4a` | It's picnic time! | When tapped in the room |
+| 1498 | `fr_cookie_nap.m4a` | Zzz... picnic dreams... | Sleepy, while napping |
 
 ## Picnic Spot things (68) — later (68)
 
@@ -1693,74 +1728,74 @@ Item names, said brightly when a kid taps one in the shop.
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 1470 | `it_bed_simple.m4a` | Cozy bed! |  |
-| 1471 | `it_bed_cloud.m4a` | Cloud bed! |  |
-| 1472 | `it_sofa.m4a` | Comfy sofa! |  |
-| 1473 | `it_beanbag_pink.m4a` | Pink cushion! |  |
-| 1474 | `it_beanbag_blue.m4a` | Mint cushion! |  |
-| 1475 | `it_chair.m4a` | Stump stool! |  |
-| 1476 | `it_tent.m4a` | Parasol! |  |
-| 1477 | `it_table_round.m4a` | Picnic table! |  |
-| 1478 | `it_desk.m4a` | Desk! |  |
-| 1479 | `it_bookshelf.m4a` | Bookshelf! |  |
-| 1480 | `it_dresser.m4a` | Dresser! |  |
-| 1481 | `it_toyshelf.m4a` | Toy shelf! |  |
-| 1482 | `it_snackcart.m4a` | Cupcake stand! |  |
-| 1483 | `it_fishtank.m4a` | Fish tank! |  |
-| 1484 | `it_globe.m4a` | Globe! |  |
-| 1485 | `it_piano.m4a` | Toy piano! |  |
-| 1486 | `it_plates.m4a` | Picnic plates! |  |
-| 1487 | `it_fruit_bowl.m4a` | Fruit bowl! |  |
-| 1488 | `it_lemonade_jug.m4a` | Lemonade jug! |  |
-| 1489 | `it_thermos.m4a` | Cocoa thermos! |  |
-| 1490 | `it_plant_tall.m4a` | Leafy plant! |  |
-| 1491 | `it_plant_cactus.m4a` | Cactus! |  |
-| 1492 | `it_plant_flower.m4a` | Flower pot! |  |
-| 1493 | `it_plant_tree.m4a` | Little tree! |  |
-| 1494 | `it_lamp_floor.m4a` | Lantern! |  |
-| 1495 | `it_lamp_star.m4a` | Star lamp! |  |
-| 1496 | `it_lamp_mushroom.m4a` | Mushroom lamp! |  |
-| 1497 | `it_toybox.m4a` | Picnic basket! |  |
-| 1498 | `it_blocks.m4a` | Block tower! |  |
-| 1499 | `it_train.m4a` | Toy train! |  |
-| 1500 | `it_drum.m4a` | Drum! |  |
-| 1501 | `it_rocket.m4a` | Toy rocket! |  |
-| 1502 | `it_plush_bunny.m4a` | Bunny plush! |  |
-| 1503 | `it_easel.m4a` | Paint easel! |  |
-| 1504 | `it_telescope.m4a` | Telescope! |  |
-| 1505 | `it_soccergoal.m4a` | Mini goal! |  |
-| 1506 | `it_soccerball.m4a` | Soccer ball! |  |
-| 1507 | `it_batrack.m4a` | Bat and glove rack! |  |
-| 1508 | `it_hoop.m4a` | Mini hoop! |  |
-| 1509 | `it_rug_round.m4a` | Picnic blanket! |  |
-| 1510 | `it_rug_rainbow.m4a` | Rainbow rug! |  |
-| 1511 | `it_rug_star.m4a` | Star rug! |  |
-| 1512 | `it_rug_diamond.m4a` | Ballpark rug! |  |
-| 1513 | `it_poster_space.m4a` | Space poster! |  |
-| 1514 | `it_poster_mochi.m4a` | Dora Dumpling poster! |  |
-| 1515 | `it_poster_baseball.m4a` | Baseball poster! |  |
-| 1516 | `it_frame_sun.m4a` | Strawberry picture! |  |
-| 1517 | `it_clock.m4a` | Clock! |  |
-| 1518 | `it_shelf_wall.m4a` | Wall shelf! |  |
-| 1519 | `it_fairylights.m4a` | Fairy lights! |  |
-| 1520 | `it_pennant.m4a` | Bunting! |  |
-| 1521 | `it_mirror.m4a` | Mirror! |  |
-| 1522 | `it_wp_cream.m4a` | Cream wallpaper! |  |
-| 1523 | `it_wp_stripes.m4a` | Candy stripes! |  |
-| 1524 | `it_wp_dots.m4a` | Polka dots! |  |
-| 1525 | `it_wp_stars.m4a` | Starry wallpaper! |  |
-| 1526 | `it_wp_clouds.m4a` | Cloud wallpaper! |  |
-| 1527 | `it_wp_leaves.m4a` | Leafy wallpaper! |  |
-| 1528 | `it_fl_wood.m4a` | Wood floor! |  |
-| 1529 | `it_fl_checker.m4a` | Checker floor! |  |
-| 1530 | `it_fl_carpet.m4a` | Soft carpet! |  |
-| 1531 | `it_fl_tiles.m4a` | Mint tiles! |  |
-| 1532 | `it_trophy_story.m4a` | Story trophy! |  |
-| 1533 | `it_bat_gold.m4a` | Golden bat! |  |
-| 1534 | `it_plush_grumbly.m4a` | Grumbly plush! |  |
-| 1535 | `it_rug_sticker.m4a` | Sticker rug! |  |
-| 1536 | `it_star_big.m4a` | Giant star! |  |
-| 1537 | `it_hr_ball.m4a` | Home run ball! |  |
+| 1499 | `it_bed_simple.m4a` | Cozy bed! |  |
+| 1500 | `it_bed_cloud.m4a` | Cloud bed! |  |
+| 1501 | `it_sofa.m4a` | Comfy sofa! |  |
+| 1502 | `it_beanbag_pink.m4a` | Pink cushion! |  |
+| 1503 | `it_beanbag_blue.m4a` | Mint cushion! |  |
+| 1504 | `it_chair.m4a` | Stump stool! |  |
+| 1505 | `it_tent.m4a` | Parasol! |  |
+| 1506 | `it_table_round.m4a` | Picnic table! |  |
+| 1507 | `it_desk.m4a` | Desk! |  |
+| 1508 | `it_bookshelf.m4a` | Bookshelf! |  |
+| 1509 | `it_dresser.m4a` | Dresser! |  |
+| 1510 | `it_toyshelf.m4a` | Toy shelf! |  |
+| 1511 | `it_snackcart.m4a` | Cupcake stand! |  |
+| 1512 | `it_fishtank.m4a` | Fish tank! |  |
+| 1513 | `it_globe.m4a` | Globe! |  |
+| 1514 | `it_piano.m4a` | Toy piano! |  |
+| 1515 | `it_plates.m4a` | Picnic plates! |  |
+| 1516 | `it_fruit_bowl.m4a` | Fruit bowl! |  |
+| 1517 | `it_lemonade_jug.m4a` | Lemonade jug! |  |
+| 1518 | `it_thermos.m4a` | Cocoa thermos! |  |
+| 1519 | `it_plant_tall.m4a` | Leafy plant! |  |
+| 1520 | `it_plant_cactus.m4a` | Cactus! |  |
+| 1521 | `it_plant_flower.m4a` | Flower pot! |  |
+| 1522 | `it_plant_tree.m4a` | Little tree! |  |
+| 1523 | `it_lamp_floor.m4a` | Lantern! |  |
+| 1524 | `it_lamp_star.m4a` | Star lamp! |  |
+| 1525 | `it_lamp_mushroom.m4a` | Mushroom lamp! |  |
+| 1526 | `it_toybox.m4a` | Picnic basket! |  |
+| 1527 | `it_blocks.m4a` | Block tower! |  |
+| 1528 | `it_train.m4a` | Toy train! |  |
+| 1529 | `it_drum.m4a` | Drum! |  |
+| 1530 | `it_rocket.m4a` | Toy rocket! |  |
+| 1531 | `it_plush_bunny.m4a` | Bunny plush! |  |
+| 1532 | `it_easel.m4a` | Paint easel! |  |
+| 1533 | `it_telescope.m4a` | Telescope! |  |
+| 1534 | `it_soccergoal.m4a` | Mini goal! |  |
+| 1535 | `it_soccerball.m4a` | Soccer ball! |  |
+| 1536 | `it_batrack.m4a` | Bat and glove rack! |  |
+| 1537 | `it_hoop.m4a` | Mini hoop! |  |
+| 1538 | `it_rug_round.m4a` | Picnic blanket! |  |
+| 1539 | `it_rug_rainbow.m4a` | Rainbow rug! |  |
+| 1540 | `it_rug_star.m4a` | Star rug! |  |
+| 1541 | `it_rug_diamond.m4a` | Ballpark rug! |  |
+| 1542 | `it_poster_space.m4a` | Space poster! |  |
+| 1543 | `it_poster_mochi.m4a` | Dora Dumpling poster! |  |
+| 1544 | `it_poster_baseball.m4a` | Baseball poster! |  |
+| 1545 | `it_frame_sun.m4a` | Strawberry picture! |  |
+| 1546 | `it_clock.m4a` | Clock! |  |
+| 1547 | `it_shelf_wall.m4a` | Wall shelf! |  |
+| 1548 | `it_fairylights.m4a` | Fairy lights! |  |
+| 1549 | `it_pennant.m4a` | Bunting! |  |
+| 1550 | `it_mirror.m4a` | Mirror! |  |
+| 1551 | `it_wp_cream.m4a` | Cream wallpaper! |  |
+| 1552 | `it_wp_stripes.m4a` | Candy stripes! |  |
+| 1553 | `it_wp_dots.m4a` | Polka dots! |  |
+| 1554 | `it_wp_stars.m4a` | Starry wallpaper! |  |
+| 1555 | `it_wp_clouds.m4a` | Cloud wallpaper! |  |
+| 1556 | `it_wp_leaves.m4a` | Leafy wallpaper! |  |
+| 1557 | `it_fl_wood.m4a` | Wood floor! |  |
+| 1558 | `it_fl_checker.m4a` | Checker floor! |  |
+| 1559 | `it_fl_carpet.m4a` | Soft carpet! |  |
+| 1560 | `it_fl_tiles.m4a` | Mint tiles! |  |
+| 1561 | `it_trophy_story.m4a` | Story trophy! |  |
+| 1562 | `it_bat_gold.m4a` | Golden bat! |  |
+| 1563 | `it_plush_grumbly.m4a` | Grumbly plush! |  |
+| 1564 | `it_rug_sticker.m4a` | Sticker rug! |  |
+| 1565 | `it_star_big.m4a` | Giant star! |  |
+| 1566 | `it_hr_ball.m4a` | Home run ball! |  |
 
 ## Dress Up hats and held items (34) — later (34)
 
@@ -1768,40 +1803,40 @@ Hat and held-item names, said brightly when a kid picks one in Dress Up.
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 1538 | `ow_bow.m4a` | Balloon! |  |
-| 1539 | `ow_cap.m4a` | Sun hat! |  |
-| 1540 | `ow_headband.m4a` | Ice-cream cone! |  |
-| 1541 | `ow_sunglasses.m4a` | Bookworm glasses! |  |
-| 1542 | `ow_flower.m4a` | Flower crown! |  |
-| 1543 | `ow_partyhat.m4a` | Party hat! |  |
-| 1544 | `ow_beanie.m4a` | Chef's hat! |  |
-| 1545 | `ow_crown.m4a` | Crown! |  |
-| 1546 | `ow_explorer.m4a` | Explorer cap! |  |
-| 1547 | `ow_snorkel.m4a` | Snorkel mask! |  |
-| 1548 | `ow_conductor.m4a` | Conductor cap! |  |
-| 1549 | `ow_bee.m4a` | Bee antennae! |  |
-| 1550 | `ow_dino.m4a` | Dino hood! |  |
-| 1551 | `ow_headlamp.m4a` | Doctor's headlamp! |  |
-| 1552 | `ow_rainhat.m4a` | Rain hat! |  |
-| 1553 | `ow_safari.m4a` | Safari hat! |  |
-| 1554 | `ow_astronaut.m4a` | Astronaut helmet! |  |
-| 1555 | `ow_wizard.m4a` | Wizard hat! |  |
-| 1556 | `ow_gradcap.m4a` | Graduation cap! |  |
-| 1557 | `ow_kite.m4a` | Kite! |  |
-| 1558 | `ow_lollipop.m4a` | Lollipop! |  |
-| 1559 | `ow_bouquet.m4a` | Flower bouquet! |  |
-| 1560 | `ow_book.m4a` | Book! |  |
-| 1561 | `ow_trophy.m4a` | Trophy! |  |
-| 1562 | `ow_bubbles.m4a` | Bubble wand! |  |
-| 1563 | `ow_net.m4a` | Butterfly net! |  |
-| 1564 | `ow_telescope.m4a` | Telescope! |  |
-| 1565 | `ow_teddy.m4a` | Teddy bear! |  |
-| 1566 | `ow_umbrella.m4a` | Umbrella! |  |
-| 1567 | `ow_wand.m4a` | Magic wand! |  |
-| 1568 | `ow_ukulele.m4a` | Ukulele! |  |
-| 1569 | `ow_flag.m4a` | Flag! |  |
-| 1570 | `ow_basket.m4a` | Picnic basket! |  |
-| 1571 | `ow_golden_basket.m4a` | Golden picnic basket! |  |
+| 1567 | `ow_bow.m4a` | Balloon! |  |
+| 1568 | `ow_cap.m4a` | Sun hat! |  |
+| 1569 | `ow_headband.m4a` | Ice-cream cone! |  |
+| 1570 | `ow_sunglasses.m4a` | Bookworm glasses! |  |
+| 1571 | `ow_flower.m4a` | Flower crown! |  |
+| 1572 | `ow_partyhat.m4a` | Party hat! |  |
+| 1573 | `ow_beanie.m4a` | Chef's hat! |  |
+| 1574 | `ow_crown.m4a` | Crown! |  |
+| 1575 | `ow_explorer.m4a` | Explorer cap! |  |
+| 1576 | `ow_snorkel.m4a` | Snorkel mask! |  |
+| 1577 | `ow_conductor.m4a` | Conductor cap! |  |
+| 1578 | `ow_bee.m4a` | Bee antennae! |  |
+| 1579 | `ow_dino.m4a` | Dino hood! |  |
+| 1580 | `ow_headlamp.m4a` | Doctor's headlamp! |  |
+| 1581 | `ow_rainhat.m4a` | Rain hat! |  |
+| 1582 | `ow_safari.m4a` | Safari hat! |  |
+| 1583 | `ow_astronaut.m4a` | Astronaut helmet! |  |
+| 1584 | `ow_wizard.m4a` | Wizard hat! |  |
+| 1585 | `ow_gradcap.m4a` | Graduation cap! |  |
+| 1586 | `ow_kite.m4a` | Kite! |  |
+| 1587 | `ow_lollipop.m4a` | Lollipop! |  |
+| 1588 | `ow_bouquet.m4a` | Flower bouquet! |  |
+| 1589 | `ow_book.m4a` | Book! |  |
+| 1590 | `ow_trophy.m4a` | Trophy! |  |
+| 1591 | `ow_bubbles.m4a` | Bubble wand! |  |
+| 1592 | `ow_net.m4a` | Butterfly net! |  |
+| 1593 | `ow_telescope.m4a` | Telescope! |  |
+| 1594 | `ow_teddy.m4a` | Teddy bear! |  |
+| 1595 | `ow_umbrella.m4a` | Umbrella! |  |
+| 1596 | `ow_wand.m4a` | Magic wand! |  |
+| 1597 | `ow_ukulele.m4a` | Ukulele! |  |
+| 1598 | `ow_flag.m4a` | Flag! |  |
+| 1599 | `ow_basket.m4a` | Picnic basket! |  |
+| 1600 | `ow_golden_basket.m4a` | Golden picnic basket! |  |
 
 ## Dress Up: how to earn each locked hat or item — later (26)
 
@@ -1809,32 +1844,32 @@ Friendly and encouraging, said when a kid taps a locked hat or held item.
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 1572 | `ow_kite_hint.m4a` | Play on 3 days in one week to earn this! |  |
-| 1573 | `ow_lollipop_hint.m4a` | Finish Compare Berry Beach to earn this! |  |
-| 1574 | `ow_explorer_hint.m4a` | Finish Add-Up Broccoli Woods to earn this! |  |
-| 1575 | `ow_book_hint.m4a` | Master 2 skills to earn this! |  |
-| 1576 | `ow_bouquet_hint.m4a` | Collect 160 stars to earn this! |  |
-| 1577 | `ow_trophy_hint.m4a` | Win 3 friend challenges with no oopsies to earn this! |  |
-| 1578 | `ow_snorkel_hint.m4a` | Finish Mystery Melon Bay to earn this! |  |
-| 1579 | `ow_conductor_hint.m4a` | Meet your weekly goal in 5 weeks to earn this! |  |
-| 1580 | `ow_teddy_hint.m4a` | Play on 25 different days to earn this! |  |
-| 1581 | `ow_bubbles_hint.m4a` | Get 3 stars on both stops of 2 island areas to earn this! |  |
-| 1582 | `ow_bee_hint.m4a` | Get 3 stars on both stops of Take-Away Apple Grove to earn this! |  |
-| 1583 | `ow_net_hint.m4a` | Finish Take-Away Apple Grove and meet your weekly goal in 5 weeks to earn this! |  |
-| 1584 | `ow_headlamp_hint.m4a` | Finish Even-Odd Cookie Caves and master 4 skills to earn this! |  |
-| 1585 | `ow_dino_hint.m4a` | Get 3 stars on both stops of Teen Cocoa Volcano to earn this! |  |
-| 1586 | `ow_telescope_hint.m4a` | Get 3 stars on both stops of Big Sum Lolly Lighthouse to earn this! |  |
-| 1587 | `ow_umbrella_hint.m4a` | Meet your weekly goal in 6 weeks to earn this! |  |
-| 1588 | `ow_rainhat_hint.m4a` | Meet your weekly goal in 8 weeks to earn this! |  |
-| 1589 | `ow_ukulele_hint.m4a` | Meet your weekly goal in 10 weeks to earn this! |  |
-| 1590 | `ow_wand_hint.m4a` | Master 5 skills to earn this! |  |
-| 1591 | `ow_wizard_hint.m4a` | Master 7 skills to earn this! |  |
-| 1592 | `ow_gradcap_hint.m4a` | Master 10 skills to earn this! |  |
-| 1593 | `ow_astronaut_hint.m4a` | Collect 450 stars to earn this! |  |
-| 1594 | `ow_safari_hint.m4a` | Collect 600 stars to earn this! |  |
-| 1595 | `ow_basket_hint.m4a` | Collect 750 stars to earn this! |  |
-| 1596 | `ow_flag_hint.m4a` | Collect 900 stars and meet your weekly goal in 6 weeks to earn this! |  |
-| 1597 | `ow_golden_basket_hint.m4a` | Finish the whole Picnic Island story to earn this! |  |
+| 1601 | `ow_kite_hint.m4a` | Play on 3 days in one week to earn this! |  |
+| 1602 | `ow_lollipop_hint.m4a` | Finish Compare Berry Beach to earn this! |  |
+| 1603 | `ow_explorer_hint.m4a` | Finish Add-Up Broccoli Woods to earn this! |  |
+| 1604 | `ow_book_hint.m4a` | Master 2 skills to earn this! |  |
+| 1605 | `ow_bouquet_hint.m4a` | Collect 160 stars to earn this! |  |
+| 1606 | `ow_trophy_hint.m4a` | Win 3 friend challenges with no oopsies to earn this! |  |
+| 1607 | `ow_snorkel_hint.m4a` | Finish Mystery Melon Bay to earn this! |  |
+| 1608 | `ow_conductor_hint.m4a` | Meet your weekly goal in 5 weeks to earn this! |  |
+| 1609 | `ow_teddy_hint.m4a` | Play on 25 different days to earn this! |  |
+| 1610 | `ow_bubbles_hint.m4a` | Get 3 stars on both stops of 2 island areas to earn this! |  |
+| 1611 | `ow_bee_hint.m4a` | Get 3 stars on both stops of Take-Away Apple Grove to earn this! |  |
+| 1612 | `ow_net_hint.m4a` | Finish Take-Away Apple Grove and meet your weekly goal in 5 weeks to earn this! |  |
+| 1613 | `ow_headlamp_hint.m4a` | Finish Even-Odd Cookie Caves and master 4 skills to earn this! |  |
+| 1614 | `ow_dino_hint.m4a` | Get 3 stars on both stops of Teen Cocoa Volcano to earn this! |  |
+| 1615 | `ow_telescope_hint.m4a` | Get 3 stars on both stops of Big Sum Lolly Lighthouse to earn this! |  |
+| 1616 | `ow_umbrella_hint.m4a` | Meet your weekly goal in 6 weeks to earn this! |  |
+| 1617 | `ow_rainhat_hint.m4a` | Meet your weekly goal in 8 weeks to earn this! |  |
+| 1618 | `ow_ukulele_hint.m4a` | Meet your weekly goal in 10 weeks to earn this! |  |
+| 1619 | `ow_wand_hint.m4a` | Master 5 skills to earn this! |  |
+| 1620 | `ow_wizard_hint.m4a` | Master 7 skills to earn this! |  |
+| 1621 | `ow_gradcap_hint.m4a` | Master 10 skills to earn this! |  |
+| 1622 | `ow_astronaut_hint.m4a` | Collect 450 stars to earn this! |  |
+| 1623 | `ow_safari_hint.m4a` | Collect 600 stars to earn this! |  |
+| 1624 | `ow_basket_hint.m4a` | Collect 750 stars to earn this! |  |
+| 1625 | `ow_flag_hint.m4a` | Collect 900 stars and meet your weekly goal in 6 weeks to earn this! |  |
+| 1626 | `ow_golden_basket_hint.m4a` | Finish the whole Picnic Island story to earn this! |  |
 
 ## Bonus questions (127) — later (127)
 
@@ -1842,133 +1877,133 @@ Read each question like a friendly quiz host. The built-in voice already covers 
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 1598 | `q_notplanet.m4a` | Which one is NOT a planet? | Space |
-| 1599 | `q_livein.m4a` | Which planet do we live on? | Space |
-| 1600 | `q_daylight.m4a` | What gives us light and warmth in the daytime? | Space |
-| 1601 | `q_rings.m4a` | Which planet has big, beautiful rings? | Space |
-| 1602 | `q_redplanet.m4a` | Which planet is called the red planet? | Space |
-| 1603 | `q_rocket.m4a` | What do astronauts ride into space? | Space |
-| 1604 | `q_moonorbit.m4a` | What does the Moon go around and around? | Space |
-| 1605 | `q_nightsky.m4a` | What do we see twinkling in the night sky? | Space |
-| 1606 | `q_spacesuit.m4a` | What does an astronaut wear in space? | Space |
-| 1607 | `q_biggest.m4a` | Which one is the biggest? | Space |
-| 1608 | `q_sunstar.m4a` | The Sun is a big, hot... | Space |
-| 1609 | `q_moo.m4a` | Which animal says moo? | Animals |
-| 1610 | `q_quack.m4a` | Which animal says quack? | Animals |
-| 1611 | `q_oink.m4a` | Which animal says oink? | Animals |
-| 1612 | `q_roar.m4a` | Which animal has a big, loud roar? | Animals |
-| 1613 | `q_neck.m4a` | Which animal has a very long neck? | Animals |
-| 1614 | `q_trunk.m4a` | Which animal has a long trunk? | Animals |
-| 1615 | `q_stripes.m4a` | Which animal has black and white stripes? | Animals |
-| 1616 | `q_fly.m4a` | Which animal has wings and can fly? | Animals |
-| 1617 | `q_fins.m4a` | Which animal swims with fins? | Animals |
-| 1618 | `q_puppy.m4a` | A puppy grows up to be a... | Animals |
-| 1619 | `q_kitten.m4a` | A kitten grows up to be a... | Animals |
-| 1620 | `q_tadpole.m4a` | A tadpole grows up to be a... | Animals |
-| 1621 | `q_caterpillar.m4a` | A caterpillar turns into a... | Animals |
-| 1622 | `q_pouch.m4a` | Which animal hops and carries its baby in a pouch? | Animals |
-| 1623 | `q_wool.m4a` | Which animal gives us soft wool? | Animals |
-| 1624 | `q_eggs.m4a` | Which animal lays the eggs we eat for breakfast? | Animals |
-| 1625 | `q_eightlegs.m4a` | Which animal has eight legs? | Animals |
-| 1626 | `q_shell.m4a` | Which animal carries a hard shell on its back? | Animals |
-| 1627 | `q_honey.m4a` | Which animal makes honey? | Animals |
-| 1628 | `q_whale.m4a` | Which animal is the biggest? | Animals |
-| 1629 | `q_penguin.m4a` | Which bird cannot fly, but is a great swimmer? | Animals |
-| 1630 | `q_hoot.m4a` | Which bird says hoo hoo at night? | Animals |
-| 1631 | `q_milkfrom.m4a` | Which animal gives us milk to drink? | Animals |
-| 1632 | `q_carrots.m4a` | Which animal loves to munch carrots and has long ears? | Animals |
-| 1633 | `q_bark.m4a` | Which animal says woof? | Animals |
-| 1634 | `q_sky.m4a` | What color is the sky on a sunny day? | Colors & shapes |
-| 1635 | `q_grass.m4a` | What color is grass? | Colors & shapes |
-| 1636 | `q_banana.m4a` | What color is a ripe banana? | Colors & shapes |
-| 1637 | `q_snowcolor.m4a` | What color is snow? | Colors & shapes |
-| 1638 | `q_stopsign.m4a` | What color is a stop sign? | Colors & shapes |
-| 1639 | `q_redyellow.m4a` | Red and yellow paint mixed together make... | Colors & shapes |
-| 1640 | `q_blueyellow.m4a` | Blue and yellow paint mixed together make... | Colors & shapes |
-| 1641 | `q_redblue.m4a` | Red and blue paint mixed together make... | Colors & shapes |
-| 1642 | `q_triangle.m4a` | Which shape has three sides? | Colors & shapes |
-| 1643 | `q_circle.m4a` | Which shape is round, like a ball? | Colors & shapes |
-| 1644 | `q_squaresides.m4a` | How many sides does a square have? | Colors & shapes |
-| 1645 | `q_starpoints.m4a` | Which shape has five points? | Colors & shapes |
-| 1646 | `q_heartshape.m4a` | Which one is a heart? | Colors & shapes |
-| 1647 | `q_leaves.m4a` | In which season do lots of leaves fall off the trees? | Seasons & weather |
-| 1648 | `q_snowseason.m4a` | In which season do we often see snow? | Seasons & weather |
-| 1649 | `q_bloom.m4a` | In which season do many flowers start to bloom? | Seasons & weather |
-| 1650 | `q_hottest.m4a` | Which season is the hottest? | Seasons & weather |
-| 1651 | `q_umbrella.m4a` | What do you use to stay dry in the rain? | Seasons & weather |
-| 1652 | `q_rainbow.m4a` | What colorful thing can you see when the sun shines while it rains? | Seasons & weather |
-| 1653 | `q_mittens.m4a` | What keeps your hands warm when it is cold? | Seasons & weather |
-| 1654 | `q_lightning.m4a` | What flashes bright in the sky during a storm? | Seasons & weather |
-| 1655 | `q_snowice.m4a` | Snowflakes are made of tiny bits of... | Seasons & weather |
-| 1656 | `q_snowman.m4a` | What can you build with snow? | Seasons & weather |
-| 1657 | `q_see.m4a` | What do you use to see? | My body |
-| 1658 | `q_hear.m4a` | What do you use to hear? | My body |
-| 1659 | `q_smell.m4a` | What do you use to smell a flower? | My body |
-| 1660 | `q_fingers.m4a` | How many fingers are on one hand? | My body |
-| 1661 | `q_chew.m4a` | What do you use to chew your food? | My body |
-| 1662 | `q_heartbeat.m4a` | What goes thump-thump inside your chest? | My body |
-| 1663 | `q_think.m4a` | What part of your body helps you think? | My body |
-| 1664 | `q_wash.m4a` | What should you do before you eat? | My body |
-| 1665 | `q_legs.m4a` | How many legs do you have? | My body |
-| 1666 | `q_fruit.m4a` | Which one is a fruit? | Food |
-| 1667 | `q_veggie.m4a` | Which one is a vegetable? | Food |
-| 1668 | `q_frozen.m4a` | Which treat is cold and frozen? | Food |
-| 1669 | `q_tree.m4a` | Which one grows on a tree? | Food |
-| 1670 | `q_cheese.m4a` | Which food is made from milk? | Food |
-| 1671 | `q_yellowfruit.m4a` | Which fruit is long and yellow? | Food |
-| 1672 | `q_strawberry.m4a` | Which red fruit has tiny seeds on the outside? | Food |
-| 1673 | `q_popcorn.m4a` | Popcorn is made from... | Food |
-| 1674 | `q_bees.m4a` | Bees make a sweet, sticky food called... | Food |
-| 1675 | `q_orangefruit.m4a` | Which fruit is orange, round and juicy? | Food |
-| 1676 | `q_hot.m4a` | What is the opposite of hot? | Opposites |
-| 1677 | `q_big.m4a` | What is the opposite of big? | Opposites |
-| 1678 | `q_up.m4a` | What is the opposite of up? | Opposites |
-| 1679 | `q_day.m4a` | What is the opposite of day? | Opposites |
-| 1680 | `q_happy.m4a` | What is the opposite of happy? | Opposites |
-| 1681 | `q_fast.m4a` | What is the opposite of fast? | Opposites |
-| 1682 | `q_open.m4a` | What is the opposite of open? | Opposites |
-| 1683 | `q_wet.m4a` | What is the opposite of wet? | Opposites |
-| 1684 | `q_loud.m4a` | What is the opposite of loud? | Opposites |
-| 1685 | `q_notfruit.m4a` | Which one is NOT a fruit? | Odd one out |
-| 1686 | `q_notanimal.m4a` | Which one is NOT an animal? | Odd one out |
-| 1687 | `q_notwear.m4a` | Which one do you NOT wear on your feet? | Odd one out |
-| 1688 | `q_cantfly.m4a` | Which one can NOT fly? | Odd one out |
-| 1689 | `q_notalive.m4a` | Which one is NOT alive? | Odd one out |
-| 1690 | `q_noteat.m4a` | Which one can you NOT eat? | Odd one out |
-| 1691 | `q_notwater.m4a` | Which one does NOT live in the water? | Odd one out |
-| 1692 | `q_nowheels.m4a` | Which one does NOT have wheels? | Odd one out |
-| 1693 | `q_notmusic.m4a` | Which one is NOT a musical instrument? | Odd one out |
-| 1694 | `q_r_cat.m4a` | Which one rhymes with cat? | Rhymes |
-| 1695 | `q_r_bee.m4a` | Which one rhymes with bee? | Rhymes |
-| 1696 | `q_r_car.m4a` | Which one rhymes with car? | Rhymes |
-| 1697 | `q_r_frog.m4a` | Which one rhymes with frog? | Rhymes |
-| 1698 | `q_r_cake.m4a` | Which one rhymes with cake? | Rhymes |
-| 1699 | `q_r_goat.m4a` | Which one rhymes with goat? | Rhymes |
-| 1700 | `q_r_bear.m4a` | Which one rhymes with bear? | Rhymes |
-| 1701 | `q_r_mouse.m4a` | Which one rhymes with mouse? | Rhymes |
-| 1702 | `q_r_moon.m4a` | Which one rhymes with moon? | Rhymes |
-| 1703 | `q_r_king.m4a` | Which one rhymes with king? | Rhymes |
-| 1704 | `q_r_fish.m4a` | Which one rhymes with fish? | Rhymes |
-| 1705 | `q_plants.m4a` | What do plants need to grow? | Simple science |
-| 1706 | `q_melt.m4a` | What happens to ice when it gets warm? | Simple science |
-| 1707 | `q_magnet.m4a` | Which one sticks to a magnet? | Simple science |
-| 1708 | `q_float.m4a` | Which one floats on water? | Simple science |
-| 1709 | `q_rainfall.m4a` | What falls from rain clouds? | Simple science |
-| 1710 | `q_seed.m4a` | A seed can grow into a... | Simple science |
-| 1711 | `q_fire.m4a` | Which one is very hot? | Simple science |
-| 1712 | `q_magnify.m4a` | Which tool helps you see tiny things up close? | Simple science |
-| 1713 | `q_clock.m4a` | What do we use to tell the time? | Simple science |
-| 1714 | `q_breathe.m4a` | What do we breathe in all day and all night? | Simple science |
-| 1715 | `q_ocean.m4a` | What do we call a giant, salty water with big waves? | Maps & places |
-| 1716 | `q_map.m4a` | What shows you where places are? | Maps & places |
-| 1717 | `q_compass.m4a` | Which tool always points north? | Maps & places |
-| 1718 | `q_mountain.m4a` | What is very, very tall land with a pointy top? | Maps & places |
-| 1719 | `q_beach.m4a` | Where can you find lots of sand next to the water? | Maps & places |
-| 1720 | `q_forest.m4a` | What place has lots and lots of trees? | Maps & places |
-| 1721 | `q_desert.m4a` | Where is it very hot and dry, with lots of sand? | Maps & places |
-| 1722 | `q_earthshape.m4a` | The Earth is round, like a... | Maps & places |
-| 1723 | `q_city.m4a` | What do we call a big place with lots of buildings and streets? | Maps & places |
-| 1724 | `q_penguinhome.m4a` | Many penguins live where it is very... | Maps & places |
+| 1627 | `q_notplanet.m4a` | Which one is NOT a planet? | Space |
+| 1628 | `q_livein.m4a` | Which planet do we live on? | Space |
+| 1629 | `q_daylight.m4a` | What gives us light and warmth in the daytime? | Space |
+| 1630 | `q_rings.m4a` | Which planet has big, beautiful rings? | Space |
+| 1631 | `q_redplanet.m4a` | Which planet is called the red planet? | Space |
+| 1632 | `q_rocket.m4a` | What do astronauts ride into space? | Space |
+| 1633 | `q_moonorbit.m4a` | What does the Moon go around and around? | Space |
+| 1634 | `q_nightsky.m4a` | What do we see twinkling in the night sky? | Space |
+| 1635 | `q_spacesuit.m4a` | What does an astronaut wear in space? | Space |
+| 1636 | `q_biggest.m4a` | Which one is the biggest? | Space |
+| 1637 | `q_sunstar.m4a` | The Sun is a big, hot... | Space |
+| 1638 | `q_moo.m4a` | Which animal says moo? | Animals |
+| 1639 | `q_quack.m4a` | Which animal says quack? | Animals |
+| 1640 | `q_oink.m4a` | Which animal says oink? | Animals |
+| 1641 | `q_roar.m4a` | Which animal has a big, loud roar? | Animals |
+| 1642 | `q_neck.m4a` | Which animal has a very long neck? | Animals |
+| 1643 | `q_trunk.m4a` | Which animal has a long trunk? | Animals |
+| 1644 | `q_stripes.m4a` | Which animal has black and white stripes? | Animals |
+| 1645 | `q_fly.m4a` | Which animal has wings and can fly? | Animals |
+| 1646 | `q_fins.m4a` | Which animal swims with fins? | Animals |
+| 1647 | `q_puppy.m4a` | A puppy grows up to be a... | Animals |
+| 1648 | `q_kitten.m4a` | A kitten grows up to be a... | Animals |
+| 1649 | `q_tadpole.m4a` | A tadpole grows up to be a... | Animals |
+| 1650 | `q_caterpillar.m4a` | A caterpillar turns into a... | Animals |
+| 1651 | `q_pouch.m4a` | Which animal hops and carries its baby in a pouch? | Animals |
+| 1652 | `q_wool.m4a` | Which animal gives us soft wool? | Animals |
+| 1653 | `q_eggs.m4a` | Which animal lays the eggs we eat for breakfast? | Animals |
+| 1654 | `q_eightlegs.m4a` | Which animal has eight legs? | Animals |
+| 1655 | `q_shell.m4a` | Which animal carries a hard shell on its back? | Animals |
+| 1656 | `q_honey.m4a` | Which animal makes honey? | Animals |
+| 1657 | `q_whale.m4a` | Which animal is the biggest? | Animals |
+| 1658 | `q_penguin.m4a` | Which bird cannot fly, but is a great swimmer? | Animals |
+| 1659 | `q_hoot.m4a` | Which bird says hoo hoo at night? | Animals |
+| 1660 | `q_milkfrom.m4a` | Which animal gives us milk to drink? | Animals |
+| 1661 | `q_carrots.m4a` | Which animal loves to munch carrots and has long ears? | Animals |
+| 1662 | `q_bark.m4a` | Which animal says woof? | Animals |
+| 1663 | `q_sky.m4a` | What color is the sky on a sunny day? | Colors & shapes |
+| 1664 | `q_grass.m4a` | What color is grass? | Colors & shapes |
+| 1665 | `q_banana.m4a` | What color is a ripe banana? | Colors & shapes |
+| 1666 | `q_snowcolor.m4a` | What color is snow? | Colors & shapes |
+| 1667 | `q_stopsign.m4a` | What color is a stop sign? | Colors & shapes |
+| 1668 | `q_redyellow.m4a` | Red and yellow paint mixed together make... | Colors & shapes |
+| 1669 | `q_blueyellow.m4a` | Blue and yellow paint mixed together make... | Colors & shapes |
+| 1670 | `q_redblue.m4a` | Red and blue paint mixed together make... | Colors & shapes |
+| 1671 | `q_triangle.m4a` | Which shape has three sides? | Colors & shapes |
+| 1672 | `q_circle.m4a` | Which shape is round, like a ball? | Colors & shapes |
+| 1673 | `q_squaresides.m4a` | How many sides does a square have? | Colors & shapes |
+| 1674 | `q_starpoints.m4a` | Which shape has five points? | Colors & shapes |
+| 1675 | `q_heartshape.m4a` | Which one is a heart? | Colors & shapes |
+| 1676 | `q_leaves.m4a` | In which season do lots of leaves fall off the trees? | Seasons & weather |
+| 1677 | `q_snowseason.m4a` | In which season do we often see snow? | Seasons & weather |
+| 1678 | `q_bloom.m4a` | In which season do many flowers start to bloom? | Seasons & weather |
+| 1679 | `q_hottest.m4a` | Which season is the hottest? | Seasons & weather |
+| 1680 | `q_umbrella.m4a` | What do you use to stay dry in the rain? | Seasons & weather |
+| 1681 | `q_rainbow.m4a` | What colorful thing can you see when the sun shines while it rains? | Seasons & weather |
+| 1682 | `q_mittens.m4a` | What keeps your hands warm when it is cold? | Seasons & weather |
+| 1683 | `q_lightning.m4a` | What flashes bright in the sky during a storm? | Seasons & weather |
+| 1684 | `q_snowice.m4a` | Snowflakes are made of tiny bits of... | Seasons & weather |
+| 1685 | `q_snowman.m4a` | What can you build with snow? | Seasons & weather |
+| 1686 | `q_see.m4a` | What do you use to see? | My body |
+| 1687 | `q_hear.m4a` | What do you use to hear? | My body |
+| 1688 | `q_smell.m4a` | What do you use to smell a flower? | My body |
+| 1689 | `q_fingers.m4a` | How many fingers are on one hand? | My body |
+| 1690 | `q_chew.m4a` | What do you use to chew your food? | My body |
+| 1691 | `q_heartbeat.m4a` | What goes thump-thump inside your chest? | My body |
+| 1692 | `q_think.m4a` | What part of your body helps you think? | My body |
+| 1693 | `q_wash.m4a` | What should you do before you eat? | My body |
+| 1694 | `q_legs.m4a` | How many legs do you have? | My body |
+| 1695 | `q_fruit.m4a` | Which one is a fruit? | Food |
+| 1696 | `q_veggie.m4a` | Which one is a vegetable? | Food |
+| 1697 | `q_frozen.m4a` | Which treat is cold and frozen? | Food |
+| 1698 | `q_tree.m4a` | Which one grows on a tree? | Food |
+| 1699 | `q_cheese.m4a` | Which food is made from milk? | Food |
+| 1700 | `q_yellowfruit.m4a` | Which fruit is long and yellow? | Food |
+| 1701 | `q_strawberry.m4a` | Which red fruit has tiny seeds on the outside? | Food |
+| 1702 | `q_popcorn.m4a` | Popcorn is made from... | Food |
+| 1703 | `q_bees.m4a` | Bees make a sweet, sticky food called... | Food |
+| 1704 | `q_orangefruit.m4a` | Which fruit is orange, round and juicy? | Food |
+| 1705 | `q_hot.m4a` | What is the opposite of hot? | Opposites |
+| 1706 | `q_big.m4a` | What is the opposite of big? | Opposites |
+| 1707 | `q_up.m4a` | What is the opposite of up? | Opposites |
+| 1708 | `q_day.m4a` | What is the opposite of day? | Opposites |
+| 1709 | `q_happy.m4a` | What is the opposite of happy? | Opposites |
+| 1710 | `q_fast.m4a` | What is the opposite of fast? | Opposites |
+| 1711 | `q_open.m4a` | What is the opposite of open? | Opposites |
+| 1712 | `q_wet.m4a` | What is the opposite of wet? | Opposites |
+| 1713 | `q_loud.m4a` | What is the opposite of loud? | Opposites |
+| 1714 | `q_notfruit.m4a` | Which one is NOT a fruit? | Odd one out |
+| 1715 | `q_notanimal.m4a` | Which one is NOT an animal? | Odd one out |
+| 1716 | `q_notwear.m4a` | Which one do you NOT wear on your feet? | Odd one out |
+| 1717 | `q_cantfly.m4a` | Which one can NOT fly? | Odd one out |
+| 1718 | `q_notalive.m4a` | Which one is NOT alive? | Odd one out |
+| 1719 | `q_noteat.m4a` | Which one can you NOT eat? | Odd one out |
+| 1720 | `q_notwater.m4a` | Which one does NOT live in the water? | Odd one out |
+| 1721 | `q_nowheels.m4a` | Which one does NOT have wheels? | Odd one out |
+| 1722 | `q_notmusic.m4a` | Which one is NOT a musical instrument? | Odd one out |
+| 1723 | `q_r_cat.m4a` | Which one rhymes with cat? | Rhymes |
+| 1724 | `q_r_bee.m4a` | Which one rhymes with bee? | Rhymes |
+| 1725 | `q_r_car.m4a` | Which one rhymes with car? | Rhymes |
+| 1726 | `q_r_frog.m4a` | Which one rhymes with frog? | Rhymes |
+| 1727 | `q_r_cake.m4a` | Which one rhymes with cake? | Rhymes |
+| 1728 | `q_r_goat.m4a` | Which one rhymes with goat? | Rhymes |
+| 1729 | `q_r_bear.m4a` | Which one rhymes with bear? | Rhymes |
+| 1730 | `q_r_mouse.m4a` | Which one rhymes with mouse? | Rhymes |
+| 1731 | `q_r_moon.m4a` | Which one rhymes with moon? | Rhymes |
+| 1732 | `q_r_king.m4a` | Which one rhymes with king? | Rhymes |
+| 1733 | `q_r_fish.m4a` | Which one rhymes with fish? | Rhymes |
+| 1734 | `q_plants.m4a` | What do plants need to grow? | Simple science |
+| 1735 | `q_melt.m4a` | What happens to ice when it gets warm? | Simple science |
+| 1736 | `q_magnet.m4a` | Which one sticks to a magnet? | Simple science |
+| 1737 | `q_float.m4a` | Which one floats on water? | Simple science |
+| 1738 | `q_rainfall.m4a` | What falls from rain clouds? | Simple science |
+| 1739 | `q_seed.m4a` | A seed can grow into a... | Simple science |
+| 1740 | `q_fire.m4a` | Which one is very hot? | Simple science |
+| 1741 | `q_magnify.m4a` | Which tool helps you see tiny things up close? | Simple science |
+| 1742 | `q_clock.m4a` | What do we use to tell the time? | Simple science |
+| 1743 | `q_breathe.m4a` | What do we breathe in all day and all night? | Simple science |
+| 1744 | `q_ocean.m4a` | What do we call a giant, salty water with big waves? | Maps & places |
+| 1745 | `q_map.m4a` | What shows you where places are? | Maps & places |
+| 1746 | `q_compass.m4a` | Which tool always points north? | Maps & places |
+| 1747 | `q_mountain.m4a` | What is very, very tall land with a pointy top? | Maps & places |
+| 1748 | `q_beach.m4a` | Where can you find lots of sand next to the water? | Maps & places |
+| 1749 | `q_forest.m4a` | What place has lots and lots of trees? | Maps & places |
+| 1750 | `q_desert.m4a` | Where is it very hot and dry, with lots of sand? | Maps & places |
+| 1751 | `q_earthshape.m4a` | The Earth is round, like a... | Maps & places |
+| 1752 | `q_city.m4a` | What do we call a big place with lots of buildings and streets? | Maps & places |
+| 1753 | `q_penguinhome.m4a` | Many penguins live where it is very... | Maps & places |
 
 ## Bonus question answers (232) — later (232)
 
@@ -1976,238 +2011,238 @@ Say each answer on its own, brightly. They are read out as choices, and after "T
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 1725 | `c_the_sun.m4a` | the Sun |  |
-| 1726 | `c_earth.m4a` | Earth |  |
-| 1727 | `c_saturn.m4a` | Saturn |  |
-| 1728 | `c_mars.m4a` | Mars |  |
-| 1729 | `c_the_moon.m4a` | the Moon |  |
-| 1730 | `c_a_cloud.m4a` | a cloud |  |
-| 1731 | `c_a_rocket.m4a` | a rocket |  |
-| 1732 | `c_a_bus.m4a` | a bus |  |
-| 1733 | `c_a_sailboat.m4a` | a sailboat |  |
-| 1734 | `c_stars.m4a` | stars |  |
-| 1735 | `c_a_rainbow.m4a` | a rainbow |  |
-| 1736 | `c_butterflies.m4a` | butterflies |  |
-| 1737 | `c_a_space_suit.m4a` | a space suit |  |
-| 1738 | `c_a_swimsuit.m4a` | a swimsuit |  |
-| 1739 | `c_a_raincoat.m4a` | a raincoat |  |
-| 1740 | `c_star.m4a` | star |  |
-| 1741 | `c_moon.m4a` | moon |  |
-| 1742 | `c_cloud.m4a` | cloud |  |
-| 1743 | `c_a_cow.m4a` | a cow |  |
-| 1744 | `c_a_cat.m4a` | a cat |  |
-| 1745 | `c_a_duck.m4a` | a duck |  |
-| 1746 | `c_a_dog.m4a` | a dog |  |
-| 1747 | `c_a_pig.m4a` | a pig |  |
-| 1748 | `c_a_sheep.m4a` | a sheep |  |
-| 1749 | `c_a_lion.m4a` | a lion |  |
-| 1750 | `c_a_mouse.m4a` | a mouse |  |
-| 1751 | `c_a_giraffe.m4a` | a giraffe |  |
-| 1752 | `c_a_frog.m4a` | a frog |  |
-| 1753 | `c_an_elephant.m4a` | an elephant |  |
-| 1754 | `c_a_zebra.m4a` | a zebra |  |
-| 1755 | `c_a_bird.m4a` | a bird |  |
-| 1756 | `c_a_fish.m4a` | a fish |  |
-| 1757 | `c_a_turtle.m4a` | a turtle |  |
-| 1758 | `c_a_horse.m4a` | a horse |  |
-| 1759 | `c_a_rabbit.m4a` | a rabbit |  |
-| 1760 | `c_dog.m4a` | dog |  |
-| 1761 | `c_cat.m4a` | cat |  |
-| 1762 | `c_cow.m4a` | cow |  |
-| 1763 | `c_horse.m4a` | horse |  |
-| 1764 | `c_frog.m4a` | frog |  |
-| 1765 | `c_fish.m4a` | fish |  |
-| 1766 | `c_duck.m4a` | duck |  |
-| 1767 | `c_butterfly.m4a` | butterfly |  |
-| 1768 | `c_spider.m4a` | spider |  |
-| 1769 | `c_snail.m4a` | snail |  |
-| 1770 | `c_a_kangaroo.m4a` | a kangaroo |  |
-| 1771 | `c_a_chicken.m4a` | a chicken |  |
-| 1772 | `c_a_spider.m4a` | a spider |  |
-| 1773 | `c_an_ant.m4a` | an ant |  |
-| 1774 | `c_a_bee.m4a` | a bee |  |
-| 1775 | `c_a_butterfly.m4a` | a butterfly |  |
-| 1776 | `c_a_whale.m4a` | a whale |  |
-| 1777 | `c_a_penguin.m4a` | a penguin |  |
-| 1778 | `c_a_parrot.m4a` | a parrot |  |
-| 1779 | `c_an_owl.m4a` | an owl |  |
-| 1780 | `c_blue.m4a` | blue |  |
-| 1781 | `c_green.m4a` | green |  |
-| 1782 | `c_red.m4a` | red |  |
-| 1783 | `c_purple.m4a` | purple |  |
-| 1784 | `c_orange.m4a` | orange |  |
-| 1785 | `c_yellow.m4a` | yellow |  |
-| 1786 | `c_white.m4a` | white |  |
-| 1787 | `c_black.m4a` | black |  |
-| 1788 | `c_a_triangle.m4a` | a triangle |  |
-| 1789 | `c_a_circle.m4a` | a circle |  |
-| 1790 | `c_a_square.m4a` | a square |  |
-| 1791 | `c_four.m4a` | four |  |
-| 1792 | `c_three.m4a` | three |  |
-| 1793 | `c_six.m4a` | six |  |
-| 1794 | `c_a_star.m4a` | a star |  |
-| 1795 | `c_the_heart.m4a` | the heart |  |
-| 1796 | `c_the_star.m4a` | the star |  |
-| 1797 | `c_the_circle.m4a` | the circle |  |
-| 1798 | `c_fall.m4a` | fall |  |
-| 1799 | `c_summer.m4a` | summer |  |
-| 1800 | `c_spring.m4a` | spring |  |
-| 1801 | `c_winter.m4a` | winter |  |
-| 1802 | `c_an_umbrella.m4a` | an umbrella |  |
-| 1803 | `c_sunglasses.m4a` | sunglasses |  |
-| 1804 | `c_mittens.m4a` | mittens |  |
-| 1805 | `c_a_snowman.m4a` | a snowman |  |
-| 1806 | `c_sandals.m4a` | sandals |  |
-| 1807 | `c_shorts.m4a` | shorts |  |
-| 1808 | `c_lightning.m4a` | lightning |  |
-| 1809 | `c_ice.m4a` | ice |  |
-| 1810 | `c_sugar.m4a` | sugar |  |
-| 1811 | `c_paper.m4a` | paper |  |
-| 1812 | `c_a_beach.m4a` | a beach |  |
-| 1813 | `c_a_sunflower.m4a` | a sunflower |  |
-| 1814 | `c_your_eyes.m4a` | your eyes |  |
-| 1815 | `c_your_ears.m4a` | your ears |  |
-| 1816 | `c_your_nose.m4a` | your nose |  |
-| 1817 | `c_your_hands.m4a` | your hands |  |
-| 1818 | `c_your_feet.m4a` | your feet |  |
-| 1819 | `c_five.m4a` | five |  |
-| 1820 | `c_ten.m4a` | ten |  |
-| 1821 | `c_your_teeth.m4a` | your teeth |  |
-| 1822 | `c_your_heart.m4a` | your heart |  |
-| 1823 | `c_your_foot.m4a` | your foot |  |
-| 1824 | `c_your_brain.m4a` | your brain |  |
-| 1825 | `c_your_leg.m4a` | your leg |  |
-| 1826 | `c_your_ear.m4a` | your ear |  |
-| 1827 | `c_wash_your_hands.m4a` | wash your hands |  |
-| 1828 | `c_take_a_nap.m4a` | take a nap |  |
-| 1829 | `c_hop_like_a_kangaroo.m4a` | hop like a kangaroo |  |
-| 1830 | `c_two.m4a` | two |  |
-| 1831 | `c_an_apple.m4a` | an apple |  |
-| 1832 | `c_a_carrot.m4a` | a carrot |  |
-| 1833 | `c_bread.m4a` | bread |  |
-| 1834 | `c_a_banana.m4a` | a banana |  |
-| 1835 | `c_ice_cream.m4a` | ice cream |  |
-| 1836 | `c_soup.m4a` | soup |  |
-| 1837 | `c_toast.m4a` | toast |  |
-| 1838 | `c_a_potato.m4a` | a potato |  |
-| 1839 | `c_cheese.m4a` | cheese |  |
-| 1840 | `c_grapes.m4a` | grapes |  |
-| 1841 | `c_a_strawberry.m4a` | a strawberry |  |
-| 1842 | `c_corn.m4a` | corn |  |
-| 1843 | `c_apples.m4a` | apples |  |
-| 1844 | `c_carrots.m4a` | carrots |  |
-| 1845 | `c_honey.m4a` | honey |  |
-| 1846 | `c_an_orange.m4a` | an orange |  |
-| 1847 | `c_cold.m4a` | cold |  |
-| 1848 | `c_sunny.m4a` | sunny |  |
-| 1849 | `c_loud.m4a` | loud |  |
-| 1850 | `c_small.m4a` | small |  |
-| 1851 | `c_tall.m4a` | tall |  |
-| 1852 | `c_fast.m4a` | fast |  |
-| 1853 | `c_down.m4a` | down |  |
-| 1854 | `c_left.m4a` | left |  |
-| 1855 | `c_right.m4a` | right |  |
-| 1856 | `c_night.m4a` | night |  |
-| 1857 | `c_morning.m4a` | morning |  |
-| 1858 | `c_lunch.m4a` | lunch |  |
-| 1859 | `c_sad.m4a` | sad |  |
-| 1860 | `c_silly.m4a` | silly |  |
-| 1861 | `c_sleepy.m4a` | sleepy |  |
-| 1862 | `c_slow.m4a` | slow |  |
-| 1863 | `c_closed.m4a` | closed |  |
-| 1864 | `c_dry.m4a` | dry |  |
-| 1865 | `c_quiet.m4a` | quiet |  |
-| 1866 | `c_the_carrot.m4a` | the carrot |  |
-| 1867 | `c_the_apple.m4a` | the apple |  |
-| 1868 | `c_the_banana.m4a` | the banana |  |
-| 1869 | `c_the_grapes.m4a` | the grapes |  |
-| 1870 | `c_the_car.m4a` | the car |  |
-| 1871 | `c_the_cat.m4a` | the cat |  |
-| 1872 | `c_the_dog.m4a` | the dog |  |
-| 1873 | `c_the_cow.m4a` | the cow |  |
-| 1874 | `c_the_spoon.m4a` | the spoon |  |
-| 1875 | `c_the_sock.m4a` | the sock |  |
-| 1876 | `c_the_sneaker.m4a` | the sneaker |  |
-| 1877 | `c_the_boot.m4a` | the boot |  |
-| 1878 | `c_the_fish.m4a` | the fish |  |
-| 1879 | `c_the_bird.m4a` | the bird |  |
-| 1880 | `c_the_airplane.m4a` | the airplane |  |
-| 1881 | `c_the_butterfly.m4a` | the butterfly |  |
-| 1882 | `c_the_teddy_bear.m4a` | the teddy bear |  |
-| 1883 | `c_the_tree.m4a` | the tree |  |
-| 1884 | `c_the_frog.m4a` | the frog |  |
-| 1885 | `c_the_bee.m4a` | the bee |  |
-| 1886 | `c_the_pizza.m4a` | the pizza |  |
-| 1887 | `c_the_cheese.m4a` | the cheese |  |
-| 1888 | `c_the_lion.m4a` | the lion |  |
-| 1889 | `c_the_octopus.m4a` | the octopus |  |
-| 1890 | `c_the_whale.m4a` | the whale |  |
-| 1891 | `c_the_sailboat.m4a` | the sailboat |  |
-| 1892 | `c_the_bike.m4a` | the bike |  |
-| 1893 | `c_the_bus.m4a` | the bus |  |
-| 1894 | `c_the_hammer.m4a` | the hammer |  |
-| 1895 | `c_the_drum.m4a` | the drum |  |
-| 1896 | `c_the_guitar.m4a` | the guitar |  |
-| 1897 | `c_the_trumpet.m4a` | the trumpet |  |
-| 1898 | `c_hat.m4a` | hat |  |
-| 1899 | `c_sun.m4a` | sun |  |
-| 1900 | `c_tree.m4a` | tree |  |
-| 1901 | `c_bus.m4a` | bus |  |
-| 1902 | `c_bird.m4a` | bird |  |
-| 1903 | `c_snake.m4a` | snake |  |
-| 1904 | `c_apple.m4a` | apple |  |
-| 1905 | `c_drum.m4a` | drum |  |
-| 1906 | `c_boat.m4a` | boat |  |
-| 1907 | `c_sheep.m4a` | sheep |  |
-| 1908 | `c_chair.m4a` | chair |  |
-| 1909 | `c_bed.m4a` | bed |  |
-| 1910 | `c_shoe.m4a` | shoe |  |
-| 1911 | `c_house.m4a` | house |  |
-| 1912 | `c_spoon.m4a` | spoon |  |
-| 1913 | `c_ring.m4a` | ring |  |
-| 1914 | `c_crown.m4a` | crown |  |
-| 1915 | `c_castle.m4a` | castle |  |
-| 1916 | `c_dish.m4a` | dish |  |
-| 1917 | `c_fork.m4a` | fork |  |
-| 1918 | `c_cup.m4a` | cup |  |
-| 1919 | `c_water.m4a` | water |  |
-| 1920 | `c_candy.m4a` | candy |  |
-| 1921 | `c_toys.m4a` | toys |  |
-| 1922 | `c_it_melts.m4a` | it melts |  |
-| 1923 | `c_it_gets_colder.m4a` | it gets colder |  |
-| 1924 | `c_it_bounces.m4a` | it bounces |  |
-| 1925 | `c_a_paper_clip.m4a` | a paper clip |  |
-| 1926 | `c_a_teddy_bear.m4a` | a teddy bear |  |
-| 1927 | `c_a_boat.m4a` | a boat |  |
-| 1928 | `c_a_key.m4a` | a key |  |
-| 1929 | `c_a_hammer.m4a` | a hammer |  |
-| 1930 | `c_leaves.m4a` | leaves |  |
-| 1931 | `c_plant.m4a` | plant |  |
-| 1932 | `c_car.m4a` | car |  |
-| 1933 | `c_fire.m4a` | fire |  |
-| 1934 | `c_a_magnifying_glass.m4a` | a magnifying glass |  |
-| 1935 | `c_a_spoon.m4a` | a spoon |  |
-| 1936 | `c_a_sock.m4a` | a sock |  |
-| 1937 | `c_a_clock.m4a` | a clock |  |
-| 1938 | `c_a_sneaker.m4a` | a sneaker |  |
-| 1939 | `c_air.m4a` | air |  |
-| 1940 | `c_juice.m4a` | juice |  |
-| 1941 | `c_sand.m4a` | sand |  |
-| 1942 | `c_the_ocean.m4a` | the ocean |  |
-| 1943 | `c_a_puddle.m4a` | a puddle |  |
-| 1944 | `c_a_cup.m4a` | a cup |  |
-| 1945 | `c_a_map.m4a` | a map |  |
-| 1946 | `c_a_compass.m4a` | a compass |  |
-| 1947 | `c_a_mountain.m4a` | a mountain |  |
-| 1948 | `c_a_forest.m4a` | a forest |  |
-| 1949 | `c_a_desert.m4a` | a desert |  |
-| 1950 | `c_an_iceberg.m4a` | an iceberg |  |
-| 1951 | `c_ball.m4a` | ball |  |
-| 1952 | `c_box.m4a` | box |  |
-| 1953 | `c_triangle.m4a` | triangle |  |
-| 1954 | `c_a_city.m4a` | a city |  |
-| 1955 | `c_an_ocean.m4a` | an ocean |  |
-| 1956 | `c_hot.m4a` | hot |  |
+| 1754 | `c_the_sun.m4a` | the Sun |  |
+| 1755 | `c_earth.m4a` | Earth |  |
+| 1756 | `c_saturn.m4a` | Saturn |  |
+| 1757 | `c_mars.m4a` | Mars |  |
+| 1758 | `c_the_moon.m4a` | the Moon |  |
+| 1759 | `c_a_cloud.m4a` | a cloud |  |
+| 1760 | `c_a_rocket.m4a` | a rocket |  |
+| 1761 | `c_a_bus.m4a` | a bus |  |
+| 1762 | `c_a_sailboat.m4a` | a sailboat |  |
+| 1763 | `c_stars.m4a` | stars |  |
+| 1764 | `c_a_rainbow.m4a` | a rainbow |  |
+| 1765 | `c_butterflies.m4a` | butterflies |  |
+| 1766 | `c_a_space_suit.m4a` | a space suit |  |
+| 1767 | `c_a_swimsuit.m4a` | a swimsuit |  |
+| 1768 | `c_a_raincoat.m4a` | a raincoat |  |
+| 1769 | `c_star.m4a` | star |  |
+| 1770 | `c_moon.m4a` | moon |  |
+| 1771 | `c_cloud.m4a` | cloud |  |
+| 1772 | `c_a_cow.m4a` | a cow |  |
+| 1773 | `c_a_cat.m4a` | a cat |  |
+| 1774 | `c_a_duck.m4a` | a duck |  |
+| 1775 | `c_a_dog.m4a` | a dog |  |
+| 1776 | `c_a_pig.m4a` | a pig |  |
+| 1777 | `c_a_sheep.m4a` | a sheep |  |
+| 1778 | `c_a_lion.m4a` | a lion |  |
+| 1779 | `c_a_mouse.m4a` | a mouse |  |
+| 1780 | `c_a_giraffe.m4a` | a giraffe |  |
+| 1781 | `c_a_frog.m4a` | a frog |  |
+| 1782 | `c_an_elephant.m4a` | an elephant |  |
+| 1783 | `c_a_zebra.m4a` | a zebra |  |
+| 1784 | `c_a_bird.m4a` | a bird |  |
+| 1785 | `c_a_fish.m4a` | a fish |  |
+| 1786 | `c_a_turtle.m4a` | a turtle |  |
+| 1787 | `c_a_horse.m4a` | a horse |  |
+| 1788 | `c_a_rabbit.m4a` | a rabbit |  |
+| 1789 | `c_dog.m4a` | dog |  |
+| 1790 | `c_cat.m4a` | cat |  |
+| 1791 | `c_cow.m4a` | cow |  |
+| 1792 | `c_horse.m4a` | horse |  |
+| 1793 | `c_frog.m4a` | frog |  |
+| 1794 | `c_fish.m4a` | fish |  |
+| 1795 | `c_duck.m4a` | duck |  |
+| 1796 | `c_butterfly.m4a` | butterfly |  |
+| 1797 | `c_spider.m4a` | spider |  |
+| 1798 | `c_snail.m4a` | snail |  |
+| 1799 | `c_a_kangaroo.m4a` | a kangaroo |  |
+| 1800 | `c_a_chicken.m4a` | a chicken |  |
+| 1801 | `c_a_spider.m4a` | a spider |  |
+| 1802 | `c_an_ant.m4a` | an ant |  |
+| 1803 | `c_a_bee.m4a` | a bee |  |
+| 1804 | `c_a_butterfly.m4a` | a butterfly |  |
+| 1805 | `c_a_whale.m4a` | a whale |  |
+| 1806 | `c_a_penguin.m4a` | a penguin |  |
+| 1807 | `c_a_parrot.m4a` | a parrot |  |
+| 1808 | `c_an_owl.m4a` | an owl |  |
+| 1809 | `c_blue.m4a` | blue |  |
+| 1810 | `c_green.m4a` | green |  |
+| 1811 | `c_red.m4a` | red |  |
+| 1812 | `c_purple.m4a` | purple |  |
+| 1813 | `c_orange.m4a` | orange |  |
+| 1814 | `c_yellow.m4a` | yellow |  |
+| 1815 | `c_white.m4a` | white |  |
+| 1816 | `c_black.m4a` | black |  |
+| 1817 | `c_a_triangle.m4a` | a triangle |  |
+| 1818 | `c_a_circle.m4a` | a circle |  |
+| 1819 | `c_a_square.m4a` | a square |  |
+| 1820 | `c_four.m4a` | four |  |
+| 1821 | `c_three.m4a` | three |  |
+| 1822 | `c_six.m4a` | six |  |
+| 1823 | `c_a_star.m4a` | a star |  |
+| 1824 | `c_the_heart.m4a` | the heart |  |
+| 1825 | `c_the_star.m4a` | the star |  |
+| 1826 | `c_the_circle.m4a` | the circle |  |
+| 1827 | `c_fall.m4a` | fall |  |
+| 1828 | `c_summer.m4a` | summer |  |
+| 1829 | `c_spring.m4a` | spring |  |
+| 1830 | `c_winter.m4a` | winter |  |
+| 1831 | `c_an_umbrella.m4a` | an umbrella |  |
+| 1832 | `c_sunglasses.m4a` | sunglasses |  |
+| 1833 | `c_mittens.m4a` | mittens |  |
+| 1834 | `c_a_snowman.m4a` | a snowman |  |
+| 1835 | `c_sandals.m4a` | sandals |  |
+| 1836 | `c_shorts.m4a` | shorts |  |
+| 1837 | `c_lightning.m4a` | lightning |  |
+| 1838 | `c_ice.m4a` | ice |  |
+| 1839 | `c_sugar.m4a` | sugar |  |
+| 1840 | `c_paper.m4a` | paper |  |
+| 1841 | `c_a_beach.m4a` | a beach |  |
+| 1842 | `c_a_sunflower.m4a` | a sunflower |  |
+| 1843 | `c_your_eyes.m4a` | your eyes |  |
+| 1844 | `c_your_ears.m4a` | your ears |  |
+| 1845 | `c_your_nose.m4a` | your nose |  |
+| 1846 | `c_your_hands.m4a` | your hands |  |
+| 1847 | `c_your_feet.m4a` | your feet |  |
+| 1848 | `c_five.m4a` | five |  |
+| 1849 | `c_ten.m4a` | ten |  |
+| 1850 | `c_your_teeth.m4a` | your teeth |  |
+| 1851 | `c_your_heart.m4a` | your heart |  |
+| 1852 | `c_your_foot.m4a` | your foot |  |
+| 1853 | `c_your_brain.m4a` | your brain |  |
+| 1854 | `c_your_leg.m4a` | your leg |  |
+| 1855 | `c_your_ear.m4a` | your ear |  |
+| 1856 | `c_wash_your_hands.m4a` | wash your hands |  |
+| 1857 | `c_take_a_nap.m4a` | take a nap |  |
+| 1858 | `c_hop_like_a_kangaroo.m4a` | hop like a kangaroo |  |
+| 1859 | `c_two.m4a` | two |  |
+| 1860 | `c_an_apple.m4a` | an apple |  |
+| 1861 | `c_a_carrot.m4a` | a carrot |  |
+| 1862 | `c_bread.m4a` | bread |  |
+| 1863 | `c_a_banana.m4a` | a banana |  |
+| 1864 | `c_ice_cream.m4a` | ice cream |  |
+| 1865 | `c_soup.m4a` | soup |  |
+| 1866 | `c_toast.m4a` | toast |  |
+| 1867 | `c_a_potato.m4a` | a potato |  |
+| 1868 | `c_cheese.m4a` | cheese |  |
+| 1869 | `c_grapes.m4a` | grapes |  |
+| 1870 | `c_a_strawberry.m4a` | a strawberry |  |
+| 1871 | `c_corn.m4a` | corn |  |
+| 1872 | `c_apples.m4a` | apples |  |
+| 1873 | `c_carrots.m4a` | carrots |  |
+| 1874 | `c_honey.m4a` | honey |  |
+| 1875 | `c_an_orange.m4a` | an orange |  |
+| 1876 | `c_cold.m4a` | cold |  |
+| 1877 | `c_sunny.m4a` | sunny |  |
+| 1878 | `c_loud.m4a` | loud |  |
+| 1879 | `c_small.m4a` | small |  |
+| 1880 | `c_tall.m4a` | tall |  |
+| 1881 | `c_fast.m4a` | fast |  |
+| 1882 | `c_down.m4a` | down |  |
+| 1883 | `c_left.m4a` | left |  |
+| 1884 | `c_right.m4a` | right |  |
+| 1885 | `c_night.m4a` | night |  |
+| 1886 | `c_morning.m4a` | morning |  |
+| 1887 | `c_lunch.m4a` | lunch |  |
+| 1888 | `c_sad.m4a` | sad |  |
+| 1889 | `c_silly.m4a` | silly |  |
+| 1890 | `c_sleepy.m4a` | sleepy |  |
+| 1891 | `c_slow.m4a` | slow |  |
+| 1892 | `c_closed.m4a` | closed |  |
+| 1893 | `c_dry.m4a` | dry |  |
+| 1894 | `c_quiet.m4a` | quiet |  |
+| 1895 | `c_the_carrot.m4a` | the carrot |  |
+| 1896 | `c_the_apple.m4a` | the apple |  |
+| 1897 | `c_the_banana.m4a` | the banana |  |
+| 1898 | `c_the_grapes.m4a` | the grapes |  |
+| 1899 | `c_the_car.m4a` | the car |  |
+| 1900 | `c_the_cat.m4a` | the cat |  |
+| 1901 | `c_the_dog.m4a` | the dog |  |
+| 1902 | `c_the_cow.m4a` | the cow |  |
+| 1903 | `c_the_spoon.m4a` | the spoon |  |
+| 1904 | `c_the_sock.m4a` | the sock |  |
+| 1905 | `c_the_sneaker.m4a` | the sneaker |  |
+| 1906 | `c_the_boot.m4a` | the boot |  |
+| 1907 | `c_the_fish.m4a` | the fish |  |
+| 1908 | `c_the_bird.m4a` | the bird |  |
+| 1909 | `c_the_airplane.m4a` | the airplane |  |
+| 1910 | `c_the_butterfly.m4a` | the butterfly |  |
+| 1911 | `c_the_teddy_bear.m4a` | the teddy bear |  |
+| 1912 | `c_the_tree.m4a` | the tree |  |
+| 1913 | `c_the_frog.m4a` | the frog |  |
+| 1914 | `c_the_bee.m4a` | the bee |  |
+| 1915 | `c_the_pizza.m4a` | the pizza |  |
+| 1916 | `c_the_cheese.m4a` | the cheese |  |
+| 1917 | `c_the_lion.m4a` | the lion |  |
+| 1918 | `c_the_octopus.m4a` | the octopus |  |
+| 1919 | `c_the_whale.m4a` | the whale |  |
+| 1920 | `c_the_sailboat.m4a` | the sailboat |  |
+| 1921 | `c_the_bike.m4a` | the bike |  |
+| 1922 | `c_the_bus.m4a` | the bus |  |
+| 1923 | `c_the_hammer.m4a` | the hammer |  |
+| 1924 | `c_the_drum.m4a` | the drum |  |
+| 1925 | `c_the_guitar.m4a` | the guitar |  |
+| 1926 | `c_the_trumpet.m4a` | the trumpet |  |
+| 1927 | `c_hat.m4a` | hat |  |
+| 1928 | `c_sun.m4a` | sun |  |
+| 1929 | `c_tree.m4a` | tree |  |
+| 1930 | `c_bus.m4a` | bus |  |
+| 1931 | `c_bird.m4a` | bird |  |
+| 1932 | `c_snake.m4a` | snake |  |
+| 1933 | `c_apple.m4a` | apple |  |
+| 1934 | `c_drum.m4a` | drum |  |
+| 1935 | `c_boat.m4a` | boat |  |
+| 1936 | `c_sheep.m4a` | sheep |  |
+| 1937 | `c_chair.m4a` | chair |  |
+| 1938 | `c_bed.m4a` | bed |  |
+| 1939 | `c_shoe.m4a` | shoe |  |
+| 1940 | `c_house.m4a` | house |  |
+| 1941 | `c_spoon.m4a` | spoon |  |
+| 1942 | `c_ring.m4a` | ring |  |
+| 1943 | `c_crown.m4a` | crown |  |
+| 1944 | `c_castle.m4a` | castle |  |
+| 1945 | `c_dish.m4a` | dish |  |
+| 1946 | `c_fork.m4a` | fork |  |
+| 1947 | `c_cup.m4a` | cup |  |
+| 1948 | `c_water.m4a` | water |  |
+| 1949 | `c_candy.m4a` | candy |  |
+| 1950 | `c_toys.m4a` | toys |  |
+| 1951 | `c_it_melts.m4a` | it melts |  |
+| 1952 | `c_it_gets_colder.m4a` | it gets colder |  |
+| 1953 | `c_it_bounces.m4a` | it bounces |  |
+| 1954 | `c_a_paper_clip.m4a` | a paper clip |  |
+| 1955 | `c_a_teddy_bear.m4a` | a teddy bear |  |
+| 1956 | `c_a_boat.m4a` | a boat |  |
+| 1957 | `c_a_key.m4a` | a key |  |
+| 1958 | `c_a_hammer.m4a` | a hammer |  |
+| 1959 | `c_leaves.m4a` | leaves |  |
+| 1960 | `c_plant.m4a` | plant |  |
+| 1961 | `c_car.m4a` | car |  |
+| 1962 | `c_fire.m4a` | fire |  |
+| 1963 | `c_a_magnifying_glass.m4a` | a magnifying glass |  |
+| 1964 | `c_a_spoon.m4a` | a spoon |  |
+| 1965 | `c_a_sock.m4a` | a sock |  |
+| 1966 | `c_a_clock.m4a` | a clock |  |
+| 1967 | `c_a_sneaker.m4a` | a sneaker |  |
+| 1968 | `c_air.m4a` | air |  |
+| 1969 | `c_juice.m4a` | juice |  |
+| 1970 | `c_sand.m4a` | sand |  |
+| 1971 | `c_the_ocean.m4a` | the ocean |  |
+| 1972 | `c_a_puddle.m4a` | a puddle |  |
+| 1973 | `c_a_cup.m4a` | a cup |  |
+| 1974 | `c_a_map.m4a` | a map |  |
+| 1975 | `c_a_compass.m4a` | a compass |  |
+| 1976 | `c_a_mountain.m4a` | a mountain |  |
+| 1977 | `c_a_forest.m4a` | a forest |  |
+| 1978 | `c_a_desert.m4a` | a desert |  |
+| 1979 | `c_an_iceberg.m4a` | an iceberg |  |
+| 1980 | `c_ball.m4a` | ball |  |
+| 1981 | `c_box.m4a` | box |  |
+| 1982 | `c_triangle.m4a` | triangle |  |
+| 1983 | `c_a_city.m4a` | a city |  |
+| 1984 | `c_an_ocean.m4a` | an ocean |  |
+| 1985 | `c_hot.m4a` | hot |  |
 
 ## Tiny Picnic (toddler mode) — record first (66)
 
@@ -2215,72 +2250,72 @@ Slow, warm and simple, for a 2-year-old. Prompts, gentle "that's a ..." lines fo
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 1957 | `tp_title.m4a` | Tiny Picnic! |  |
-| 1958 | `tp_hello.m4a` | Tiny Picnic! Let's play! |  |
-| 1959 | `tp_match.m4a` | Find the same one! |  |
-| 1960 | `tp_yay_1.m4a` | Yay! You found it! |  |
-| 1961 | `tp_yay_2.m4a` | Great job! |  |
-| 1962 | `tp_yay_3.m4a` | Hooray! |  |
-| 1963 | `tp_yay_4.m4a` | You did it! |  |
-| 1964 | `tp_done.m4a` | Hooray! What a great picnic! |  |
-| 1965 | `tp_again.m4a` | Play again? |  |
-| 1966 | `tp_home.m4a` | Bye bye, picnic! |  |
-| 1967 | `tp_find_strawberry.m4a` | Find the strawberry! |  |
-| 1968 | `tp_is_strawberry.m4a` | That's a strawberry! |  |
-| 1969 | `tp_find_apple.m4a` | Find the apple! |  |
-| 1970 | `tp_is_apple.m4a` | That's an apple! |  |
-| 1971 | `tp_find_banana.m4a` | Find the banana! |  |
-| 1972 | `tp_is_banana.m4a` | That's a banana! |  |
-| 1973 | `tp_find_corn.m4a` | Find the corn! |  |
-| 1974 | `tp_is_corn.m4a` | That's corn! |  |
-| 1975 | `tp_find_lemon.m4a` | Find the lemon! |  |
-| 1976 | `tp_is_lemon.m4a` | That's a lemon! |  |
-| 1977 | `tp_find_blueberry.m4a` | Find the blueberry! |  |
-| 1978 | `tp_is_blueberry.m4a` | That's a blueberry! |  |
-| 1979 | `tp_find_carrot.m4a` | Find the carrot! |  |
-| 1980 | `tp_is_carrot.m4a` | That's a carrot! |  |
-| 1981 | `tp_find_broccoli.m4a` | Find the broccoli! |  |
-| 1982 | `tp_is_broccoli.m4a` | That's broccoli! |  |
-| 1983 | `tp_find_pear.m4a` | Find the pear! |  |
-| 1984 | `tp_is_pear.m4a` | That's a pear! |  |
-| 1985 | `tp_find_grapes.m4a` | Find the grapes! |  |
-| 1986 | `tp_is_grapes.m4a` | Those are grapes! |  |
-| 1987 | `tp_find_watermelon.m4a` | Find the watermelon! |  |
-| 1988 | `tp_is_watermelon.m4a` | That's a watermelon! |  |
-| 1989 | `tp_find_pineapple.m4a` | Find the pineapple! |  |
-| 1990 | `tp_is_pineapple.m4a` | That's a pineapple! |  |
-| 1991 | `tp_find_cupcake.m4a` | Find the cupcake! |  |
-| 1992 | `tp_is_cupcake.m4a` | That's a cupcake! |  |
-| 1993 | `tp_find_cookie.m4a` | Find the cookie! |  |
-| 1994 | `tp_is_cookie.m4a` | That's a cookie! |  |
-| 1995 | `tp_find_circle.m4a` | Find the circle! |  |
-| 1996 | `tp_is_circle.m4a` | That's a circle! |  |
-| 1997 | `tp_find_square.m4a` | Find the square! |  |
-| 1998 | `tp_is_square.m4a` | That's a square! |  |
-| 1999 | `tp_find_triangle.m4a` | Find the triangle! |  |
-| 2000 | `tp_is_triangle.m4a` | That's a triangle! |  |
-| 2001 | `tp_find_star.m4a` | Find the star! |  |
-| 2002 | `tp_is_star.m4a` | That's a star! |  |
-| 2003 | `tp_find_heart.m4a` | Find the heart! |  |
-| 2004 | `tp_is_heart.m4a` | That's a heart! |  |
-| 2005 | `tp_color_red.m4a` | Which one is red? |  |
-| 2006 | `tp_c_red.m4a` | That's red! |  |
-| 2007 | `tp_color_yellow.m4a` | Which one is yellow? |  |
-| 2008 | `tp_c_yellow.m4a` | That's yellow! |  |
-| 2009 | `tp_color_blue.m4a` | Which one is blue? |  |
-| 2010 | `tp_c_blue.m4a` | That's blue! |  |
-| 2011 | `tp_color_green.m4a` | Which one is green? |  |
-| 2012 | `tp_c_green.m4a` | That's green! |  |
-| 2013 | `tp_color_orange.m4a` | Which one is orange? |  |
-| 2014 | `tp_c_orange.m4a` | That's orange! |  |
-| 2015 | `tp_color_purple.m4a` | Which one is purple? |  |
-| 2016 | `tp_c_purple.m4a` | That's purple! |  |
-| 2017 | `tp_count_1.m4a` | Find one! |  |
-| 2018 | `tp_n_1.m4a` | That's one! |  |
-| 2019 | `tp_count_2.m4a` | Find two! |  |
-| 2020 | `tp_n_2.m4a` | That's two! |  |
-| 2021 | `tp_count_3.m4a` | Find three! |  |
-| 2022 | `tp_n_3.m4a` | That's three! |  |
+| 1986 | `tp_title.m4a` | Tiny Picnic! |  |
+| 1987 | `tp_hello.m4a` | Tiny Picnic! Let's play! |  |
+| 1988 | `tp_match.m4a` | Find the same one! |  |
+| 1989 | `tp_yay_1.m4a` | Yay! You found it! |  |
+| 1990 | `tp_yay_2.m4a` | Great job! |  |
+| 1991 | `tp_yay_3.m4a` | Hooray! |  |
+| 1992 | `tp_yay_4.m4a` | You did it! |  |
+| 1993 | `tp_done.m4a` | Hooray! What a great picnic! |  |
+| 1994 | `tp_again.m4a` | Play again? |  |
+| 1995 | `tp_home.m4a` | Bye bye, picnic! |  |
+| 1996 | `tp_find_strawberry.m4a` | Find the strawberry! |  |
+| 1997 | `tp_is_strawberry.m4a` | That's a strawberry! |  |
+| 1998 | `tp_find_apple.m4a` | Find the apple! |  |
+| 1999 | `tp_is_apple.m4a` | That's an apple! |  |
+| 2000 | `tp_find_banana.m4a` | Find the banana! |  |
+| 2001 | `tp_is_banana.m4a` | That's a banana! |  |
+| 2002 | `tp_find_corn.m4a` | Find the corn! |  |
+| 2003 | `tp_is_corn.m4a` | That's corn! |  |
+| 2004 | `tp_find_lemon.m4a` | Find the lemon! |  |
+| 2005 | `tp_is_lemon.m4a` | That's a lemon! |  |
+| 2006 | `tp_find_blueberry.m4a` | Find the blueberry! |  |
+| 2007 | `tp_is_blueberry.m4a` | That's a blueberry! |  |
+| 2008 | `tp_find_carrot.m4a` | Find the carrot! |  |
+| 2009 | `tp_is_carrot.m4a` | That's a carrot! |  |
+| 2010 | `tp_find_broccoli.m4a` | Find the broccoli! |  |
+| 2011 | `tp_is_broccoli.m4a` | That's broccoli! |  |
+| 2012 | `tp_find_pear.m4a` | Find the pear! |  |
+| 2013 | `tp_is_pear.m4a` | That's a pear! |  |
+| 2014 | `tp_find_grapes.m4a` | Find the grapes! |  |
+| 2015 | `tp_is_grapes.m4a` | Those are grapes! |  |
+| 2016 | `tp_find_watermelon.m4a` | Find the watermelon! |  |
+| 2017 | `tp_is_watermelon.m4a` | That's a watermelon! |  |
+| 2018 | `tp_find_pineapple.m4a` | Find the pineapple! |  |
+| 2019 | `tp_is_pineapple.m4a` | That's a pineapple! |  |
+| 2020 | `tp_find_cupcake.m4a` | Find the cupcake! |  |
+| 2021 | `tp_is_cupcake.m4a` | That's a cupcake! |  |
+| 2022 | `tp_find_cookie.m4a` | Find the cookie! |  |
+| 2023 | `tp_is_cookie.m4a` | That's a cookie! |  |
+| 2024 | `tp_find_circle.m4a` | Find the circle! |  |
+| 2025 | `tp_is_circle.m4a` | That's a circle! |  |
+| 2026 | `tp_find_square.m4a` | Find the square! |  |
+| 2027 | `tp_is_square.m4a` | That's a square! |  |
+| 2028 | `tp_find_triangle.m4a` | Find the triangle! |  |
+| 2029 | `tp_is_triangle.m4a` | That's a triangle! |  |
+| 2030 | `tp_find_star.m4a` | Find the star! |  |
+| 2031 | `tp_is_star.m4a` | That's a star! |  |
+| 2032 | `tp_find_heart.m4a` | Find the heart! |  |
+| 2033 | `tp_is_heart.m4a` | That's a heart! |  |
+| 2034 | `tp_color_red.m4a` | Which one is red? |  |
+| 2035 | `tp_c_red.m4a` | That's red! |  |
+| 2036 | `tp_color_yellow.m4a` | Which one is yellow? |  |
+| 2037 | `tp_c_yellow.m4a` | That's yellow! |  |
+| 2038 | `tp_color_blue.m4a` | Which one is blue? |  |
+| 2039 | `tp_c_blue.m4a` | That's blue! |  |
+| 2040 | `tp_color_green.m4a` | Which one is green? |  |
+| 2041 | `tp_c_green.m4a` | That's green! |  |
+| 2042 | `tp_color_orange.m4a` | Which one is orange? |  |
+| 2043 | `tp_c_orange.m4a` | That's orange! |  |
+| 2044 | `tp_color_purple.m4a` | Which one is purple? |  |
+| 2045 | `tp_c_purple.m4a` | That's purple! |  |
+| 2046 | `tp_count_1.m4a` | Find one! |  |
+| 2047 | `tp_n_1.m4a` | That's one! |  |
+| 2048 | `tp_count_2.m4a` | Find two! |  |
+| 2049 | `tp_n_2.m4a` | That's two! |  |
+| 2050 | `tp_count_3.m4a` | Find three! |  |
+| 2051 | `tp_n_3.m4a` | That's three! |  |
 
 ## Play-time limit & stretch breaks — record first (3)
 
@@ -2288,9 +2323,1108 @@ Calm and kind. Said at a natural stopping point, never mid-question.
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 2023 | `pt_stop.m4a` | Great stopping point! You played so well today. Time to rest. |  |
-| 2024 | `pt_bye.m4a` | Bye bye! See you next time! |  |
-| 2025 | `pt_stretch.m4a` | Time for a stretch! Reach up high, wiggle your fingers, and take a big breath. |  |
+| 2052 | `pt_stop.m4a` | Great stopping point! You played so well today. Time to rest. |  |
+| 2053 | `pt_bye.m4a` | Bye bye! See you next time! |  |
+| 2054 | `pt_stretch.m4a` | Time for a stretch! Reach up high, wiggle your fingers, and take a big breath. |  |
+
+## Number steps (counting, facts to 20) — record first (20)
+
+Read by the device voice until recorded (v2p2a). Warm and simple.
+
+| # | File name | Say this | Note |
+|---:|---|---|---|
+| 2055 | `st_speedy.m4a` | Speedy! You know this one. Let's skip ahead! | After 5 fast right answers in a row on a step: the kid jumps to the next step |
+| 2056 | `st_warmup.m4a` | Warm-up time! Just a few quick ones. | Before a new number ladder: about 6 quick picks |
+| 2057 | `st_how_many.m4a` | How many? |  |
+| 2058 | `st_find.m4a` | Find | + number, e.g. "Find" + "14" |
+| 2059 | `st_what_next.m4a` | What comes next? |  |
+| 2060 | `st_what_before.m4a` | What comes before? |  |
+| 2061 | `st_whats_missing.m4a` | Which number is missing? |  |
+| 2062 | `st_one_more.m4a` | One more comes! How many now? | After a number, e.g. "3" + this line |
+| 2063 | `st_one_less.m4a` | Jammy eats one. How many now? | After a number, e.g. "5" + this line |
+| 2064 | `st_one_more_than.m4a` | What is one more than | + number |
+| 2065 | `st_one_less_than.m4a` | What is one less than | + number |
+| 2066 | `st_which_more.m4a` | Which has more? |  |
+| 2067 | `st_bigger.m4a` | Which number is bigger? |  |
+| 2068 | `st_same.m4a` | They are the same! |  |
+| 2069 | `st_fill5.m4a` | How many more to fill it? | Make 5: a five-frame with some dots |
+| 2070 | `st_two_make5.m4a` | Which two plates make five dots? | Make 5: pictures only |
+| 2071 | `st_back_up.m4a` | Great job! Now back to your step. | After a short, easier round |
+| 2072 | `st_new_step.m4a` | A new step! |  |
+| 2073 | `st_intro_pk.m4a` | Let's count and find numbers! | First counting step |
+| 2074 | `st_intro_e20.m4a` | Adding and taking away to twenty! Let's go! | First step of the facts to 20 |
+
+## Topic questions (animals, colors & shapes, seasons & weather, letters) — later (622)
+
+Read by the device voice until recorded (v2p2b). Generated from the spec; edit the spec, then re-run tools/build-topics.js.
+
+| # | File name | Say this | Note |
+|---:|---|---|---|
+| 2075 | `tq_an_t1_1.m4a` | Who says moo? | Animals / Animal sounds (T) |
+| 2076 | `tw_cow.m4a` | cow | topic answer word |
+| 2077 | `tw_dog.m4a` | dog | topic answer word |
+| 2078 | `tq_an_t1_2.m4a` | Who says woof? | Animals / Animal sounds (T) |
+| 2079 | `tw_cat.m4a` | cat | topic answer word |
+| 2080 | `tq_an_t1_3.m4a` | Who says meow? | Animals / Animal sounds (T) |
+| 2081 | `tw_duck.m4a` | duck | topic answer word |
+| 2082 | `tq_an_t1_4.m4a` | Who says quack? | Animals / Animal sounds (T) |
+| 2083 | `tq_an_t1_5.m4a` | Who says baa? | Animals / Animal sounds (T) |
+| 2084 | `tw_sheep.m4a` | sheep | topic answer word |
+| 2085 | `tw_pig.m4a` | pig | topic answer word |
+| 2086 | `tq_an_t1_6.m4a` | Who says oink? | Animals / Animal sounds (T) |
+| 2087 | `tw_horse.m4a` | horse | topic answer word |
+| 2088 | `tq_an_t1_7.m4a` | Who says neigh? | Animals / Animal sounds (T) |
+| 2089 | `tq_an_t1_8.m4a` | Who says roar? | Animals / Animal sounds (T) |
+| 2090 | `tw_lion.m4a` | lion | topic answer word |
+| 2091 | `tq_an_t1_9.m4a` | Who says hiss? | Animals / Animal sounds (T) |
+| 2092 | `tw_snake.m4a` | snake | topic answer word |
+| 2093 | `tq_an_t1_10.m4a` | Who says cluck? | Animals / Animal sounds (T) |
+| 2094 | `tw_chicken.m4a` | chicken | topic answer word |
+| 2095 | `tq_an_t2_1.m4a` | Find the dog | Animals / Find the animal (T) |
+| 2096 | `tq_an_t2_2.m4a` | Find the fish | Animals / Find the animal (T) |
+| 2097 | `tq_an_t2_3.m4a` | Find the bird | Animals / Find the animal (T) |
+| 2098 | `tq_an_t2_4.m4a` | Find the cat | Animals / Find the animal (T) |
+| 2099 | `tq_an_t2_5.m4a` | Find the elephant | Animals / Find the animal (T) |
+| 2100 | `tq_an_t2_6.m4a` | Find the frog | Animals / Find the animal (T) |
+| 2101 | `tq_an_t2_7.m4a` | Find the bunny | Animals / Find the animal (T) |
+| 2102 | `tq_an_t2_8.m4a` | Find the bear | Animals / Find the animal (T) |
+| 2103 | `tq_an_t2_9.m4a` | Find the monkey | Animals / Find the animal (T) |
+| 2104 | `tq_an_t2_10.m4a` | Find the duck | Animals / Find the animal (T) |
+| 2105 | `tq_an_t3_1.m4a` | Which one is big? | Animals / Big or little (T) |
+| 2106 | `tq_an_t3_2.m4a` | Which one is little? | Animals / Big or little (T) |
+| 2107 | `tq_an_t3_3.m4a` | Which one is big? | Animals / Big or little (T) |
+| 2108 | `tq_an_t3_4.m4a` | Which one is little? | Animals / Big or little (T) |
+| 2109 | `tq_an_t3_5.m4a` | Which one is big? | Animals / Big or little (T) |
+| 2110 | `tq_an_t3_6.m4a` | Which one is little? | Animals / Big or little (T) |
+| 2111 | `tq_an_t3_7.m4a` | Which one is big? | Animals / Big or little (T) |
+| 2112 | `tq_an_t3_8.m4a` | Which one is little? | Animals / Big or little (T) |
+| 2113 | `tq_an_t3_9.m4a` | Which one is big? | Animals / Big or little (T) |
+| 2114 | `tq_an_t3_10.m4a` | Which one is little? | Animals / Big or little (T) |
+| 2115 | `tq_an_p1_1.m4a` | A puppy grows up to be a... | Animals / Baby animals (P) |
+| 2116 | `tq_an_p1_2.m4a` | A kitten grows up to be a... | Animals / Baby animals (P) |
+| 2117 | `tq_an_p1_3.m4a` | A calf grows up to be a... | Animals / Baby animals (P) |
+| 2118 | `tq_an_p1_4.m4a` | A chick grows up to be a... | Animals / Baby animals (P) |
+| 2119 | `tw_owl.m4a` | owl | topic answer word |
+| 2120 | `tq_an_p1_5.m4a` | A duckling grows up to be a... | Animals / Baby animals (P) |
+| 2121 | `tw_frog.m4a` | frog | topic answer word |
+| 2122 | `tq_an_p1_6.m4a` | A lamb grows up to be a... | Animals / Baby animals (P) |
+| 2123 | `tw_goat.m4a` | goat | topic answer word |
+| 2124 | `tq_an_p1_7.m4a` | A piglet grows up to be a... | Animals / Baby animals (P) |
+| 2125 | `tq_an_p1_8.m4a` | A foal grows up to be a... | Animals / Baby animals (P) |
+| 2126 | `tw_deer.m4a` | deer | topic answer word |
+| 2127 | `tq_an_p1_9.m4a` | A joey grows up to be a... | Animals / Baby animals (P) |
+| 2128 | `tw_kangaroo.m4a` | kangaroo | topic answer word |
+| 2129 | `tw_bear.m4a` | bear | topic answer word |
+| 2130 | `tw_rabbit.m4a` | rabbit | topic answer word |
+| 2131 | `tq_an_p1_10.m4a` | A tadpole grows up to be a... | Animals / Baby animals (P) |
+| 2132 | `tw_fish.m4a` | fish | topic answer word |
+| 2133 | `tq_an_p2_1.m4a` | How does a fish move? | Animals / Fly, swim or walk (P) |
+| 2134 | `tw_swim.m4a` | swim | topic answer word |
+| 2135 | `tw_fly.m4a` | fly | topic answer word |
+| 2136 | `tw_walk.m4a` | walk | topic answer word |
+| 2137 | `tq_an_p2_2.m4a` | How does a bird move? | Animals / Fly, swim or walk (P) |
+| 2138 | `tq_an_p2_3.m4a` | How does a dog move? | Animals / Fly, swim or walk (P) |
+| 2139 | `tq_an_p2_4.m4a` | How does a butterfly move? | Animals / Fly, swim or walk (P) |
+| 2140 | `tq_an_p2_5.m4a` | How does a whale move? | Animals / Fly, swim or walk (P) |
+| 2141 | `tq_an_p2_6.m4a` | How does an elephant move? | Animals / Fly, swim or walk (P) |
+| 2142 | `tq_an_p2_7.m4a` | How does a bee move? | Animals / Fly, swim or walk (P) |
+| 2143 | `tq_an_p2_8.m4a` | How does a shark move? | Animals / Fly, swim or walk (P) |
+| 2144 | `tq_an_p2_9.m4a` | How does a horse move? | Animals / Fly, swim or walk (P) |
+| 2145 | `tq_an_p2_10.m4a` | How does an octopus move? | Animals / Fly, swim or walk (P) |
+| 2146 | `tq_an_p3_1.m4a` | What does a panda eat? | Animals / What do they eat? (P) |
+| 2147 | `tw_bamboo.m4a` | bamboo | topic answer word |
+| 2148 | `tw_meat.m4a` | meat | topic answer word |
+| 2149 | `tq_an_p3_2.m4a` | What does a rabbit eat? | Animals / What do they eat? (P) |
+| 2150 | `tw_carrot.m4a` | carrot | topic answer word |
+| 2151 | `tq_an_p3_3.m4a` | What does a cow eat? | Animals / What do they eat? (P) |
+| 2152 | `tw_grass.m4a` | grass | topic answer word |
+| 2153 | `tw_cake.m4a` | cake | topic answer word |
+| 2154 | `tq_an_p3_4.m4a` | What does a bee drink from? | Animals / What do they eat? (P) |
+| 2155 | `tw_flowers.m4a` | flowers | topic answer word |
+| 2156 | `tw_rocks.m4a` | rocks | topic answer word |
+| 2157 | `tq_an_p3_5.m4a` | What does a squirrel eat? | Animals / What do they eat? (P) |
+| 2158 | `tw_nuts.m4a` | nuts | topic answer word |
+| 2159 | `tq_an_p3_6.m4a` | What does a lion eat? | Animals / What do they eat? (P) |
+| 2160 | `tw_carrots.m4a` | carrots | topic answer word |
+| 2161 | `tq_an_p3_7.m4a` | What does a giraffe eat? | Animals / What do they eat? (P) |
+| 2162 | `tw_leaves.m4a` | leaves | topic answer word |
+| 2163 | `tq_an_p3_8.m4a` | What does a robin eat? | Animals / What do they eat? (P) |
+| 2164 | `tw_worms.m4a` | worms | topic answer word |
+| 2165 | `tq_an_p3_9.m4a` | What does a caterpillar eat? | Animals / What do they eat? (P) |
+| 2166 | `tq_an_p3_10.m4a` | What does a horse eat? | Animals / What do they eat? (P) |
+| 2167 | `tw_hay.m4a` | hay | topic answer word |
+| 2168 | `tq_an_p4_1.m4a` | Where does a bird live? | Animals / Animal homes (P) |
+| 2169 | `tw_nest.m4a` | nest | topic answer word |
+| 2170 | `tw_hive.m4a` | hive | topic answer word |
+| 2171 | `tw_web.m4a` | web | topic answer word |
+| 2172 | `tq_an_p4_2.m4a` | Where do bees live? | Animals / Animal homes (P) |
+| 2173 | `tw_cave.m4a` | cave | topic answer word |
+| 2174 | `tq_an_p4_3.m4a` | What does a spider make? | Animals / Animal homes (P) |
+| 2175 | `tq_an_p4_4.m4a` | Where does a fish live? | Animals / Animal homes (P) |
+| 2176 | `tw_water.m4a` | water | topic answer word |
+| 2177 | `tw_tree.m4a` | tree | topic answer word |
+| 2178 | `tq_an_p4_5.m4a` | Where does a bear sleep in winter? | Animals / Animal homes (P) |
+| 2179 | `tw_den_cave.m4a` | den/cave | topic answer word |
+| 2180 | `tw_pond.m4a` | pond | topic answer word |
+| 2181 | `tq_an_p4_6.m4a` | Where does a rabbit live? | Animals / Animal homes (P) |
+| 2182 | `tw_burrow.m4a` | burrow | topic answer word |
+| 2183 | `tq_an_p4_7.m4a` | Where do ants live? | Animals / Animal homes (P) |
+| 2184 | `tw_anthill.m4a` | anthill | topic answer word |
+| 2185 | `tq_an_p4_8.m4a` | Where does a horse sleep on a farm? | Animals / Animal homes (P) |
+| 2186 | `tw_barn.m4a` | barn | topic answer word |
+| 2187 | `tq_an_p4_9.m4a` | Where does a frog live? | Animals / Animal homes (P) |
+| 2188 | `tw_desert.m4a` | desert | topic answer word |
+| 2189 | `tq_an_p4_10.m4a` | Where does a beaver live? | Animals / Animal homes (P) |
+| 2190 | `tw_lodge.m4a` | lodge | topic answer word |
+| 2191 | `tq_an_e1_1.m4a` | A dog is a... | Animals / Mammal, bird or fish (E) |
+| 2192 | `tw_mammal.m4a` | mammal | topic answer word |
+| 2193 | `tw_bird.m4a` | bird | topic answer word |
+| 2194 | `tf_an_e1_1.m4a` | Mammals have hair or fur and feed their babies milk. | fact after a right answer (spoken at 2-5, read at 6+) |
+| 2195 | `tq_an_e1_2.m4a` | An eagle is a... | Animals / Mammal, bird or fish (E) |
+| 2196 | `tf_an_e1_2.m4a` | All birds have feathers. | fact after a right answer (spoken at 2-5, read at 6+) |
+| 2197 | `tq_an_e1_3.m4a` | A salmon is a... | Animals / Mammal, bird or fish (E) |
+| 2198 | `tf_an_e1_3.m4a` | Fish breathe with gills. | fact after a right answer (spoken at 2-5, read at 6+) |
+| 2199 | `tq_an_e1_4.m4a` | A whale is a... | Animals / Mammal, bird or fish (E) |
+| 2200 | `tf_an_e1_4.m4a` | Whales breathe air through a blowhole. | fact after a right answer (spoken at 2-5, read at 6+) |
+| 2201 | `tq_an_e1_5.m4a` | A penguin is a... | Animals / Mammal, bird or fish (E) |
+| 2202 | `tf_an_e1_5.m4a` | Penguins can't fly, but they have feathers. | fact after a right answer (spoken at 2-5, read at 6+) |
+| 2203 | `tq_an_e1_6.m4a` | A bat is a... | Animals / Mammal, bird or fish (E) |
+| 2204 | `tf_an_e1_6.m4a` | Bats are the only mammals that can really fly. | fact after a right answer (spoken at 2-5, read at 6+) |
+| 2205 | `tq_an_e1_7.m4a` | A shark is a... | Animals / Mammal, bird or fish (E) |
+| 2206 | `tq_an_e1_8.m4a` | A dolphin is a... | Animals / Mammal, bird or fish (E) |
+| 2207 | `tq_an_e1_9.m4a` | An owl is a... | Animals / Mammal, bird or fish (E) |
+| 2208 | `tq_an_e1_10.m4a` | A goldfish is a... | Animals / Mammal, bird or fish (E) |
+| 2209 | `tq_an_e2_1.m4a` | Where does a polar bear live? | Animals / Habitats (E) |
+| 2210 | `tw_arctic.m4a` | Arctic | topic answer word |
+| 2211 | `tw_rainforest.m4a` | rainforest | topic answer word |
+| 2212 | `tq_an_e2_2.m4a` | Where does a camel live? | Animals / Habitats (E) |
+| 2213 | `tw_ocean.m4a` | ocean | topic answer word |
+| 2214 | `tq_an_e2_3.m4a` | Where do most monkeys live? | Animals / Habitats (E) |
+| 2215 | `tq_an_e2_4.m4a` | Where does an octopus live? | Animals / Habitats (E) |
+| 2216 | `tq_an_e2_5.m4a` | Where does a frog live? | Animals / Habitats (E) |
+| 2217 | `tq_an_e2_6.m4a` | Where does a deer live? | Animals / Habitats (E) |
+| 2218 | `tw_forest.m4a` | forest | topic answer word |
+| 2219 | `tq_an_e2_7.m4a` | Where do emperor penguins live? | Animals / Habitats (E) |
+| 2220 | `tw_antarctica.m4a` | Antarctica | topic answer word |
+| 2221 | `tq_an_e2_8.m4a` | Where does a parrot live? | Animals / Habitats (E) |
+| 2222 | `tq_an_e2_9.m4a` | Where does a starfish live? | Animals / Habitats (E) |
+| 2223 | `tq_an_e2_10.m4a` | Where does a lizard like the gila monster live? | Animals / Habitats (E) |
+| 2224 | `tq_an_e3_1.m4a` | A snake is a... | Animals / Reptiles, amphibians, insects (E) |
+| 2225 | `tw_reptile.m4a` | reptile | topic answer word |
+| 2226 | `tw_insect.m4a` | insect | topic answer word |
+| 2227 | `tw_amphibian.m4a` | amphibian | topic answer word |
+| 2228 | `tf_an_e3_1.m4a` | Reptiles have dry, scaly skin. | fact after a right answer (spoken at 2-5, read at 6+) |
+| 2229 | `tq_an_e3_2.m4a` | A frog is an... | Animals / Reptiles, amphibians, insects (E) |
+| 2230 | `tf_an_e3_2.m4a` | Amphibians live in water when young and on land later. | fact after a right answer (spoken at 2-5, read at 6+) |
+| 2231 | `tq_an_e3_3.m4a` | An ant is an... | Animals / Reptiles, amphibians, insects (E) |
+| 2232 | `tf_an_e3_3.m4a` | Insects have 6 legs. | fact after a right answer (spoken at 2-5, read at 6+) |
+| 2233 | `tq_an_e3_4.m4a` | How many legs does an insect have? | Animals / Reptiles, amphibians, insects (E) |
+| 2234 | `tq_an_e3_5.m4a` | How many legs does a spider have? | Animals / Reptiles, amphibians, insects (E) |
+| 2235 | `tf_an_e3_5.m4a` | Spiders are not insects. | fact after a right answer (spoken at 2-5, read at 6+) |
+| 2236 | `tq_an_e3_6.m4a` | A turtle is a... | Animals / Reptiles, amphibians, insects (E) |
+| 2237 | `tq_an_e3_7.m4a` | A salamander is an... | Animals / Reptiles, amphibians, insects (E) |
+| 2238 | `tq_an_e3_8.m4a` | A butterfly is an... | Animals / Reptiles, amphibians, insects (E) |
+| 2239 | `tq_an_e3_9.m4a` | A crocodile is a... | Animals / Reptiles, amphibians, insects (E) |
+| 2240 | `tq_an_e3_10.m4a` | A bee is an... | Animals / Reptiles, amphibians, insects (E) |
+| 2241 | `tq_an_e4_1.m4a` | An octopus has eight arms. How many arms? | Animals / Read a fact (E) |
+| 2242 | `tq_an_e4_2.m4a` | Hummingbirds can fly backward. Which bird can fly backward? | Animals / Read a fact (E) |
+| 2243 | `tw_hummingbird.m4a` | hummingbird | topic answer word |
+| 2244 | `tw_penguin.m4a` | penguin | topic answer word |
+| 2245 | `tq_an_e4_3.m4a` | A baby kangaroo is called a joey. What is a baby kangaroo called? | Animals / Read a fact (E) |
+| 2246 | `tw_joey.m4a` | joey | topic answer word |
+| 2247 | `tw_cub.m4a` | cub | topic answer word |
+| 2248 | `tw_calf.m4a` | calf | topic answer word |
+| 2249 | `tq_an_e4_4.m4a` | Cheetahs are the fastest land animals. Which is fastest on land? | Animals / Read a fact (E) |
+| 2250 | `tw_cheetah.m4a` | cheetah | topic answer word |
+| 2251 | `tw_turtle.m4a` | turtle | topic answer word |
+| 2252 | `tw_elephant.m4a` | elephant | topic answer word |
+| 2253 | `tq_an_e4_5.m4a` | Bats sleep upside down. How do bats sleep? | Animals / Read a fact (E) |
+| 2254 | `tw_upside_down.m4a` | upside down | topic answer word |
+| 2255 | `tw_in_water.m4a` | in water | topic answer word |
+| 2256 | `tw_standing_up.m4a` | standing up | topic answer word |
+| 2257 | `tq_an_e4_6.m4a` | A giraffe's long neck helps it reach leaves. Why is the neck long? | Animals / Read a fact (E) |
+| 2258 | `tw_to_reach_leaves.m4a` | to reach leaves | topic answer word |
+| 2259 | `tw_to_swim.m4a` | to swim | topic answer word |
+| 2260 | `tw_to_dig.m4a` | to dig | topic answer word |
+| 2261 | `tq_an_e4_7.m4a` | Penguins cannot fly, but they swim fast. What are penguins good at? | Animals / Read a fact (E) |
+| 2262 | `tw_swimming.m4a` | swimming | topic answer word |
+| 2263 | `tw_flying.m4a` | flying | topic answer word |
+| 2264 | `tw_climbing_trees.m4a` | climbing trees | topic answer word |
+| 2265 | `tq_an_e4_8.m4a` | Bees make honey. What do bees make? | Animals / Read a fact (E) |
+| 2266 | `tw_honey.m4a` | honey | topic answer word |
+| 2267 | `tw_milk.m4a` | milk | topic answer word |
+| 2268 | `tw_jam.m4a` | jam | topic answer word |
+| 2269 | `tq_an_e4_9.m4a` | Frogs start life as tadpoles. What is a baby frog? | Animals / Read a fact (E) |
+| 2270 | `tw_tadpole.m4a` | tadpole | topic answer word |
+| 2271 | `tw_chick.m4a` | chick | topic answer word |
+| 2272 | `tq_an_e4_10.m4a` | A snail carries its shell on its back. Where is its shell? | Animals / Read a fact (E) |
+| 2273 | `tw_on_its_back.m4a` | on its back | topic answer word |
+| 2274 | `tw_in_a_nest.m4a` | in a nest | topic answer word |
+| 2275 | `tw_under_a_rock.m4a` | under a rock | topic answer word |
+| 2276 | `tq_cs_t1_1.m4a` | Find red | Colors & shapes / Find the color (T) |
+| 2277 | `tq_cs_t1_2.m4a` | Find blue | Colors & shapes / Find the color (T) |
+| 2278 | `tq_cs_t1_3.m4a` | Find yellow | Colors & shapes / Find the color (T) |
+| 2279 | `tq_cs_t1_4.m4a` | Find green | Colors & shapes / Find the color (T) |
+| 2280 | `tq_cs_t1_5.m4a` | Find red | Colors & shapes / Find the color (T) |
+| 2281 | `tq_cs_t1_6.m4a` | Find yellow | Colors & shapes / Find the color (T) |
+| 2282 | `tq_cs_t1_7.m4a` | Find green | Colors & shapes / Find the color (T) |
+| 2283 | `tq_cs_t1_8.m4a` | Find blue | Colors & shapes / Find the color (T) |
+| 2284 | `tq_cs_t1_9.m4a` | Find red | Colors & shapes / Find the color (T) |
+| 2285 | `tq_cs_t1_10.m4a` | Find yellow | Colors & shapes / Find the color (T) |
+| 2286 | `tq_cs_t2_1.m4a` | Find the circle | Colors & shapes / Find the shape (T) |
+| 2287 | `tq_cs_t2_2.m4a` | Find the square | Colors & shapes / Find the shape (T) |
+| 2288 | `tq_cs_t2_3.m4a` | Find the triangle | Colors & shapes / Find the shape (T) |
+| 2289 | `tq_cs_t2_4.m4a` | Find the circle | Colors & shapes / Find the shape (T) |
+| 2290 | `tq_cs_t2_5.m4a` | Find the triangle | Colors & shapes / Find the shape (T) |
+| 2291 | `tq_cs_t2_6.m4a` | Find the square | Colors & shapes / Find the shape (T) |
+| 2292 | `tq_cs_t2_7.m4a` | Find the circle | Colors & shapes / Find the shape (T) |
+| 2293 | `tq_cs_t2_8.m4a` | Find the triangle | Colors & shapes / Find the shape (T) |
+| 2294 | `tq_cs_t2_9.m4a` | Find the square | Colors & shapes / Find the shape (T) |
+| 2295 | `tq_cs_t2_10.m4a` | Find the circle | Colors & shapes / Find the shape (T) |
+| 2296 | `tq_cs_p1_1.m4a` | Find orange | Colors & shapes / More colors (P) |
+| 2297 | `tq_cs_p1_2.m4a` | Find purple | Colors & shapes / More colors (P) |
+| 2298 | `tq_cs_p1_3.m4a` | Find pink | Colors & shapes / More colors (P) |
+| 2299 | `tq_cs_p1_4.m4a` | Find brown | Colors & shapes / More colors (P) |
+| 2300 | `tq_cs_p1_5.m4a` | Find black | Colors & shapes / More colors (P) |
+| 2301 | `tq_cs_p1_6.m4a` | Find white | Colors & shapes / More colors (P) |
+| 2302 | `tq_cs_p1_7.m4a` | Find orange | Colors & shapes / More colors (P) |
+| 2303 | `tq_cs_p1_8.m4a` | Find purple | Colors & shapes / More colors (P) |
+| 2304 | `tq_cs_p1_9.m4a` | Find brown | Colors & shapes / More colors (P) |
+| 2305 | `tq_cs_p1_10.m4a` | Find pink | Colors & shapes / More colors (P) |
+| 2306 | `tq_cs_p2_1.m4a` | Find the rectangle | Colors & shapes / Shape names (P) |
+| 2307 | `tw_long_box.m4a` | long box | topic answer word |
+| 2308 | `tq_cs_p2_2.m4a` | Find the star | Colors & shapes / Shape names (P) |
+| 2309 | `tq_cs_p2_3.m4a` | Find the heart | Colors & shapes / Shape names (P) |
+| 2310 | `tq_cs_p2_4.m4a` | Find the oval | Colors & shapes / Shape names (P) |
+| 2311 | `tw_shape.m4a` | shape | topic answer word |
+| 2312 | `tq_cs_p2_5.m4a` | Find the diamond | Colors & shapes / Shape names (P) |
+| 2313 | `tq_cs_p2_6.m4a` | Find the triangle | Colors & shapes / Shape names (P) |
+| 2314 | `tq_cs_p2_7.m4a` | Find the circle | Colors & shapes / Shape names (P) |
+| 2315 | `tw_oval.m4a` | oval | topic answer word |
+| 2316 | `tq_cs_p2_8.m4a` | Find the square | Colors & shapes / Shape names (P) |
+| 2317 | `tq_cs_p2_9.m4a` | Find the rectangle | Colors & shapes / Shape names (P) |
+| 2318 | `tq_cs_p2_10.m4a` | Find the star | Colors & shapes / Shape names (P) |
+| 2319 | `tq_cs_p3_1.m4a` | What shape is a pizza slice? | Colors & shapes / Shapes in real things (P) |
+| 2320 | `tw_triangle.m4a` | triangle | topic answer word |
+| 2321 | `tw_circle.m4a` | circle | topic answer word |
+| 2322 | `tw_square.m4a` | square | topic answer word |
+| 2323 | `tq_cs_p3_2.m4a` | What shape is a clock? | Colors & shapes / Shapes in real things (P) |
+| 2324 | `tw_star.m4a` | star | topic answer word |
+| 2325 | `tq_cs_p3_3.m4a` | What shape is a door? | Colors & shapes / Shapes in real things (P) |
+| 2326 | `tw_rectangle.m4a` | rectangle | topic answer word |
+| 2327 | `tq_cs_p3_4.m4a` | What shape is an egg? | Colors & shapes / Shapes in real things (P) |
+| 2328 | `tq_cs_p3_5.m4a` | What shape is a cookie? | Colors & shapes / Shapes in real things (P) |
+| 2329 | `tq_cs_p3_6.m4a` | What shape is a slice of bread? | Colors & shapes / Shapes in real things (P) |
+| 2330 | `tq_cs_p3_7.m4a` | What shape is a window pane? | Colors & shapes / Shapes in real things (P) |
+| 2331 | `tq_cs_p3_8.m4a` | What shape is a phone? | Colors & shapes / Shapes in real things (P) |
+| 2332 | `tq_cs_p3_9.m4a` | What shape is a slice of watermelon? | Colors & shapes / Shapes in real things (P) |
+| 2333 | `tq_cs_p3_10.m4a` | What shape is a wheel? | Colors & shapes / Shapes in real things (P) |
+| 2334 | `tq_cs_p4_1.m4a` | Red and yellow make... | Colors & shapes / Color mixing (P) |
+| 2335 | `tw_orange.m4a` | orange | topic answer word |
+| 2336 | `tw_green.m4a` | green | topic answer word |
+| 2337 | `tw_purple.m4a` | purple | topic answer word |
+| 2338 | `tq_cs_p4_2.m4a` | Blue and yellow make... | Colors & shapes / Color mixing (P) |
+| 2339 | `tw_pink.m4a` | pink | topic answer word |
+| 2340 | `tq_cs_p4_3.m4a` | Red and blue make... | Colors & shapes / Color mixing (P) |
+| 2341 | `tq_cs_p4_4.m4a` | Red and white make... | Colors & shapes / Color mixing (P) |
+| 2342 | `tw_brown.m4a` | brown | topic answer word |
+| 2343 | `tq_cs_p4_5.m4a` | Yellow and red make... | Colors & shapes / Color mixing (P) |
+| 2344 | `tw_blue.m4a` | blue | topic answer word |
+| 2345 | `tq_cs_p4_6.m4a` | Yellow and blue make... | Colors & shapes / Color mixing (P) |
+| 2346 | `tw_red.m4a` | red | topic answer word |
+| 2347 | `tq_cs_p4_7.m4a` | Blue and red make... | Colors & shapes / Color mixing (P) |
+| 2348 | `tw_yellow.m4a` | yellow | topic answer word |
+| 2349 | `tq_cs_p4_8.m4a` | White and red make... | Colors & shapes / Color mixing (P) |
+| 2350 | `tw_black.m4a` | black | topic answer word |
+| 2351 | `tq_cs_p4_9.m4a` | Black and white make... | Colors & shapes / Color mixing (P) |
+| 2352 | `tw_gray.m4a` | gray | topic answer word |
+| 2353 | `tq_cs_p4_10.m4a` | Which two make green? | Colors & shapes / Color mixing (P) |
+| 2354 | `tw_blue_and_yellow.m4a` | blue and yellow | topic answer word |
+| 2355 | `tw_red_and_blue.m4a` | red and blue | topic answer word |
+| 2356 | `tw_red_and_yellow.m4a` | red and yellow | topic answer word |
+| 2357 | `tq_cs_e1_1.m4a` | How many sides does a triangle have? | Colors & shapes / Sides and corners (E) |
+| 2358 | `tq_cs_e1_2.m4a` | How many sides does a square have? | Colors & shapes / Sides and corners (E) |
+| 2359 | `tq_cs_e1_3.m4a` | How many corners does a rectangle have? | Colors & shapes / Sides and corners (E) |
+| 2360 | `tq_cs_e1_4.m4a` | How many sides does a pentagon have? | Colors & shapes / Sides and corners (E) |
+| 2361 | `tq_cs_e1_5.m4a` | How many sides does a hexagon have? | Colors & shapes / Sides and corners (E) |
+| 2362 | `tf_cs_e1_5.m4a` | Honeycomb cells are hexagons. | fact after a right answer (spoken at 2-5, read at 6+) |
+| 2363 | `tq_cs_e1_6.m4a` | A stop sign has 8 sides. What shape is it? | Colors & shapes / Sides and corners (E) |
+| 2364 | `tw_octagon.m4a` | octagon | topic answer word |
+| 2365 | `tw_hexagon.m4a` | hexagon | topic answer word |
+| 2366 | `tw_pentagon.m4a` | pentagon | topic answer word |
+| 2367 | `tq_cs_e1_7.m4a` | How many corners does a circle have? | Colors & shapes / Sides and corners (E) |
+| 2368 | `tq_cs_e1_8.m4a` | Which shape has 3 corners? | Colors & shapes / Sides and corners (E) |
+| 2369 | `tq_cs_e1_9.m4a` | Which shape has 6 sides? | Colors & shapes / Sides and corners (E) |
+| 2370 | `tq_cs_e1_10.m4a` | Which shape has 5 sides? | Colors & shapes / Sides and corners (E) |
+| 2371 | `tq_cs_e2_1.m4a` | A ball is shaped like a... | Colors & shapes / Solid (E) |
+| 2372 | `tw_sphere.m4a` | sphere | topic answer word |
+| 2373 | `tw_cube.m4a` | cube | topic answer word |
+| 2374 | `tw_cone.m4a` | cone | topic answer word |
+| 2375 | `tq_cs_e2_2.m4a` | A dice is shaped like a... | Colors & shapes / Solid (E) |
+| 2376 | `tw_cylinder.m4a` | cylinder | topic answer word |
+| 2377 | `tq_cs_e2_3.m4a` | A soup can is shaped like a... | Colors & shapes / Solid (E) |
+| 2378 | `tq_cs_e2_4.m4a` | An ice cream cone is shaped like a... | Colors & shapes / Solid (E) |
+| 2379 | `tq_cs_e2_5.m4a` | The pyramids in Egypt are shaped like a... | Colors & shapes / Solid (E) |
+| 2380 | `tw_pyramid.m4a` | pyramid | topic answer word |
+| 2381 | `tq_cs_e2_6.m4a` | A party hat is shaped like a... | Colors & shapes / Solid (E) |
+| 2382 | `tq_cs_e2_7.m4a` | An orange is shaped like a... | Colors & shapes / Solid (E) |
+| 2383 | `tq_cs_e2_8.m4a` | A cereal box is a... | Colors & shapes / Solid (E) |
+| 2384 | `tw_rectangular_prism.m4a` | rectangular prism | topic answer word |
+| 2385 | `tq_cs_e2_9.m4a` | How many faces does a cube have? | Colors & shapes / Solid (E) |
+| 2386 | `tq_cs_e2_10.m4a` | Which shape can roll? | Colors & shapes / Solid (E) |
+| 2387 | `tq_cs_e3_1.m4a` | A pizza is cut into 2 equal parts. Each part is a... | Colors & shapes / Halves and fourths (E) |
+| 2388 | `tw_half.m4a` | half | topic answer word |
+| 2389 | `tw_fourth.m4a` | fourth | topic answer word |
+| 2390 | `tw_whole.m4a` | whole | topic answer word |
+| 2391 | `tq_cs_e3_2.m4a` | A pie is cut into 4 equal parts. Each part is a... | Colors & shapes / Halves and fourths (E) |
+| 2392 | `tw_third.m4a` | third | topic answer word |
+| 2393 | `tq_cs_e3_3.m4a` | Which shows halves? | Colors & shapes / Halves and fourths (E) |
+| 2394 | `tw_2_equal_parts.m4a` | 2 equal parts | topic answer word |
+| 2395 | `tw_2_unequal_parts.m4a` | 2 unequal parts | topic answer word |
+| 2396 | `tw_3_parts.m4a` | 3 parts | topic answer word |
+| 2397 | `tq_cs_e3_4.m4a` | How many halves make a whole? | Colors & shapes / Halves and fourths (E) |
+| 2398 | `tq_cs_e3_5.m4a` | How many fourths make a whole? | Colors & shapes / Halves and fourths (E) |
+| 2399 | `tq_cs_e3_6.m4a` | Which is bigger: a half or a fourth of the same pizza? | Colors & shapes / Halves and fourths (E) |
+| 2400 | `tw_same.m4a` | same | topic answer word |
+| 2401 | `tq_cs_e3_7.m4a` | A sandwich is cut into 2 equal parts. How many halves? | Colors & shapes / Halves and fourths (E) |
+| 2402 | `tq_cs_e3_8.m4a` | Which pie is cut into fourths? | Colors & shapes / Halves and fourths (E) |
+| 2403 | `tw_4_equal_slices.m4a` | 4 equal slices | topic answer word |
+| 2404 | `tw_4_unequal_slices.m4a` | 4 unequal slices | topic answer word |
+| 2405 | `tw_2_slices.m4a` | 2 slices | topic answer word |
+| 2406 | `tq_cs_e3_9.m4a` | A quarter is another name for a... | Colors & shapes / Halves and fourths (E) |
+| 2407 | `tq_cs_e4_1.m4a` | Which is a primary color? | Colors & shapes / Primary colors and mixing (E) |
+| 2408 | `tf_cs_e4_1.m4a` | Red, yellow and blue are the primary colors. | fact after a right answer (spoken at 2-5, read at 6+) |
+| 2409 | `tq_cs_e4_2.m4a` | Which is a primary color? | Colors & shapes / Primary colors and mixing (E) |
+| 2410 | `tq_cs_e4_3.m4a` | Which is a primary color? | Colors & shapes / Primary colors and mixing (E) |
+| 2411 | `tq_cs_e4_4.m4a` | Which is NOT a primary color? | Colors & shapes / Primary colors and mixing (E) |
+| 2412 | `tq_cs_e4_5.m4a` | Orange is made from... | Colors & shapes / Primary colors and mixing (E) |
+| 2413 | `tw_red_yellow.m4a` | red + yellow | topic answer word |
+| 2414 | `tw_blue_yellow.m4a` | blue + yellow | topic answer word |
+| 2415 | `tw_red_blue.m4a` | red + blue | topic answer word |
+| 2416 | `tq_cs_e4_6.m4a` | Purple is made from... | Colors & shapes / Primary colors and mixing (E) |
+| 2417 | `tw_yellow_blue.m4a` | yellow + blue | topic answer word |
+| 2418 | `tq_cs_e4_7.m4a` | Green is made from... | Colors & shapes / Primary colors and mixing (E) |
+| 2419 | `tw_red_white.m4a` | red + white | topic answer word |
+| 2420 | `tq_cs_e4_8.m4a` | A rainbow starts with red. What comes next? | Colors & shapes / Primary colors and mixing (E) |
+| 2421 | `tq_cs_e4_9.m4a` | What color comes after yellow in a rainbow? | Colors & shapes / Primary colors and mixing (E) |
+| 2422 | `tq_cs_e4_10.m4a` | What color is last in a rainbow? | Colors & shapes / Primary colors and mixing (E) |
+| 2423 | `tw_violet.m4a` | violet | topic answer word |
+| 2424 | `tq_sw_t1_1.m4a` | Find the sun | Seasons & weather / Sun or rain (T) |
+| 2425 | `tq_sw_t1_2.m4a` | Find the rain | Seasons & weather / Sun or rain (T) |
+| 2426 | `tq_sw_t1_3.m4a` | Find the snow | Seasons & weather / Sun or rain (T) |
+| 2427 | `tq_sw_t1_4.m4a` | Find the cloud | Seasons & weather / Sun or rain (T) |
+| 2428 | `tq_sw_t1_5.m4a` | Find the rainbow | Seasons & weather / Sun or rain (T) |
+| 2429 | `tq_sw_t1_6.m4a` | Find the sun | Seasons & weather / Sun or rain (T) |
+| 2430 | `tq_sw_t1_7.m4a` | Find the snowman | Seasons & weather / Sun or rain (T) |
+| 2431 | `tq_sw_t1_8.m4a` | Find the rain | Seasons & weather / Sun or rain (T) |
+| 2432 | `tq_sw_t1_9.m4a` | Find the moon | Seasons & weather / Sun or rain (T) |
+| 2433 | `tq_sw_t1_10.m4a` | Find the snow | Seasons & weather / Sun or rain (T) |
+| 2434 | `tq_sw_t2_1.m4a` | It's raining! What do we need? | Seasons & weather / What do we wear? (T) |
+| 2435 | `tw_umbrella.m4a` | umbrella | topic answer word |
+| 2436 | `tq_sw_t2_2.m4a` | It's snowing! What do we wear? | Seasons & weather / What do we wear? (T) |
+| 2437 | `tw_mittens.m4a` | mittens | topic answer word |
+| 2438 | `tq_sw_t2_3.m4a` | It's sunny! What do we wear? | Seasons & weather / What do we wear? (T) |
+| 2439 | `tw_sunglasses.m4a` | sunglasses | topic answer word |
+| 2440 | `tq_sw_t2_4.m4a` | It's cold! What do we wear? | Seasons & weather / What do we wear? (T) |
+| 2441 | `tw_coat.m4a` | coat | topic answer word |
+| 2442 | `tq_sw_t2_5.m4a` | Puddles! What do we wear? | Seasons & weather / What do we wear? (T) |
+| 2443 | `tw_boots.m4a` | boots | topic answer word |
+| 2444 | `tq_sw_t2_6.m4a` | It's hot! Where do we play? | Seasons & weather / What do we wear? (T) |
+| 2445 | `tw_beach.m4a` | beach | topic answer word |
+| 2446 | `tq_sw_t2_7.m4a` | Snow day! What do we build? | Seasons & weather / What do we wear? (T) |
+| 2447 | `tq_sw_t2_8.m4a` | It's sunny! What do we put on our heads? | Seasons & weather / What do we wear? (T) |
+| 2448 | `tw_hat.m4a` | hat | topic answer word |
+| 2449 | `tq_sw_t2_9.m4a` | It's cold! What goes on our heads? | Seasons & weather / What do we wear? (T) |
+| 2450 | `tw_warm_hat.m4a` | warm hat | topic answer word |
+| 2451 | `tq_sw_t2_10.m4a` | Rain! What do we wear? | Seasons & weather / What do we wear? (T) |
+| 2452 | `tw_raincoat.m4a` | raincoat | topic answer word |
+| 2453 | `tq_sw_p1_1.m4a` | What's the weather? | Seasons & weather / Weather words (P) |
+| 2454 | `tw_sunny.m4a` | sunny | topic answer word |
+| 2455 | `tw_snowy.m4a` | snowy | topic answer word |
+| 2456 | `tw_rainy.m4a` | rainy | topic answer word |
+| 2457 | `tq_sw_p1_2.m4a` | What's the weather? | Seasons & weather / Weather words (P) |
+| 2458 | `tw_windy.m4a` | windy | topic answer word |
+| 2459 | `tq_sw_p1_3.m4a` | What's the weather? | Seasons & weather / Weather words (P) |
+| 2460 | `tw_cloudy.m4a` | cloudy | topic answer word |
+| 2461 | `tq_sw_p1_4.m4a` | What's the weather? (kites, blowing leaves) | Seasons & weather / Weather words (P) |
+| 2462 | `tq_sw_p1_5.m4a` | What's the weather? | Seasons & weather / Weather words (P) |
+| 2463 | `tq_sw_p1_6.m4a` | What's the weather? | Seasons & weather / Weather words (P) |
+| 2464 | `tw_stormy.m4a` | stormy | topic answer word |
+| 2465 | `tq_sw_p1_7.m4a` | Kites fly best when it is... | Seasons & weather / Weather words (P) |
+| 2466 | `tq_sw_p1_8.m4a` | We see a rainbow after... | Seasons & weather / Weather words (P) |
+| 2467 | `tw_rain.m4a` | rain | topic answer word |
+| 2468 | `tw_snow.m4a` | snow | topic answer word |
+| 2469 | `tw_night.m4a` | night | topic answer word |
+| 2470 | `tq_sw_p1_9.m4a` | A snowman needs a day that is... | Seasons & weather / Weather words (P) |
+| 2471 | `tw_sunny_and_hot.m4a` | sunny and hot | topic answer word |
+| 2472 | `tq_sw_p1_10.m4a` | Thunder and lightning means it is... | Seasons & weather / Weather words (P) |
+| 2473 | `tq_sw_p2_1.m4a` | Snow and sledding happen in... | Seasons & weather / The four seasons (P) |
+| 2474 | `tw_winter.m4a` | winter | topic answer word |
+| 2475 | `tw_summer.m4a` | summer | topic answer word |
+| 2476 | `tw_spring.m4a` | spring | topic answer word |
+| 2477 | `tq_sw_p2_2.m4a` | Flowers start to bloom in... | Seasons & weather / The four seasons (P) |
+| 2478 | `tw_fall.m4a` | fall | topic answer word |
+| 2479 | `tq_sw_p2_3.m4a` | Swimming and hot days are in... | Seasons & weather / The four seasons (P) |
+| 2480 | `tq_sw_p2_4.m4a` | Leaves turn red and fall down in... | Seasons & weather / The four seasons (P) |
+| 2481 | `tq_sw_p2_5.m4a` | We pick pumpkins in... | Seasons & weather / The four seasons (P) |
+| 2482 | `tq_sw_p2_6.m4a` | We build snowmen in... | Seasons & weather / The four seasons (P) |
+| 2483 | `tq_sw_p2_7.m4a` | Baby birds hatch in... | Seasons & weather / The four seasons (P) |
+| 2484 | `tq_sw_p2_8.m4a` | Ice cream on the beach is a... treat | Seasons & weather / The four seasons (P) |
+| 2485 | `tq_sw_p2_9.m4a` | We jump in leaf piles in... | Seasons & weather / The four seasons (P) |
+| 2486 | `tq_sw_p2_10.m4a` | We wear mittens in... | Seasons & weather / The four seasons (P) |
+| 2487 | `tq_sw_p3_1.m4a` | After winter comes... | Seasons & weather / What comes next? (P) |
+| 2488 | `tq_sw_p3_2.m4a` | After spring comes... | Seasons & weather / What comes next? (P) |
+| 2489 | `tq_sw_p3_3.m4a` | After summer comes... | Seasons & weather / What comes next? (P) |
+| 2490 | `tq_sw_p3_4.m4a` | After fall comes... | Seasons & weather / What comes next? (P) |
+| 2491 | `tq_sw_p3_5.m4a` | Before summer comes... | Seasons & weather / What comes next? (P) |
+| 2492 | `tq_sw_p3_6.m4a` | Before winter comes... | Seasons & weather / What comes next? (P) |
+| 2493 | `tq_sw_p3_7.m4a` | Before fall comes... | Seasons & weather / What comes next? (P) |
+| 2494 | `tq_sw_p3_8.m4a` | Before spring comes... | Seasons & weather / What comes next? (P) |
+| 2495 | `tq_sw_p3_9.m4a` | How many seasons are there? | Seasons & weather / What comes next? (P) |
+| 2496 | `tq_sw_p3_10.m4a` | Which season is the coldest? | Seasons & weather / What comes next? (P) |
+| 2497 | `tq_sw_e1_1.m4a` | December is in... | Seasons & weather / Months and seasons (E) |
+| 2498 | `tq_sw_e1_2.m4a` | July is in... | Seasons & weather / Months and seasons (E) |
+| 2499 | `tq_sw_e1_3.m4a` | April is in... | Seasons & weather / Months and seasons (E) |
+| 2500 | `tq_sw_e1_4.m4a` | October is in... | Seasons & weather / Months and seasons (E) |
+| 2501 | `tq_sw_e1_5.m4a` | Which month comes after March? | Seasons & weather / Months and seasons (E) |
+| 2502 | `tw_april.m4a` | April | topic answer word |
+| 2503 | `tw_may.m4a` | May | topic answer word |
+| 2504 | `tw_february.m4a` | February | topic answer word |
+| 2505 | `tq_sw_e1_6.m4a` | Which month comes before June? | Seasons & weather / Months and seasons (E) |
+| 2506 | `tw_july.m4a` | July | topic answer word |
+| 2507 | `tq_sw_e1_7.m4a` | How many months are in a year? | Seasons & weather / Months and seasons (E) |
+| 2508 | `tq_sw_e1_8.m4a` | January is in... | Seasons & weather / Months and seasons (E) |
+| 2509 | `tq_sw_e1_9.m4a` | Which month is first in the year? | Seasons & weather / Months and seasons (E) |
+| 2510 | `tw_january.m4a` | January | topic answer word |
+| 2511 | `tw_december.m4a` | December | topic answer word |
+| 2512 | `tw_march.m4a` | March | topic answer word |
+| 2513 | `tq_sw_e1_10.m4a` | August is in... | Seasons & weather / Months and seasons (E) |
+| 2514 | `tq_sw_e2_1.m4a` | A thermometer measures... | Seasons & weather / Weather science (E) |
+| 2515 | `tw_temperature.m4a` | temperature | topic answer word |
+| 2516 | `tw_wind.m4a` | wind | topic answer word |
+| 2517 | `tq_sw_e2_2.m4a` | Snow is frozen... | Seasons & weather / Weather science (E) |
+| 2518 | `tw_sand.m4a` | sand | topic answer word |
+| 2519 | `tw_sugar.m4a` | sugar | topic answer word |
+| 2520 | `tq_sw_e2_3.m4a` | Clouds are made of tiny drops of... | Seasons & weather / Weather science (E) |
+| 2521 | `tw_cotton.m4a` | cotton | topic answer word |
+| 2522 | `tw_smoke.m4a` | smoke | topic answer word |
+| 2523 | `tq_sw_e2_4.m4a` | To see a rainbow you need sun and... | Seasons & weather / Weather science (E) |
+| 2524 | `tq_sw_e2_5.m4a` | Which comes first in a storm? | Seasons & weather / Weather science (E) |
+| 2525 | `tw_lightning.m4a` | lightning | topic answer word |
+| 2526 | `tw_thunder.m4a` | thunder | topic answer word |
+| 2527 | `tw_they_are_always_together.m4a` | they are always together | topic answer word |
+| 2528 | `tf_sw_e2_5.m4a` | Light travels faster than sound, so you see the flash before you hear the boom. | fact after a right answer (spoken at 2-5, read at 6+) |
+| 2529 | `tq_sw_e2_6.m4a` | When water gets very cold it turns into... | Seasons & weather / Weather science (E) |
+| 2530 | `tw_ice.m4a` | ice | topic answer word |
+| 2531 | `tw_steam.m4a` | steam | topic answer word |
+| 2532 | `tq_sw_e2_7.m4a` | When the sun warms a puddle, the water goes up into the... | Seasons & weather / Weather science (E) |
+| 2533 | `tw_air.m4a` | air | topic answer word |
+| 2534 | `tw_ground.m4a` | ground | topic answer word |
+| 2535 | `tw_ocean_floor.m4a` | ocean floor | topic answer word |
+| 2536 | `tq_sw_e2_8.m4a` | A wind sock shows... | Seasons & weather / Weather science (E) |
+| 2537 | `tw_which_way_the_wind_blows.m4a` | which way the wind blows | topic answer word |
+| 2538 | `tw_how_hot_it_is.m4a` | how hot it is | topic answer word |
+| 2539 | `tw_how_much_rain_fell.m4a` | how much rain fell | topic answer word |
+| 2540 | `tq_sw_e2_9.m4a` | What falls from clouds? | Seasons & weather / Weather science (E) |
+| 2541 | `tw_rain_or_snow.m4a` | rain or snow | topic answer word |
+| 2542 | `tq_sw_e2_10.m4a` | The sun gives us light and... | Seasons & weather / Weather science (E) |
+| 2543 | `tw_heat.m4a` | heat | topic answer word |
+| 2544 | `tq_sw_e3_1.m4a` | Every snowflake has six sides or points. How many points? | Seasons & weather / Read a fact (E) |
+| 2545 | `tq_sw_e3_2.m4a` | Some trees lose their leaves in fall to rest for winter. When do they lose leaves? | Seasons & weather / Read a fact (E) |
+| 2546 | `tq_sw_e3_3.m4a` | Bears sleep through much of the winter in a den. Where do bears rest? | Seasons & weather / Read a fact (E) |
+| 2547 | `tw_den.m4a` | den | topic answer word |
+| 2548 | `tq_sw_e3_4.m4a` | Hail is balls of ice that fall in some storms. What is hail? | Seasons & weather / Read a fact (E) |
+| 2549 | `tw_balls_of_ice.m4a` | balls of ice | topic answer word |
+| 2550 | `tq_sw_e3_5.m4a` | Many birds fly south when it gets cold. Which way do they fly? | Seasons & weather / Read a fact (E) |
+| 2551 | `tw_south.m4a` | south | topic answer word |
+| 2552 | `tw_north.m4a` | north | topic answer word |
+| 2553 | `tw_up_to_the_moon.m4a` | up to the moon | topic answer word |
+| 2554 | `tq_sw_e3_6.m4a` | A tornado is a spinning column of wind. What does a tornado do? | Seasons & weather / Read a fact (E) |
+| 2555 | `tw_spins.m4a` | spins | topic answer word |
+| 2556 | `tw_freezes.m4a` | freezes | topic answer word |
+| 2557 | `tw_glows.m4a` | glows | topic answer word |
+| 2558 | `tq_sw_e3_7.m4a` | Fog is a cloud close to the ground. Where is fog? | Seasons & weather / Read a fact (E) |
+| 2559 | `tw_near_the_ground.m4a` | near the ground | topic answer word |
+| 2560 | `tw_in_space.m4a` | in space | topic answer word |
+| 2561 | `tw_under_water.m4a` | under water | topic answer word |
+| 2562 | `tq_sw_e3_8.m4a` | Spring rain helps plants grow. What does spring rain help? | Seasons & weather / Read a fact (E) |
+| 2563 | `tw_plants_grow.m4a` | plants grow | topic answer word |
+| 2564 | `tw_snow_fall.m4a` | snow fall | topic answer word |
+| 2565 | `tw_leaves_drop.m4a` | leaves drop | topic answer word |
+| 2566 | `tq_sw_e3_9.m4a` | Days are longest in summer. When are days longest? | Seasons & weather / Read a fact (E) |
+| 2567 | `tq_sw_e3_10.m4a` | Frost forms on cold nights. When does frost form? | Seasons & weather / Read a fact (E) |
+| 2568 | `tw_cold_nights.m4a` | cold nights | topic answer word |
+| 2569 | `tw_hot_days.m4a` | hot days | topic answer word |
+| 2570 | `tw_rainy_afternoons.m4a` | rainy afternoons | topic answer word |
+| 2571 | `tq_lt_p3_1.m4a` | A | Letters / Match capital to lowercase (P) |
+| 2572 | `tq_lt_p3_2.m4a` | B | Letters / Match capital to lowercase (P) |
+| 2573 | `tq_lt_p3_3.m4a` | D | Letters / Match capital to lowercase (P) |
+| 2574 | `tq_lt_p3_4.m4a` | G | Letters / Match capital to lowercase (P) |
+| 2575 | `tq_lt_p3_5.m4a` | R | Letters / Match capital to lowercase (P) |
+| 2576 | `tq_lt_p3_6.m4a` | E | Letters / Match capital to lowercase (P) |
+| 2577 | `tq_lt_p3_7.m4a` | Q | Letters / Match capital to lowercase (P) |
+| 2578 | `tq_lt_p3_8.m4a` | H | Letters / Match capital to lowercase (P) |
+| 2579 | `tq_lt_p3_9.m4a` | N | Letters / Match capital to lowercase (P) |
+| 2580 | `tq_lt_p3_10.m4a` | T | Letters / Match capital to lowercase (P) |
+| 2581 | `tq_lt_p4_1.m4a` | Which starts with /b/? | Letters / First sounds (P) |
+| 2582 | `tw_ball.m4a` | ball | topic answer word |
+| 2583 | `tw_sun.m4a` | sun | topic answer word |
+| 2584 | `tq_lt_p4_2.m4a` | Which starts with /s/? | Letters / First sounds (P) |
+| 2585 | `tw_moon.m4a` | moon | topic answer word |
+| 2586 | `tq_lt_p4_3.m4a` | Which starts with /m/? | Letters / First sounds (P) |
+| 2587 | `tq_lt_p4_4.m4a` | Which starts with /k/? | Letters / First sounds (P) |
+| 2588 | `tq_lt_p4_5.m4a` | Which starts with /d/? | Letters / First sounds (P) |
+| 2589 | `tw_bed.m4a` | bed | topic answer word |
+| 2590 | `tq_lt_p4_6.m4a` | Which starts with /f/? | Letters / First sounds (P) |
+| 2591 | `tw_van.m4a` | van | topic answer word |
+| 2592 | `tw_sock.m4a` | sock | topic answer word |
+| 2593 | `tq_lt_p4_7.m4a` | Which starts with /p/? | Letters / First sounds (P) |
+| 2594 | `tw_bee.m4a` | bee | topic answer word |
+| 2595 | `tw_top.m4a` | top | topic answer word |
+| 2596 | `tq_lt_p4_8.m4a` | Which starts with /t/? | Letters / First sounds (P) |
+| 2597 | `tw_tiger.m4a` | tiger | topic answer word |
+| 2598 | `tq_lt_p4_9.m4a` | Which starts with /h/? | Letters / First sounds (P) |
+| 2599 | `tw_apple.m4a` | apple | topic answer word |
+| 2600 | `tw_cup.m4a` | cup | topic answer word |
+| 2601 | `tq_lt_p4_10.m4a` | Which starts with /r/? | Letters / First sounds (P) |
+| 2602 | `tw_wing.m4a` | wing | topic answer word |
+| 2603 | `tw_leaf.m4a` | leaf | topic answer word |
+| 2604 | `tq_lt_e1_1.m4a` | What comes after K? | Letters / ABC order (E) |
+| 2605 | `tq_lt_e1_2.m4a` | What comes before G? | Letters / ABC order (E) |
+| 2606 | `tq_lt_e1_3.m4a` | What comes after P? | Letters / ABC order (E) |
+| 2607 | `tq_lt_e1_4.m4a` | What comes between R and T? | Letters / ABC order (E) |
+| 2608 | `tq_lt_e1_5.m4a` | What comes before N? | Letters / ABC order (E) |
+| 2609 | `tq_lt_e1_6.m4a` | What comes after W? | Letters / ABC order (E) |
+| 2610 | `tq_lt_e1_7.m4a` | What comes between C and E? | Letters / ABC order (E) |
+| 2611 | `tq_lt_e1_8.m4a` | What is the last letter? | Letters / ABC order (E) |
+| 2612 | `tq_lt_e1_9.m4a` | What comes before J? | Letters / ABC order (E) |
+| 2613 | `tq_lt_e1_10.m4a` | What comes after T? | Letters / ABC order (E) |
+| 2614 | `tq_lt_e2_1.m4a` | Which comes first? | Letters / ABC order (E) |
+| 2615 | `tw_banana.m4a` | banana | topic answer word |
+| 2616 | `tw_cherry.m4a` | cherry | topic answer word |
+| 2617 | `tq_lt_e2_2.m4a` | Which comes first? | Letters / ABC order (E) |
+| 2618 | `tw_bat.m4a` | bat | topic answer word |
+| 2619 | `tq_lt_e2_3.m4a` | Which comes first? | Letters / ABC order (E) |
+| 2620 | `tw_log.m4a` | log | topic answer word |
+| 2621 | `tq_lt_e2_4.m4a` | Which comes first? | Letters / ABC order (E) |
+| 2622 | `tq_lt_e2_5.m4a` | Which comes first? | Letters / ABC order (E) |
+| 2623 | `tw_cookie.m4a` | cookie | topic answer word |
+| 2624 | `tw_cupcake.m4a` | cupcake | topic answer word |
+| 2625 | `tq_lt_e2_6.m4a` | Which comes first? | Letters / ABC order (E) |
+| 2626 | `tw_pear.m4a` | pear | topic answer word |
+| 2627 | `tw_plum.m4a` | plum | topic answer word |
+| 2628 | `tw_pumpkin.m4a` | pumpkin | topic answer word |
+| 2629 | `tq_lt_e2_7.m4a` | Which comes first? | Letters / ABC order (E) |
+| 2630 | `tw_ant.m4a` | ant | topic answer word |
+| 2631 | `tw_wasp.m4a` | wasp | topic answer word |
+| 2632 | `tq_lt_e2_8.m4a` | Which comes first? | Letters / ABC order (E) |
+| 2633 | `tw_storm.m4a` | storm | topic answer word |
+| 2634 | `tq_lt_e2_9.m4a` | Which comes first? | Letters / ABC order (E) |
+| 2635 | `tw_jelly.m4a` | jelly | topic answer word |
+| 2636 | `tw_juice.m4a` | juice | topic answer word |
+| 2637 | `tq_lt_e2_10.m4a` | Which comes last? | Letters / ABC order (E) |
+| 2638 | `tw_zebra.m4a` | zebra | topic answer word |
+| 2639 | `tw_yak.m4a` | yak | topic answer word |
+| 2640 | `tw_wolf.m4a` | wolf | topic answer word |
+| 2641 | `tq_lt_e3_1.m4a` | Which is a vowel? | Letters / Vowels and long or short sounds (E) |
+| 2642 | `tf_lt_e3_1.m4a` | The vowels are a, e, i, o, u. | fact after a right answer (spoken at 2-5, read at 6+) |
+| 2643 | `tq_lt_e3_2.m4a` | Which is a vowel? | Letters / Vowels and long or short sounds (E) |
+| 2644 | `tq_lt_e3_3.m4a` | Which is NOT a vowel? | Letters / Vowels and long or short sounds (E) |
+| 2645 | `tq_lt_e3_4.m4a` | Which word has a short a? | Letters / Vowels and long or short sounds (E) |
+| 2646 | `tq_lt_e3_5.m4a` | Which word has a long a? | Letters / Vowels and long or short sounds (E) |
+| 2647 | `tq_lt_e3_6.m4a` | Which word has a long i? | Letters / Vowels and long or short sounds (E) |
+| 2648 | `tw_kite.m4a` | kite | topic answer word |
+| 2649 | `tw_sit.m4a` | sit | topic answer word |
+| 2650 | `tq_lt_e3_7.m4a` | Which word has a short o? | Letters / Vowels and long or short sounds (E) |
+| 2651 | `tw_boat.m4a` | boat | topic answer word |
+| 2652 | `tw_nose.m4a` | nose | topic answer word |
+| 2653 | `tq_lt_e3_8.m4a` | Which word has a long o? | Letters / Vowels and long or short sounds (E) |
+| 2654 | `tw_hot.m4a` | hot | topic answer word |
+| 2655 | `tw_pot.m4a` | pot | topic answer word |
+| 2656 | `tq_lt_e3_9.m4a` | Which word has a short u? | Letters / Vowels and long or short sounds (E) |
+| 2657 | `tw_bug.m4a` | bug | topic answer word |
+| 2658 | `tw_flute.m4a` | flute | topic answer word |
+| 2659 | `tq_lt_e3_10.m4a` | Which word has a long e? | Letters / Vowels and long or short sounds (E) |
+| 2660 | `tw_net.m4a` | net | topic answer word |
+| 2661 | `tq_lt_e4_1.m4a` | Which word starts with sh? | Letters / Letter teams (E) |
+| 2662 | `tw_ship.m4a` | ship | topic answer word |
+| 2663 | `tw_chip.m4a` | chip | topic answer word |
+| 2664 | `tw_tip.m4a` | tip | topic answer word |
+| 2665 | `tq_lt_e4_2.m4a` | Which word starts with ch? | Letters / Letter teams (E) |
+| 2666 | `tw_chair.m4a` | chair | topic answer word |
+| 2667 | `tw_share.m4a` | share | topic answer word |
+| 2668 | `tw_hair.m4a` | hair | topic answer word |
+| 2669 | `tq_lt_e4_3.m4a` | Which word starts with th? | Letters / Letter teams (E) |
+| 2670 | `tw_thumb.m4a` | thumb | topic answer word |
+| 2671 | `tw_dumb.m4a` | dumb | topic answer word |
+| 2672 | `tw_chum.m4a` | chum | topic answer word |
+| 2673 | `tq_lt_e4_4.m4a` | Which word starts with wh? | Letters / Letter teams (E) |
+| 2674 | `tw_whale.m4a` | whale | topic answer word |
+| 2675 | `tw_tale.m4a` | tale | topic answer word |
+| 2676 | `tw_shale.m4a` | shale | topic answer word |
+| 2677 | `tq_lt_e4_5.m4a` | Which word ends with ck? | Letters / Letter teams (E) |
+| 2678 | `tw_dug.m4a` | dug | topic answer word |
+| 2679 | `tw_dusk.m4a` | dusk | topic answer word |
+| 2680 | `tq_lt_e4_6.m4a` | Which word ends with sh? | Letters / Letter teams (E) |
+| 2681 | `tw_fist.m4a` | fist | topic answer word |
+| 2682 | `tw_fit.m4a` | fit | topic answer word |
+| 2683 | `tq_lt_e4_7.m4a` | Which word ends with ch? | Letters / Letter teams (E) |
+| 2684 | `tw_lunch.m4a` | lunch | topic answer word |
+| 2685 | `tw_lung.m4a` | lung | topic answer word |
+| 2686 | `tw_luck.m4a` | luck | topic answer word |
+| 2687 | `tq_lt_e4_8.m4a` | Which word ends with th? | Letters / Letter teams (E) |
+| 2688 | `tw_bath.m4a` | bath | topic answer word |
+| 2689 | `tw_bash.m4a` | bash | topic answer word |
+| 2690 | `tq_lt_e4_9.m4a` | Which word starts with sh? | Letters / Letter teams (E) |
+| 2691 | `tw_cheap.m4a` | cheap | topic answer word |
+| 2692 | `tw_jeep.m4a` | jeep | topic answer word |
+| 2693 | `tq_lt_e4_10.m4a` | Which word starts with ch? | Letters / Letter teams (E) |
+| 2694 | `tw_cheese.m4a` | cheese | topic answer word |
+| 2695 | `tw_sneeze.m4a` | sneeze | topic answer word |
+| 2696 | `tw_these.m4a` | these | topic answer word |
+
+## Lemonade Stand — later (134)
+
+Read by the device voice until recorded (stand1). Friendly shop-keeper voice; customers giggle, never grumble.
+
+| # | File name | Say this | Note |
+|---:|---|---|---|
+| 2697 | `ls_title.m4a` | Lemonade Stand |  |
+| 2698 | `ls_hello.m4a` | Welcome to the lemonade stand! Let's help our friends. |  |
+| 2699 | `ls_sunny.m4a` | It's a sunny day! One more friend is coming. |  |
+| 2700 | `ls_warmup.m4a` | Let's warm up! | Before the first stand orders on a new ladder |
+| 2701 | `ls_easy.m4a` | Here's an easy one! | An easier customer after a few oopsies |
+| 2702 | `ls_speedy.m4a` | Speedy! You know this one. Let's try something new! |  |
+| 2703 | `ls_this_one.m4a` | Can I have this one, please? | Toddler order: match the picture |
+| 2704 | `ls_color_yellow.m4a` | Can I have the yellow one, please? |  |
+| 2705 | `ls_color_pink.m4a` | Can I have the pink one, please? |  |
+| 2706 | `ls_color_blue.m4a` | Can I have the blue one, please? |  |
+| 2707 | `ls_color_green.m4a` | Can I have the green one, please? |  |
+| 2708 | `ls_i_want.m4a` | Can I have | Followed by a number and a food, e.g. "Can I have" + "3" + "strawberries" |
+| 2709 | `ls_have.m4a` | I have | Counting on: "I have" + 4 + "strawberries." + "Then" + 1 + "more, please!" |
+| 2710 | `ls_then.m4a` | Then |  |
+| 2711 | `ls_more.m4a` | more, please! |  |
+| 2712 | `ls_only.m4a` | Can I have | Sorting: "Can I have" + 3 + "red" + "fruits? Only that color, please!" |
+| 2713 | `ls_fruit.m4a` | fruits? Only that color, please! |  |
+| 2714 | `ls_read_ticket.m4a` | Here's my order. Can you read my ticket? |  |
+| 2715 | `ls_and.m4a` | and |  |
+| 2716 | `ls_no.m4a` | No |  |
+| 2717 | `ls_silly.m4a` | Hee hee! A silly order! Can I have | Followed by a number and pickles |
+| 2718 | `ls_giggle.m4a` | Hee hee! Pickle lemonade! |  |
+| 2719 | `ls_oops_no.m4a` | Oops! I said no | Followed by the food, e.g. "Oops! I said no" + "cheese" |
+| 2720 | `ls_oops_more.m4a` | Hmm, I think I need a little more! |  |
+| 2721 | `ls_oops_less.m4a` | Whoa, that's a lot! A little less, please. |  |
+| 2722 | `ls_oops_wrong.m4a` | Hee hee, that's not on my order! |  |
+| 2723 | `ls_oops_color.m4a` | Hee hee, that one's a different color! |  |
+| 2724 | `ls_that_is.m4a` | That's | Followed by a number and "dollars." |
+| 2725 | `ls_dollar.m4a` | dollar. |  |
+| 2726 | `ls_dollars.m4a` | dollars. |  |
+| 2727 | `ls_price_is.m4a` | It's | Adding prices: "It's" + 3 + "plus" + 2 |
+| 2728 | `ls_plus.m4a` | plus |  |
+| 2729 | `ls_enough.m4a` | Do I have enough? |  |
+| 2730 | `ls_yes_enough.m4a` | Yes! I have enough. Here you go! |  |
+| 2731 | `ls_not_enough.m4a` | Not enough? That's okay! I'll get a smaller one. |  |
+| 2732 | `ls_enough_oops.m4a` | Hmm, let's count my bills together. |  |
+| 2733 | `ls_pay_more.m4a` | Hmm, I think I owe a little more. |  |
+| 2734 | `ls_pay_less.m4a` | Oops, that's too much! Give some back. |  |
+| 2735 | `ls_thanks.m4a` | Thank you! |  |
+| 2736 | `ls_tip.m4a` | Here's a tip for you! |  |
+| 2737 | `ls_surprise_tip.m4a` | Surprise! An extra tip! |  |
+| 2738 | `ls_rush_ask.m4a` | Rush hour! Some friends are in a hurry. Want to try? |  |
+| 2739 | `ls_rush_go.m4a` | Ready, set, go! |  |
+| 2740 | `ls_rush_win.m4a` | Rush bonus! You were super speedy! |  |
+| 2741 | `ls_rush_done.m4a` | Phew! Rush hour is over. Great helping! |  |
+| 2742 | `ls_jar.m4a` | Let's count the tip jar! |  |
+| 2743 | `ls_jar_tap.m4a` | Tap each one to count. |  |
+| 2744 | `ls_jar_oops.m4a` | Let's count together! |  |
+| 2745 | `ls_day_done.m4a` | What a great day at the stand! |  |
+| 2746 | `ls_a.m4a` | a | Longer tickets: "a" + "sandwich" |
+| 2747 | `ls_with.m4a` | with | "a sandwich" + "with" + 2 + "pickles" |
+| 2748 | `ls_but_no.m4a` | but no | "... but no" + "cheese" |
+| 2749 | `ls_id_like.m4a` | I'd like | Followed by a number and a food |
+| 2750 | `ls_please.m4a` | please! |  |
+| 2751 | `ls_and_round.m4a` | things that are round, please! | Two-rule sorting: "Can I have" + 3 + "red" + "things that are round, please!" |
+| 2752 | `ls_not_round.m4a` | things that are NOT round, please! | Two-rule sorting: "Can I have" + 3 + "green" + "things that are NOT round, please!" |
+| 2753 | `ls_oops_round.m4a` | Hee hee, I said round ones! |  |
+| 2754 | `ls_oops_notround.m4a` | Hee hee, that one's round! I said NOT round. |  |
+| 2755 | `ls_make_it.m4a` | Make it | Doubling: "Make it" + 2 + "sandwiches" + "with" + 3 + "pickles" + "each, please!" |
+| 2756 | `ls_each.m4a` | each, please! |  |
+| 2757 | `ls_double.m4a` | Now double it all, please! | Doubling: after the list, make two times as many of everything |
+| 2758 | `ls_remember.m4a` | Here's my order. Can you remember it? My ticket will flip over! | Remember the order: then the ticket is read aloud |
+| 2759 | `ls_peek.m4a` | Peek! Here it is again. |  |
+| 2760 | `ls_it_lemonade.m4a` | lemonade |  |
+| 2761 | `ls_its_lemonade.m4a` | lemonades |  |
+| 2762 | `ls_it_pinklem.m4a` | pink lemonade |  |
+| 2763 | `ls_its_pinklem.m4a` | pink lemonades |  |
+| 2764 | `ls_it_bluelem.m4a` | blueberry lemonade |  |
+| 2765 | `ls_its_bluelem.m4a` | blueberry lemonades |  |
+| 2766 | `ls_it_greenlem.m4a` | mint lemonade |  |
+| 2767 | `ls_its_greenlem.m4a` | mint lemonades |  |
+| 2768 | `ls_it_cookie.m4a` | cookie |  |
+| 2769 | `ls_its_cookie.m4a` | cookies |  |
+| 2770 | `ls_it_pretzel.m4a` | pretzel |  |
+| 2771 | `ls_its_pretzel.m4a` | pretzels |  |
+| 2772 | `ls_it_strawberry.m4a` | strawberry |  |
+| 2773 | `ls_its_strawberry.m4a` | strawberries |  |
+| 2774 | `ls_it_apple.m4a` | apple |  |
+| 2775 | `ls_its_apple.m4a` | apples |  |
+| 2776 | `ls_it_cherry.m4a` | cherry |  |
+| 2777 | `ls_its_cherry.m4a` | cherries |  |
+| 2778 | `ls_it_banana.m4a` | banana |  |
+| 2779 | `ls_its_banana.m4a` | bananas |  |
+| 2780 | `ls_it_blueberry.m4a` | blueberry |  |
+| 2781 | `ls_its_blueberry.m4a` | blueberries |  |
+| 2782 | `ls_it_grapes.m4a` | grape |  |
+| 2783 | `ls_its_grapes.m4a` | grapes |  |
+| 2784 | `ls_it_kiwi.m4a` | kiwi |  |
+| 2785 | `ls_its_kiwi.m4a` | kiwis |  |
+| 2786 | `ls_it_orange.m4a` | orange |  |
+| 2787 | `ls_its_orange.m4a` | oranges |  |
+| 2788 | `ls_it_sandwich.m4a` | sandwich |  |
+| 2789 | `ls_its_sandwich.m4a` | sandwiches |  |
+| 2790 | `ls_it_ice.m4a` | ice cube |  |
+| 2791 | `ls_its_ice.m4a` | ice cubes |  |
+| 2792 | `ls_it_cheese.m4a` | cheese |  |
+| 2793 | `ls_its_cheese.m4a` | cheese |  |
+| 2794 | `ls_it_pickle.m4a` | pickle |  |
+| 2795 | `ls_its_pickle.m4a` | pickles |  |
+| 2796 | `ls_c_red.m4a` | red |  |
+| 2797 | `ls_c_yellow.m4a` | yellow |  |
+| 2798 | `ls_c_blue.m4a` | blue |  |
+| 2799 | `ls_c_green.m4a` | green |  |
+| 2800 | `ls_c_pink.m4a` | pink |  |
+| 2801 | `ls_c_purple.m4a` | purple |  |
+| 2802 | `ls_c_orange.m4a` | orange |  |
+| 2803 | `ls_c_brown.m4a` | brown |  |
+| 2804 | `ls_react_strawberry.m4a` | Berry yummy! Thank you! | Said by Jammy after a Lemonade Stand order |
+| 2805 | `ls_react_apple.m4a` | Mmm, nice and crisp! Thank you! | Said by Crisp after a Lemonade Stand order |
+| 2806 | `ls_react_corn.m4a` | Aw, shucks! That is a-maize-ing! | Said by Niblet after a Lemonade Stand order |
+| 2807 | `ls_react_blueberry.m4a` | Bloop bloop! So yummy! | Said by Bloop after a Lemonade Stand order |
+| 2808 | `ls_react_mochi.m4a` | Squishy hugs for you! Yum! | Said by Dora Dumpling after a Lemonade Stand order |
+| 2809 | `ls_react_banana.m4a` | I am going bananas! Yum! | Said by Peel after a Lemonade Stand order |
+| 2810 | `ls_react_pear.m4a` | We make a great pear! Thank you! | Said by Petey Pear after a Lemonade Stand order |
+| 2811 | `ls_react_carrot.m4a` | Crunch crunch! So good! | Said by Crunch after a Lemonade Stand order |
+| 2812 | `ls_react_broccoli.m4a` | That makes me stand tall! Thanks! | Said by Brock after a Lemonade Stand order |
+| 2813 | `ls_react_sushi.m4a` | Perfect! Thank you very much. | Said by Umi after a Lemonade Stand order |
+| 2814 | `ls_react_taco.m4a` | Taco-tastic! Woo hoo! | Said by Guac after a Lemonade Stand order |
+| 2815 | `ls_react_pizza.m4a` | You're a-pizza-zing! | Said by Slice after a Lemonade Stand order |
+| 2816 | `ls_react_pancake.m4a` | Stack it up! Yummy! | Said by Maple after a Lemonade Stand order |
+| 2817 | `ls_react_cupcake.m4a` | Sprinkle sprinkle! So sweet! | Said by Sprinkles after a Lemonade Stand order |
+| 2818 | `ls_react_avocado.m4a` | Avo great day! Thanks! | Said by Avo after a Lemonade Stand order |
+| 2819 | `ls_react_watermelon.m4a` | You're one in a melon! | Said by Mellie after a Lemonade Stand order |
+| 2820 | `ls_react_pretzel.m4a` | Twisty-licious! Thank you! | Said by Twist after a Lemonade Stand order |
+| 2821 | `ls_react_grapes.m4a` | Grape job! Thanks! | Said by Vinnie after a Lemonade Stand order |
+| 2822 | `ls_react_onigiri.m4a` | Rice and easy! Thank you. | Said by Nori after a Lemonade Stand order |
+| 2823 | `ls_react_pineapple.m4a` | Sharp and sweet! Thanks! | Said by Spike after a Lemonade Stand order |
+| 2824 | `ls_react_waffle.m4a` | No waffling, that is perfect! | Said by Wally after a Lemonade Stand order |
+| 2825 | `ls_react_lemon.m4a` | Easy peasy, lemon squeezy! | Said by Zest after a Lemonade Stand order |
+| 2826 | `ls_react_donut.m4a` | Donut you worry, it is perfect! | Said by Minty after a Lemonade Stand order |
+| 2827 | `ls_react_popcorn.m4a` | Pop pop hooray! | Said by Popper after a Lemonade Stand order |
+| 2828 | `ls_react_peach.m4a` | Everything's peachy! Thank you! | Said by Peachy after a Lemonade Stand order |
+| 2829 | `ls_react_cheese.m4a` | Gouda job! Hee hee! | Said by Gouda after a Lemonade Stand order |
+| 2830 | `ls_react_cookie.m4a` | Crunchy and yummy! Thanks! | Said by Chip after a Lemonade Stand order |
+
+## Bubble Pop — later (87)
+
+Read by the device voice until recorded (bubble1). Light, bubbly voice; a wrong pop is only ever a giggle.
+
+| # | File name | Say this | Note |
+|---:|---|---|---|
+| 2831 | `bp_title.m4a` | Bubble Pop |  |
+| 2832 | `bp_hello.m4a` | Let's pop some bubbles! |  |
+| 2833 | `bp_warmup.m4a` | Let's warm up! |  |
+| 2834 | `bp_easy.m4a` | Here's an easy one! |  |
+| 2835 | `bp_speedy.m4a` | Speedy! You know this one. Let's try something new! |  |
+| 2836 | `bp_next.m4a` | Next one! |  |
+| 2837 | `bp_hint.m4a` | Look for the shiny ones! |  |
+| 2838 | `bp_pop_any.m4a` | Pop the bubbles! | Toddlers: every bubble pops |
+| 2839 | `bp_pop_the.m4a` | Pop the | Followed by the target, e.g. "Pop the" + 7 |
+| 2840 | `bp_ones.m4a` | ones! |  |
+| 2841 | `bp_bubble.m4a` | bubble! |  |
+| 2842 | `bp_bubbles.m4a` | bubbles! |  |
+| 2843 | `bp_peek.m4a` | Peekaboo! Pop a bubble! |  |
+| 2844 | `bp_boo.m4a` | Boo! |  |
+| 2845 | `bp_its_a.m4a` | It's a |  |
+| 2846 | `bp_big.m4a` | Pop the big bubbles! |  |
+| 2847 | `bp_little.m4a` | Pop the little bubbles! |  |
+| 2848 | `bp_w_big.m4a` | big |  |
+| 2849 | `bp_w_little.m4a` | little |  |
+| 2850 | `bp_count.m4a` | Let's count! Pop | Followed by 3 or 5 and "bubbles!" |
+| 2851 | `bp_pop_n.m4a` | Pop | "Pop" + 3 + "ducks" |
+| 2852 | `bp_says.m4a` | Pop the animal that says | Followed by the animal sound |
+| 2853 | `bp_starts.m4a` | Pop the letter that starts | Followed by a word, e.g. "ball" |
+| 2854 | `bp_bigger.m4a` | Which is bigger? | "Which is bigger?" + 6 + "or" + 9 |
+| 2855 | `bp_or.m4a` | or |  |
+| 2856 | `bp_order.m4a` | Pop the numbers in order, from 1 to | Followed by 5 or 10 |
+| 2857 | `bp_find_word.m4a` | Find the word | Followed by a sight word |
+| 2858 | `bp_answer.m4a` | Pop the answer! | "Pop the answer!" + 8 + "plus" + 5 |
+| 2859 | `bp_plus.m4a` | plus |  |
+| 2860 | `bp_even.m4a` | even numbers! |  |
+| 2861 | `bp_odd.m4a` | odd numbers! |  |
+| 2862 | `bp_rhyme.m4a` | Pop the words that rhyme with | Followed by a word, e.g. "cat" |
+| 2863 | `bp_missing.m4a` | Which letter is missing? Pop it! The word is | Followed by the word |
+| 2864 | `bp_make10.m4a` | Pop all the ways to make 10! |  |
+| 2865 | `bp_make.m4a` | Pop all the ways to make | Followed by 5, 8, 12, 14 or 15 |
+| 2866 | `bp_minus.m4a` | minus |  |
+| 2867 | `bp_skip.m4a` | Skip-count by | Followed by 2, 5 or 10; pop them in order |
+| 2868 | `bp_spell.m4a` | Spell | Followed by the word; pop its letters in order |
+| 2869 | `bp_giggle.m4a` | Hee hee! Boing! | A wrong bubble bounces away (never a penalty) |
+| 2870 | `bp_yay.m4a` | Pop! |  |
+| 2871 | `bp_great.m4a` | Great popping! |  |
+| 2872 | `bp_golden.m4a` | Ooh! A golden bubble! |  |
+| 2873 | `bp_storm_ask.m4a` | Bubble storm! Want to pop as many as you can, super fast? |  |
+| 2874 | `bp_storm_go.m4a` | Ready, set, pop! |  |
+| 2875 | `bp_storm_win.m4a` | Storm bonus! You were super speedy! |  |
+| 2876 | `bp_storm_done.m4a` | Phew! The storm is over. Great popping! |  |
+| 2877 | `bp_round_done.m4a` | Pop-tastic! What a lot of bubbles! |  |
+| 2878 | `bp_c_red.m4a` | red |  |
+| 2879 | `bp_c_blue.m4a` | blue |  |
+| 2880 | `bp_c_yellow.m4a` | yellow |  |
+| 2881 | `bp_c_green.m4a` | green |  |
+| 2882 | `bp_c_purple.m4a` | purple |  |
+| 2883 | `bp_c_orange.m4a` | orange |  |
+| 2884 | `bp_sh_circle.m4a` | circle |  |
+| 2885 | `bp_shs_circle.m4a` | circles! |  |
+| 2886 | `bp_sh_square.m4a` | square |  |
+| 2887 | `bp_shs_square.m4a` | squares! |  |
+| 2888 | `bp_sh_triangle.m4a` | triangle |  |
+| 2889 | `bp_shs_triangle.m4a` | triangles! |  |
+| 2890 | `bp_sh_star.m4a` | star |  |
+| 2891 | `bp_shs_star.m4a` | stars! |  |
+| 2892 | `bp_sh_heart.m4a` | heart |  |
+| 2893 | `bp_shs_heart.m4a` | hearts! |  |
+| 2894 | `bp_an_cow.m4a` | cow |  |
+| 2895 | `bp_ans_cow.m4a` | cows! |  |
+| 2896 | `bp_snd_cow.m4a` | moo |  |
+| 2897 | `bp_an_duck.m4a` | duck |  |
+| 2898 | `bp_ans_duck.m4a` | ducks! |  |
+| 2899 | `bp_snd_duck.m4a` | quack |  |
+| 2900 | `bp_an_frog.m4a` | frog |  |
+| 2901 | `bp_ans_frog.m4a` | frogs! |  |
+| 2902 | `bp_snd_frog.m4a` | ribbit |  |
+| 2903 | `bp_an_pig.m4a` | pig |  |
+| 2904 | `bp_ans_pig.m4a` | pigs! |  |
+| 2905 | `bp_snd_pig.m4a` | oink |  |
+| 2906 | `bp_an_dog.m4a` | dog |  |
+| 2907 | `bp_ans_dog.m4a` | dogs! |  |
+| 2908 | `bp_snd_dog.m4a` | woof |  |
+| 2909 | `bp_an_cat.m4a` | cat |  |
+| 2910 | `bp_ans_cat.m4a` | cats! |  |
+| 2911 | `bp_snd_cat.m4a` | meow |  |
+| 2912 | `bp_an_sheep.m4a` | sheep |  |
+| 2913 | `bp_ans_sheep.m4a` | sheep! |  |
+| 2914 | `bp_snd_sheep.m4a` | baa |  |
+| 2915 | `bp_an_fish.m4a` | fish |  |
+| 2916 | `bp_ans_fish.m4a` | fish! |  |
+| 2917 | `bp_snd_fish.m4a` | blub |  |
+
+## Story mode v2 — later (33)
+
+Read by the device voice until recorded (story2). Warm, cozy storyteller; the mini boss is a fun challenge, never scary.
+
+| # | File name | Say this | Note |
+|---:|---|---|---|
+| 2918 | `s2_world.m4a` | Here is our picnic world! Tap a place. |  |
+| 2919 | `s2_new_place.m4a` | Yay! A new place! |  |
+| 2920 | `s2_boss.m4a` | Mini boss! A big, fun challenge. Take your time. |  |
+| 2921 | `s2_who.m4a` | Who is the hero? Pick a friend. |  |
+| 2922 | `s2_tomorrow.m4a` | Hooray! You did the mini boss! A new path will be ready next time. |  |
+| 2923 | `s2_switched.m4a` | Now the hero is | Followed by the friend name (device voice) |
+| 2924 | `s2_place_meadow.m4a` | Berry Meadow! Butterflies and flowers everywhere. |  |
+| 2925 | `s2_place_lagoon.m4a` | Letter Lagoon! Hop along the lily pads with the frog. |  |
+| 2926 | `s2_place_hills.m4a` | Muffin Hills! Ding ding, the muffin bells are ringing. |  |
+| 2927 | `s2_place_woods.m4a` | Word Woods! The fireflies glow and the owl says hoo hoo. |  |
+| 2928 | `s2_place_peaks.m4a` | Pancake Peaks! Up, up the fluffy mountains. |  |
+| 2929 | `s2_place_bay.m4a` | Melon Bay! Splash in the waves and find the shells. |  |
+| 2930 | `s2_place_caves.m4a` | Cookie Caves! Sparkly crystals, drip, drop. |  |
+| 2931 | `s2_tag_strawberry.m4a` | With a picnic plan, we will find everyone! | Hero line at a new place (strawberry) |
+| 2932 | `s2_bosscheer_strawberry.m4a` | A plan and a smile. You can do it! | Hero cheer before a mini boss (strawberry) |
+| 2933 | `s2_tag_apple.m4a` | My compass points this way. Let's explore! | Hero line at a new place (apple) |
+| 2934 | `s2_bosscheer_apple.m4a` | Explorers try big things. Let's try! | Hero cheer before a mini boss (apple) |
+| 2935 | `s2_tag_corn.m4a` | Knock knock! It's us, coming to find you! | Hero line at a new place (corn) |
+| 2936 | `s2_bosscheer_corn.m4a` | Big challenge? Big giggles! Let's go! | Hero cheer before a mini boss (corn) |
+| 2937 | `s2_tag_blueberry.m4a` | Boing! I can see far from up here! | Hero line at a new place (blueberry) |
+| 2938 | `s2_bosscheer_blueberry.m4a` | Boing boing! Let's bounce through it! | Hero cheer before a mini boss (blueberry) |
+| 2939 | `s2_tag_other.m4a` | Let's go find our friends together! | Hero line at a new place (other) |
+| 2940 | `s2_bosscheer_other.m4a` | This one is big and fun. Let's try! | Hero cheer before a mini boss (other) |
+| 2941 | `story2_intro_1_simple.m4a` | The sun is out. {hero} and the friends have a big picnic. | Intro page 1 (simple); {hero} and {food} are filled in by the device voice |
+| 2942 | `story2_intro_1_rich.m4a` | It was a bright, sunny morning, and {hero} the {food} had planned the biggest picnic ever. | Intro page 1 (rich); {hero} and {food} are filled in by the device voice |
+| 2943 | `story2_intro_2_simple.m4a` | Niblet is so silly! We all laugh and play. | Intro page 2 (simple); {hero} and {food} are filled in by the device voice |
+| 2944 | `story2_intro_2_rich.m4a` | The food friends munched and played on the checkered blanket. Niblet told a corny joke, and everyone giggled. | Intro page 2 (rich); {hero} and {food} are filled in by the device voice |
+| 2945 | `story2_intro_3_simple.m4a` | The friends look up. Oh no! The sky is gray. | Intro page 3 (simple); {hero} and {food} are filled in by the device voice |
+| 2946 | `story2_intro_3_rich.m4a` | Suddenly the friends looked up. The sun was gone, and the sky turned gloomy and gray. | Intro page 3 (rich); {hero} and {food} are filled in by the device voice |
+| 2947 | `story2_intro_4_simple.m4a` | Whoosh! Away go some of our friends! | Intro page 4 (simple); {hero} and {food} are filled in by the device voice |
+| 2948 | `story2_intro_4_rich.m4a` | Whoosh! Balloons, books, and the picnic basket swirled into the air, and some of our friends tumbled away like dandelion fluff. | Intro page 4 (rich); {hero} and {food} are filled in by the device voice |
+| 2949 | `story2_intro_5_simple.m4a` | {hero} and the friends are sad. "We can find them," said {hero}. "Let's go!" | Intro page 5 (simple); {hero} and {food} are filled in by the device voice |
+| 2950 | `story2_intro_5_rich.m4a` | {hero} and the other friends stared at the empty blanket. Then {hero} stood tall. "Let's go! We will follow the paths and find every single friend." | Intro page 5 (rich); {hero} and {food} are filled in by the device voice |
+
+## Fun breaks and coloring — later (161)
+
+Read by the device voice until recorded (p4). Giggly, playful, never a test: no right or wrong.
+
+| # | File name | Say this | Note |
+|---:|---|---|---|
+| 2951 | `br_skip.m4a` | Skip | Big skip button |
+| 2952 | `br_done.m4a` | All done! Back to play! | End of a break |
+| 2953 | `br_fun.m4a` | Fun break time! | Start of a break |
+| 2954 | `br_dance.m4a` | Dance party! Copy the moves! | Dance break |
+| 2955 | `br_freeze.m4a` | Freeze! | Freeze dance: the music stops |
+| 2956 | `br_unfreeze.m4a` | Ha ha! Dance again! | Freeze dance: the music restarts |
+| 2957 | `br_count.m4a` | Let us count together! | Counting dance (readers) |
+| 2958 | `br_jump5.m4a` | Jump five times! | Counting dance |
+| 2959 | `br_clap5.m4a` | Clap five times! | Counting dance |
+| 2960 | `br_stomp5.m4a` | Stomp five times! | Counting dance |
+| 2961 | `br_joke.m4a` | Joke time! Tap to hear the silly part! | Joke break |
+| 2962 | `br_tapjoke.m4a` | Tap for the silly part! | Joke: waiting for the tap |
+| 2963 | `br_laugh.m4a` | Ha ha ha! Hee hee hee! | Friends crack up |
+| 2964 | `br_skit.m4a` | Silly show! Tap to see what happens! | Skit break |
+| 2965 | `br_tapnext.m4a` | Tap to see what happens next! | Skit: waiting for the tap |
+| 2966 | `br_peek.m4a` | Peekaboo! Where is your friend hiding? | Peekaboo break |
+| 2967 | `br_peek_found.m4a` | Peekaboo! You found me! | Peekaboo: found |
+| 2968 | `br_peek_bug.m4a` | Not here! Just a ladybug. Hee hee! | Peekaboo: a funny surprise in an empty spot |
+| 2969 | `br_sounds.m4a` | Silly sounds! Tap your friends to make a song! | Sound machine break |
+| 2970 | `br_playsong.m4a` | Here is your song! | Sound machine: play back |
+| 2971 | `br_dress.m4a` | Dress up time! Tap a hat, glasses or a cape! | Dress-up break |
+| 2972 | `br_surprise.m4a` | Ooh! A surprise outfit! | Dress-up: a rare outfit appears |
+| 2973 | `br_concert.m4a` | Concert time! Tap a friend to play or stop! | Mini concert break |
+| 2974 | `br_pop.m4a` | Pop, pop, pop! Pop all you want! | Pop break |
+| 2975 | `br_snow.m4a` | It is snowing! Catch the snowflakes! | Weather break: snow |
+| 2976 | `br_rain.m4a` | Rain! Tap to splash in the puddles! | Weather break: rain |
+| 2977 | `br_rainbow.m4a` | A rainbow! Tap for sparkles! | Weather break: rainbow |
+| 2978 | `br_color.m4a` | Coloring time! Tap a color, then tap the picture! | Coloring break |
+| 2979 | `cl_title.m4a` | Coloring | Free Play tile |
+| 2980 | `cl_pick.m4a` | Pick a picture to color! | Page picker |
+| 2981 | `cl_fill.m4a` | Tap a color, then tap a part of the picture! | Fill tool |
+| 2982 | `cl_brush.m4a` | Draw with your finger! | Brush tool |
+| 2983 | `cl_stickers.m4a` | Drag a sticker onto your picture! | Sticker tool |
+| 2984 | `cl_undo.m4a` | Oops! Back one step. | Undo |
+| 2985 | `cl_clear.m4a` | Start over! A fresh page. | Start over |
+| 2986 | `cl_saved.m4a` | Beautiful! It is in your gallery! | Saved to the gallery |
+| 2987 | `cl_gallery.m4a` | Your gallery! Swipe to see your pictures. | Gallery |
+| 2988 | `cl_newpage.m4a` | A new picture to color! | A coloring page unlocked |
+| 2989 | `cl_full.m4a` | Your gallery is full! A grown-up can make room. | Gallery cap |
+| 2990 | `br_mv_wiggle.m4a` | Wiggle! | Dance move call-out |
+| 2991 | `br_mv_spin.m4a` | Spin around! | Dance move call-out |
+| 2992 | `br_mv_jump.m4a` | Jump! | Dance move call-out |
+| 2993 | `br_mv_sway.m4a` | Sway side to side! | Dance move call-out |
+| 2994 | `br_mv_clap.m4a` | Clap your hands! | Dance move call-out |
+| 2995 | `br_mv_stomp.m4a` | Stomp your feet! | Dance move call-out |
+| 2996 | `br_mv_shake.m4a` | Shake, shake, shake! | Dance move call-out |
+| 2997 | `br_mv_reach.m4a` | Reach up high! | Dance move call-out |
+| 2998 | `br_mv_squat.m4a` | Squish down low! | Dance move call-out |
+| 2999 | `br_mv_twist.m4a` | Twist and twist! | Dance move call-out |
+| 3000 | `br_j01_q.m4a` | What did the corn say when it got a big hug? | Joke setup (corn) |
+| 3001 | `br_j01_p.m4a` | Aww, shucks! | Joke punchline (strawberry / corn) |
+| 3002 | `br_j02_q.m4a` | Why did the strawberry call for help? | Joke setup (strawberry) |
+| 3003 | `br_j02_p.m4a` | It was in a jam! | Joke punchline (blueberry / strawberry) |
+| 3004 | `br_j03_q.m4a` | What does a blueberry say on a trampoline? | Joke setup (blueberry) |
+| 3005 | `br_j03_p.m4a` | Boing, boing, berry fun! | Joke punchline (apple / blueberry) |
+| 3006 | `br_j04_q.m4a` | What is red and goes up and down? | Joke setup (apple) |
+| 3007 | `br_j04_p.m4a` | An apple in an elevator! | Joke punchline (corn / apple) |
+| 3008 | `br_j05_q.m4a` | Knock knock! Who is there? Cow says. Cow says who? | Joke setup (corn) |
+| 3009 | `br_j05_p.m4a` | No, silly! A cow says moo! | Joke punchline (blueberry / corn) |
+| 3010 | `br_j06_q.m4a` | Knock knock! Who is there? Boo. Boo who? | Joke setup (strawberry) |
+| 3011 | `br_j06_p.m4a` | Don't cry! It is only a joke! | Joke punchline (corn / strawberry) |
+| 3012 | `br_j07_q.m4a` | Knock knock! Who is there? Lettuce. Lettuce who? | Joke setup (apple) |
+| 3013 | `br_j07_p.m4a` | Lettuce in, it is chilly out here! | Joke punchline (strawberry / apple) |
+| 3014 | `br_j08_q.m4a` | What do you call a sleeping dinosaur? | Joke setup (blueberry) |
+| 3015 | `br_j08_p.m4a` | A dino-snore! Zzzz! | Joke punchline (strawberry / blueberry) |
+| 3016 | `br_j09_q.m4a` | Why did the cookie go to the doctor? | Joke setup (corn) |
+| 3017 | `br_j09_p.m4a` | It felt crummy! | Joke punchline (apple / corn) |
+| 3018 | `br_j10_q.m4a` | What has ears but cannot hear? | Joke setup (apple) |
+| 3019 | `br_j10_p.m4a` | A corn cob! Hey, that is me! | Joke punchline (corn / apple) |
+| 3020 | `br_j11_q.m4a` | What do you call a bear with no teeth? | Joke setup (blueberry) |
+| 3021 | `br_j11_p.m4a` | A gummy bear! | Joke punchline (corn / blueberry) |
+| 3022 | `br_j12_q.m4a` | What did one plate say to the other plate? | Joke setup (corn) |
+| 3023 | `br_j12_p.m4a` | Lunch is on me! | Joke punchline (strawberry / corn) |
+| 3024 | `br_j13_q.m4a` | Why did the teddy bear say no to dessert? | Joke setup (strawberry) |
+| 3025 | `br_j13_p.m4a` | It was already stuffed! | Joke punchline (blueberry / strawberry) |
+| 3026 | `br_j14_q.m4a` | What do you call a funny mountain? | Joke setup (apple) |
+| 3027 | `br_j14_p.m4a` | Hill-arious! | Joke punchline (blueberry / apple) |
+| 3028 | `br_j15_q.m4a` | How do you make a tissue dance? | Joke setup (blueberry) |
+| 3029 | `br_j15_p.m4a` | Put a little boogie in it! | Joke punchline (apple / blueberry) |
+| 3030 | `br_j16_q.m4a` | Why did the banana go to the doctor? | Joke setup (corn) |
+| 3031 | `br_j16_p.m4a` | It was not peeling well! | Joke punchline (blueberry / corn) |
+| 3032 | `br_j17_q.m4a` | What falls down but never gets hurt? | Joke setup (strawberry) |
+| 3033 | `br_j17_p.m4a` | Rain! Pitter patter! | Joke punchline (apple / strawberry) |
+| 3034 | `br_j18_q.m4a` | What kind of tree fits in your hand? | Joke setup (apple) |
+| 3035 | `br_j18_p.m4a` | A palm tree! | Joke punchline (strawberry / apple) |
+| 3036 | `br_j19_q.m4a` | Knock knock! Who is there? Interrupting cow. Interrupting c... | Joke setup (corn) |
+| 3037 | `br_j19_p.m4a` | Moooo! | Joke punchline (apple / corn) |
+| 3038 | `br_j20_q.m4a` | Why are fish so smart? | Joke setup (strawberry) |
+| 3039 | `br_j20_p.m4a` | They swim in schools! | Joke punchline (apple / strawberry) |
+| 3040 | `br_j21_q.m4a` | What sound does a sneezing cow make? | Joke setup (apple) |
+| 3041 | `br_j21_p.m4a` | Ah... ah... ah-MOO! | Joke punchline (blueberry / apple) |
+| 3042 | `br_j22_q.m4a` | Why did the cow go to the movies? | Joke setup (blueberry) |
+| 3043 | `br_j22_p.m4a` | To see a moo-vie! | Joke punchline (corn / blueberry) |
+| 3044 | `br_j23_q.m4a` | What does a snowman eat for breakfast? | Joke setup (corn) |
+| 3045 | `br_j23_p.m4a` | Snowflakes! Crunch, crunch! | Joke punchline (strawberry / corn) |
+| 3046 | `br_j24_q.m4a` | Why did the egg hide? | Joke setup (strawberry) |
+| 3047 | `br_j24_p.m4a` | It was a little chicken! | Joke punchline (blueberry / strawberry) |
+| 3048 | `br_j25_q.m4a` | What is a cat's favorite color? | Joke setup (apple) |
+| 3049 | `br_j25_p.m4a` | Purr-ple! | Joke punchline (corn / apple) |
+| 3050 | `br_j26_q.m4a` | What is a ghost's favorite fruit? | Joke setup (blueberry) |
+| 3051 | `br_j26_p.m4a` | Boo-berries! Like me! | Joke punchline (apple / blueberry) |
+| 3052 | `br_j27_q.m4a` | What do you call a train that sneezes? | Joke setup (corn) |
+| 3053 | `br_j27_p.m4a` | An achoo-choo train! | Joke punchline (blueberry / corn) |
+| 3054 | `br_j28_q.m4a` | What does a cloud wear under its raincoat? | Joke setup (strawberry) |
+| 3055 | `br_j28_p.m4a` | Thunderwear! | Joke punchline (corn / strawberry) |
+| 3056 | `br_j29_q.m4a` | Why did the sun go to school? | Joke setup (apple) |
+| 3057 | `br_j29_p.m4a` | To get brighter! | Joke punchline (strawberry / apple) |
+| 3058 | `br_j30_q.m4a` | What do you call a duck that tells jokes? | Joke setup (blueberry) |
+| 3059 | `br_j30_p.m4a` | A quack-up! | Joke punchline (strawberry / blueberry) |
+| 3060 | `br_j31_q.m4a` | What room has no doors and no windows? | Joke setup (corn) |
+| 3061 | `br_j31_p.m4a` | A mushroom! | Joke punchline (apple / corn) |
+| 3062 | `br_j32_q.m4a` | What do you call a sleepy pancake? | Joke setup (strawberry) |
+| 3063 | `br_j32_p.m4a` | A flap-snack! Yawn! | Joke punchline (blueberry / strawberry) |
+| 3064 | `br_j33_q.m4a` | Why did the banana wear sunscreen? | Joke setup (banana) |
+| 3065 | `br_j33_p.m4a` | So it would not peel! | Joke punchline (strawberry / banana) |
+| 3066 | `br_j34_q.m4a` | What do you call two pears? | Joke setup (pear) |
+| 3067 | `br_j34_p.m4a` | A pair! Hee hee! | Joke punchline (apple / pear) |
+| 3068 | `br_j35_q.m4a` | What does a bunny use to fix its hair? | Joke setup (carrot) |
+| 3069 | `br_j35_p.m4a` | A hare brush! | Joke punchline (corn / carrot) |
+| 3070 | `br_j36_q.m4a` | Why was the pancake so happy? | Joke setup (pancake) |
+| 3071 | `br_j36_p.m4a` | It had a whole stack of friends! | Joke punchline (blueberry / pancake) |
+| 3072 | `br_k01_1.m4a` | Look! A butterfly! | Skit "The Butterfly" beat 1 |
+| 3073 | `br_k01_2.m4a` | Bloop bounces after it. Boing! Boing! | Skit "The Butterfly" beat 2 |
+| 3074 | `br_k01_3.m4a` | The butterfly lands on Bloop's nose! | Skit "The Butterfly" beat 3 |
+| 3075 | `br_k01_4.m4a` | Ah... ah... achoo! Flutter, flutter! Hee hee! | Skit "The Butterfly" beat 4 |
+| 3076 | `br_k02_1.m4a` | What a windy day! Whoosh! | Skit "The Windy Hat" beat 1 |
+| 3077 | `br_k02_2.m4a` | Oh no! The hat blows away! | Skit "The Windy Hat" beat 2 |
+| 3078 | `br_k02_3.m4a` | Crisp runs and runs after it! | Skit "The Windy Hat" beat 3 |
+| 3079 | `br_k02_4.m4a` | The hat lands on a bird! Tweet tweet! Ha ha! | Skit "The Windy Hat" beat 4 |
+| 3080 | `br_k03_1.m4a` | Niblet's nose feels tickly... | Skit "The Big Sneeze" beat 1 |
+| 3081 | `br_k03_2.m4a` | Ah... ah... ah... | Skit "The Big Sneeze" beat 2 |
+| 3082 | `br_k03_3.m4a` | Achoo! Niblet bounces up high! | Skit "The Big Sneeze" beat 3 |
+| 3083 | `br_k03_4.m4a` | Boing, boing, plop! Bless you! | Skit "The Big Sneeze" beat 4 |
+| 3084 | `br_k04_1.m4a` | Jammy makes a sandwich. | Skit "The Tall Sandwich" beat 1 |
+| 3085 | `br_k04_2.m4a` | One more layer... and one more! | Skit "The Tall Sandwich" beat 2 |
+| 3086 | `br_k04_3.m4a` | It is sooo tall! Wobble, wobble! | Skit "The Tall Sandwich" beat 3 |
+| 3087 | `br_k04_4.m4a` | Plop! Sandwiches for everyone! Yum! | Skit "The Tall Sandwich" beat 4 |
+| 3088 | `br_k05_1.m4a` | Crisp sits on top of the hill. | Skit "Roly-Poly Hill" beat 1 |
+| 3089 | `br_k05_2.m4a` | Uh oh! Roll, roll, roll! | Skit "Roly-Poly Hill" beat 2 |
+| 3090 | `br_k05_3.m4a` | Bump! Into a big pile of leaves! | Skit "Roly-Poly Hill" beat 3 |
+| 3091 | `br_k05_4.m4a` | Crisp pops out with leafy hair! Ta-da! | Skit "Roly-Poly Hill" beat 4 |
+| 3092 | `br_k06_1.m4a` | Hic! Bloop has the hiccups! | Skit "Hiccups" beat 1 |
+| 3093 | `br_k06_2.m4a` | Hic! Every hiccup is a bounce! Hic! | Skit "Hiccups" beat 2 |
+| 3094 | `br_k06_3.m4a` | Hold your breath, Bloop! Puff! | Skit "Hiccups" beat 3 |
+| 3095 | `br_k06_4.m4a` | Pop! All gone! Hooray! | Skit "Hiccups" beat 4 |
+| 3096 | `br_k07_1.m4a` | Here come the ants! March, march! | Skit "The Ant Parade" beat 1 |
+| 3097 | `br_k07_2.m4a` | They carry one tiny crumb. | Skit "The Ant Parade" beat 2 |
+| 3098 | `br_k07_3.m4a` | Now a giant cookie! Heave, ho! | Skit "The Ant Parade" beat 3 |
+| 3099 | `br_k07_4.m4a` | Bye bye, ants! Wave bye bye! | Skit "The Ant Parade" beat 4 |
+| 3100 | `br_k08_1.m4a` | Look! A big puddle! | Skit "The Big Puddle" beat 1 |
+| 3101 | `br_k08_2.m4a` | One, two, three... jump! | Skit "The Big Puddle" beat 2 |
+| 3102 | `br_k08_3.m4a` | Splash! Everyone is wet! | Skit "The Big Puddle" beat 3 |
+| 3103 | `br_k08_4.m4a` | Shake, shake, shake! Like a puppy! | Skit "The Big Puddle" beat 4 |
+| 3104 | `br_k09_1.m4a` | Let us build a snowman! | Skit "The Silly Snowman" beat 1 |
+| 3105 | `br_k09_2.m4a` | Roll a big ball. Roll a small ball. | Skit "The Silly Snowman" beat 2 |
+| 3106 | `br_k09_3.m4a` | A nose? Oops, it is a corn nose! | Skit "The Silly Snowman" beat 3 |
+| 3107 | `br_k09_4.m4a` | The snowman giggles! Snow everywhere! | Skit "The Silly Snowman" beat 4 |
+| 3108 | `br_k10_1.m4a` | Jammy throws the ball. Up, up! | Skit "The Bouncy Ball" beat 1 |
+| 3109 | `br_k10_2.m4a` | Bloop wants to catch it! | Skit "The Bouncy Ball" beat 2 |
+| 3110 | `br_k10_3.m4a` | Boing! The ball bounces on Bloop's head! | Skit "The Bouncy Ball" beat 3 |
+| 3111 | `br_k10_4.m4a` | Bloop is the ball now! Bounce, bounce! | Skit "The Bouncy Ball" beat 4 |
 
 ---
 *Generated from `js/core/voice-lines.js` by `tools/build-recording-script.js`. File names can end in .m4a, .mp3, .wav or .webm.*

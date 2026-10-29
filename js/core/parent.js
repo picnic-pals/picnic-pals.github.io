@@ -78,9 +78,10 @@
     SUBJ.forEach(function (x) {
       var T = C().track(p, x.id), cur = C().byId[T.current], cs = p.skills[T.current];
       h += '<section class="subj" data-subj="' + x.id + '"><h3>' + x.emoji + ' ' + x.name + (W[x.id] ? ' <small class="muted">' + Math.round(W[x.id] * 100) + '% of rounds</small>' : ' <small class="muted">off in the mix</small>') + '</h3>' +
-        '<p class="muted">Now practicing: <b>' + A.esc(cur.name) + '</b> — level ' + (cs.level + 1) + ' of ' + cur.levels.length + ' (' + A.esc(cur.levels[cs.level]) + ')' +
+        (x.id === 'math' ? '<p class="muted"><label>Now practicing: <select data-step="math">' + C().SKILLS.filter(function (s) { return C().subjectOf(s) === 'math' && s.status === 'active'; }).map(function (s) { return '<option value="' + s.id + '"' + (s.id === T.current ? ' selected' : '') + '>' + A.esc(s.name) + '</option>'; }).join('') + '</select></label> <small>pick the step to work on</small>'   // v2p2b: math is steps; a grown-up picks the step, not a level
+        : '<p class="muted">Now practicing: <b>' + A.esc(cur.name) + '</b> — level ' + (cs.level + 1) + ' of ' + cur.levels.length + ' (' + A.esc(cur.levels[cs.level]) + ')') +
         (T.returnTo ? ' · short review detour, then back to <b>' + A.esc(C().byId[T.returnTo].name) + '</b>' : '') + '</p>';
-      h += '<table><thead><tr><th>Skill</th><th>Status</th><th>Level</th><th>Accuracy</th><th class="hide-sm">Answers</th><th>Recent rounds</th><th class="hide-sm">Time</th><th>Set</th></tr></thead><tbody>';
+      h += '<table><thead><tr><th>Skill</th><th>Status</th><th>' + (x.id === 'math' ? 'Step' : 'Level') + '</th><th>Accuracy</th><th class="hide-sm">Answers</th><th>Recent rounds</th><th class="hide-sm">Time</th><th>Set</th></tr></thead><tbody>';
       C().SKILLS.forEach(function (s) { if (C().subjectOf(s) === x.id) h += skillRow(p, s); });
       h += '</tbody></table></section>';
     });
@@ -94,6 +95,7 @@
     A.$$('[data-reset]', b).forEach(function (x) { x.addEventListener('click', function () { if (x.dataset.armed) { C().resetSkill(p, x.dataset.reset); save(); render(); } else { x.dataset.armed = 1; x.textContent = 'Tap again'; x.classList.add('red'); } }); });
     A.$$('[data-sublvl]', b).forEach(function (x) { x.addEventListener('change', function () { A.Levels.set(p, x.dataset.sublvl, x.value); save(); render(); A.UI.toast(p.name + ': ' + x.options[x.selectedIndex].text); }); });
     A.$$('[data-mix]', b).forEach(function (x) { x.addEventListener('change', function () { p.mix = x.value; p.mixCredit = {}; save(); render(); A.UI.toast(p.name + ': ' + x.options[x.selectedIndex].text); }); });
+    A.$$('[data-step]', b).forEach(function (x) { x.addEventListener('change', function () { C().setCurrent(p, x.value); save(); render(); A.UI.toast(p.name + ' will practice ' + C().byId[x.value].name + ' next.'); }); });
     A.$$('[data-lvl]', b).forEach(function (x) { x.addEventListener('change', function () { C().setCurrent(p, x.dataset.lvl, +x.value); save(); render(); }); });
     A.$$('.tog', b).forEach(function (t) { t.addEventListener('click', function () {
       if (t.dataset.k === 'pin') p.math.pin = !p.math.pin; else if (t.dataset.k === 'grumbly') p.games.munch.grumbly = !p.games.munch.grumbly;
@@ -120,7 +122,7 @@
     if (s.status !== 'active') return '<tr class="later"><td><b>' + A.esc(s.name) + '</b><br><small>' + A.esc(s.short) + ' · ' + s.std + '</small></td><td><span class="st later">Later (grade ' + s.grade + ')</span></td><td colspan="6"><small>' + s.levels.map(A.esc).join(' → ') + '</small></td></tr>';
     var spark = '<span class="sparkbars" title="Last rounds (green = 80%+)">' + m.recent.map(function (a) { return '<i class="' + (a >= .8 ? 'g' : a >= .55 ? 'y' : 'r') + '" style="height:' + Math.max(4, Math.round(a * 24)) + 'px"></i>'; }).join('') + '</span>' +
       (m.trend ? ' ' + ({ up: '↗', down: '↘', flat: '→' })[m.trend] : '') + (m.recent.length ? '' : '<small class="muted">—</small>');
-    var lvlSel = '<select data-lvl="' + s.id + '">' + s.levels.map(function (L, i) { return '<option value="' + i + '"' + (i === m.level ? ' selected' : '') + '>' + (i + 1) + ': ' + A.esc(L) + '</option>'; }).join('') + '</select>';
+    var lvlSel = C().subjectOf(s) === 'math' && s.levels.length < 2 ? (m.current ? '<small>▶ this step</small>' : '<small class="muted">—</small>') : '<select data-lvl="' + s.id + '">' + s.levels.map(function (L, i) { return '<option value="' + i + '"' + (i === m.level ? ' selected' : '') + '>' + (i + 1) + ': ' + A.esc(L) + '</option>'; }).join('') + '</select>';
     h += '<tr class="' + (m.current ? 'cur' : '') + '" data-skill="' + s.id + '"><td><b>' + A.esc(s.name) + '</b>' + (m.current ? ' <small>▶ now</small>' : '') + '<br><small class="muted">' + A.esc(s.short) + ' · ' + s.std + '</small></td>' +
       '<td><span class="st ' + m.cls + '">' + m.label + '</span>' + coachInfo(m) + '</td><td>' + lvlSel + '</td><td>' + pct(m.acc) + '</td><td class="hide-sm">' + m.attempts + '</td><td>' + spark + '</td><td class="hide-sm">' + A.fmtTime(m.timeMs) + '</td>' +
       '<td><div class="act">' + (m.current ? '' : '<button class="sbtn pri" data-cur="' + s.id + '">Practice this</button>') +
@@ -334,6 +336,7 @@
       '</div><h3>Music & games</h3><div class="togs">' +
       tog('music', 'Music', 'Gentle background tunes. They get quieter whenever the voice is talking. Kids can also turn music off with the 🎵 button or the M key.', s.music !== false) +
       '<button class="tog" data-x="bbclock"><span>' + A.TITLES.baseball + ' shot clock<small>Optional time limit per pitch. Off (default): no clock — answering fast just makes bigger hits. When it runs out it is a strike, and the answer is shown.</small></span><select data-bbclock aria-label="Baseball shot clock"><option value="0">Off</option><option value="30">30 s</option><option value="20">20 s</option><option value="15">15 s</option><option value="10">10 s</option></select></button>' +
+      tog('breaks', 'Fun breaks', 'Now and then (about 1 level in 5 or 6), a short silly break between levels: a dance, jokes, peekaboo, coloring and more. 15 to 30 seconds, always skippable, no scores. Off: no breaks.', s.breaks !== false) +
       tog('timer', 'Munch timer', 'A friendly countdown bar in ' + A.TITLES.munch + '. When time runs out the round ends kindly and still earns stars. Each player’s pace is set in Players (Relaxed / Normal / Speedy). Off = no clock, and bonus questions give a star instead of time.', s.timer !== false) +
       tog('padRumble', 'Controller rumble', 'Game controllers: a light buzz for a correct munch and a bigger one for a home run (controllers that support it, in Chrome/Edge). Controllers can play every game but can never open this grown-up area.', s.padRumble !== false) +
       tog('placement', 'Placement check for new skills', 'When a new skill opens, ' + A.TITLES.munch + ' first asks 5 quick questions (“Let’s see what you already know!”). 5 of 5 skips the skill (it still comes back for review), 4 of 5 starts a level higher.', s.placement !== false) +
@@ -366,7 +369,7 @@
     b.querySelector('[data-rate]').addEventListener('change', function (e) { s.rate = +e.target.value; save(); });
     A.$$('.tog[data-k]', b).forEach(function (t) { t.addEventListener('click', function () {
       var k = t.dataset.k; if (k === 'muteAll' || k === 'breakReminder') { s[k] = !s[k]; save(); t.classList.toggle('on'); if (A.Music) { A.Music.apply(); A.emit('music:changed'); } if (k === 'muteAll') A.Voice.stop(); return; }
-      s[k] = (k === 'recorded' || k === 'ttsClips' || k === 'music' || k === 'timer' || k === 'padRumble' || k === 'placement') ? s[k] === false : !s[k]; save(); t.classList.toggle('on'); if (k === 'sound' && s.sound) A.Audio.sfx('tap');
+      s[k] = (k === 'recorded' || k === 'ttsClips' || k === 'music' || k === 'timer' || k === 'padRumble' || k === 'placement' || k === 'breaks') ? s[k] === false : !s[k]; save(); t.classList.toggle('on'); if (k === 'sound' && s.sound) A.Audio.sfx('tap');
       if (k === 'music' && A.Music) { A.Music.apply(); A.emit('music:changed'); }
     }); });
     b.querySelector('[data-test]').addEventListener('click', function () { A.Voice.say(['hub_im', 'blob_strawberry'], { force: true }); });

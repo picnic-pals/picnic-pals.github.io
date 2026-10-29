@@ -19,13 +19,15 @@
     <button class="iconbtn" id="homeBtn" data-nav aria-label="Back to the arcade"><svg viewBox="0 0 24 24"><path d="M3.5 11.2 12 4l8.5 7.2" fill="none" stroke="#7a6a99" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10.5V19a1 1 0 0 0 1 1h3.5v-5h3v5H17a1 1 0 0 0 1-1v-8.5" fill="#ffd6e3" stroke="#7a6a99" stroke-width="2.2" stroke-linejoin="round"/></svg></button>
     <div class="rtitle"><span class="rav" id="rAv"></span><span><b id="rName" data-title="room">Picnic Spot</b><small id="rSub"></small></span></div>
     <div class="bits" id="bits" aria-live="polite" title="Star bits: earn 1 for every star in any game"><span class="bi">✦</span><b id="bitCount">0</b><small>star bits</small></div>
+    <button class="jar" id="jarBtn" data-nav aria-label="Savings jar"></button>
     <span class="saved" id="saved" aria-hidden="true">✓ Saved</span>
+    <button class="iconbtn help" id="helpBtn" data-nav aria-label="How to play">?</button>
     <button class="iconbtn music" id="musicBtn" aria-label="Music on/off (M)">🎵</button>
   </div>
-  <div id="roomWrap"><div id="roomBox" tabindex="0" aria-label="Your room"><svg id="roomSvg" viewBox="0 0 1200 760" preserveAspectRatio="none" aria-hidden="true"></svg><div id="things"></div><div id="friendsL"></div><div id="dark"></div><div id="glows"></div><div id="season"></div></div></div>
+  <div id="roomWrap"><div id="roomBox" tabindex="0" aria-label="Your room"><svg id="roomSvg" viewBox="0 0 1200 760" preserveAspectRatio="none" aria-hidden="true"></svg><div id="things"></div><div id="friendsL"></div><div id="dark"></div><div id="glows"></div><div id="season"></div><div id="selBar" aria-hidden="true"><button class="sbtn" id="selFlip" aria-label="Flip">↔</button><button class="sbtn away" id="selAway" aria-label="Put away">🗑️</button></div><div id="trash" aria-hidden="true"><span>🗑️</span><small>Put away</small></div></div></div>
   <div class="rbar" id="mainBar">
     <button class="rbtn shop" id="shopBtn" data-nav><span class="ri">🛍️</span>Shop</button>
-    <button class="rbtn deco" id="decoBtn" data-nav><span class="ri">🎨</span>Decorate</button>
+    <button class="rbtn deco" id="decoBtn" data-nav><span class="ri">🧺</span>My things</button>
     <button class="rbtn troph" id="trophyBtn" data-nav><span class="ri">🏆</span>Trophies</button>
     <button class="rbtn frnd" id="friendBtn" data-nav><span class="ri">💗</span>Friends</button>
   </div>
@@ -38,7 +40,7 @@
       <button class="dbtn done" id="doneBtn" data-nav title="Done (Esc)">✓<small>Done</small></button>
     </div>
   </div>
-  <div class="keys" id="keysMain"><span class="grp"><kbd>←</kbd><kbd>→</kbd> choose</span><span class="grp"><kbd class="wide">Space</kbd> pick</span><span class="grp"><kbd>S</kbd> shop</span><span class="grp"><kbd>D</kbd> decorate</span><span class="grp"><kbd>Esc</kbd> back</span></div>
+  <div class="keys" id="keysMain"><span class="grp"><kbd>←</kbd><kbd>→</kbd> choose</span><span class="grp"><kbd class="wide">Space</kbd> pick</span><span class="grp"><kbd>S</kbd> shop</span><span class="grp"><kbd>D</kbd> my things</span><span class="grp"><kbd>Esc</kbd> back</span></div>
   <div class="keys" id="keysDeco"><span class="grp"><kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> move</span><span class="grp"><kbd class="wide">Space</kbd> place / pick up</span><span class="grp"><kbd>R</kbd> flip</span><span class="grp"><kbd class="wide">Delete</kbd> put away</span><span class="grp"><kbd>Z</kbd> undo</span><span class="grp"><kbd>Tab</kbd> your things</span><span class="grp"><kbd>Esc</kbd> done</span></div>
   <div id="padKeys"></div>
 </section>
@@ -56,12 +58,20 @@
 <script src="../../js/core/room-catalog.js"></script>
 <script src="../../js/core/friends.js"></script>
 <script src="../../js/core/tiny-data.js"></script>
+<script src="../../js/core/stand-core.js"></script>
+<script src="../../js/core/bubble-core.js"></script>
+  <script src="../../js/core/story2.js"></script>
+<script src="../../js/core/breaks-data.js"></script>
+<script src="../../js/core/color-pages.js"></script>
 <script src="../../js/core/voice-lines.js"></script>
 <script src="../../js/core/curriculum-math.js"></script>
 <script src="../../js/core/coach.js"></script>
 <script src="../../js/core/questions.js"></script>
 <script src="../../js/core/skills-early.js"></script>
 <script src="../../js/core/skills-grade1.js"></script>
+<script src="../../js/core/steps-math.js"></script>
+<script src="../../js/core/topics-data.js"></script>
+<script src="../../js/core/topics.js"></script>
 <script src="../../js/core/blobs.js"></script>
 <script src="../../js/core/audio.js"></script>
 <script src="../../js/core/music.js"></script>
@@ -72,6 +82,8 @@
 <script src="../../js/core/playtime.js"></script>
 <script src="../../js/core/gamepad.js"></script>
 <script src="../../js/core/parent.js"></script>
+<script src="../../js/core/coloring.js"></script>
+<script src="../../js/core/breaks.js"></script>
 <script src="items-art.js"></script>
 <script src="room.js"></script>
 </body>

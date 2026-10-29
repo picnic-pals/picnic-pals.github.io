@@ -8,8 +8,14 @@
   // games registry: future games plug in here
   var GAMES = [
     { id: 'tiny', name: 'Tiny Picnic', sub: 'Find, tap and giggle', cls: 'tiny', href: 'games/tiny/index.html', ready: true, toddler: true, voice: ['tp_title'], say: ['tp_title'], tip: 'Tap the picture that matches. Big pictures, no wrong answers!' },
+    // story2: toddlers get the simple Story (2 levels + a mini boss per place) as a second big tile
+    { id: 'story', name: 'Story', sub: 'Find our friends!', cls: 'story', href: 'games/munch/index.html?mode=story', ready: true, toddler: true, voice: ['menu_story'], say: ['menu_story'], tip: 'Go on a picnic adventure with your friend. Short and easy!' },
     { id: 'munch', name: A.TITLES.munch, sub: 'Number munching math', cls: 'munch', href: 'games/munch/index.html', ready: true, voice: ['hub_lets_go'], say: ['munch_title'], tip: 'Walk around the picnic and munch the right answers. Math and words!' },
     { id: 'baseball', name: A.TITLES.baseball, sub: 'Math at the ballpark', cls: 'base', href: 'games/baseball/index.html', ready: true, voice: ['bb_play_ball'], say: ['bb_title'], tip: 'Beat the Sprout Squad! Right answers are hits, misses are outs. Score more runs to win.' },
+    { id: 'stand', name: A.TITLES.stand, sub: 'Serve your friends', cls: 'stand', href: 'games/stand/index.html', ready: true, all: true, voice: ['ls_title'], say: ['ls_title'], tip: 'Run a lemonade stand! Fill each friend\'s order and count the tips.' },
+    { id: 'bubble', name: A.TITLES.bubble, sub: 'Pop the right bubbles', cls: 'bubble', href: 'games/bubble/index.html', ready: true, all: true, voice: ['bp_title'], say: ['bp_title'], tip: 'Pop the bubbles your friend asks for: colors, animals, letters, numbers, words.' },
+    // p4: Coloring (all ages; toddlers get Fill + Stickers). No stars, no right or wrong; pictures go to the kid's Gallery.
+    { id: 'color', name: A.TITLES.color, sub: 'Color, stickers & gallery', cls: 'color', href: 'games/color/index.html', ready: true, all: true, voice: ['cl_title'], say: ['cl_title'], tip: 'Color pictures of your friends and places. Tap to fill, draw with a brush, add stickers, and save to your gallery.' },
     { id: 'room', name: A.TITLES.room, sub: 'Decorate & picnic friends', cls: 'room', href: 'games/room/index.html', ready: true, voice: ['rm_title'], say: ['rm_title'], tip: 'Your own picnic spot. Buy fun things with star bits and decorate!' },
     // design1 (2026-10-22): no "Coming soon" tiles (Penalty Kicks, Sight Words): only games that are ready are shown
   ];
@@ -19,9 +25,19 @@
 
   /* ---------- scenes for tiles ---------- */
   function scene(g, p) {
+    if (g.id === 'color') {   // a half-colored page with crayons
+      return '<div class="colorsc"><svg viewBox="0 0 200 140" aria-hidden="true"><rect x="8" y="8" width="184" height="124" rx="14" fill="#fff"/><path d="M8 100 C 60 86 140 110 192 96 V118 a14 14 0 0 1 -14 14 H22 a14 14 0 0 1 -14 -14Z" fill="#8fdc7a"/>' +
+        '<circle cx="160" cy="34" r="16" fill="#ffd23f"/><path d="M100 30 C 60 30 56 70 70 92 C 80 108 120 108 130 92 C 144 70 140 30 100 30Z" fill="#ff6f8f"/><path d="M84 30 C 90 18 110 18 116 30 C 106 26 94 26 84 30Z" fill="#6fd36a"/>' +
+        '<g fill="none" stroke="#3b2d55" stroke-width="3.5" stroke-linecap="round"><rect x="8" y="8" width="184" height="124" rx="14"/><path d="M100 30 C 60 30 56 70 70 92 C 80 108 120 108 130 92 C 144 70 140 30 100 30Z"/><circle cx="160" cy="34" r="16"/><path d="M36 48 c 8 -10 22 -10 30 0"/><path d="M88 62 a3 3 0 1 0 .1 0 M112 62 a3 3 0 1 0 .1 0 M90 78 q10 8 20 0"/></g></svg>' +
+        '<span class="crayons"><i style="background:#ff5d5d"></i><i style="background:#ffe14d"></i><i style="background:#4fa3ff"></i><i style="background:#a77bff"></i></span></div>';
+    }
     if (g.id === 'tiny') {   // big, simple: three food friends on the picnic blanket
       var R0 = A.ROOT + 'assets/picnic/friends/';
       return '<div class="tinysc">' + ['strawberry', 'banana', 'blueberry'].map(function (id) { return '<img src="' + R0 + id + '/happy_256.webp" alt="" draggable="false">'; }).join('') + '</div>' +
+        '<div class="who2">' + B.forProfile(p, { expr: 'happy' }) + '</div>';
+    }
+    if (g.id === 'story') {   // the hero on a little path with a map pin
+      return '<div class="storysc"><span class="sp1" aria-hidden="true">🗺️</span><span class="sp2" aria-hidden="true">🌼</span><span class="sp3" aria-hidden="true">🪷</span></div>' +
         '<div class="who2">' + B.forProfile(p, { expr: 'happy' }) + '</div>';
     }
     if (g.id === 'munch') {
@@ -33,6 +49,18 @@
       return '<svg class="sc" viewBox="0 0 100 75"><path d="M0 60 Q50 46 100 60 V75 H0Z" fill="#9fe0a8"/><path d="M50 50 L66 60 L50 70 L34 60Z" fill="#f2d6a2"/><rect x="47" y="58" width="6" height="4" fill="#fff"/>' +
         '<g transform="translate(80 18) rotate(20)"><circle r="7" fill="#fff" stroke="#ddd" stroke-width="1"/><path d="M-4 -5 Q-1 0 -4 5 M4 -5 Q1 0 4 5" stroke="#ff5a6e" stroke-width="1.1" fill="none"/></g>' +
         '</svg><div class="who2">' + B.forProfile(p, { outfit: 'helmet', expr: 'bat' }) + '</div>';
+    }
+    if (g.id === 'bubble') {   // bubble1: a friend with a bubble wand and floating bubbles (original SVG)
+      return '<svg class="sc" viewBox="0 0 100 75"><defs><radialGradient id="hbb" cx="40%" cy="35%" r="65%"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#d4eeff" stop-opacity=".55"/><stop offset="1" stop-color="#8ccaff"/></radialGradient></defs>' +
+        '<circle cx="62" cy="22" r="13" fill="url(#hbb)" stroke="#fff" stroke-width="1.5"/><circle cx="84" cy="36" r="9" fill="url(#hbb)" stroke="#fff" stroke-width="1.5"/><circle cx="74" cy="56" r="7" fill="url(#hbb)" stroke="#fff" stroke-width="1.5"/><circle cx="44" cy="10" r="6" fill="url(#hbb)" stroke="#fff" stroke-width="1.2"/>' +
+        '<circle cx="58" cy="19" r="2.5" fill="#fff"/><text x="62" y="27" text-anchor="middle" font-size="13" font-weight="800" fill="#4a3b6b" font-family="sans-serif">7</text></svg>' +
+        '<div class="who2">' + B.forProfile(p, { expr: 'happy' }) + '</div>';
+    }
+    if (g.id === 'stand') {   // stand1: the lemonade jug on a striped stand, with two cups
+      return '<svg class="sc" viewBox="0 0 100 75"><path d="M0 0 H100 V12 H0Z" fill="#ffd23c"/><path d="M0 12 Q6 20 12 12 Q18 20 25 12 Q31 20 37 12 Q43 20 50 12 Q56 20 62 12 Q68 20 75 12 Q81 20 87 12 Q93 20 100 12Z" fill="#ffd23c"/>' +
+        '<path d="M8 50 H92 V74 H8Z" fill="#e9b97a"/><path d="M8 50 H92 V55 H8Z" fill="#d9a35f"/><image href="assets/picnic/room/lemonade_jug.webp" x="56" y="20" width="30" height="32"/>' +
+        '<path d="M26 34 H40 L38 50 H28Z" fill="#ffe066" stroke="#fff" stroke-width="1.5"/><path d="M42 36 H54 L52 50 H44Z" fill="#ff9fc0" stroke="#fff" stroke-width="1.5"/></svg>' +
+        '<div class="who2">' + B.forProfile(p, { expr: 'happy' }) + '</div>';
     }
     if (g.id === 'room') {
       // the Picnic Spot scene (same painted room as games/room) with the blanket, basket and parasol
@@ -56,7 +84,7 @@
   function show(id) {
     A.$$('.screen').forEach(function (s) { s.classList.toggle('on', s.id === id); });
     if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id);
-    var first = A.$('#' + id + ' [data-nav], #' + id + ' .kid, #' + id + ' .tile');
+    var first = (id === 'mode' && A.$('#modeStory')) || (id === 'games' && A.$('#meBtn')) || A.$('#' + id + ' [data-nav], #' + id + ' .kid, #' + id + ' .tile');   // v2p1a: Story first; the game picker keeps its old first focus (not the new Back)
     setTimeout(function () { if (first && !A.Parent.isOpen()) try { first.focus({ preventScroll: true }); } catch (e) {} }, 30);
   }
 
@@ -68,7 +96,7 @@
     if (last) {
       var cb = A.el('<button class="contbtn" data-nav id="contBtn"><span class="ca bd" style="' + B.backdrop(last.color) + '">' + B.forProfile(last, { expr: 'happy' }) + '</span><span class="ct"><b>▶ Continue</b><small>' + A.esc(last.name) + ' · ⭐ ' + last.stars + '</small></span></button>');
       cb.setAttribute('aria-label', 'Continue as ' + last.name);
-      cb.addEventListener('click', function () { A.Audio.sfx('pop'); A.Store.setActive(last.id); go('games'); A.Voice.say(greet(last, 'hub_continue', ['hub_welcome_back', 'hub_continue'])); });
+      cb.addEventListener('click', function () { A.Audio.sfx('pop'); A.Store.setActive(last.id); goHome(); A.Voice.say(homeSay(last, greet(last, 'hub_continue', ['hub_welcome_back', 'hub_continue']))); });
       cb._say = [{ text: 'Continue, ' + last.name }];
       cw.appendChild(cb);
     }
@@ -82,7 +110,7 @@
       b.setAttribute('aria-label', editing ? 'Edit ' + p.name : p.name + ', ' + p.stars + ' stars. ' + sv.say);
       b.addEventListener('click', function () {
         if (editing) { editPlayer(p); return; }
-        A.Blobs.anim(b, 'jump', 600); A.Audio.sfx('pop'); A.Store.setActive(p.id); setTimeout(function () { go('games'); A.Voice.say(greet(p, 'hub_pick_game', ['hub_welcome_back', 'hub_pick_game'])); }, 260);
+        A.Blobs.anim(b, 'jump', 600); A.Audio.sfx('pop'); A.Store.setActive(p.id); setTimeout(function () { goHome(); A.Voice.say(homeSay(p, greet(p, 'hub_pick_game', ['hub_welcome_back', 'hub_pick_game']))); }, 260);
       });
       b.addEventListener('pointerenter', function () { A.Blobs.anim(b, 'squish', 420); });
       b._say = [{ text: editing ? 'Edit ' + p.name : p.name }];
@@ -192,7 +220,7 @@
     if (!nm) { var i = $('#nkName'); i.classList.remove('nudge'); void i.offsetWidth; i.classList.add('nudge'); A.Audio.sfx('locked'); A.Voice.say(['hub_new_player']); i.focus(); return; }
     var p = A.Store.add(nm, nk.blob); p.color = nk.color; if (nk.color !== 'classic') p.unlocks.colors[nk.color] = Date.now(); p.age = nk.age; p.levels = Object.assign({}, nk.levels); p.flags.madeByKid = true; A.Store.startByAge(p);
     A.Store.setActive(p.id); A.Store.save(); A.Audio.sfx('unlock');
-    go('games'); A.UI.rain(30); A.Voice.say(greet(p, 'hub_welcome', ['hub_welcome']));
+    goHome(); A.UI.rain(30); A.Voice.say(homeSay(p, greet(p, 'hub_welcome', ['hub_welcome'])));
   }
   $('#nkName').addEventListener('input', function () { $('#nkShow').textContent = $('#nkName').value.trim() || '?'; });
   $('#nkName').addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === 'ArrowDown') { e.preventDefault(); var f = A.$('#nkBlob .opt.sel') || A.$('#nkBlob .opt'); if (f) f.focus(); } e.stopPropagation(); if (e.key === 'Escape') go('players'); });
@@ -216,7 +244,7 @@
     var tiles = $('#tiles'); tiles.innerHTML = '';
     // toddler mode (age 2, or the grown-up setting): Tiny Picnic is the big first tile; grade-level games are tucked away
     var tod = A.toddler(me); $('#games').classList.toggle('toddler', tod); tiles.classList.toggle('toddler', tod);
-    GAMES.filter(function (gm) { return tod ? gm.toddler || gm.id === 'room' : !gm.toddler; }).forEach(function (gm) {
+    GAMES.filter(function (gm) { return tod ? gm.toddler || gm.all || gm.id === 'room' : !gm.toddler; }).forEach(function (gm) {
       var t = A.el('<button class="tile ' + gm.cls + (tod && gm.toddler ? ' big' : '') + (gm.ready ? '' : ' soon') + '" data-nav data-game="' + gm.id + '"><div class="scene">' + scene(gm, me) + '</div>' +
         (gm.ready ? '<span class="play">▶ Play</span>' : '<span class="ribbon">COMING SOON</span>') + '<span class="tn">' + gm.name + '</span><span class="tsub">' + gm.sub + '</span></button>');
       t.addEventListener('click', function () {
@@ -236,7 +264,7 @@
   function hubCheckpoint(n) {   // waits for any open card (e.g. today's prizes) to close first
     clearTimeout(hubCheckpoint.t);
     hubCheckpoint.t = setTimeout(function () {
-      if (!A.$('#games').classList.contains('on') || A.PlayTime.showing()) return;
+      if (!(A.$('#games').classList.contains('on') || A.$('#mode').classList.contains('on')) || A.PlayTime.showing()) return;
       if ((A.UI.cardOpen || A.Parent.isOpen() || A.$('#gate')) && n < 60) return hubCheckpoint(n + 1);
       A.PlayTime.checkpoint({ home: function () { A.$$('.ptcard').forEach(function (x) { x.remove(); }); A.UI.cardOpen = false; go('players'); } });
     }, n ? 700 : 400);
@@ -336,11 +364,35 @@
     });
   }
 
+  /* ---------- v2p1a: Story or Free Play (the first choice after picking a player) ----------
+     Story opens the Picnic Island map (Picnic Munch's story mode); Free Play opens the game picker. Toddlers (Tiny Picnic)
+     never see the story map, so they go straight to their game picker. */
+  function wantsMode(p) { return !!p && !A.toddler(p); }
+  function goHome() { var p = A.Store.active(); go(wantsMode(p) ? 'mode' : 'games'); }
+  function homeSay(p, parts) { return wantsMode(p) ? [].concat(parts || [], ['menu_story', 'menu_free']) : parts; }
+  function renderMode() {
+    me = A.Store.active(); if (!me) return go('players');
+    if (!wantsMode(me)) return go('games');
+    $('#modeAv').innerHTML = B.forProfile(me); $('#modeAv').setAttribute('style', B.backdrop(me.color)); $('#modeAv').classList.add('bd'); $('#modeHi').textContent = 'Hi, ' + me.name + '!'; $('#modeStars').textContent = me.stars;
+    var ST = A.Story, R = ST.run(me), sd = ST.data(me), sub = $('#modeStorySub');
+    sub.textContent = sd.finished ? 'You finished it! Play again' : (R.stop ? 'Stop ' + (Math.min(R.stop, ST.mainCount() - 1) + 1) + ' on ' + ST.WORLD : ST.WORLD + ' adventure');
+  }
+  $('#modeStory')._say = ['menu_story']; $('#modeFree')._say = ['menu_free'];
+  A.UI.tip($('#modeStory'), 'Follow the map from stop to stop on a picnic journey.', { name: 'Story' });
+  A.UI.tip($('#modeFree'), 'Pick any game: Munch, Slugger, your Picnic Spot and more.', { name: 'Free Play' });
+  $('#modeStory').addEventListener('click', function () { var b = $('#modeStory'); A.Blobs.anim(b, 'jump', 600); A.Audio.sfx('pop'); A.Voice.say(['menu_story']); A.Store.save(); setTimeout(function () { location.href = 'games/munch/index.html?mode=story'; }, 450); });
+  $('#modeFree').addEventListener('click', function () { A.Blobs.anim($('#modeFree'), 'jump', 600); A.Audio.sfx('pop'); A.Voice.say(['menu_free']); go('games'); });
+  $('#modeBack').addEventListener('click', function () { A.Audio.sfx('tap'); go('players'); A.Voice.say(['hub_whos_playing']); });
+  $('#modeMe').addEventListener('click', function () { A.Audio.sfx('tap'); go('players'); A.Voice.say(['hub_whos_playing']); });
+  $('#gamesBack').addEventListener('click', function () { A.Audio.sfx('tap'); var p = A.Store.active(); if (wantsMode(p)) go('mode'); else { go('players'); A.Voice.say(['hub_whos_playing']); } });
+  $('#modeBack')._say = [{ text: 'Back' }]; $('#gamesBack')._say = [{ text: 'Back' }]; $('#modeMe')._say = [{ text: 'Switch player' }];
+
   function go(id) {
     if (id !== 'players') editing = false;
     if (id === 'friends') renderFriends();
     if (id === 'players') renderPlayers();
     if (id === 'games') renderGames();
+    if (id === 'mode') renderMode();
     if (id === 'stickers') renderStickers();
     if (id === 'closet') renderCloset();
     show(id);
@@ -369,7 +421,8 @@
       else if (editing && A.$('#players').classList.contains('on')) { editing = false; renderPlayers(); }
       else if (A.$('#stickers').classList.contains('on') || A.$('#friends').classList.contains('on')) go('games');
       else if (A.$('#closet').classList.contains('on')) leaveCloset();
-      else if (A.$('#games').classList.contains('on')) go('players');
+      else if (A.$('#games').classList.contains('on')) { if (wantsMode(A.Store.active())) go('mode'); else go('players'); }
+      else if (A.$('#mode').classList.contains('on')) go('players');
     }
   });
   A.UI.arrowNav(function () { return A.$$('.screen.on [data-nav]'); });
@@ -385,10 +438,10 @@
   window.__hubSession = function () { var p = A.Store.active(); return R.celebrateSession(p); };
   // first screen
   var h = (location.hash || '').slice(1);
-  if (['games', 'stickers', 'closet', 'friends'].indexOf(h) >= 0 && A.Store.active()) go(h);
+  if (['mode', 'games', 'stickers', 'closet', 'friends'].indexOf(h) >= 0 && A.Store.active()) go(h);
   else if (!A.Store.profiles().length) { go('players'); openNew(); } // first visit: no players yet -> make one
   else go('players');
-  window.__hub = { go: go, openNew: openNew, saveInfo: saveInfo };
+  window.__hub = { go: go, goHome: goHome, openNew: openNew, saveInfo: saveInfo };
   backFromGame();
   A.Music.play('hub');
   $('#hubMusic').addEventListener('click', function () { A.Music.toggle(); hubMusic(); });

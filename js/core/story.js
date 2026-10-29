@@ -61,7 +61,20 @@
 
   // mixV 1 (2026-10-22, game mix): nothing in old saves moves. Stops are still saved by index and path, so passed stops stay
   // passed. Each stop's game comes from gameOf(), worked out from the player id, so an old save gets its mix with no rewrite.
-  function data(p) { var s = p.story || (p.story = {}); if (!s.stops) s.stops = {}; if (!s.seen) s.seen = {}; if (!s.challenges) s.challenges = {}; if (!s.mixV) s.mixV = 1; return s; }
+  function data(p) { var s = p.story || (p.story = {}); if (!s.stops) s.stops = {}; if (!s.seen) s.seen = {}; if (!s.challenges) s.challenges = {}; if (!s.mixV) s.mixV = 1; if ((s.placeV || 0) < 2) unplace(s); return s; }
+  // v2p1a migration: stops that were only "placed" (passed by the old placeAtLevel, never played) on a path whose journey has
+  // not really started (no stop on it played yet) are taken back, so that journey starts at stop 1 like everyone's. A journey
+  // already under way keeps its placed stops (nothing that was played ever moves). Idempotent (s.placeV = 2).
+  function unplace(s) {
+    s.placeV = 2;
+    ['big', 'little'].forEach(function (pa) {
+      var pre = pa + ':', keys = Object.keys(s.stops).filter(function (k) { return k.indexOf(pre) === 0; });
+      var played = keys.some(function (k) { var r = s.stops[k]; return r.plays > 0 || (r.passed && !r.placed); });
+      if (played) return;
+      var n = 0; keys.forEach(function (k) { if (s.stops[k].placed) { delete s.stops[k]; n++; } });
+      if (n && s.run && s.run.path === pa && !s.run.done && !s.run.score) s.run.stop = 0;
+    });
+  }
 
   /* ---------- game mix (owner, 2026-10-22: "the levels should be random… automatically, so the user's not picking") ----------
      Each stop plays Picnic Munch or Snack Slugger, picked for the kid (never a choice), and it is the same every time:
@@ -71,7 +84,7 @@
        → about 60% Munch / 40% Slugger on the main trail
      Friend challenges stay Munch (they are timed snack-munching races). Tiny Picnic is not in the mix: toddlers never see the
      story map (the hub hides Picnic Munch in toddler mode). */
-  var GAMES = { munch: { id: 'munch', icon: '🍓', label: 'Munch' }, slugger: { id: 'slugger', icon: '⚾', label: 'Slugger' } };
+  var GAMES = { munch: { id: 'munch', icon: '🍓', label: 'Munch' }, slugger: { id: 'slugger', icon: '⚾', label: 'Slugger' }, stand: { id: 'stand', icon: '🍋', label: 'Stand' }, bubble: { id: 'bubble', icon: '🫧', label: 'Bubbles' } };
   var SLUG_P = 0.3, mixCache = {};
   function seed01(str) { var x = 2166136261 >>> 0; for (var i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619) >>> 0; }
     x ^= x >>> 13; x = Math.imul(x, 0x5bd1e995) >>> 0; x ^= x >>> 15; return (x >>> 0) / 4294967296; }
@@ -92,7 +105,40 @@
     });
     return (mixCache[key] = out);
   }
-  function gameOf(p, i) { return gameMix(p)[i] || 'munch'; }
+  /* stand1 (2026-10-28): the Lemonade Stand is a possible stop type. It only takes a stop that would be Munch, never stop 1 of a
+     trail, the finale, a side trip or two stands in a row (~20% of the free Munch stops). Nothing already played moves: the
+     choice is made once for a stop that has never been played on either path and kept in s.gm (old saves keep every played
+     stop's game; mixV stays 1). Never for toddlers (they never see the map). */
+  var STAND_P = 0.2;
+  function playedAny(s, i) { return ['big', 'little'].some(function (pa) { var r = s.stops[pa + ':' + i]; return r && (r.plays > 0 || r.passed); }); }
+  function standOk(p, i, base) {
+    var st = STOPS[i]; if (!p || base !== 'munch' || !st || st.side || !A.Stand || (A.toddler && A.toddler(p))) return false;
+    var M = mainCount(); if (i === 0 || i >= M - 1) return false;
+    return seed01(String(p.id || p.name || 'player') + '|stand|' + i) < STAND_P;
+  }
+  function gameOf(p, i) {
+    var base = gameMix(p)[i] || 'munch'; if (!p || !p.story) return base;
+    var s = data(p), gm = s.gm || (s.gm = {});
+    if (gm[i] == null) {
+      if (playedAny(s, i)) return base;   // played before the stand existed: keep its game
+      gm[i] = standOk(p, i, base) && !(gm[i - 1] === 1) ? 1 : 0;
+    }
+    if (gm[i]) return 'stand';
+    return bubbleOf(p, s, i, base);
+  }
+  /* bubble1 (2026-10-29): Bubble Pop takes about the same share (~20%) of the Munch stops the stand did not take: never stop 1,
+     the finale, a side trip, a stand stop or right after another Bubble stop. Memoized separately (s.gb) so stops decided before
+     Bubble Pop existed can still become one, but only while never played; a played stop never changes. Never for toddlers. */
+  var BUBBLE_P = 0.2;
+  function bubbleOf(p, s, i, base) {
+    var gb = s.gb || (s.gb = {});
+    if (gb[i] != null) return gb[i] ? 'bubble' : base;
+    if (playedAny(s, i)) return base;
+    var st = STOPS[i], M = mainCount();
+    var ok = base === 'munch' && st && !st.side && A.Bubble && !(A.toddler && A.toddler(p)) && i > 0 && i < M - 1 && !(s.gm && s.gm[i - 1] === 1) && !(gb[i - 1] === 1) &&
+      seed01(String(p.id || p.name || 'player') + '|bubble|' + i) < BUBBLE_P / (1 - STAND_P);
+    gb[i] = ok ? 1 : 0; return ok ? 'bubble' : base;
+  }
   // a Snack Slugger stop (slugger2, 2026-10-22): the stop's skill and level, 2 innings (wrong answer = an out, 3 outs an
   // inning; 4 at age 4 and under), goal = RUNS: 5 (design2: 6 at age 5 and 8 at 4 and under, where right answers are never caught; 4 outs at 4 and under), one fewer
   // on a "helper" stop after two misses. Sim (_test/slugger2-test.js): cleared ~80% at 80% accuracy (age 5-6), ~30% at 60%.
@@ -132,7 +178,7 @@
   function chRecord(p, k, r) {
     var c = CH[k], s = data(p), x = s.challenges[c.area] || (s.challenges[c.area] = { tries: 0, wins: 0, best: 0 }), cfg = chConfig(p, k);
     x.tries++; var won = !!(r.finished && r.wrong <= cfg.maxWrong && r.secs <= cfg.target), out = { won: won, secs: r.secs, target: cfg.target };
-    if (won) { x.wins++; if (!x.best || r.secs < x.best) { out.newBest = !!x.best; x.best = Math.round(r.secs * 10) / 10; }
+    if (won) { x.wins++; out.wins = x.wins; if (!x.best || r.secs < x.best) { out.newBest = !!x.best; x.best = Math.round(r.secs * 10) / 10; }
       if (!r.wrong) { x.perfect = (x.perfect || 0) + 1; out.perfect = true; }
       // friends are earned by MASTERING skills (js/core/rewards.js CONFIG.characters); a win here earns badges, not the friend
       var b = p.unlocks.blobs || (p.unlocks.blobs = {}); if (!A.Rewards && !b[c.blob]) { b[c.blob] = Date.now(); out.firstWin = true; } }
@@ -156,15 +202,32 @@
     // a helper stop (2 tries that didn't clear) now really has fewer snacks: 6 (Little Steps stays 5)
     var nBig = helper ? 6 : 8;
     if (st.side) return { skill: st.skill, level: little ? 0 : 1, nOk: little ? 5 : nBig, helper: helper, side: true, timeX: (helper ? 1.3 : 1) * (little ? 1.1 : 1) };
-    var sk = skillFor(p, st.area.skill);
-    return { skill: sk, lifted: sk !== st.area.skill, level: little ? 0 : st.lv, nOk: little ? 5 : nBig, helper: helper, timeX: (helper ? 1.3 : 1) * (little ? 1.1 : 1) };
+    var fit = fitStop(p, st.area.skill, st.lv, little);
+    return { skill: fit.skill, lifted: fit.skill !== st.area.skill, capped: !!fit.capped, level: fit.level, nOk: little ? 5 : nBig, helper: helper, timeX: (helper ? 1.3 : 1) * (little ? 1.1 : 1) };
   }
   /* design1 (2026-10-22, parent-approved): the story is a multi-day journey for every age. Placement skips at most ONE area
      (PLACE_MAX_AREAS), so a 6-year-old starts near the beginning of the trail instead of at stop 15 of 20. So those early
      stops are not babyish, a main stop whose area skill is below the player's own current math skill plays the player's
      current skill instead ("lifted"; the area keeps its name, story card and friend). Once the trail reaches the player's
      skill, every stop plays its own area skill as before. */
-  var PLACE_MAX_AREAS = 1;
+  /* v2p1a (2026-10-25, parent-approved v2 plan): no placement skips at all (PLACE_MAX_AREAS 0): everyone starts at stop 1.
+     Instead each main stop's difficulty fits the kid: think of the math ladder as steps (skill, level), e.g. Compare L1,
+     Compare L2, Adding to 10 L1, ... A stop never plays BELOW the kid's current step (an easy area is "lifted" to her step) and
+     never more than ONE step ABOVE it (a hard area is "capped"). Little Steps stays on the kid's own step; Big Steps plays the
+     area's level, so the 2nd stop of a lifted area can be a one-step stretch. As the kid levels up, the stops follow. */
+  var PLACE_MAX_AREAS = 0;
+  function ladder(list) { var out = []; list.forEach(function (id, ix) { var sk = A.Curriculum.byId && A.Curriculum.byId[id], n = sk && sk.levels ? sk.levels.length : 2; for (var l = 0; l < n; l++) out.push({ id: id, ix: ix, lv: l }); }); return out; }
+  function fitStop(p, sid, lv, little) {
+    var cm = curMath(p), plain = { skill: sid, level: little ? 0 : lv }; if (!cm || cm.ix < 0) return plain;
+    var ix = cm.list.indexOf(sid); if (ix < 0) return plain;
+    var L = ladder(cm.list), kl = 0; try { kl = A.Curriculum.state(p, cm.id).level || 0; } catch (e) {}
+    var find = function (i, l) { for (var k = 0; k < L.length; k++) if (L[k].ix === i && L[k].lv === l) return k; for (k = L.length - 1; k >= 0; k--) if (L[k].ix === i) return k; return 0; };
+    var kOrd = find(cm.ix, kl), tOrd = ix < cm.ix ? kOrd + (little ? 0 : lv) : find(ix, little ? 0 : lv), maxOrd = Math.min(L.length - 1, kOrd + (little ? 0 : 1));
+    // the one-step stretch never opens a new skill early: if the next step is a skill the kid hasn't opened yet, stay on her step
+    if (maxOrd > kOrd && L[maxOrd].id !== cm.id) { var ns = null; try { ns = A.Curriculum.state(p, L[maxOrd].id); } catch (e) {} if (!ns || ns.status === 'locked') maxOrd = kOrd; }
+    var o = Math.max(kOrd, Math.min(tOrd, maxOrd)), r = L[o];
+    return { skill: r.id, level: r.lv, capped: o < tOrd };
+  }
   function curMath(p) { var C = A.Curriculum; if (!C || !C.current || !C.list) return null; try { var list = C.list('math').map(function (k) { return k.id; }), cur = C.current(p, 'math'); return cur ? { id: cur.id, ix: list.indexOf(cur.id), list: list } : null; } catch (e) { return null; } }
   function skillFor(p, sid) {
     var cm = curMath(p); if (!cm || cm.ix < 0) return sid;
@@ -198,33 +261,16 @@
     }
     return out;
   }
-  // start the story at the player's level: main stops whose skill comes before the player's current math skill (or is
-  // mastered / placed) are marked passed as "placed" (no stars, no score), so the trail opens at their level. Only before the
-  // first stop on this path is played. Idempotent.
-  function placeAtLevel(p) {
-    var C = A.Curriculum; if (!C || !C.current || !C.list) return 0;
-    var list = C.list('math').map(function (k) { return k.id; }), cur = null; try { cur = C.current(p, 'math'); } catch (e) {}
-    var curIx = cur ? list.indexOf(cur.id) : list.length, s = data(p), R = run(p), n = 0, M = mainCount();
-    var pre = path(p) + ':', played = Object.keys(s.stops).some(function (k) { return k.indexOf(pre) === 0 && (s.stops[k].plays > 0 || (s.stops[k].passed && !s.stops[k].placed)); });
-    if (played || R.done) return 0;   // only a journey that hasn't started yet is moved to the player's level (saved progress is never changed)
-    for (var i = 0; i < M; i++) {
-      var st = STOPS[i], key = path(p) + ':' + i, info = s.stops[key], ix = list.indexOf(st.area.skill), sst = p.skills && p.skills[st.area.skill];
-      var ahead = ix >= 0 && (ix < curIx || (sst && sst.status === 'mastered'));
-      if (!ahead || st.ai >= PLACE_MAX_AREAS) break;   // design1: skip at most PLACE_MAX_AREAS areas (the rest play at the player's level, config)
-      if (info && info.passed) continue;
-      if (R.stop > i) continue;
-      s.stops[key] = Object.assign(info || { best: 0, stars: 0, fails: 0, plays: 0 }, { passed: true, placed: true });
-      if (R.stop === i) R.stop = i + 1; n++;
-    }
-    return n;
-  }
+  // v2p1a (2026-10-25): every journey starts at stop 1 (nothing is pre-passed). Placement moved into config(): each stop
+  // plays at the kid's own level (fitStop). Kept as a no-op so old callers (munch.js) still work.
+  function placeAtLevel(p) { data(p); return 0; }
   // family board: each player's best journey (all profiles on this device)
   function board(profiles) {
     return profiles.map(function (p) { var s = data(p); return { p: p, score: s.bestRun || 0, stops: s.bestRunStops || 0, path: s.bestRunPath || path(p), finished: s.finished || 0 }; })
       .sort(function (a, b) { return b.score - a.score || b.stops - a.stops || a.p.name.localeCompare(b.p.name); });
   }
-  A.Story = { placeAtLevel: placeAtLevel, PLACE_MAX_AREAS: PLACE_MAX_AREAS, skillFor: skillFor, WORLD: WORLD, FESTIVAL: FESTIVAL, addArea: addArea, mainCount: mainCount, isSide: isSide, playable: playable, AREAS: AREAS, STOPS: STOPS, PATHS: PATHS, PROLOGUE: PROLOGUE, FINALE: FINALE, data: data, path: path, defaultPath: defaultPath, setPath: setPath,
+  A.Story = { placeAtLevel: placeAtLevel, fitStop: fitStop, PLACE_MAX_AREAS: PLACE_MAX_AREAS, skillFor: skillFor, WORLD: WORLD, FESTIVAL: FESTIVAL, addArea: addArea, mainCount: mainCount, isSide: isSide, playable: playable, AREAS: AREAS, STOPS: STOPS, PATHS: PATHS, PROLOGUE: PROLOGUE, FINALE: FINALE, data: data, path: path, defaultPath: defaultPath, setPath: setPath,
     CH: CH, chFor: chFor, chConfig: chConfig, chOpen: chOpen, chHint: chHint, chRecord: chRecord, unlockAll: unlockAll,
-    GAMES: GAMES, SLUG_P: SLUG_P, gameMix: gameMix, gameOf: gameOf, sluggerConfig: sluggerConfig, seed01: seed01,
+    GAMES: GAMES, SLUG_P: SLUG_P, STAND_P: STAND_P, BUBBLE_P: BUBBLE_P, gameMix: gameMix, gameOf: gameOf, sluggerConfig: sluggerConfig, seed01: seed01,
     stopInfo: stopInfo, unlockedTo: unlockedTo, run: run, newRun: newRun, config: config, scoreFor: scoreFor, record: record, board: board };
 })(window.Arcade);

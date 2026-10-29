@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" data-page-title="color">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: data:; font-src 'self'; connect-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Coloring · Picnic Pals</title>
+<link rel="icon" type="image/png" href="../../assets/picnic/logo/picnic_pals_app_icon_192.png">
+<link rel="stylesheet" href="../../css/core.css">
+<link rel="stylesheet" href="color.css">
+</head>
+<body>
+<section class="screen on" id="color">
+  <div class="tbar">
+    <button class="homebtn" id="homeBtn" aria-label="Home (press and hold)" title="Press and hold to go home">🏠<span class="holdtip" aria-hidden="true">Hold to go home</span></button>
+    <div class="ctitle" id="cTitle">Coloring</div>
+    <button class="cbtn" id="galBtn" aria-label="My gallery">🖼️ <span>Gallery</span></button>
+  </div>
+  <div class="cview on" id="vPick"><div class="cpages" id="pages"></div></div>
+  <div class="cview" id="vDraw"><div class="cdraw" id="draw"></div><div class="cside"><button class="cbtn big" id="saveBtn">💾 <span>Save</span></button><button class="cbtn" id="backBtn">📄 <span>Pages</span></button></div></div>
+  <div class="cview" id="vGal"><button class="garr" id="gPrev" aria-label="Back">◀</button><div class="gframe" id="gFrame"></div><button class="garr" id="gNext" aria-label="Next">▶</button>
+    <div class="gbar"><span id="gNum"></span><button class="cbtn" id="gEdit">🖍️ <span>Color more</span></button><button class="cbtn" id="gPages">📄 <span>Pages</span></button></div></div>
+</section>
+<script src="../../audio/voice/manifest.js"></script>
+<script src="../../audio/voice-tts/manifest.js"></script>
+<script src="../../js/core/util.js"></script>
+<script src="../../js/core/foods-data.js"></script>
+<script src="../../js/core/wear-data.js"></script>
+<script src="../../js/core/storage.js"></script>
+<script src="../../js/core/sightwords.js"></script>
+<script src="../../js/core/bonus-questions.js"></script>
+<script src="../../js/core/story.js"></script>
+<script src="../../js/core/early-words.js"></script>
+<script src="../../js/core/grade1-words.js"></script>
+<script src="../../js/core/room-catalog.js"></script>
+<script src="../../js/core/friends.js"></script>
+<script src="../../js/core/tiny-data.js"></script>
+<script src="../../js/core/stand-core.js"></script>
+<script src="../../js/core/bubble-core.js"></script>
+  <script src="../../js/core/story2.js"></script>
+<script src="../../js/core/breaks-data.js"></script>
+<script src="../../js/core/color-pages.js"></script>
+<script src="../../js/core/voice-lines.js"></script>
+<script src="../../js/core/curriculum-math.js"></script>
+<script src="../../js/core/coach.js"></script>
+<script src="../../js/core/questions.js"></script>
+<script src="../../js/core/skills-early.js"></script>
+<script src="../../js/core/skills-grade1.js"></script>
+<script src="../../js/core/steps-math.js"></script>
+<script src="../../js/core/topics-data.js"></script>
+<script src="../../js/core/topics.js"></script>
+<script src="../../js/core/blobs.js"></script>
+<script src="../../js/core/audio.js"></script>
+<script src="../../js/core/music.js"></script>
+<script src="../../js/core/zip.js"></script>
+<script src="../../js/core/rewards.js"></script>
+<script src="../../js/core/pace.js"></script>
+<script src="../../js/core/ui.js"></script>
+<script src="../../js/core/playtime.js"></script>
+<script src="../../js/core/gamepad.js"></script>
+<script src="../../js/core/parent.js"></script>
+<script src="../../js/core/coloring.js"></script>
+<script src="../../js/core/breaks.js"></script>
+<script src="color.js"></script>
+</body>
+</html>

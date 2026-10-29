@@ -9,6 +9,12 @@
   var P = A.Store.active();
   if (!P) { location.href = '../../index.html'; return; }
   var S = A.Store.settings;
+  // v2p1b: new short read-aloud lines (no recorded/TTS clip yet, so V.say speaks them with the device voice)
+  var NEWL = { rm_demo: 'Tap a thing to pick it. Then drag it where you want!', rm_drag: 'Drag it where you want!',
+    rm_jar_set: 'Saving up for it! Your jar fills up as you play.', rm_jar_ready: 'Your jar is full! You can buy it now!',
+    rm_jar_empty: 'Pick something in the shop to save up for!', rm_no_room: 'Your picnic spot is full! Put something away first.',
+    rm_buy_it: 'Do you want to buy it?', rm_new_shop: 'Something new is in the shop! Come and see!', rm_things: 'Here are your things! Tap one to put it out.' };
+  if (A.VoiceLines && A.VoiceLines.byId) Object.keys(NEWL).forEach(function (id) { if (!A.VoiceLines.byId[id]) A.VoiceLines.byId[id] = { id: id, text: NEWL[id], section: 'room' }; });
   // grown-ups can grant star bits or reset the room in the parent area: pick up their changes when it closes
   var bitsAtOpen = P.wallet.bits;
   UI.gear({ onClose: function () { musicBtn(); M.apply(); var q = A.Store.get(P.id); if (!q || q.room !== RM || q.wallet.bits !== bitsAtOpen) location.reload(); } });
@@ -55,13 +61,30 @@
   /* ================= the room's data ================= */
   function starter() {
     return { v: 1, wall: 'wp_cream', floor: 'fl_wood', n: 5, visits: 0, gifts: {}, prizes: {},
-      items: [{ u: 1, id: 'bed_simple', c: 0, r: 1, f: 0 }, { u: 2, id: 'rug_round', c: 3, r: 2, f: 0 }, { u: 3, id: 'plant_flower', c: 6, r: 0, f: 0 }, { u: 4, id: 'poster_mochi', s: 1, f: 0 }] };
+      items: [{ u: 1, id: 'bed_simple', c: 0, r: 1, f: 0 }, { u: 2, id: 'rug_round', c: 3, r: 2, f: 0 }, { u: 3, id: 'plant_flower', c: 6, r: 0, f: 0 }, { u: 4, id: 'frame_sun', s: 1, f: 0 }] };
   }
   function own(id, n) { var it = P.inventory[id] || (P.inventory[id] = { n: 0, at: Date.now() }); it.n += n || 1; return it; }
   var firstVisit = !P.room;
-  if (!P.room) { P.room = starter(); ['bed_simple', 'rug_round', 'plant_flower', 'poster_mochi', 'wp_cream', 'fl_wood'].forEach(function (id) { if (!P.inventory[id]) own(id); }); }
+  if (!P.room) { P.room = starter(); ['bed_simple', 'rug_round', 'plant_flower', 'frame_sun', 'wp_cream', 'fl_wood'].forEach(function (id) { if (!P.inventory[id]) own(id); }); }
   var RM = P.room; RM.gifts = RM.gifts || {}; RM.prizes = RM.prizes || {}; RM.items = RM.items || [];
   ['wp_cream', 'fl_wood'].forEach(function (id) { if (!P.inventory[id]) own(id); });
+  // never show or hint at a friend a kid hasn't met: friend-themed things (the Dora Dumpling poster) only exist for kids who have
+  // that friend. Old rooms keep them in RM.stash (still owned) and they come back by themselves once the friend is met.
+  var FRIEND_ITEM = { poster_mochi: 'mochi' };
+  function friendOk(id) { var b = FRIEND_ITEM[id]; return !b || F.of(P).indexOf(b) >= 0; }
+  // v2p1c: badge-gated showpieces and special prizes are invisible until earned (no lock tiles, no "do X to open it up")
+  function shown(it) { return !!it && !((it.need || it.badge) && !CAT.earned(P, it)); }
+  function inShop(it) { return it.cat !== 'paper' && !it.starter && friendOk(it.id) && shown(it); }
+  RM.stash = (RM.stash || []).filter(function (x) { if (!friendOk(x.id)) return true; var it = CAT.byId[x.id]; if (it && (it.kind === 'wall' ? !atSlot(x.s) : !at(x.c, x.r, it.kind === 'rug'))) RM.items.push(x); return false; });
+  var bareSlots = [];
+  RM.items = RM.items.filter(function (x) {
+    if (friendOk(x.id)) return true; RM.stash.push(x);
+    if (CAT.byId[x.id].kind === 'wall') bareSlots.push(x.s);
+    return false;
+  });
+  // the wall isn't left bare: a strawberry picture (a spare one, or a new one) hangs where the hidden poster was.
+  // (v2p1c: was pushed inside the filter above, so it was dropped by the filter's result and the wall stayed bare)
+  bareSlots.forEach(function (s) { if (atSlot(s)) return; if (avail('frame_sun') <= 0) own('frame_sun'); RM.items.push({ u: ++RM.n, id: 'frame_sun', s: s, f: 0 }); });
   function placedCount(id) { return RM.items.filter(function (x) { return x.id === id; }).length; }
   function avail(id) { return ((P.inventory[id] || {}).n || 0) - placedCount(id); }
   function at(c, r, rug) { return RM.items.filter(function (x) { var it = CAT.byId[x.id]; return x.c === c && x.r === r && (rug ? it.kind === 'rug' : it.kind === 'floor'); })[0] || null; }
@@ -155,7 +178,7 @@
 
   /* ================= things in the room ================= */
   function thingHTML(x, ghost) {
-    var it = CAT.byId[x.id], kind = it.kind, pos, sc, w, z, cls = 'thing k-' + kind + (ghost ? ' ghost' : '') + (x.f ? ' flip' : '');
+    var it = CAT.byId[x.id], kind = it.kind, pos, sc, w, z, cls = 'thing k-' + kind + (ghost ? ' ghost' : '') + (x.f ? ' flip' : '') + (!ghost && x === SEL ? ' sel' : '');
     if (kind === 'wall') { pos = slotXY(x.s); sc = 1; w = it.w * 1.35; z = 5; }
     else { pos = cellXY(x.c, x.r); sc = scaleAt(pos.y); w = it.w * sc * (kind === 'rug' ? 1.25 : 1.45); z = kind === 'rug' ? 2 : Math.round(pos.y) + 8; if (kind === 'floor') pos.y += 14 * sc; }
     return '<div class="' + cls + '" data-u="' + (x.u || '') + '" data-id="' + x.id + '" style="' + pct(pos.x, pos.y) + 'width:' + (w / VW * 100).toFixed(3) + '%;z-index:' + (ghost ? 700 : z) + '">' + ART.svg(x.id) + '</div>';
@@ -164,7 +187,7 @@
     var h = RM.items.map(function (x) { return thingHTML(x); }).join('');
     if (D.on && D.hold) { var g = D.hold, gx = { id: g.id, f: g.f }; if (CAT.byId[g.id].kind === 'wall') { if (D.cur.k === 'wall') { gx.s = D.cur.s; h += thingHTML(gx, true); } } else if (D.cur.k === 'floor') { gx.c = D.cur.c; gx.r = D.cur.r; h += thingHTML(gx, true); } }
     $('#things').innerHTML = h;
-    renderGlows();
+    renderGlows(); placeSelBar();
   }
   function renderGlows() {
     var g = '';
@@ -188,7 +211,7 @@
       var cell = cells[i % Math.max(1, cells.length)] || { c: i % COLS, r: 2 }, p0 = cellXY(cell.c, cell.r);
       var el = A.el('<div class="friend" data-nav role="button" tabindex="0" data-b="' + b + '" aria-label="' + B.byId[b].name + '">' + (b === P.blob ? '<span class="myspot" style="' + B.backdrop(P.color) + '"></span>' : '') + '<div class="fb">' + friendSvg(b, 'idle') + '</div><span class="bub"></span><span class="zz">z<b>z</b><i>z</i></span></div>');
       var f = { b: b, el: el, x: p0.x + (Math.random() * 30 - 15), y: p0.y, tx: 0, ty: 0, st: 'idle', until: Date.now() + 600 + Math.random() * 2400, dir: 1, seat: null, expr: 'idle', bio: F.BIO[b] || { speed: 1, napP: .1, likes: [] } };
-      el.addEventListener('click', function (e) { e.stopPropagation(); if (D.on) return; tapFriend(f, e); });
+      el.addEventListener('click', function (e) { e.stopPropagation(); if (D.on || Date.now() < gestureUntil) return; tapFriend(f, e); });
       el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); if (!e.repeat) tapFriend(f, null); } });
       $('#friendsL').appendChild(el); FR.push(f); placeFriend(f);
     });
@@ -318,50 +341,68 @@
   var shopCat = 'cozy';
   function openShop(cat) {
     shopCat = cat || shopCat;
-    var tabs = CAT.CATS.filter(function (c) { return c.id !== 'paper'; }).map(function (c) { return '<button class="ptab' + (c.id === shopCat ? ' on' : '') + '" data-nav data-cat="' + c.id + '">' + c.icon + ' ' + c.name + '</button>'; }).join('');
-    var items = CAT.ITEMS.filter(function (it) { return it.cat === shopCat && !it.starter; });
+    var cats = CAT.CATS.filter(function (c) { return c.id !== 'paper' && CAT.ITEMS.some(function (it) { return it.cat === c.id && inShop(it); }); });
+    if (!cats.some(function (c) { return c.id === shopCat; })) shopCat = cats.length ? cats[0].id : shopCat;
+    var tabs = cats.map(function (c) { return '<button class="ptab' + (c.id === shopCat ? ' on' : '') + '" data-nav data-cat="' + c.id + '">' + c.icon + ' ' + c.name + '</button>'; }).join('');
+    var items = CAT.ITEMS.filter(function (it) { return it.cat === shopCat && inShop(it); }), NEW = RM.shopNew || {};
     var grid = items.map(function (it) {
-      var n = (P.inventory[it.id] || {}).n || 0, locked = (it.need || it.badge) && !CAT.earned(P, it), afford = P.wallet.bits >= it.price;
-      var tag = it.badge ? (locked ? '<span class="pr lock">🔒 ✦ ' + it.price + '</span>' : '<span class="pr' + (afford ? '' : ' no') + '">🏅 ✦ ' + it.price + '</span>') :
-        it.need ? (locked ? '<span class="pr lock">🔒 Prize</span>' : '<span class="pr won">✓ Won!</span>') : '<span class="pr' + (afford ? '' : ' no') + '">✦ ' + it.price + '</span>';
-      return '<button class="sitem' + (locked ? ' locked' : '') + (it.tier ? ' t-' + it.tier : '') + (n ? ' owned' : '') + '" data-nav data-id="' + it.id + '" aria-label="' + A.esc(it.name) + (it.badge ? (locked ? ', ' + it.price + ' star bits after you ' + A.esc(it.hint.toLowerCase()) : ', ' + it.price + ' star bits') : it.need ? (locked ? ', special prize: ' + A.esc(it.hint) : ', won') : ', ' + it.price + ' star bits') + (n ? ', you have ' + n : '') + '">' +
-        '<span class="sa">' + ART.svg(it.id, 'thumb') + '</span><span class="sn">' + A.esc(it.name) + '</span>' + tag + (n ? '<span class="have">×' + n + '</span>' : '') + '</button>';
+      var n = (P.inventory[it.id] || {}).n || 0, afford = P.wallet.bits >= it.price, isNew = !!NEW[it.id];
+      var tag = it.need && !it.badge ? '<span class="pr won">✓ Won!</span>' : '<span class="pr' + (afford ? '' : ' no') + '">' + (it.badge ? '🏅 ' : '') + '✦ ' + it.price + '</span>';
+      return '<button class="sitem' + (!(it.need && !it.badge) && afford ? ' can' : '') + (it.tier ? ' t-' + it.tier : '') + (n ? ' owned' : '') + (isNew ? ' isnew' : '') + '" data-nav data-id="' + it.id + '" aria-label="' + (isNew ? 'New! ' : '') + A.esc(it.name) + (it.need && !it.badge ? ', won' : ', ' + it.price + ' star bits') + (n ? ', you have ' + n : '') + '">' +
+        '<span class="sa">' + ART.svg(it.id, 'thumb') + '</span><span class="sn">' + A.esc(it.name) + '</span>' + tag + (n ? '<span class="have">×' + n + '</span>' : '') + (RM.goal === it.id ? '<span class="goalb">🫙</span>' : '') + (isNew ? '<span class="newtag">✨ New</span>' : '') + '</button>';
     }).join('');
     var pn = openPanel('shop', '<div class="phead"><h2>🛍️ Shop</h2><div class="bits small"><span class="bi">✦</span><b>' + P.wallet.bits + '</b><small>star bits</small></div><button class="iconbtn px" data-x aria-label="Close shop (Esc)">✕</button></div>' +
-      '<div class="ptabs">' + tabs + '</div><div class="sgrid scroll">' + grid + '</div><p class="phint">Earn ✦ star bits by playing games: 1 for every star!</p>');
+      '<div class="ptabs">' + tabs + '</div><div class="sgrid scroll">' + grid + '</div><p class="phint">Tap a thing to buy it · Play games to earn more ✦ (1 for every star!)</p>');
     A.$$('.ptab', pn).forEach(function (b) { b.addEventListener('click', function () { A.Audio.sfx('tap'); openShop(b.dataset.cat); focusFirst('.ptab.on'); }); });
     A.$$('.sitem', pn).forEach(function (b) { b.addEventListener('click', function () { shopItem(CAT.byId[b.dataset.id]); }); });
+    // a "New" tag shows until the kid has seen that tile once
+    var seen = items.filter(function (it) { return NEW[it.id]; }); if (seen.length) { seen.forEach(function (it) { delete NEW[it.id]; }); save(); shopBadge(); }
+  }
+  function shopBadge() { var nw = RM.shopNew || {}, any = Object.keys(nw).some(function (id) { return inShop(CAT.byId[id] || {}); }); $('#shopBtn').classList.toggle('hasnew', any); }
+  // v2p1c: when a kid earns a badge showpiece it appears in the shop with a happy surprise (once), tagged New until seen.
+  // Players who already had some earned get them silently on the first run (they could already see them).
+  function newInShop() {
+    var badgeItems = CAT.ITEMS.filter(function (it) { return it.badge && inShop(it); }), first = !RM.shopKnown;
+    RM.shopKnown = RM.shopKnown || {}; RM.shopNew = RM.shopNew || {};
+    var fresh = badgeItems.filter(function (it) { return !RM.shopKnown[it.id]; });
+    fresh.forEach(function (it) { RM.shopKnown[it.id] = Date.now(); if (!first) RM.shopNew[it.id] = 1; });
+    if (fresh.length) save();
+    return first ? [] : fresh;
   }
   function shopItem(it) {
     var n = (P.inventory[it.id] || {}).n || 0, art = '<div class="bigthumb">' + ART.svg(it.id, 'thumb') + '</div>';
+    A.Audio.sfx('pop'); var tile = panel && panel.querySelector('.sitem[data-id="' + it.id + '"]'); if (tile) B.anim(tile, 'jump', 400);
     V.say(['it_' + it.id], { kind: 'name' });
-    if (it.badge && !CAT.earned(P, it)) { A.Audio.sfx('locked'); return UI.card({ tag: '🏅 Badge item · ✦ ' + it.price, title: it.name, art: art, sub: '🔒 ' + it.hint + ' to open it up, then it costs ✦ ' + it.price + '.', btn: 'OK', voice: ['it_' + it.id, 'rm_locked_item'], cls: 'shopcard' }).then(function () { focusItem(it.id); }); }
-    if (it.need && !it.badge && !CAT.earned(P, it)) { A.Audio.sfx('locked'); return UI.card({ tag: 'Special prize', title: it.name, art: art, sub: '🔒 ' + it.hint + ' to win it!', btn: 'OK', voice: ['it_' + it.id, 'rm_locked_item'], cls: 'shopcard' }).then(function () { focusItem(it.id); }); }
+    if (!shown(it)) return Promise.resolve(false);   // never reached from the shop (not-yet-earned things aren't listed)
     if (it.need && !it.badge) return UI.card({ tag: 'Special prize', title: it.name, art: art, sub: 'You won this! It\'s in your things.', btn: 'OK', voice: ['it_' + it.id, 'rm_owned'], cls: 'shopcard' }).then(function () { focusItem(it.id); });
     var short = it.price - P.wallet.bits;
-    if (short > 0) {
-      A.Audio.sfx('locked');
-      return UI.card({ tag: '✦ ' + it.price + ' star bits', title: it.name, art: art, sub: 'You have ' + P.wallet.bits + '. You need ' + short + ' more star bit' + (short === 1 ? '' : 's') + ' — play a game to earn some!', btn: 'OK', voice: ['it_' + it.id, 'rm_it_costs', it.price, 'rm_bits_you_have', P.wallet.bits, 'rm_need_more'], cls: 'shopcard' }).then(function () { focusItem(it.id); });
+    if (short > 0) {   // not yet: a friendly "save up" choice (the savings jar), never a plain "no"
+      var isGoal = RM.goal === it.id;
+      return UI.confirm({ title: it.name, art: art + jarMini(it), sub: 'You have ✦ ' + P.wallet.bits + '. ' + short + ' more to go!', yes: isGoal ? 'OK' : '🫙 Save up for it', no: isGoal ? 'Close' : 'Not now', cls: 'shopcard save',
+        voice: ['it_' + it.id, 'rm_it_costs', it.price, 'rm_bits_you_have', P.wallet.bits] }).then(function (yes) {
+        if (yes && !isGoal) setGoal(it.id);
+        focusItem(it.id);
+      });
     }
-    return UI.confirm({ title: it.name, art: art, sub: (n ? 'You have ' + n + '. ' : '') + 'It costs ✦ ' + it.price + ' star bits. You have ' + P.wallet.bits + '.', yes: 'Buy for ✦ ' + it.price, no: 'Not now', cls: 'shopcard', voice: ['it_' + it.id, 'rm_it_costs', it.price, 'rm_bits_you_have', P.wallet.bits] }).then(function (yes) {
+    return UI.confirm({ title: it.name, art: art, sub: (n ? 'You have ' + n + '. ' : '') + 'It costs ✦ ' + it.price + '. You have ✦ ' + P.wallet.bits + '.', yes: 'Buy it! ✦ ' + it.price, no: 'Not now', cls: 'shopcard', voice: ['it_' + it.id, 'rm_it_costs', it.price, 'rm_bits_you_have', P.wallet.bits] }).then(function (yes) {
       if (!yes) return focusItem(it.id);
       return buy(it);
     });
   }
   function focusItem(id) { setTimeout(function () { var b = panel && panel.querySelector('.sitem[data-id="' + id + '"]'); if (b) b.focus({ preventScroll: true }); }, 40); }
+  // buying: one tap on "Buy it!" -> the shop closes and the thing pops straight into the picnic spot, picked, ready to drag
   function buy(it) {
     if (!A.Store.spendBits(P, it.price, it.id)) return Promise.resolve(false);
     $('#bitCount').textContent = P.wallet.bits; B.anim($('#bits'), 'jump', 600);
-    A.Audio.sfx('unlock'); UI.rain(28); save();
+    if (RM.goal === it.id) RM.goal = null;
+    A.Audio.sfx('unlock'); UI.rain(28); save(); renderJar();
     var paper = it.kind === 'paper' || it.kind === 'tiles';
-    if (paper) { if (it.kind === 'paper') RM.wall = it.id; else RM.floor = it.id; save(); drawRoom(); }
-    return UI.confirm({ title: "It's yours! 🎉", art: '<div class="bigthumb dance">' + ART.svg(it.id, 'thumb') + '</div>', sub: paper ? 'Your room has ' + (it.kind === 'paper' ? 'new wallpaper' : 'a new floor') + '!' : it.name + ' is in your things.', yes: paper ? 'Yay!' : 'Place it now ▶', no: 'Keep shopping', cls: 'shopcard bought' })
-      .then(function (place) {
-        V.say(paper ? [it.kind === 'paper' ? 'rm_new_wall' : 'rm_new_floor'] : ['rm_bought']);
-        if (place && !paper) { closePanel(true); startDecor(it.id); }
-        else { openShop(it.cat); focusItem(it.id); }
-        return true;
-      });
+    if (paper) { if (it.kind === 'paper') RM.wall = it.id; else RM.floor = it.id; save(); drawRoom(); V.say([it.kind === 'paper' ? 'rm_new_wall' : 'rm_new_floor']); return Promise.resolve(true); }
+    closePanel(true);
+    var x = popIn(it.id, true);
+    UI.toast('🎉 ' + it.name + ' is yours!');
+    V.say(x ? ['rm_bought', 'rm_drag'] : ['rm_bought']);
+    return Promise.resolve(true);
   }
 
   /* ---------- TROPHY SHELF (trophies · stickers · friends) ---------- */
@@ -399,32 +440,34 @@
   }
 
   /* ================= DECORATE ================= */
-  var D = { on: false, hold: null, cur: { k: 'floor', c: 3, r: 2 }, undo: [] };
+  var D = { on: false, hold: null, cur: { k: 'floor', c: 3, r: 2 }, undo: [] }, gestureUntil = 0;
   function snap() { return JSON.stringify({ items: RM.items, wall: RM.wall, floor: RM.floor, n: RM.n }); }
   function pushUndo() { D.undo.push(snap()); if (D.undo.length > 40) D.undo.shift(); }
   function startDecor(holdId) {
     D.on = true; D.hold = null; D.undo = []; document.body.classList.add('decor');
     FR.forEach(function (f) { f.el.classList.remove('walk'); });
-    renderTray(); V.say([holdId ? 'rm_pick_spot' : 'rm_decorate']);
+    renderTray(); V.say([holdId ? 'rm_pick_spot' : 'rm_things']);
     if (holdId) pickFromTray(holdId); else { renderThings(); drawCursor(); }
     setTimeout(function () { var t = A.$('#tray .chip'); if (!holdId && t) t.focus({ preventScroll: true }); else $('#roomBox').focus({ preventScroll: true }); }, 40);
     padKeys();
   }
   function endDecor() {
-    if (D.hold) cancelHold();
+    if (D.hold) cancelHold(); deselect();
     D.on = false; document.body.classList.remove('decor'); renderThings(); save(); padKeys();
     setTimeout(function () { $('#decoBtn').focus({ preventScroll: true }); }, 30); V.say(['rm_placed']);
   }
   function renderTray() {
     if (!D.on) return;
     var ids = Object.keys(P.inventory).filter(function (id) { return CAT.byId[id]; });
-    var things = ids.filter(function (id) { var k = CAT.byId[id].kind; return (k === 'floor' || k === 'rug' || k === 'wall') && avail(id) > 0; });
+    var things = ids.filter(function (id) { var k = CAT.byId[id].kind; return (k === 'floor' || k === 'rug' || k === 'wall') && avail(id) > 0 && friendOk(id); });
     var styles = []; // wallpapers/floors don't apply to the painted picnic scene (still kept in saves)
     var h = things.map(function (id) { return '<button class="chip' + (D.hold && D.hold.id === id && !D.hold.from ? ' on' : '') + '" data-nav data-id="' + id + '" role="option" aria-label="' + A.esc(CAT.byId[id].name) + ', ' + avail(id) + ' to place">' + ART.svg(id, 'thumb') + '<span class="cn">' + A.esc(CAT.byId[id].name) + '</span>' + (avail(id) > 1 ? '<b class="cx">×' + avail(id) + '</b>' : '') + '</button>'; }).join('');
-    if (!things.length) h += '<span class="empty">All your things are in the room! Visit the 🛍️ Shop for more.</span>';
+    if (!things.length) h += '<span class="empty">All your things are out! 🛍️ Shop for more.</span>';
     h += styles.map(function (id) { var it = CAT.byId[id], cur = RM.wall === id || RM.floor === id; return '<button class="chip style' + (cur ? ' cur' : '') + '" data-nav data-id="' + id + '" aria-label="' + A.esc(it.name) + (cur ? ', in use' : '') + '">' + ART.swatch(id) + '<span class="cn">' + A.esc(it.name) + '</span></button>'; }).join('');
     $('#tray').innerHTML = h;
-    A.$$('#tray .chip').forEach(function (b) { b.addEventListener('click', function () { var it = CAT.byId[b.dataset.id]; if (it.kind === 'paper' || it.kind === 'tiles') applyStyle(it); else { pickFromTray(it.id); $('#roomBox').focus({ preventScroll: true }); } }); });
+    A.$$('#tray .chip').forEach(function (b) { b.addEventListener('click', function (e) { var it = CAT.byId[b.dataset.id]; if (it.kind === 'paper' || it.kind === 'tiles') applyStyle(it);
+      else if (e.detail === 0) { pickFromTray(it.id); $('#roomBox').focus({ preventScroll: true }); }
+      else { B.anim(b, 'jump', 300); popIn(it.id); } }); });
   }
   function applyStyle(it) {
     var key = it.kind === 'paper' ? 'wall' : 'floor'; if (RM[key] === it.id) return;
@@ -475,11 +518,13 @@
     A.Audio.sfx('tap'); return false;
   }
   function flip() {
+    if (SEL && !D.hold) return flipThing(SEL);
     if (!D.on) return; var t = D.hold || curTarget(); if (!t) return;
     if (!D.hold) pushUndo();
     t.f = t.f ? 0 : 1; A.Audio.sfx('boing'); renderThings(); if (!D.hold) save(); V.say(['rm_flip']);
   }
   function putAway() {
+    if (SEL && !D.hold) return putAwayThing(SEL);
     if (!D.on) return;
     if (D.hold) { var h = D.hold; D.hold = null; if (!h.from) { renderTray(); renderThings(); drawCursor(); return; } save(); }
     else { var t = curTarget(); if (!t) return; pushUndo(); RM.items = RM.items.filter(function (y) { return y !== t; }); save(); }
@@ -513,12 +558,15 @@
   }
   function roomPoint(e) { var b = $('#roomBox').getBoundingClientRect(); return { x: (e.clientX - b.left) / b.width * VW, y: (e.clientY - b.top) / b.height * VH }; }
   $('#roomBox').addEventListener('pointermove', function (e) {
-    if (!D.on || e.pointerType === 'touch') return; var h = hit.apply(null, (function (p) { return [p.x, p.y]; })(roomPoint(e))); if (!h) return;
+    if (!D.on || G || e.pointerType === 'touch' || e.pointerType === 'pen') return; var h = hit.apply(null, (function (p) { return [p.x, p.y]; })(roomPoint(e))); if (!h) return;
     if (D.hold && (CAT.byId[D.hold.id].kind === 'wall') !== (h.k === 'wall')) return;
     if (h.k === D.cur.k && (h.k === 'wall' ? h.s === D.cur.s : h.c === D.cur.c && h.r === D.cur.r)) return;
     D.cur = h; renderThings(); drawCursor();
   });
   $('#roomBox').addEventListener('click', function (e) {
+    if (Date.now() < gestureUntil) return;
+    if (e.target.closest && e.target.closest('#selBar')) return;
+    if (SEL && !D.hold && e.detail !== 0) { var q = roomPoint(e); moveSelTo(q.x, q.y); return; }
     if (!D.on) return;
     if (e.detail === 0 || e.clientX == null || (e.clientX === 0 && e.clientY === 0)) { act(); return; }   // controller A / keyboard click on the focused room
     var p = roomPoint(e), h = hit(p.x, p.y); if (!h) return;
@@ -528,6 +576,167 @@
     D.cur = h; act();
   });
   $('#flipBtn').addEventListener('click', flip); $('#awayBtn').addEventListener('click', putAway); $('#undoBtn').addEventListener('click', undo); $('#doneBtn').addEventListener('click', endDecor);
+
+  /* ================= v2p1b: touch-first, no hidden modes ================= */
+  // Any time: press a thing and drag it with a finger (it snaps to the nearest free spot; a 🗑️ corner shows up for putting it away),
+  // or tap it to pick it (big ↔ Flip and 🗑️ Put away buttons pop up beside it) and then tap a spot to move it there.
+  // Pointer events + touch-action:none on the room, so it works the same for fingers, a pen and a mouse.
+  var SEL = null, G = null;
+  function itemByU(u) { return RM.items.filter(function (y) { return String(y.u) === String(u); })[0] || null; }
+  function thingEl(x) { return x ? A.$('#things .thing[data-u="' + x.u + '"]') : null; }
+  function anchorOf(x) { return CAT.byId[x.id].kind === 'wall' ? slotXY(x.s) : cellXY(x.c, x.r); }
+  function freeFor(x, c, r) { var o = at(c, r, CAT.byId[x.id].kind === 'rug'); return !o || o === x; }
+  function freeSlot(x, s) { var o = atSlot(s); return !o || o === x; }
+  function snapFor(x, px, py) {   // nearest free spot for thing x (floor things: floor squares; wall things: wall spots)
+    var k = CAT.byId[x.id].kind, best = null, bd = 1e9, d, i;
+    if (k === 'wall') { for (i = 0; i < SLOTS; i++) { if (!freeSlot(x, i)) continue; d = Math.hypot(px - SLOT_X[i], (py - SLOT_Y[i]) * 1.3); if (d < bd) { bd = d; best = { k: 'wall', s: i }; } } return best; }
+    for (var r = 0; r < ROWS; r++) for (var c = 0; c < COLS; c++) { if (!freeFor(x, c, r)) continue; var q = cellXY(c, r); d = Math.hypot(px - q.x, (py - q.y) * 1.6); if (d < bd) { bd = d; best = { k: 'floor', c: c, r: r }; } }
+    return best;
+  }
+  function setPos(x, t) { if (t.k === 'wall') { x.s = t.s; delete x.c; delete x.r; } else { x.c = t.c; x.r = t.r; delete x.s; } }
+  function showSnap(t) {
+    var c = $('#cur'); if (!c) return;
+    if (!t) { if (D.on) drawCursor(); else c.setAttribute('points', '0,0'); return; }
+    var q = t.k === 'wall' ? (function () { var r = slotRect(t.s); return [[r.x, r.y], [r.x + r.w, r.y], [r.x + r.w, r.y + r.h], [r.x, r.y + r.h]]; })() : cellPoly(t.c, t.r);
+    c.setAttribute('points', pts(q)); c.setAttribute('class', 'ok');
+  }
+  function select(x, quiet) {
+    SEL = x || null; A.$$('#things .thing.sel').forEach(function (e) { e.classList.remove('sel'); });
+    var el = thingEl(SEL); if (el) el.classList.add('sel');
+    document.body.classList.toggle('picking', !!SEL);   // while a thing is picked, friends let taps through to the spot under them
+    placeSelBar();
+    if (SEL && !quiet) { A.Audio.sfx('pop'); if (el) B.anim(el, 'placed', 450); }
+  }
+  function deselect() { if (SEL) select(null, true); }
+  function placeSelBar() {
+    var bar = $('#selBar'); if (SEL && RM.items.indexOf(SEL) < 0) SEL = null;
+    var el = thingEl(SEL); if (!SEL || !el) { bar.classList.remove('on'); document.body.classList.remove('picking'); return; }
+    var box = $('#roomBox').getBoundingClientRect(), r = el.getBoundingClientRect();
+    var cx = (r.left + r.width / 2 - box.left) / box.width * 100, top = (r.top - box.top) / box.height * 100;
+    bar.style.left = Math.max(12, Math.min(88, cx)).toFixed(2) + '%'; bar.style.top = Math.max(17, top).toFixed(2) + '%';
+    bar.classList.add('on');
+  }
+  function flipThing(x) { pushUndo(); x.f = x.f ? 0 : 1; save(); A.Audio.sfx('boing'); renderThings(); var el = thingEl(x); if (el) B.anim(el, 'placed', 450); V.say(['rm_flip']); }
+  function putAwayThing(x) {
+    pushUndo(); RM.items = RM.items.filter(function (y) { return y !== x; }); if (SEL === x) SEL = null;
+    save(); A.Audio.sfx('soft'); renderThings(); renderTray(); B.anim($('#decoBtn'), 'jump', 500); UI.toast('🧺 ' + CAT.byId[x.id].name + ' is back in your things'); V.say(['rm_put_away']);
+  }
+  function moveSelTo(px, py) {   // "tap a thing, then tap a spot"
+    var x = SEL; if (!x) return; var h = hit(px, py);
+    if (!h) { deselect(); A.Audio.sfx('tap'); return; }
+    var t = snapFor(x, px, py); if (!t) { A.Audio.sfx('locked'); B.anim($('#roomBox'), 'nudge', 400); return; }
+    pushUndo(); setPos(x, t); save(); A.Audio.sfx('star'); renderThings(); var el = thingEl(x); if (el) B.anim(el, 'placed', 450); deselect();
+  }
+  // a thing from "My things" (or just bought) pops into the middle of the spot, picked and ready to drag
+  function popIn(id) {
+    if (avail(id) <= 0 || !friendOk(id)) return null;
+    var it = CAT.byId[id], x = { u: ++RM.n, id: id, f: 0 }, t = snapFor(x, VW / 2, it.kind === 'wall' ? 150 : cellXY(3, 2).y);
+    if (!t) { RM.n--; A.Audio.sfx('locked'); V.say(['rm_no_room']); UI.toast('🧺 Your spot is full! Put something away first.'); return null; }
+    pushUndo(); setPos(x, t); RM.items.push(x); save(); A.Audio.sfx('pop'); renderThings(); renderTray(); select(x, true);
+    var el = thingEl(x); if (el) B.anim(el, 'popin', 700);
+    return x;
+  }
+  function overTrash(cx, cy) { var t = $('#trash').getBoundingClientRect(); return t.width > 0 && cx >= t.left - 24 && cx <= t.right + 24 && cy >= t.top - 24 && cy <= t.bottom + 24; }
+  var RB = $('#roomBox');
+  RB.addEventListener('pointerdown', function (e) {
+    if (panel || UI.cardOpen || D.hold || G || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    if (e.target.closest && e.target.closest('#selBar')) return;
+    var el = e.target.closest && e.target.closest('#things .thing');
+    if (!el && e.target.closest && e.target.closest('.friend') && document.elementsFromPoint) {   // a friend is standing in front: the thing under the finger wins
+      var under = document.elementsFromPoint(e.clientX, e.clientY).filter(function (n) { return n.tagName !== 'DIV' && n.closest && n.closest('#things .thing'); })[0];
+      if (under) el = under.closest('#things .thing');
+    }
+    var x = el && itemByU(el.dataset.u);
+    if (!x) return;
+    e.preventDefault();
+    G = { x: x, el: el, id: e.pointerId, sx: e.clientX, sy: e.clientY, k: RB.getBoundingClientRect().width / VW, a: anchorOf(x), moved: false, t: null, trash: false };
+    try { RB.setPointerCapture(e.pointerId); } catch (er) {}
+    el.classList.add('lift'); A.Audio.sfx('tap');
+  });
+  RB.addEventListener('pointermove', function (e) {
+    if (!G || e.pointerId !== G.id) return;
+    var dx = e.clientX - G.sx, dy = e.clientY - G.sy;
+    if (!G.moved && Math.abs(dx) + Math.abs(dy) < 12) return;
+    if (!G.moved) { G.moved = true; document.body.classList.add('dragging'); $('#selBar').classList.remove('on'); }
+    e.preventDefault();
+    G.el.style.translate = dx.toFixed(1) + 'px ' + dy.toFixed(1) + 'px';
+    G.trash = overTrash(e.clientX, e.clientY); $('#trash').classList.toggle('hot', G.trash);
+    G.t = G.trash ? null : snapFor(G.x, G.a.x + dx / G.k, G.a.y + dy / G.k); showSnap(G.t);
+  });
+  function endGesture(e, cancel) {
+    if (!G || (e && e.pointerId !== G.id)) return; var g = G; G = null; gestureUntil = Date.now() + 450;
+    document.body.classList.remove('dragging'); $('#trash').classList.remove('hot'); g.el.classList.remove('lift');
+    if (cancel) { g.el.style.translate = ''; showSnap(null); placeSelBar(); return; }
+    if (!g.moved) { select(g.x); return; }
+    if (g.trash) { showSnap(null); putAwayThing(g.x); return; }
+    if (g.t) { pushUndo(); setPos(g.x, g.t); save(); A.Audio.sfx('star'); } else A.Audio.sfx('soft');
+    SEL = g.x; renderThings(); showSnap(null); var el = thingEl(g.x); if (el) B.anim(el, 'placed', 450);
+  }
+  RB.addEventListener('pointerup', function (e) { endGesture(e); });
+  RB.addEventListener('pointercancel', function (e) { endGesture(e, true); });
+  RB.addEventListener('lostpointercapture', function (e) { if (G && e.pointerId === G.id) endGesture(e, !G.moved ? false : false); });
+  ['pointerdown', 'click'].forEach(function (ev) { $('#selBar').addEventListener(ev, function (e) { e.stopPropagation(); }); });
+  $('#selFlip').addEventListener('click', function () { if (SEL) flipThing(SEL); });
+  $('#selAway').addEventListener('click', function () { if (SEL) putAwayThing(SEL); });
+  window.addEventListener('resize', function () { placeSelBar(); });
+
+  // the keyboard hint strip: body.touchui is set/cleared for every page in js/core/util.js (key or controller input shows it)
+
+  /* ================= v2p1b: savings jar (pick one thing to save up for) ================= */
+  var jarN = 0;
+  function goalIt() { var it = RM.goal && CAT.byId[RM.goal]; return it && !it.starter && it.price > 0 && inShop(it) ? it : null; }
+  function jarSvg(f) {
+    f = Math.max(0, Math.min(1, f || 0)); var id = 'jc' + (++jarN), h = 46 * f;
+    return '<svg class="jarsvg" viewBox="0 0 60 72" aria-hidden="true"><defs><clipPath id="' + id + '"><path d="M12 20 H48 V60 Q48 68 40 68 H20 Q12 68 12 60Z"/></clipPath></defs>' +
+      '<path d="M12 20 H48 V60 Q48 68 40 68 H20 Q12 68 12 60Z" fill="#eef8ff"/><rect x="10" y="' + (68 - h).toFixed(1) + '" width="40" height="' + h.toFixed(1) + '" fill="#ffd23c" clip-path="url(#' + id + ')"/>' +
+      (f > .08 ? '<g clip-path="url(#' + id + ')" fill="#fff6c8"><circle cx="22" cy="' + (66 - h * .4).toFixed(1) + '" r="3"/><circle cx="36" cy="' + (64 - h * .7).toFixed(1) + '" r="2.4"/></g>' : '') +
+      '<path d="M12 20 H48 V60 Q48 68 40 68 H20 Q12 68 12 60Z" fill="none" stroke="#7fb8e6" stroke-width="3.5"/><rect x="15" y="8" width="30" height="12" rx="4" fill="#ff9fc0" stroke="#e57aa0" stroke-width="2.5"/></svg>';
+  }
+  function jarMini(it) { var have = Math.min(P.wallet.bits, it.price); return '<div class="jarmini">' + jarSvg(have / it.price) + '<b>✦ ' + P.wallet.bits + ' / ' + it.price + '</b></div>'; }
+  function renderJar() {
+    var b = $('#jarBtn'), it = goalIt(); if (!b) return;
+    if (RM.goal && !it) RM.goal = null;
+    if (!it) { b.className = 'jar empty'; b.innerHTML = jarSvg(0) + '<span class="jt">Goal?</span>'; b.setAttribute('aria-label', 'Savings jar: pick something to save up for'); return; }
+    var ready = P.wallet.bits >= it.price;
+    b.className = 'jar' + (ready ? ' ready' : '');
+    b.innerHTML = jarSvg(P.wallet.bits / it.price) + '<span class="jg">' + ART.svg(it.id, 'thumb') + '</span><span class="jt">' + (ready ? 'Ready!' : '✦ ' + P.wallet.bits + '/' + it.price) + '</span>';
+    b.setAttribute('aria-label', 'Savings jar: ' + it.name + ', ' + P.wallet.bits + ' of ' + it.price + ' star bits' + (ready ? ', ready to buy' : ''));
+  }
+  function setGoal(id) {
+    RM.goal = id; save(); renderJar(); A.Audio.sfx('sparkle'); V.say(['rm_jar_set']); B.anim($('#jarBtn'), 'jump', 600);
+    if (panel && panel.id === 'shop') { openShop(shopCat); focusItem(id); }
+  }
+  $('#jarBtn').addEventListener('click', function () {
+    var it = goalIt(); B.anim($('#jarBtn'), 'jump', 500);
+    if (!it) { A.Audio.sfx('pop'); V.say(['rm_jar_empty']); openShop(); focusFirst('.sitem'); return; }
+    if (P.wallet.bits >= it.price) V.say(['rm_jar_ready']);
+    openShop(it.cat); shopItem(it);
+  });
+
+  /* ================= v2p1b: the how-to demo (~10 s): plays on a kid's first visit, the big ? replays it ================= */
+  function demo() {
+    return new Promise(function (resolve) {
+      var old = $('#rdemo'); if (old) old.remove();
+      var ov = A.el('<div class="overlay on rdemo roomintro" id="rdemo" role="dialog" aria-modal="true" aria-label="How to play"><div class="card"><h2>' + A.esc(P.name) + "'s Picnic Spot</h2>" +
+        '<div class="dstage" aria-hidden="true"><img class="dbg" src="' + BG + '" alt="" draggable="false"><div class="dpal">' + B.forProfile(P, { expr: 'happy' }) + '</div>' +
+        '<div class="dtray"><span class="dchip c1">' + ART.svg('plant_tall', 'thumb') + '</span><span class="dchip">' + ART.svg('beanbag_pink', 'thumb') + '</span><span class="dchip">' + ART.svg('lamp_star', 'thumb') + '</span></div>' +
+        '<div class="ditem">' + ART.svg('plant_tall', 'thumb') + '</div><div class="dhand">👆</div></div>' +
+        '<p class="dsay"><span class="s1">👆 Tap to pick</span><span class="s2">✋ Drag it where you want!</span></p>' +
+        '<div class="row2"><button class="bigbtn mint" data-go>Got it! ▶</button></div></div></div>');
+      document.body.appendChild(ov); UI.cardOpen = true; var t0 = Date.now();
+      function close() {
+        if (!ov.parentNode) return; document.removeEventListener('keydown', key, true); clearTimeout(ov._t); ov.remove();
+        UI.cardOpen = !!document.querySelector('.overlay.on'); P.flags = P.flags || {}; P.flags.roomDemo = (P.flags.roomDemo || 0) + 1; save(); A.Audio.sfx('pop'); resolve();
+      }
+      function key(e) { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); if (Date.now() - t0 > 300) close(); } }
+      document.addEventListener('keydown', key, true);
+      ov.querySelector('[data-go]').addEventListener('click', close);
+      ov.addEventListener('click', function (e) { if (e.target === ov && Date.now() - t0 > 1500) close(); });
+      A.Audio.sfx('pop'); setTimeout(function () { if (ov.parentNode) V.say(['rm_demo'], { kind: 'prompt' }); }, 350);
+      setTimeout(function () { var g = ov.querySelector('[data-go]'); if (g) g.focus({ preventScroll: true }); }, 60);
+    });
+  }
+  $('#helpBtn').addEventListener('click', function () { A.Audio.sfx('pop'); B.anim($('#helpBtn'), 'jump', 400); deselect(); closePanel(true); demo(); });
 
   /* ================= keys (keyboard; the controller sends the same keys) ================= */
   document.addEventListener('keydown', function (e) {
@@ -582,19 +791,19 @@
   $('#rAv').innerHTML = B.forProfile(P, { expr: 'happy' }); $('#rAv').setAttribute('style', B.backdrop(P.color)); $('#rName').textContent = P.name + "'s " + A.TITLES.room; $('#bitCount').textContent = P.wallet.bits; musicBtn();
   drawRoom(); renderThings(); renderFriendCount(); padKeys();
   // a daily visit: each friend living here gets a friendship point
-  var ups = F.visit(P); RM.visits = (RM.visits || 0) + 1; var prizes = checkPrizes(); save();
+  var ups = F.visit(P); RM.visits = (RM.visits || 0) + 1; var prizes = checkPrizes(), fresh = newInShop(); save(); shopBadge();
   makeFriends(); requestAnimationFrame(step);
   M.play('cozy');
-  var intro = firstVisit
-    ? UI.card({ tag: 'Welcome!', title: P.name + "'s Picnic Spot", art: '<div class="dance">' + B.forProfile(P, { expr: 'love' }) + '</div>', html: '<div class="welcomepics" aria-hidden="true"><span>⭐</span><i>➜</i><span>✦</span><i>➜</i><span>🛍️</span><i>➜</i><span>🎨</span></div><p class="howto short">Play, get <b>✦</b>, shop, decorate!</p>', btn: "Let's go! ▶", voice: ['rm_welcome'], cls: 'roomintro picintro', minMs: 500 })
-    : (V.say(['rm_welcome_back']), Promise.resolve());
+  renderJar();
+  var intro = !(P.flags && P.flags.roomDemo) ? demo() : (V.say(['rm_welcome_back']), Promise.resolve());
   intro.then(function () {
     var chain = Promise.resolve();
     prizes.forEach(function (it) { chain = chain.then(function () { return UI.card({ tag: 'Special prize!', title: it.name, art: '<div class="bigthumb dance">' + ART.svg(it.id, 'thumb') + '</div>', glow: true, sub: 'For: ' + it.hint + '. It\'s in your things!', voice: ['rm_prize_won', 'it_' + it.id], sfx: 'unlock', confetti: true, btn: 'Yay!', cls: 'reward' }); }); });
+    fresh.forEach(function (it) { chain = chain.then(function () { return UI.card({ tag: '✨ New in the shop!', title: it.name, art: '<div class="bigthumb dance">' + ART.svg(it.id, 'thumb') + '</div>', glow: true, sub: 'Come and see it in the shop!', voice: ['rm_new_shop'], sfx: 'unlock', confetti: true, btn: 'Yay!', cls: 'reward newshop' }); }); });
     return chain.then(showNews);
   }).then(function () { var f = $('#shopBtn'); if (f && !panel && !D.on) f.focus({ preventScroll: true }); });
 
   window.__room = { P: P, RM: RM, D: D, FR: FR, friends: function () { return FR; }, set speed(v) { SPEED = v; }, get speed() { return SPEED; },
     cellXY: cellXY, slotXY: slotXY, hit: hit, avail: avail, at: at, atSlot: atSlot, act: act, flip: flip, putAway: putAway, undo: undo, moveCur: moveCur, buy: function (id) { return buy(CAT.byId[id]); },
-    tap: function (i) { return tapFriend(FR[i], null); }, pickTarget: pickTarget, tod: TOD, season: SEASON, openBio: openBio, openShop: openShop, openShelf: openShelf, startDecor: startDecor, endDecor: endDecor, panel: function () { return panel && panel.id; } };
+    tap: function (i) { return tapFriend(FR[i], null); }, newInShop: newInShop, shown: shown, popIn: popIn, select: select, friendOk: friendOk, placeFriend: function (f) { placeFriend(f); }, sel: function () { return SEL; }, demo: demo, setGoal: setGoal, snapFor: snapFor, jar: renderJar, pickTarget: pickTarget, tod: TOD, season: SEASON, openBio: openBio, openShop: openShop, openShelf: openShelf, startDecor: startDecor, endDecor: endDecor, panel: function () { return panel && panel.id; } };
 })(window.Arcade);

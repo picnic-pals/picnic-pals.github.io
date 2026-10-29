@@ -70,7 +70,7 @@
 .keys .arrows .up { grid-column: 2; }
 .keys .arrows kbd:not(.up) { grid-row: 2; }
 .keys.touch { display: none; }
-@media (hover: none) and (pointer: coarse) { #keys, #map .mkeys { display: none; } .keys.touch { display: flex; } #munchBtn .k { display: none; } }
+body.touchui .keys.touch { display: flex !important; } body.touchui #munchBtn .k { display: none; }   /* v2p1c: was a (hover:none) media query; body.touchui (util.js) clears on a key press */
 
 .card .example { font-size: clamp(26px, 5vmin, 42px); font-weight: 700; margin: 8px 0 0; }
 .card .example .frame { font-size: 1.1em; }

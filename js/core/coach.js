@@ -307,7 +307,7 @@
   //  4/5 -> start at the top level · 3/5 -> as placed · 2 or fewer on the START skill -> step back one skill (its top level)
   var PLACE_CHAIN = 4;
   function placementResult(p, sid, score) {
-    var C = A.Curriculum, s = C.byId[sid], st = C.state(p, sid), top = s.levels.length - 1, out, T = C.track(p, C.subjectOf(s));
+    var C = A.Curriculum, s = C.byId[sid], st = C.state(p, sid), top = Math.max(s.levels.length, s.subLevels || 0) - 1, out, T = C.track(p, C.subjectOf(s));
     st.placeOffer = false; st.placeDone = true; st.placeCheck = { at: K.now(), score: score, of: PLACE_N };
     if (score >= PLACE_N) {
       out = 'skip'; C.markMastered(p, sid); st.placed = true; st.placedBy = 'check'; st.introduced = true; st.placeStart = false;
@@ -320,7 +320,7 @@
       var pv = C.prevSkill ? C.prevSkill(sid) : null;
       if (st.level > 0) { st.level = 0; out = 'back'; }
       else if (pv) {
-        var ps = C.state(p, pv.id); ps.status = 'open'; ps.placed = false; ps.level = pv.levels.length - 1; ps.placeDone = true; ps.placeOffer = false;
+        var ps = C.state(p, pv.id); ps.status = 'open'; ps.placed = false; ps.level = Math.max(pv.levels.length, pv.subLevels || 0) - 1; ps.placeDone = true; ps.placeOffer = false;
         if (!p.math.pin) { T.current = pv.id; T.returnTo = null; }
         out = 'back';
       } else out = 'normal';

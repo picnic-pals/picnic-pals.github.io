@@ -167,20 +167,35 @@
   if (!C || !BQ || BQ.skillWrapped) return;
   var orig = BQ.pick; BQ.skillWrapped = true;
   function plain(h) { return String(h || '').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim(); }
+  // v2p1a: a bonus question is never below the kid's age start for that subject (A.Levels: the grown-up's grade setting or
+  // the age band's start rung). An older kid whose old save still sits at the bottom of Early Concepts (colors level 1) gets
+  // the age-appropriate rung instead (shapes level 2 at 4 and up); a toddler keeps the easy ones.
+  function atLevel(p, subj) {
+    var s = C.current(p, subj), lv = C.state(p, s.id).level || 0, Lv = A.Levels;
+    // only Early Concepts is floored (its old saves sat at the very bottom); Reading / Math follow their adaptive ladders, which a grown-up may set lower on purpose
+    if (subj !== 'concepts' || !Lv || !Lv.startFor || !Lv.grade) return { skill: s, level: lv };
+    var g = Lv.grade(p, subj), f = g && g !== 'off' ? Lv.startFor(subj, g) : null; if (!f || f.soon || !C.byId[f.id]) return { skill: s, level: lv };
+    var ids = C.list(subj).map(function (k) { return k.id; }), ci = ids.indexOf(s.id), fi = ids.indexOf(f.id);
+    if (fi > ci || (fi === ci && f.level > lv)) return { skill: C.byId[f.id], level: f.level || 0, floored: true };
+    return { skill: s, level: lv };
+  }
   function fromSkill(p, subj) {
-    var s = C.current(p, subj), st = C.state(p, s.id), b = p.bonus || (p.bonus = { asked: 0, right: 0, recent: [] }), recent = b.recent || (b.recent = []), q, id, g = 0;
-    do { q = A.Questions.make(s, st.level, { choices: A.Age.choices(p) }); id = 'skill:' + s.id + ':' + q.target + ':' + q.choices[q.answer].label; } while (recent.indexOf(id) >= 0 && g++ < 12);
+    var at = atLevel(p, subj), s = at.skill, st = { level: at.level }, b = p.bonus || (p.bonus = { asked: 0, right: 0, recent: [] }), recent = b.recent || (b.recent = []), q, id, g = 0;
+    do { q = A.Questions.make(s, st.level, { choices: A.Age.choices(p) }); id = 'skill:' + s.id + ':' + q.target + ':' + q.choices[q.answer].label; } while (recent.indexOf(id) >= 0 && g++ < 40);   // v2p1a: 40 tries (was 12): a kid's own-level skill can have a small pool
     recent.push(id); while (recent.length > 60) recent.shift();   // not the same question again soon
     return { id: id, skill: s.id, level: st.level, cat: 'skill', d: 1, q: plain(q.text), line: null, parts: A.ReadAloud ? A.ReadAloud.auto(p, q) : q.say, partsAll: q.say, fact: q.fact || [], listen: !!q.listen, answer: q.answer,
       choices: q.choices.map(function (c) { return { emoji: c.html || A.esc(c.label), text: c.label, hideText: true, parts: c.say || [c.label] }; }) };
   }
   BQ.pick = function (p, opt) {
-    var w = C.mixWeights(p), early = (w.reading || 0) + (w.concepts || 0);
+    var w = Object.assign({}, C.mixWeights(p));
+    // v2p1a: 6 and up, the Early Concepts share of bonus questions goes to Reading (colors and shapes are preschool topics)
+    if (A.Age && A.Age.band && /^g/.test(A.Age.band(p)) && w.concepts) { w.reading = (w.reading || 0) + w.concepts; w.concepts = 0; }
+    var early = (w.reading || 0) + (w.concepts || 0);
     if (A.Questions && early > 0 && (opt && opt.skill || Math.random() < early * .8)) {
       var subj = (opt && opt.subject) || (Math.random() * early < (w.concepts || 0) ? 'concepts' : 'reading');
       if (C.list(subj).length) { var b = p.bonus || (p.bonus = { asked: 0, right: 0, recent: [] }); b.asked = (b.asked || 0) + 1; return fromSkill(p, subj); }
     }
     return orig(p);
   };
-  BQ.fromSkill = fromSkill;
+  BQ.fromSkill = fromSkill; BQ.atLevel = atLevel;
 })(window.Arcade);

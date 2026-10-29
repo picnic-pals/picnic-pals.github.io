@@ -26,11 +26,11 @@
 </section>
 
 <!-- NEW PLAYER -->
-<section class="screen hub" id="newkid">
+<section class="screen hub scroll" id="newkid">
   <div class="topbar"><button class="backbtn" data-nav id="nkBack">◀ Back</button><h2 class="nkt">New player</h2></div>
   <div class="nk">
     <div class="nkprev"><div class="big jump" id="nkPrev"></div><div class="nkname" id="nkShow">?</div></div>
-    <div class="nkform">
+    <div class="nkform scroll">
       <label class="nkl" for="nkName">1. Type your name</label>
       <input id="nkName" class="nkin" maxlength="16" autocomplete="off" spellcheck="false" placeholder="Name" data-nav>
       <div class="nkl">2. Pick your friend</div><div class="opts" id="nkBlob"></div>
@@ -42,9 +42,24 @@
   </div>
 </section>
 
+<!-- STORY OR FREE PLAY (v2p1a): after picking a player, one big choice -->
+<section class="screen hub" id="mode">
+  <div class="topbar modetop">
+    <button class="backbtn" data-nav id="modeBack" aria-label="Back to who's playing">◀ Back</button>
+    <button class="me" id="modeMe" data-nav aria-label="Switch player"><span class="av" id="modeAv"></span><span><span class="hi" id="modeHi"></span><small>Tap to switch player</small></span></button>
+    <div class="starchip" aria-label="Stars"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg><span id="modeStars">0</span></div>
+  </div>
+  <h2 class="modeq">What do you want to play?</h2>
+  <div class="modes">
+    <button class="modebtn story" id="modeStory" data-nav><span class="mic" aria-hidden="true">🗺️</span><span class="ml">Story</span><span class="ms" id="modeStorySub">Picnic Island adventure</span><span class="spk" aria-hidden="true">🔊</span></button>
+    <button class="modebtn free" id="modeFree" data-nav><span class="mic" aria-hidden="true">🎈</span><span class="ml">Free Play</span><span class="ms">Pick any game</span><span class="spk" aria-hidden="true">🔊</span></button>
+  </div>
+</section>
+
 <!-- GAME PICKER -->
 <section class="screen hub" id="games">
   <div class="topbar">
+    <button class="backbtn" data-nav id="gamesBack" aria-label="Back to Story or Free Play">◀ Back</button>
     <button class="me" id="meBtn" data-nav aria-label="Switch player"><span class="av" id="meAv"></span><span><span class="hi" id="meHi"></span><small>Tap to switch player</small></span></button>
     <div class="starchip" aria-label="Stars"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg><span id="meStars">0</span></div>
     <div class="goal" id="goal"></div>
@@ -71,11 +86,11 @@
 </section>
 
 <!-- DRESS UP -->
-<section class="screen hub" id="closet">
+<section class="screen hub scroll" id="closet">
   <div class="topbar"><button class="backbtn" data-back data-nav>◀ Done</button></div>
   <div class="closet">
     <div class="preview"><div class="big jump" id="prevBig"></div><div class="bn" id="prevName"></div><div class="bl" id="prevLooks"></div></div>
-    <div class="racks">
+    <div class="racks scroll">
       <div class="rack"><h3>Pick your friend</h3><div class="opts" id="optBlob"></div></div>
       <div class="rack"><h3>Backdrop color</h3><div class="opts" id="optColor"></div></div>
       <div class="rack"><h3>Hats</h3><div class="opts" id="optOutfit"></div></div>
@@ -99,12 +114,20 @@
 <script src="js/core/room-catalog.js"></script>
 <script src="js/core/friends.js"></script>
 <script src="js/core/tiny-data.js"></script>
+<script src="js/core/stand-core.js"></script>
+<script src="js/core/bubble-core.js"></script>
+  <script src="js/core/story2.js"></script>
+<script src="js/core/breaks-data.js"></script>
+<script src="js/core/color-pages.js"></script>
 <script src="js/core/voice-lines.js"></script>
 <script src="js/core/curriculum-math.js"></script>
 <script src="js/core/coach.js"></script>
 <script src="js/core/questions.js"></script>
 <script src="js/core/skills-early.js"></script>
 <script src="js/core/skills-grade1.js"></script>
+<script src="js/core/steps-math.js"></script>
+<script src="js/core/topics-data.js"></script>
+<script src="js/core/topics.js"></script>
 <script src="js/core/blobs.js"></script>
 <script src="js/core/audio.js"></script>
 <script src="js/core/music.js"></script>
@@ -115,6 +138,8 @@
 <script src="js/core/playtime.js"></script>
 <script src="js/core/gamepad.js"></script>
 <script src="js/core/parent.js"></script>
+<script src="js/core/coloring.js"></script>
+<script src="js/core/breaks.js"></script>
 <script src="js/hub.js"></script>
 </body>
 </html>

@@ -385,6 +385,8 @@
     // hardest of several at-level facts by the coach's expected success (e.g. 7 + 5 over 10 + 4), or 1 time in 3 an item
     // from the next level / skill (Q.step +1). Without a coach model it falls back to the old bigger-numbers step.
     var pl = bat(), r = pl.round, q, g = 0, n = nChoices(pl.P);
+    // v2p2b: after a miss on a step, the same pitch comes back once with its picture hint (strategy first), choices reshuffled
+    if (G.retry && G.retry.who === pl) { q = G.retry.q; var hl = G.retry.lvl; G.retry = null; var right = q.choices[q.answer]; q.choices = A.shuffle ? A.shuffle(q.choices.slice()) : q.choices.slice().sort(function () { return Math.random() - .5; }); q.answer = q.choices.indexOf(right); q.retry = true; q.hard = false; q.hintHtml = hl >= 2 ? q.hint2 || q.hint : q.hint; q.stretch = false; return q; }
     var stretch = !G.missLast && (G.forceStretch != null ? !!G.forceStretch : Math.random() < R.stretchRate(G.recentAt.slice(-6)));
     if (r.review) { var cs = C.current(pl.P, (r.skill && r.skill.subject) || 'math'); if (cs) r = { skill: cs, level: C.state(pl.P, cs.id).level, review: false }; }
     var coach = A.Coach && A.Coach.pickItem && !pl.P.guest, st;
@@ -416,8 +418,10 @@
   }
   // the coach's item id for a pitch: the fact / word (e.g. "3 + 4"), like Picnic Munch's cells
   function itemKey(q) { var t = String(q.text || '').replace(/<[^>]*>/g, ' '), m = t.match(/(\d+)\s*([+−-])\s*(\d+)/); return m ? m[1] + ' ' + (m[2] === '-' ? '−' : m[2]) + ' ' + m[3] : (t.replace(/\s+/g, ' ').trim() || q.key); }
+  // hint for a step pitch whose generator has none (the old two-level skills): the strategy picture for its fact
+  function bbHint(q) { var f = A.Steps.parseFact(itemKey(q)); if (f) { q.hint = A.Steps.factHint(f, 1, q.skill); q.hint2 = A.Steps.factHint(f, 2, q.skill); } }
   function renderQuestion(q) {
-    $('#qTxt').innerHTML = q.text; $('#qPic').innerHTML = q.pic || ''; $('#qPic').classList.toggle('on', !!q.pic);
+    $('#qTxt').innerHTML = q.text; var hh = q.retry && q.hintHtml ? '<div class="bb-hint">' + q.hintHtml + '</div>' : ''; $('#qPic').innerHTML = (q.pic || '') + hh; $('#qPic').classList.toggle('on', !!(q.pic || hh));
     var box = $('#cards'); box.innerHTML = ''; box.classList.toggle('n3', q.choices.length === 3);
     q.choices.forEach(function (c, i) {
       var b = A.el('<button class="bcard c' + i + (c.html ? ' rich' : '') + '" data-i="' + i + '" aria-label="Answer ' + (i + 1) + ': ' + A.esc(c.label) + '"><span class="kk">' + (i + 1) + '</span><span class="cv">' + (c.html || A.esc(c.label)) + '</span></button>');
@@ -475,7 +479,11 @@
     if (G.q.bonus) return bonusAnswer(i);
     G.accept = false; G.busy = true; clearInterval(G.timer);
     var q = G.q, pl = bat(), ok = i === q.answer, e = elapsed();
-    pl.pitches++; C.recordAnswer(pl.P, q.skill, ok, { key: itemKey(q) });
+    // v2p2b: answer time (from when the question finished being read) feeds the step fast-skip; a retry after a hint is hinted
+    pl.pitches++; var sig = C.recordAnswer(pl.P, q.skill, ok, { key: itemKey(q), ms: G.voiceDone ? Math.round(e * 1000) : null, hint: !!q.retry });
+    if (sig && sig.speedy) pl.speedy = true;
+    if (!ok && !q.retry && !q.bonus && A.Steps && A.Steps.STEPS[q.skill] && !pl.P.guest) { if (!q.hint) bbHint(q); if (q.hint) G.retry = { q: q, who: pl, lvl: (G.missRun = (G.missRun || 0) + 1) >= 2 ? 2 : 1 }; }
+    if (ok) G.missRun = 0;
     if (q.atLevel) { if (ok) pl.hr++; else pl.hw++; }
     if (!q.stretch) { G.recentAt.push(ok); if (G.recentAt.length > 10) G.recentAt.shift(); }
     G.missLast = !ok;
@@ -513,7 +521,7 @@
       G.phase = 'pitch'; G.bonusN++;
       // the question is read like a pitch: one unclipped line (the browser voice says it) when "How much talking" allows prompts;
       // otherwise the friend's bubble shows these words (A.Voice.say), replacing the last pitch's words
-      var spoken = String(bq.text).replace(/<[^>]*>/g, ' ').replace(/ = /g, ' is ').replace(/\s+/g, ' ').trim();
+      var spoken = String(bq.spoken || bq.text).replace(/<[^>]*>/g, ' ').replace(/ = /g, ' is ').replace(/\s+/g, ' ').trim();
       var q = G.q = { bonus: true, kind: bq.kind, text: bq.text, pic: bq.pic || '', answer: bq.answer, explain: bq.explain, choices: bq.choices.map(function (l) { return { label: String(l) }; }), say: [{ id: 'bbq_' + bq.kind, text: spoken }] };
       $('#swingTag').innerHTML = '<small>' + (bq.tag || '⚾ Baseball question!') + '</small>'; $('#swingTag').className = 'swingtag on bonusq';
       renderQuestion(q); document.body.classList.add('bonusing'); $('#sign').classList.remove('done');
@@ -559,15 +567,24 @@
     if (!RIVALON || G.scoreQ[G.inning]) return Promise.resolve();
     var me = totalRuns(PL[0]), them = totalRuns(RIV), n = nChoices(P1);
     if (them < me || them === 0) return Promise.resolve();
-    G.scoreQ[G.inning] = 1;
+    G.scoreQ[G.inning] = 1; renderBoard();   // v2p1a: the stadium board and the question's picture always show the same score (both use totalRuns)
     var tag = '📋 Scoreboard question!';
+    // v2p1a: every scoreboard question shows the score as a picture (a dot per run, in rows of 5 next to the number) and uses short words
     if (A.Age.preReader(P1)) {   // design2: 5 and under: count the dots (no "runs to tie / to win" arithmetic)
       if (them > 10) return Promise.resolve();
-      var c0 = choiceSet(them, n, 0, 12); return ask({ kind: 'count', text: 'How many runs do the Sprouts have? Count them!', pic: dots(them, 'riv'), choices: c0, answer: c0.indexOf(them), explain: 'The Sprouts have ' + them + '.', tag: tag });
+      var c0 = choiceSet(them, n, 0, 12); return ask({ kind: 'count', text: 'How many runs do the Sprouts have?', pic: sbPic([['riv', them, true]]), choices: c0, answer: c0.indexOf(them), explain: 'The Sprouts have ' + them + '.', tag: tag });
     }
-    if (them === me) { var add = A.rnd(1, 3), c1 = choiceSet(me + add, n, 0, 30); return ask({ kind: 'tied', text: "It's tied, " + me + ' to ' + them + '. If you score ' + add + (add === 1 ? ' run' : ' runs') + ', how many will you have?', choices: c1, answer: c1.indexOf(me + add), explain: me + ' + ' + add + ' = ' + (me + add) + '.', tag: tag }); }
+    if (them === me) { var add = A.rnd(1, 3), c1 = choiceSet(me + add, n, 0, 30); return ask({ kind: 'tied', text: 'You have ' + me + '. You get ' + add + ' more. How many now?', pic: sbPic([['me', me, false, add]]), choices: c1, answer: c1.indexOf(me + add), explain: me + ' + ' + add + ' = ' + (me + add) + '.', tag: tag }); }
     var win = Math.random() < .5, need = them - me + (win ? 1 : 0), c2 = choiceSet(need, n, 1, 30);
-    return ask({ kind: win ? 'towin' : 'totie', text: 'Sprouts ' + them + ', you ' + me + '. How many runs to ' + (win ? 'win' : 'tie') + '?', choices: c2, answer: c2.indexOf(need), explain: win ? 'To tie you need ' + (them - me) + ', and 1 more to win: ' + need + '.' : me + ' + ' + need + ' = ' + them + '. A tie!', tag: tag });
+    return ask({ kind: win ? 'towin' : 'totie', text: 'How many more runs to ' + (win ? '<b>win</b>' : '<b>tie</b>') + '?', pic: sbPic([['riv', them], ['me', me]]), spoken: 'The Sprouts have ' + them + '. You have ' + me + '. How many more runs to ' + (win ? 'win' : 'tie') + '?', choices: c2, answer: c2.indexOf(need), explain: win ? (them - me) + ' more ties it. 1 more wins: ' + need + '.' : me + ' + ' + need + ' = ' + them + '. A tie!', tag: tag });
+  }
+  // v2p1a: a little scoreboard picture. rows: [who ('riv' | 'me'), runs, hideNumber, extra runs drawn as new dots]
+  function sbPic(rows) {
+    return '<span class="sbpic">' + rows.map(function (r) {
+      var who = r[0], k = r[1], extra = r[3] || 0, h = '', i;
+      for (i = 0; i < k + extra; i++) h += (i && i % 5 === 0 ? '<i class="gap"></i>' : '') + '<i class="rdot ' + (who === 'riv' ? 'riv' : 'me') + (i >= k ? ' new' : '') + '"></i>';
+      return '<span class="sbrow ' + who + '"><span class="sbn">' + (who === 'riv' ? '🌱 Sprouts' : '⚾ You') + '</span><span class="sbd">' + (k + extra > 24 ? '' : h) + '</span>' + (r[2] ? '' : '<b class="sbv">' + k + (extra ? ' <span class="plus">+ ' + extra + '</span>' : '') + '</b>') + '</span>';
+    }).join('') + '</span>';
   }
 
   /* ---------- outcomes ---------- */
@@ -836,6 +853,7 @@
     setElapsed: function (sec) { G.voiceDone = true; G.qT0 = Date.now() - sec * 1000; },
     ready: function () { return !!(G.phase === 'pitch' && G.q && G.accept && !G.busy); },
     set speed(v) { SPEED = v; }, get speed() { return SPEED; },
+    scoreQ: scoreQuestion, sbPic: sbPic,   // v2p1a test hooks
     total: totalRuns, endGame: endGame, R: R, RIV: RIV, rival: RIVALON, maxOuts: maxOuts, mercy: mercy, isBonus: function () { return !!(G.q && G.q.bonus); }, whereChoices: function (from) { return whereChoices(from).map(function (x) { return x === 4 ? 'Home 🏠' : BASEN[x]; }); }, story: STORYB ? { stop: SI, cfg: SC, end: endStory } : null, bases: function () { return G.bases.map(Boolean); }
   };
   if (STORYB) {

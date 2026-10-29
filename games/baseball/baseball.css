@@ -215,9 +215,18 @@ body.bonusing .sign { border-color: #c9b2ff; }
 .vsline { text-align: center; font-weight: 700; font-size: 1.1em; margin: .3em 0; }
 .bbend.loss h2, .bbend.tie h2 { color: #6a5a9a; }
 /* ptfix: touch-only screens: no keyboard legend (it sat under the friend's bubble), like Picnic Munch's #keys */
-@media (hover: none) and (pointer: coarse) { #game #keys { display: none; } }
+/* v2p1c: #keys hidden by body.touchui in core.css (was a (hover:none) media query) */
 /* ptfix: portrait: the friend's speech bubble sits over the ball field, not on the answer cards */
 @media (orientation: portrait) { .friend-bubble { bottom: auto; top: 30vh; } }
 /* design1 (2026-10-22): landscape: the friend's speech bubble sits just above the answer cards (never over card 1 / 2);
    --bbCardsTop is the cards row's top edge in px, kept up to date by baseball.js */
 @media (orientation: landscape) { .friend-bubble { bottom: calc(100vh - var(--bbCardsTop, 76vh) + 8px); } }
+/* v2p1a: scoreboard questions as a picture: one dot per run (rows of 5) next to the number */
+.sign .qpic .sbpic { display: inline-flex; flex-direction: column; gap: 6px; font-size: clamp(15px, 2.6vh, 22px); background: #2f4a3a; color: #fff; border-radius: 14px; padding: 8px 12px; box-shadow: inset 0 0 0 3px #f1dfb2; }
+.sbpic .sbrow { display: flex; align-items: center; gap: 10px; }
+.sbpic .sbn { font-weight: 800; min-width: 6.2em; white-space: nowrap; }
+.sbpic .sbd { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; max-width: 16em; }
+.sbpic .rdot { width: .95em; height: .95em; } .sbpic .rdot.me { background: #ffd23c; border-color: #b07800; }
+.sbpic .rdot.new { background: #ff8fb6; border-color: #c2185b; } .sbpic i.gap { width: .45em; }
+.sbpic .sbv { font-size: 1.5em; min-width: 1.4em; text-align: right; } .sbpic .plus { color: #ff8fb6; font-size: .8em; }
+body.bonusing .sign .qpic.on { display: flex; align-items: center; }

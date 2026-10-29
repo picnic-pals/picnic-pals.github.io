@@ -13,6 +13,7 @@
     // bottom row: Cookie Caves sits a little right so the two side trips get room; labels share one line under the stops
     lighthouse: { mu: [112, 86], lb: [113, 98.2] }, lagoon: { mu: [81.5, 85], lb: [81.5, 98.2] }, wordwoods: { mu: [50.5, 85], lb: [50.5, 98.2] } };
   function apos(a) { var m = ART[a.id]; return m ? { x: m.mu[0], y: m.mu[1] } : { x: 10 + a.x * 1.4, y: 9 + a.y * .8 }; }
+  function EXTRA(st) { return !!(st && st.area && (st.area.trail || st.area.boss)); }
   var MAINA = ST.AREAS.filter(function (a) { return !a.side; }), MAIN = ST.mainCount();
   // side trips (Letter Lagoon): hand-placed stops around a little pond, in map units (160 x 100)
   // two rows (y 80 / 90), 5 units apart side to side, so neighbours never touch (a stop is ~7 units wide)
@@ -33,7 +34,7 @@
   })();
   var SIDE_ICON = { colors: '🎨', shapes: '🔺', letters: '🔤', begsound: '🐝', rhymes: '🎵', sight: '👀', cvc: '🐱', digraph: '🚢', sight2: '📖', opposites: '🔥', nounverb: '🏃', longvowel: '🎂', sight3: '📚', homophones: '👂', affixes: '🧩', comprehension: '📜' };
   // which game a stop plays (story.js gameOf: seeded per player, never picked by the kid)
-  function gameName(id) { return id === 'slugger' ? A.TITLES.baseball : A.TITLES.munch; }
+  function gameName(id) { return id === 'slugger' ? A.TITLES.baseball : id === 'stand' ? A.TITLES.stand : id === 'bubble' ? A.TITLES.bubble : A.TITLES.munch; }
   function stopFace(st) { return st.side ? (SIDE_ICON[st.skill] || st.n) : st.n; }
   var FEST = { x: 80.6, y: 49.2 }; // the big basket on the blanket
   // put each area's emoji + name beside the trail (the side farthest from every stop)
@@ -64,7 +65,7 @@
   function labelsSVG() {
     var LP = ST.AREAS.map(function (a, i) { return labelPos(i); }), s = '<svg class="mlabels" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" aria-hidden="true">';
     // the landmarks are in the art, so each area only gets its name (under its landmark, from stops.json)
-    ST.AREAS.forEach(function (a, i) { var c = LP[i];
+    ST.AREAS.forEach(function (a, i) { if (a.trail || a.boss) return; var c = LP[i];
       var an = (ART[a.id] && ART[a.id].lb[2]) || 'middle';
       s += '<text class="aname' + (a.side ? ' sidelbl' : '') + '" x="' + c.x.toFixed(1) + '" y="' + c.y.toFixed(1) + '" font-size="2.7" text-anchor="' + an + '">' + A.esc(a.name) + '</text>'; });
     s += '<text class="aname fest" x="' + FEST.x + '" y="' + (FEST.y + 9.5) + '" font-size="3" text-anchor="middle">' + A.esc(ST.FESTIVAL) + '</text>';
@@ -72,7 +73,7 @@
   }
   // everything you can pick on the map, in trail order: the 20 stops plus a friend-challenge after its area's second stop
   var ITEMS = [];
-  ST.STOPS.forEach(function (st) { ITEMS.push({ t: 's', i: st.i }); if (st.lv === 1 && !st.side) ST.CH.forEach(function (c, k) { if (c.ai === st.ai) ITEMS.push({ t: 'c', k: k }); }); });
+  ST.STOPS.forEach(function (st) { if (EXTRA(st)) return; ITEMS.push({ t: 's', i: st.i }); if (st.lv === 1 && !st.side) ST.CH.forEach(function (c, k) { if (c.ai === st.ai) ITEMS.push({ t: 'c', k: k }); }); });
   function sideItem(first) { // the side trip's next stop to play (or its first / last)
     var js = []; ITEMS.forEach(function (it, j) { if (it.t === 's' && ST.isSide(it.i)) js.push(j); }); if (!js.length) return -1;
     if (first) return js[0];
@@ -81,7 +82,7 @@
   }
   // ↓ again while on a side trip: the next side trip (Letter Lagoon -> Word Woods -> Letter Lagoon ...)
   function nextSideItem() {
-    var cur = ST.STOPS[ITEMS[sel].i].ai, ais = []; ST.STOPS.forEach(function (st) { if (st.side && ais.indexOf(st.ai) < 0) ais.push(st.ai); });
+    var cur = ST.STOPS[ITEMS[sel].i].ai, ais = []; ST.STOPS.forEach(function (st) { if (st.side && !EXTRA(st) && ais.indexOf(st.ai) < 0) ais.push(st.ai); });
     if (ais.length < 2) return -1; var ai = ais[(ais.indexOf(cur) + 1) % ais.length], js = [];
     ITEMS.forEach(function (it, j) { if (it.t === 's' && ST.STOPS[it.i].side && ST.STOPS[it.i].ai === ai) js.push(j); });
     for (var k = 0; k < js.length; k++) { var inf = ST.stopInfo(P, ITEMS[js[k]].i); if (playable(js[k]) && !(inf && inf.passed)) return js[k]; }
@@ -104,9 +105,9 @@
       '<span class="mmenu" id="mapMenu" hidden><button class="chipbtn gold" id="mapScores">🏆 High scores <kbd>H</kbd></button><button class="chipbtn" id="mapNew">↻ New journey</button></span></span></div>' +
       '<div class="mwrap"><div class="mbox">' + islandSVG() + '<div class="stops"></div><div class="hero" id="mapHero"></div>' + labelsSVG() + '</div></div>' +
       '<div class="mbot"><div class="info" id="mapInfo"></div><button class="bigbtn mint" id="mapPlay">▶ Play</button></div>' +
-      '<div class="keys mkeys"><span class="grp"><kbd>←</kbd><kbd>→</kbd> pick a stop</span>' + (MAIN < ST.STOPS.length ? '<span class="grp"><kbd>↓</kbd> ' + A.esc(ST.AREAS.filter(function (a) { return a.side; }).map(function (a) { return a.name; }).join(' / ')) + ' <kbd>↑</kbd> trail</span>' : '') + '<span class="grp"><kbd class="wide">Space</kbd> play</span><span class="grp"><kbd>H</kbd> high scores</span><span class="grp"><kbd>B</kbd> story</span><span class="grp"><kbd>Esc</kbd> menu</span></div></section>');
+      '<div class="keys mkeys"><span class="grp"><kbd>←</kbd><kbd>→</kbd> pick a stop</span>' + (MAIN < ST.STOPS.length ? '<span class="grp"><kbd>↓</kbd> ' + A.esc(ST.AREAS.filter(function (a) { return a.side && !a.trail && !a.boss; }).map(function (a) { return a.name; }).join(' / ')) + ' <kbd>↑</kbd> trail</span>' : '') + '<span class="grp"><kbd class="wide">Space</kbd> play</span><span class="grp"><kbd>H</kbd> high scores</span><span class="grp"><kbd>B</kbd> story</span><span class="grp"><kbd>Esc</kbd> menu</span></div></section>');
     document.body.insertBefore(sec, document.body.firstChild);
-    $('#mapHome').addEventListener('click', function () { SFX.tap(); location.href = 'index.html'; });
+    $('#mapHome').addEventListener('click', function () { SFX.tap(); location.href = A.ROOT + 'index.html#mode'; });   // v2p1a: Story is entered from the home screen
     $('#mapPlay').addEventListener('click', function () { play(sel); });
     window.__map = { items: ITEMS, sel: function () { return sel; }, select: function (j) { sel = j; render(); }, play: function (j) { play(j); } };
     $('#mapScores').addEventListener('click', function () { menu(false); scores(P); });
@@ -139,6 +140,7 @@
     box.innerHTML = '';
     ST.STOPS.forEach(function (s, i) {
       var info = ST.stopInfo(P, i) || {}, locked = !ST.playable(P, i), cur = !R.done && i === R.stop, gm = ST.GAMES[ST.gameOf(P, i)];
+      if (EXTRA(s)) return;   // story2's trail/boss levels live on the new place maps only
       if (s.side && !sideShown()) return;   // design1: side trips collapsed behind the signpost
       var b = A.el('<button class="stop' + (s.side ? ' side' : '') + ' g-' + gm.id + (locked ? ' locked' : '') + (info.passed ? ' passed' : '') + (cur ? ' cur' : '') + (ITEMS[sel].t === 's' && i === ITEMS[sel].i ? ' sel' : '') + '" style="' + pct(POS[i]) + '" data-i="' + i + '" data-game="' + gm.id + '" aria-label="' + (s.side ? A.esc(A.Curriculum.byId[s.skill].name) : 'Stop ' + s.n) + ', ' + A.esc(s.area.name) + ', ' + A.esc(gameName(gm.id)) + (locked ? ', locked' : '') + '">' +
         '<span class="n">' + (locked ? (s.side ? '' : s.n) : stopFace(s)) + '</span>' + (locked ? '' : '<span class="gm g-' + gm.id + '" title="' + A.esc(gameName(gm.id)) + '">' + gm.icon + '</span>') + (info.stars ? '<span class="ss">' + '★★★'.slice(0, info.stars) + '</span>' : '') + '</button>');
@@ -155,7 +157,7 @@
     });
     sec.classList.toggle('sideopen', !!sideShown());
     if (MAIN < ST.STOPS.length && !sideShown()) {
-      var sp = A.el('<button class="signpost" style="' + pct(SIGN) + '" aria-label="Side trips: ' + A.esc(ST.AREAS.filter(function (a) { return a.side; }).map(function (a) { return a.name; }).join(', ')) + '"><span>🪧</span><b>Side trips</b></button>');
+      var sp = A.el('<button class="signpost" style="' + pct(SIGN) + '" aria-label="Side trips: ' + A.esc(ST.AREAS.filter(function (a) { return a.side && !a.trail && !a.boss; }).map(function (a) { return a.name; }).join(', ')) + '"><span>🪧</span><b>Side trips</b></button>');
       sp.addEventListener('click', function () { if (busy) return; sideOpen = true; var ns = sideItem(); if (ns >= 0) sel = ns; render(); SFX.step(); });
       box.appendChild(sp);
     }
@@ -181,7 +183,7 @@
     var s = ST.STOPS[it.i], cfg = ST.config(P, it.i), gid = ST.gameOf(P, it.i), inf = ST.stopInfo(P, it.i) || {}, R = ST.run(P), skill = A.Curriculum.byId[cfg.skill];
     var tag = s.side ? 'Side trip' : R.done ? 'Practice' : it.i === R.stop ? 'Journey stop' : it.i < R.stop ? 'Practice' : '';
     $('#mapInfo').innerHTML = '<span class="ie">' + s.area.emoji + '</span><span class="it"><b>' + (s.side ? stopFace(s) + ' ' + A.esc(skill.name) : 'Stop ' + s.n) + ' · ' + A.esc(s.area.name) + '</b>' +
-      '<small class="game g-' + gid + '">' + ST.GAMES[gid].icon + ' <b>' + A.esc(gameName(gid)) + '</b>' + (gid === 'slugger' ? ' · ' + A.esc(ST.sluggerConfig(P, it.i).goalText) : '') + '</small>' +
+      '<small class="game g-' + gid + '">' + ST.GAMES[gid].icon + ' <b>' + A.esc(gameName(gid)) + '</b>' + (gid === 'slugger' ? ' · ' + A.esc(ST.sluggerConfig(P, it.i).goalText) : gid === 'stand' ? ' · Serve 4 friends' : gid === 'bubble' ? ' · Pop 8 bubbles' : '') + '</small>' +
       '<small>' + A.esc(skill.name) + ' · ' + A.esc(skill.levels[cfg.level]) + (cfg.helper ? ' · a little easier' : '') + (tag ? ' · ' + tag : '') + '</small>' +
       '<small>' + (inf.best ? 'Best here: <b>' + inf.best + '</b> ' + '★★★'.slice(0, inf.stars || 0) : 'Not played yet') + '</small></span>';
   }
@@ -228,7 +230,7 @@
     else if (k === ' ' || k === 'Enter' || k === 'f' || k === 'F') { e.preventDefault(); if (!e.repeat) play(sel); }
     else if (k === 'h' || k === 'H') { e.preventDefault(); scores(P); }
     else if ((k === 'b' || k === 'B') && A.StoryBook) { e.preventDefault(); V.stop(); A.StoryBook.open(P); }
-    else if (k === 'Escape') { e.preventDefault(); location.href = 'index.html'; }
+    else if (k === 'Escape') { e.preventDefault(); location.href = A.ROOT + 'index.html#mode'; }
     else if (k === 'm' || k === 'M') { A.Music.toggle(); }
   }
   function open(p, o) {
@@ -260,6 +262,7 @@
         '<td class="sc">' + (r.score || '—') + '</td><td class="st">' + (r.score ? (r.finished ? '🏁 ' : '') + r.stops + '/' + MAIN + ' ' + ST.PATHS[r.path].emoji : 'not yet') + '</td></tr>';
     }).join('');
     var mine = ST.AREAS.map(function (a, ai) {
+      if (a.trail || a.boss) return '';
       var sum = 0; ST.STOPS.forEach(function (st) { if (st.ai === ai) sum += (ST.stopInfo(p, st.i) || {}).best || 0; });
       return '<div class="ab"><span>' + a.emoji + '</span><b>' + (sum || '—') + '</b></div>';
     }).join('');

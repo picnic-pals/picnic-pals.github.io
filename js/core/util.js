@@ -9,7 +9,7 @@
   /* Game and place titles: the ONE place to rename them. Every on-screen title, tag, hint and page <title> reads these
      (elements with data-title="munch|baseball|room" get their text filled in on load). The recorded clips munch_title / bb_title
      ("Picnic Munch!", "Snack Slugger!") are audio and need re-recording/regenerating separately when the names change. */
-  A.TITLES = { munch: 'Picnic Munch', baseball: 'Snack Slugger', room: 'Picnic Spot', app: 'Picnic Pals' };
+  A.TITLES = { munch: 'Picnic Munch', baseball: 'Snack Slugger', room: 'Picnic Spot', stand: 'Lemonade Stand', bubble: 'Bubble Pop', color: 'Coloring', app: 'Picnic Pals' };
   if (document.addEventListener) document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-title]'), function (el) { var t = A.TITLES[el.getAttribute('data-title')]; if (t) el.textContent = t; });
     var pt = document.documentElement.getAttribute('data-page-title'); if (pt && A.TITLES[pt]) document.title = A.TITLES[pt] + ' · ' + A.TITLES.app;
@@ -44,6 +44,17 @@
   var subs = {};
   A.on = function (ev, fn) { (subs[ev] = subs[ev] || []).push(fn); };
   A.emit = function (ev, data) { (subs[ev] || []).slice().forEach(function (fn) { try { fn(data); } catch (e) { console.warn(e); } }); };
+
+  // v2p1c: keyboard hint strips ('← → choose · Space pick…') are for keyboards. On touch screens (and after any finger tap)
+  // body gets .touchui and core.css hides them; the first real key press or controller input shows them again. Every page.
+  (function () {
+    var b = document.body; if (!b) return;
+    if (A.isTouchOnly()) b.classList.add('touchui');
+    try { var mq = matchMedia('(hover: none) and (pointer: coarse)'), onMq = function (e) { if (e.matches) b.classList.add('touchui'); }; if (mq.addEventListener) mq.addEventListener('change', onMq); else if (mq.addListener) mq.addListener(onMq); } catch (e) {}   // the screen becomes touch-only later (hybrid / rotation)
+    document.addEventListener('pointerdown', function (e) { if (e.pointerType === 'touch') b.classList.add('touchui'); }, true);
+    document.addEventListener('keydown', function (e) { if (!/^(Shift|Control|Alt|Meta)$/.test(e.key)) b.classList.remove('touchui'); }, true);
+    A.on('pad:mode', function (on) { if (on) b.classList.remove('touchui'); });
+  })();
   A.off = function (ev, fn) { var a = subs[ev]; if (!a) return; var i = a.indexOf(fn); if (i >= 0) a.splice(i, 1); };
   /* A.Age: the ONE place for age cut-offs (2026-10-21 ux3a). Everything that changes with age asks here.
        toddler    age 2 and under  -> Toddler mode auto (Tiny Picnic)

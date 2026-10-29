@@ -37,8 +37,8 @@
     step = s; var box = $('#menuTiles'), q = $('#menuQ'), R = A.Story.run(P), st = A.Story.data(P);
     if (s === 'main') {
       q.textContent = 'What do you want to play?';
-      box.innerHTML = tile('story', 'Story', A.Story.WORLD + ' adventure' + (R.stop || st.bestRun ? '<br><b>Stop ' + Math.min(R.stop + 1, 20) + ' of 20</b> · best ' + (st.bestRun || 0) : ''), ISLAND, 'story') +
-        tile('free', 'Free Play', 'Munch at your own level', GRID, 'free') +
+      // v2p1a: Story is picked on the home screen (Story / Free Play), so this Free Play menu is just: by myself or 2 players
+      box.innerHTML = tile('free', 'Free Play', 'Munch at your own level', GRID, 'free') +
         tile('two', '2 Players', 'Team or race, one keyboard', '<span class="pair">' + B.forProfile(P, { expr: 'happy' }) + B.svg({ blob: P.blob === 'apple' ? 'blueberry' : 'apple', expr: 'happy' }) + '</span>', 'two');
       wire({ story: function () { go('mode=story'); }, free: function () { go('mode=free'); }, two: function () { V.say(['hub_pick_friend']); render('partner'); } });
     } else if (s === 'partner') {
@@ -72,7 +72,7 @@
     A.$$('.screen').forEach(function (s) { s.classList.toggle('on', s === sec); });
     $('#menuAv').innerHTML = B.forProfile(P, { expr: 'happy' }); $('#menuHi').textContent = 'Hi, ' + P.name + '!'; music();
     document.body.classList.add('menu');
-    render('main'); V.say(['menu_pick']); A.Music.play('hub');
+    render('main'); V.say(['menu_free']); A.Music.play('hub');
     UI.gear({ onClose: function () { music(); A.Music.apply(); render(step); } });
     window.__munchMenu = { render: render, step: function () { return step; } };
   }
