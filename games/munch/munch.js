@@ -454,7 +454,7 @@
       '<span class="tag">✨ Bonus question' + (TWO ? ' for ' + A.esc(pl.name) : '') + '</span>' +
       (TWO ? '<span class="mini who p' + (pl.i + 1) + '">' + A.Blobs.forProfile(pl.P) + '</span>' : '') +
       '<h2 class="qq">' + A.esc(q.q) + ' <button class="speak sm" data-again aria-label="Hear it again">🔊</button></h2>' +
-      '<div class="choices n' + order.length + '">' + order.map(function (ci, k) { var c = q.choices[ci]; return '<button class="choice" data-k="' + k + '"><span class="em">' + c.emoji + '</span><span class="lb">' + A.esc(c.hideText ? '' : c.text) + '</span></button>'; }).join('') + '</div>' +
+      '<div class="choices n' + order.length + '">' + order.map(function (ci, k) { var c = q.choices[ci]; return '<button class="choice" data-k="' + k + '"><span class="em"' + (c.size ? ' style="font-size:' + c.size + 'em"' : '') + '>' + c.emoji + '</span><span class="lb">' + A.esc(c.hideText ? '' : c.text) + '</span></button>'; }).join('') + '</div>' +
       '<div class="res" aria-live="polite"></div><span class="kh">' + (A.isTouchOnly() ? 'Tap your answer' : keys) + '</span><span class="ph">' + A.Pad.g('dpad') + ' choose · ' + A.Pad.g('a') + ' answer</span></div></div>');
     document.body.appendChild(ov); B.el = ov; UI.cardOpen = true;
     A.$$('.choice', ov).forEach(function (b) { b.addEventListener('click', function () { answer(+b.dataset.k); }); b.addEventListener('pointerenter', function () { if (!B.answered) select(+b.dataset.k); }); });
@@ -779,6 +779,14 @@
         if (gf !== a.friend) { beat = beat.split(/(?<=[.!?])\s+/).filter(function (x) { return x.indexOf(gName) < 0 && !/^(Hi|Hello)\b/.test(x); }).join(' ') || 'Let\'s find the star-snacks here!'; bv = ['area_' + a.id, { text: beat }]; }
         return UI.card({ cls: 'storycard beat', tag: a.emoji + ' ' + a.name, title: A.Blobs.byId[gf].name + ' says…', art: '<div class="jump">' + A.Blobs.svg({ blob: gf, expr: 'happy' }) + '</div>', sub: beat, btn: 'OK ▶', voice: bv, minMs: 600 });
       });
+      // quality1 (rule 2): the very first Munch stop of a subject runs the same quick check as free Munch (UI.placement), so a
+      // strong kid is never kept on below-band stops just because Story came first. The stop then re-reads its skill.
+      if (!slug && !stand && !bub && !(A.toddler && A.toddler(P1)) && A.Coach && A.Store.settings.placement !== false) chain = chain.then(function () {
+        var sk0 = C.byId[cfg.skill], subj0 = sk0 && C.subjectOf(sk0), cur0 = subj0 && C.current(P1, subj0);
+        if (!cur0 || !A.Coach.wantsPlacement(P1, cur0.id)) return;
+        return UI.placement(P1, cur0).then(function () { A.Store.save(); cfg = ST.config(P1, i); SR.cfg = cfg;
+          PL[0].round = { skill: C.byId[cfg.skill], level: cfg.level, nOk: cfg.nOk, timeX: cfg.timeX, story: true, stop: stop, review: false }; });
+      });
       return chain.then(function () {
         var parts = stop.side ? ['area_' + stop.area.id].concat(cfg.helper ? ['story_helper'] : []) : ['story_stop', stop.n].concat(cfg.helper ? ['story_helper'] : practice ? ['story_practice'] : []);
         if (stop.side && cfg.boss) return cutscene({ title: 'Mini boss!', sub: stop.area.emoji + ' ' + cfg.bossName + ' · ' + C.byId[cfg.skill].name, voice: ['s2_boss'], heroes: [P1], friends: met(A.Story2 ? [A.Story2.hero(P1)] : ['strawberry']) });
@@ -941,7 +949,8 @@
   function toggleMusic() { var on = M.toggle(); renderMusicBtn(); bubble(on ? 'Music on 🎵' : 'Music off'); }
   function renderMusicBtn() { var b = $('#musicBtn'); b.classList.toggle('off', S.music === false); b.setAttribute('aria-label', S.music === false ? 'Music is off (M)' : 'Music is on (M)'); }
   $('#musicBtn').addEventListener('click', function (e) { e.stopPropagation(); toggleMusic(); });
-  $('#homeBtn').addEventListener('click', function () { V.stop(); M.stop(); SFX.tap(); A.Store.save(); location.href = A.ROOT + 'index.html' + (STORY && !(A.toddler && A.toddler(P1)) ? '#mode' : '#games'); });
+  $('#homeBtn').addEventListener('click', function () { V.stop(); M.stop(); SFX.tap(); A.Store.save(); if (STORY && SR && $('#game').classList.contains('on')) { location.href = 'index.html?mode=story&from=' + SR.i + '&to=' + SR.i; return; }   // quality1 (C4): Back from a story level goes to its place map
+    location.href = A.ROOT + 'index.html' + (STORY && !(A.toddler && A.toddler(P1)) ? '#mode' : '#games'); });
   A.on('voice:start', function () { $('#speakBtn').classList.add('talking'); });
   A.on('voice:end', function () { $('#speakBtn').classList.remove('talking'); });
   window.addEventListener('resize', layout);
@@ -977,18 +986,19 @@
   } });
 
   /* ---------- start ---------- */
+  A.HowTo.button(function () { return STORY && !G.active ? 'story' : 'munch'; }, '#homeBtn');   // quality1 (C3): the "?" how-to card
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (cellEls.length) fitCells(); });
   if (STORY) { document.body.classList.add('story');   // back from a Snack Slugger stop: ?from=i&to=j hops the friend along
     var qf = qs.from != null && qs.from !== '' && ST.STOPS[+qs.from] ? +qs.from : null, qt = qs.to != null && qs.to !== '' && ST.STOPS[+qs.to] ? +qs.to : qf;
     if (qf != null) { try { history.replaceState(null, '', 'index.html?mode=story'); } catch (e) {} if (qt === qf) A.MunchMap.preselect(qf); }
-    storyMap(qf, qt); }
+    A.HowTo.first('story').then(function () { storyMap(qf, qt); }); }
   else if (!TWO) {
     M.play('game');
     PRE = C.pickRound(P1, { placement: true }); A.Store.save();
     var fs = PRE.skill, fl = PRE.level;
-    UI.card({ cls: 'ready', tag: fs.name + ' · Level ' + (fl + 1), title: A.TITLES.munch, art: '<div class="jump">' + A.Blobs.forProfile(P1, { expr: 'happy' }) + '</div>',
+    A.HowTo.first('munch').then(function () { return UI.card({ cls: 'ready', tag: fs.name + ' · Level ' + (fl + 1), title: A.TITLES.munch, art: '<div class="jump">' + A.Blobs.forProfile(P1, { expr: 'happy' }) + '</div>',
       sub: A.isTouchOnly() ? 'Tap a square to walk. Tap your friend to munch!' : (A.Pad.inUse() ? 'D-pad to move. ' + A.Pad.name('a') + ' to munch!' : 'Arrow keys to move. Space to munch!') + (T.on ? ' Beat the clock!' : ''), btn: '▶ Play', voice: ['munch_title', A.isTouchOnly() ? 'munch_ready_touch' : 'munch_ready'] })
-      .then(nextRound);
+      ; }).then(nextRound);
   } else {
     M.play('game');
     var art = '<div class="duo mini2"><div class="pcol p2"><div class="pa jump">' + A.Blobs.forProfile(P2, { expr: 'happy' }) + '</div><b class="pn">' + A.esc(P2.name) + '</b><span class="kk">' + A.Pad.label(1, 'W A S D + F') + '</span></div>' +

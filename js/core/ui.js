@@ -74,7 +74,8 @@
   /* ---------- placement check (coach v2): 5 quick, low-stakes questions when a skill first opens ----------
      Resolves { score, result: 'skip' | 'higher' | 'normal' }. No hearts, no timer, no "wrong" sound: a missed one just glows the answer. */
   UI.placement = function (P, skill) {
-    if (skill && skill.isStep && A.Steps) return UI.warmup(P, skill);
+    var api = A.Learn && A.Learn.placementApi ? A.Learn.placementApi(P, skill) : null;   // quality1: step warm-up, reading probe or place-value test-out
+    if (api || (skill && skill.isStep && A.Steps)) return UI.warmup(P, skill, api);
     var C = A.Curriculum, K = A.Coach, Q = A.Questions, top = skill.levels.length - 1, n = K.PLACE_N, score = 0, i = 0;
     function one() {
       return new Promise(function (resolve) {
@@ -118,11 +119,13 @@
   };
   /* v2p2a warm-up probe for a step ladder (js/core/steps-math.js): about 6 picks, one per step (a long ladder strides),
      easiest first; it stops at the first miss. No hearts, no clock, no "wrong" sound. Resolves { result: 'skip' | 'normal' }. */
-  UI.warmup = function (P, skill) {
-    var S = A.Steps, Q = A.Questions, pr = S.probePlan(P, skill.id), n = pr.plan.length, i = 0;
-    function one(step) {
+  UI.warmup = function (P, skill, api) {
+    var S = A.Steps, Q = A.Questions, i = 0;
+    if (!api) { var pr = S.probePlan(P, skill.id); api = { n: pr.plan.length, next: function () { var st = S.probeNext(pr); return st ? { skill: st, level: 0 } : null; }, answer: function (ok) { S.probeAnswer(pr, ok); }, finish: function () { var o = S.probeFinish(P, pr); o.asked = pr.asked; return o; } }; }
+    var n = api.n;
+    function one(it) {
       return new Promise(function (resolve) {
-        S.ctx.p = P; var q = Q.make(step, 0, { choices: 3 });
+        if (S) S.ctx.p = P; var q = Q.make(it.skill, it.level || 0, { choices: 3 });
         var ov = A.el('<div class="overlay on placement-card" role="dialog" aria-modal="true" aria-label="Warm-up"><div class="card">' +
           '<span class="tag">Warm-up</span><div class="pc-dots">' + Array.apply(null, Array(n)).map(function (_, k) { return '<i class="' + (k < i ? 'done' : k === i ? 'now' : '') + '"></i>'; }).join('') + '</div>' +
           '<div class="pc-q">' + q.text + '</div>' + (q.pic ? '<div class="pc-pic">' + q.pic + '</div>' : '') +
@@ -131,7 +134,7 @@
         var btns = A.$$('.pc-opt', ov), done = false, t0 = Date.now();
         function pickIt(k) {
           if (done || Date.now() - t0 < A.Pace.CFG.FRESH_Q) return; done = true; var ok = k === q.answer;
-          S.probeAnswer(pr, ok); A.Audio.sfx('tap');
+          api.answer(ok); A.Audio.sfx('tap');
           if (ok) btns[k].classList.add('right'); else btns[k].classList.add('picked', 'fade');   // a miss just fades (no red, the answer is not shown)
           document.removeEventListener('keydown', onKey, true);
           setTimeout(function () { ov.remove(); UI.cardOpen = !!document.querySelector('.overlay.on'); resolve(); }, ok ? 650 : 900);
@@ -149,13 +152,13 @@
         if (q.say) A.Voice.say(q.say);
       });
     }
-    function loop() { var st = S.probeNext(pr); if (!st) return Promise.resolve(); return one(st).then(function () { i++; return loop(); }); }
-    return UI.card({ cls: 'placement-intro', tag: 'Warm-up', title: 'Warm-up time!', html: '<p class="pc-sub">A few quick picks. No hearts, no clock. Just have fun!</p>', btn: 'Let’s go! ▶', voice: ['st_warmup'], minMs: 500 })
+    function loop() { if (i >= n) return Promise.resolve(); var it = api.next(); if (!it) return Promise.resolve(); return one(it).then(function () { i++; return loop(); }); }
+    return UI.card({ cls: 'placement-intro', tag: api.pv ? 'Quick check' : 'Warm-up', title: api.pv ? 'Tens and ones: quick check!' : 'Warm-up time!', html: '<p class="pc-sub">' + (api.pv ? 'A few quick picks about tens and ones. If you know them, we skip ahead.' : 'A few quick picks. No hearts, no clock. Just have fun!') + '</p>', btn: 'Let’s go! ▶', voice: [api.pv ? 'q1_pv_check' : 'st_warmup'], minMs: 500 })
       .then(loop).then(function () {
-        var out = S.probeFinish(P, pr); A.Store.save();
+        var out = api.finish(); A.Store.save();
         var many = out.placed.length > 0;
         return UI.card({ cls: 'placement-done', tag: 'Warm-up done', title: many ? 'Wow, you know lots!' : 'Great warm-up!', html: '<p>' + (many ? 'You can skip ahead. Let’s play!' : 'Let’s play together!') + '</p>', btn: '▶ Play', voice: [many ? 'place_skip' : 'place_normal'], sfx: many ? 'fanfare' : null, confetti: many, minMs: 500 })
-          .then(function () { return { score: pr.asked, result: many ? 'skip' : 'normal', start: out.start }; });
+          .then(function () { return { score: out.asked, result: api.v2 || api.pv ? 'done' : many ? 'skip' : 'normal', start: out.start }; });
       });
   };
   /* a small, non-blocking mini-lesson for a diagnosed mistake (coach v2 ERRORS/HINTS): shows over the game for a few seconds */
@@ -400,4 +403,39 @@
   document.addEventListener('click', function (e) {
     if (UI.swallowClickUntil && Date.now() < UI.swallowClickUntil && UI.swallowFor && UI.swallowFor.contains(e.target)) { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); UI.swallowClickUntil = 0; UI.swallowFor = null; }
   }, true);
+
+  /* ---------- quality1 (C3): how-to-play card for Munch, Bubble Pop, Lemonade Stand, Tiny Picnic and Story ----------
+     1-2 short lines + a picture; readable on mute (text), read aloud with sound (one recorded line each, js/core/learn.js Q1_LINES).
+     Shown once on a player's first play of that game (P.howto[game]) and any time behind the "?" button. Automated browsers
+     skip the first-play card (like breaks.js) unless localStorage blobArcade.howto = '1'. */
+  var HOWTO = {
+    munch: { e: '😋', title: 'Picnic Munch', lines: ['Read the question at the top.', 'Walk your friend to a right answer and munch it!'] },
+    bubble: { e: '🫧', title: 'Bubble Pop', lines: ['Listen, or read the card at the top.', 'Pop the bubbles that match!'] },
+    stand: { e: '🍋', title: 'Lemonade Stand', lines: ['Listen to the order, or read the ticket.', 'Tap what they ask for, then tap the big button!'] },
+    tiny: { e: '🧺', title: 'Tiny Picnic', lines: ['Listen for what to find.', 'Tap the picture. Every tap is OK!'] },
+    story: { e: '🗺️', title: 'Story', lines: ['Walk the path with your friends.', 'Play each stop to find the missing star-snacks!'] }
+  };
+  function howtoAuto() { try { var v = localStorage.getItem('blobArcade.howto'); if (v === '1') return true; if (v === '0') return false; } catch (e) {} return !(typeof navigator !== 'undefined' && navigator.webdriver); }
+  var HowTo = A.HowTo = { DATA: HOWTO,
+    show: function (g) {
+      var h = HOWTO[g]; if (!h || document.querySelector('.overlay.howto')) return Promise.resolve();
+      var P = A.Store && A.Store.active && A.Store.active(), friend = P && A.Blobs && A.Blobs.forProfile ? A.Blobs.forProfile(P, { expr: 'happy' }) : '';
+      return UI.card({ cls: 'howto', tag: 'How to play', title: h.title, art: '<div class="howto-art"><span class="he" aria-hidden="true">' + h.e + '</span>' + (friend ? '<span class="hf">' + friend + '</span>' : '') + '</div>',
+        html: '<p class="howto-lines">' + h.lines.map(A.esc).join('<br>') + '</p>', btn: 'OK ▶', voice: ['q1_howto_' + g], minMs: 500 });
+    },
+    seen: function (g) { var P = A.Store && A.Store.active && A.Store.active(); return !!(P && P.howto && P.howto[g]); },
+    // first play: the card once, then the game starts. Resolves right away when already seen (or under automation).
+    first: function (g) {
+      var P = A.Store && A.Store.active && A.Store.active(); if (!P || !HOWTO[g] || HowTo.seen(g) || !howtoAuto()) return Promise.resolve(false);
+      (P.howto || (P.howto = {}))[g] = Date.now(); try { A.Store.save(); } catch (e) {}
+      return HowTo.show(g).then(function () { return true; });
+    },
+    // the "?" button: placed right after `after` (an element or selector) in the game's top bar
+    button: function (g, after) {
+      var a = typeof after === 'string' ? document.querySelector(after) : after; if (!a || !a.parentNode || document.getElementById('howtoBtn')) return null;
+      var b = A.el('<button class="q1help" id="howtoBtn" aria-label="How to play" title="How to play">?</button>');
+      a.parentNode.insertBefore(b, a.nextSibling);
+      b.addEventListener('click', function (e) { e.stopPropagation(); if (document.querySelector('.overlay.on')) return;   /* UI.cardOpen can be left stale by a game's own card */ A.Audio && A.Audio.sfx && A.Audio.sfx('tap'); HowTo.show(typeof g === 'function' ? g() : g); });
+      return b;
+    } };
 })(window.Arcade);

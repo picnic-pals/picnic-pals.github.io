@@ -102,6 +102,8 @@ body.rush .counter { box-shadow: inset 0 -10px 0 #d9a35f, 0 8px 0 #c98f4f, 0 0 0
 @media (prefers-reduced-motion: reduce) { .friend, .bin, .ti, .jt, .tipfly, .billbtn { animation: none !important; transition: none !important; } }
 .bubble .line { margin: 0; font-size: 20px; font-weight: 700; color: #6b4fa0; text-align: center; max-width: 340px; }
 .bubble .line.pop { animation: sdrop .3s ease-out; }
+.bubble .ask { margin: 0 0 4px; font-size: 19px; font-weight: 800; color: #4a3b6b; text-align: center; max-width: 360px; line-height: 1.25; }
+.prices .tag.paid { background: #dff5e1; }
 .counter.pickmode .tray { display: none; }
 .counter.pickmode .bins { flex: 1; align-content: center; align-items: center; gap: 28px; }
 .counter.pickmode .bin { min-width: 210px; min-height: 210px; border-radius: 44px; } .counter.pickmode .bin .emo { font-size: 130px; } .counter.pickmode .bin .drink svg { width: 150px; height: 164px; } .counter.pickmode .bin .drink i { font-size: 38px; }
@@ -126,3 +128,39 @@ body.tod .bubble .want .emo { font-size: 84px; } body.tod .bubble .want .drink s
 .cnt.multi { flex-direction: column; height: auto; padding: 8px 10px; border-radius: 24px; gap: 4px; font-size: 28px; min-width: 76px; }
 .cnt.multi .ci { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
 .cnt.multi .emo { font-size: 26px; } .cnt.multi .drink svg { width: 26px; height: 28px; } .cnt.multi .drink i { display: none; }
+
+/* quality1 (C3): the "?" how-to button sits under the home button */
+#howtoBtn.q1help { position: fixed; top: 72px; left: 11px; z-index: 6; width: 46px; height: 46px; font-size: 26px; }
+/* quality1 polish: phone layout. The customer's order bubble (and the ticket in it) used to run off the left edge, because the
+   bubble + ticket minimum widths and a 22vh friend did not fit 390px side by side. On a narrow screen the friend is smaller,
+   the bubble takes the rest of the row and the ticket text is a little smaller. The top bar gets the same fix as Bubble Pop. */
+@media (max-width: 600px) {
+  .cust { justify-content: flex-start; gap: 4px; padding: 10px 8px 0 12px; box-sizing: border-box; width: 100%; }
+  .cust .bubble { flex: 1 1 0; min-width: 0; padding: 10px 12px; border-radius: 24px; }
+  .cust .bubble::after { left: auto; right: -16px; bottom: 30px; margin: 0; border: 12px solid transparent; border-left: 16px solid #fff; border-right: 0; }
+  .cust .friend { flex: 0 0 auto; height: 15vh; max-width: 34%; }
+  .ticket, .ticket.back, .ticket.long { min-width: 0; max-width: 100%; padding: 6px 38px 6px 12px; box-sizing: border-box; }
+  .ticket p { font-size: 22px; } .ticket.long p { font-size: 19px; }
+  .bubble .ask { font-size: 16px; } .bubble .line { font-size: 17px; }
+  #stand .sayagain { width: 56px; height: 56px; font-size: 27px; right: 70px; top: 10px; }
+  #stand .tbar { padding: 18px 134px 0 70px; justify-content: center; }
+  #stand .dots { gap: 5px; padding: 7px 8px; } #stand .dots i { width: 14px; height: 14px; flex: 0 0 14px; }
+  #stand .sunny { display: none; }
+  #stand .tbar { gap: 6px; } #stand .jarchip { position: absolute; right: 12px; top: 74px; font-size: 18px; padding: 4px 10px; white-space: nowrap; }
+  .ticket { padding-right: 34px; } .ticket p { font-size: 20px; } .ticket .spk { right: 6px; top: 6px; font-size: 20px; }
+  /* quality1 polish: the counter fits a phone screen (the Serve button was below the bottom edge at 390x844 and off screen at 375x667) */
+  .counter { padding: 10px; gap: 8px; }
+  .tray { min-height: 84px; }
+  .bins { gap: 8px; flex-wrap: nowrap; }
+  .bin { min-width: 0; flex: 1 1 0; max-width: 96px; min-height: 84px; border-radius: 20px; padding: 6px 4px; }
+  .bin .emo { font-size: 44px; } .bin .drink svg { width: 54px; height: 58px; } .bin small { font-size: 13px; }
+  .bins.pick .bin, .counter.pickmode .bin { min-width: 0; max-width: 150px; min-height: 130px; } .bins.pick .bin .emo, .counter.pickmode .bin .emo { font-size: 80px; }
+  .counter.pickmode .bins { gap: 12px; }
+  .acts { gap: 8px; } .sbtn { min-height: 64px; min-width: 150px; font-size: 26px; padding: 0 22px; } .sbtn.num { min-width: 80px; font-size: 32px; }
+}
+/* quality1 polish: short phones (iPhone SE 375x667) */
+@media (max-width: 600px) and (max-height: 720px) {
+  #stand { padding-bottom: 10px; gap: 4px; }
+  .cust .friend { height: 12vh; } .tray { min-height: 64px; } .bin { min-height: 76px; } .bin .emo { font-size: 40px; }
+  .sbtn { min-height: 58px; } .ticket p { font-size: 18px; } .ticket.long p { font-size: 17px; }
+}

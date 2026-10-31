@@ -1030,5 +1030,12 @@
   })();
   var BY = {}, ALL = [];
   S.forEach(function (s) { s.lines.forEach(function (l) { l.section = s.id; BY[l.id] = l; ALL.push(l); }); });
-  A.VoiceLines = { sections: S, byId: BY, all: ALL, EXTS: ['mp3', 'm4a', 'wav', 'webm', 'ogg'] };
+  // quality1: lines added by files that load later (js/core/learn.js content patches); same shape as sec(), merged into one section
+  function add(id, title, when, note, lines) {
+    var sc = S.filter(function (x) { return x.id === id; })[0];
+    if (!sc) { sc = { id: id, title: title, when: when || 'later', note: note || '', lines: [] }; S.push(sc); }
+    lines.forEach(function (l) { if (BY[l[0]]) return; var o = { id: l[0], text: l[1], note: l[2] || '', section: id }; sc.lines.push(o); BY[o.id] = o; ALL.push(o); });
+    return sc;
+  }
+  A.VoiceLines = { sections: S, byId: BY, all: ALL, add: add, EXTS: ['mp3', 'm4a', 'wav', 'webm', 'ogg'] };
 })(window.Arcade);

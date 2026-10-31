@@ -43,6 +43,10 @@
     ['big', '🐘', 'small', '🐭'], ['open', '🔓', 'closed', '🔒'], ['stop', '🛑', 'go', '🟢'], ['loud', '📢', 'quiet', '🤫'], ['yes', '✅', 'no', '❌']];
   G.OPP_WORDS = [['old', 'new'], ['in', 'out'], ['on', 'off'], ['top', 'bottom'], ['left', 'right'], ['push', 'pull'], ['wet', 'dry'], ['full', 'empty'],
     ['long', 'short'], ['hard', 'soft'], ['first', 'last'], ['give', 'take']];
+  // quality1: a word that is ALSO an opposite of the target (old: young) is never a wrong choice (exactly one right answer)
+  G.OPP_ALSO = { old: ['young', 'new'], new: ['old', 'used'], short: ['long', 'tall'], long: ['short'], hard: ['soft', 'easy'], soft: ['hard', 'loud'], right: ['left', 'wrong'], left: ['right'],
+    top: ['bottom', 'down'], up: ['down', 'bottom'], down: ['up', 'top'], bottom: ['top', 'up'], small: ['big', 'tall', 'long'], big: ['small', 'little'], quiet: ['loud', 'noisy'], loud: ['quiet', 'soft'],
+    go: ['stop', 'come'], stop: ['go', 'start'], first: ['last'], last: ['first'], open: ['closed', 'shut'], closed: ['open'], on: ['off'], off: ['on'], in: ['out'], out: ['in'] };
   G.OPP = {}; G.OPP_EMO = {};
   G.OPP_PICS.forEach(function (p) { G.OPP[p[0]] = p[2]; G.OPP[p[2]] = p[0]; G.OPP_EMO[p[0]] = p[1]; G.OPP_EMO[p[2]] = p[3]; });
   G.OPP_WORDS.forEach(function (p) { if (!G.OPP[p[0]]) G.OPP[p[0]] = p[1]; if (!G.OPP[p[1]]) G.OPP[p[1]] = p[0]; });
@@ -96,6 +100,12 @@
   var REAL2 = words('cap cope tape tap type mad mud make can cone cake hop hose home not nose net rob rope ride cub cute tube tub tune cut kite kit bite kick pin pane line rid rode hide hid side fin five fan bake like plan plate planet slid smile hum hole bore ' +
     'ran rail main pant print pain trail tray wit what wet free three try fat fit feel grin grain greet slip sheep slap bat beat bolt cot cat cost step soup snap got gate goal set sat sent tame them tea bench each loaf lean deaf flat flute stretch strut sweet');
   G.LONG.forEach(function (lv) { Object.keys(lv).forEach(function (w) { lv[w] = words(lv[w]).filter(function (x, i, a) { return x !== w && REAL2.indexOf(x) >= 0 && a.indexOf(x) === i; }); }); });
+  // quality1 polish: pictures for the long-vowel mute fallback (one clear picture per word) and words that must never be a
+  // wrong choice next to that picture because they could name it too (a boat floats; a tree is green)
+  G.LONG_PIC = { kite: '🪁', bike: '🚲', plane: '✈️', slide: '🛝', bone: '🦴', cube: '🧊', home: '🏠',
+    rain: '🌧️', paint: '🎨', train: '🚆', tree: '🌳', feet: '👣', sleep: '😴', boat: '⛵', coat: '🧥', soap: '🧼', goat: '🐐', seat: '💺', beach: '🏖️', leaf: '🍃' };
+  G.LONG_PIC_NOT = { boat: ['float'], tree: ['green', 'leaf'], leaf: ['green', 'tree'], plane: ['float'], bike: ['ride'], train: ['ride'], slide: ['ride'], beach: ['float'],
+    rain: ['wait'], sleep: ['home'], home: ['sleep'], feet: ['street'], seat: ['wait'] };
   // Dolch 2nd and 3rd grade
   G.DOLCH2 = words("always around because been before best both buy call cold does don't fast first five found gave goes green its made many off or pull read right sing sit sleep tell their these those upon us use very wash which why wish work would write your");
   G.DOLCH3 = words('about better bring carry clean cut done draw drink eight fall far full got grow hold hot hurt if keep kind laugh light long much myself never only own pick seven shall show six small start ten today together try warm');
@@ -133,17 +143,17 @@
      ['Crunch ate a green grape. Then he gave a red grape to Bloop.', 'Who got the red grape?', 'Bloop', 'Crunch|green|grape', 'lit'],
      ['Bloop was sad and tired. Then she got a new puppy! She smiled and hugged it.', 'How did Bloop feel at the end?', 'happy', 'sad|tired|new', 'inf'],
      ['Dora was sleepy, but Crunch was not. His kite got stuck in a tall tree. He frowned and kicked a rock.', 'How did Crunch feel?', 'upset', 'sleepy|tall|stuck', 'inf'],
-     ['Gray clouds filled the sky. Niblet put on his boots and took his umbrella.', 'What will happen next?', 'it will rain', 'Niblet will take off his boots|the sky will be green|the clouds will sleep', 'inf'],
+     ['Gray clouds filled the sky. Niblet put on his boots and took his umbrella.', 'What will happen next?', 'it will rain', 'Niblet will take off his boots|the sky will turn bright and sunny|Niblet will go swimming', 'inf'],
      ['The cat hid under the bed when it heard the loud thunder.', 'Why did the cat hide?', 'it was scared', 'it wanted the bed|it liked the thunder|it was loud', 'inf'],
      ['Dora and Jammy baked a cake for the picnic. They put on pink frosting.', 'What did they bake?', 'cake', 'picnic|pink|frosting', 'lit']],
     [['The wind was strong, so Bloop held her hat with both hands. She walked home slowly.', 'Why did Bloop hold her hat?', 'the wind was strong', 'she walked home slowly|her hands were cold|her hat was new', 'inf'],
      ['Petey found a shiny shell on the sand. He put it in his pocket to show his friends.', 'Where did Petey put the shell?', 'pocket', 'sand|friends|shell', 'lit'],
      ['After school, Peel fed the fish. Then she did her homework at the kitchen table.', 'What did Peel do first?', 'fed the fish', 'did her homework|sat at the kitchen table|went to school', 'lit'],
      ['Crunch was nervous and a little sleepy before the show. He sang his song, and everyone clapped and cheered.', 'How did Crunch feel after the show?', 'proud', 'nervous|sleepy|little', 'inf'],
-     ['Bloop packed a towel, sunscreen and a shovel. She did not pack her school bag. Then she ran to the car.', 'Where is Bloop probably going?', 'the beach', 'school|the car wash|the towel store', 'inf'],
-     ['First Crisp mixed the flour. Next he cracked two eggs. Last he put the pan in the oven.', 'What did Crisp do after mixing the flour?', 'cracked the eggs', 'put the pan in the oven|mixed the flour|ate the oven', 'lit'],
-     ["Dora's plant was brown and dry. She gave it water every day. Soon it had green leaves.", 'Why did the plant get green leaves?', 'she gave it water', 'it was brown|it was dry|it was a day', 'inf'],
-     ['Jammy heard a knock at the door. Jammy opened it and saw Grandma holding a big gift with a bow.', 'What will Jammy do next?', 'open the gift', 'knock on the door|hold the bow|go to sleep at the door', 'inf'],
+     ['Bloop packed a towel, sunscreen and a shovel. She did not pack her school bag. Then she ran to the car.', 'Where is Bloop probably going?', 'the beach', 'school|the library|the car repair shop', 'inf'],
+     ['First Crisp mixed the flour. Next he cracked two eggs. Last he put the pan in the oven.', 'What did Crisp do after mixing the flour?', 'cracked the eggs', 'put the pan in the oven|mixed the flour|washed the dishes', 'lit'],
+     ["Dora's plant was brown and dry. She gave it water every day. Soon it had green leaves.", 'Why did the plant get green leaves?', 'she gave it water', 'it was brown|it was dry|she put it in a box', 'inf'],
+     ['Jammy heard a knock at the door. Jammy opened it and saw Grandma holding a big gift with a bow. \u201cThis is for you!\u201d said Grandma.', 'What will Jammy do next?', 'open the gift', 'knock on the door|hide behind the door|wash the dishes', 'inf'],
      ['The class went to the zoo. A lion was sleeping on a rock, but the monkeys were swinging and playing.', 'Who was sleeping on the rock?', 'the lion', 'the monkeys|the class|the zoo', 'lit']]];
   G.rcWrong = function (r) { return r[3].split('|'); };
 

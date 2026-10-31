@@ -149,10 +149,10 @@
       var ok = pool.filter(function (w) { return !alike(w, T); });
       var like = ok.filter(function (w) { return w.charAt(0).toLowerCase() === T.charAt(0).toLowerCase() || w.length === T.length; });
       function mk(w) { return { label: w, html: wordHtml(w), fact: w === T ? ['sw_that_says', swLine(w)] : ['rule_sight', swLine(T)], name: [], k: w.toLowerCase() }; }
-      return { text: '<span class="listen">Listen and find the word</span>', listen: true, hint: SIGHT_HINT, say: ['rule_sight', swLine(T)], target: T,
-        good: function () { return mk(T); }, bad: function () { return mk(like.length && Math.random() < (L ? .55 : .3) ? pick(like) : pick(ok)); } };
+      return A.SightWords.mute({ text: '<span class="listen">Listen and find the word</span>', listen: true, hint: SIGHT_HINT, say: ['rule_sight', swLine(T)], target: T,
+        good: function () { return mk(T); }, bad: function () { return mk(like.length && Math.random() < (L ? .55 : .3) ? pick(like) : pick(ok)); } }, pool, mk);
     } });
-  SK[5].ask = askFrom(SK[5].gen, function (r) { return { text: '<span class="listen">Listen and find the word</span>', listen: true, say: ['sw_find', swLine(r.target)] }; });
+  SK[5].ask = askFrom(SK[5].gen, function (r) { return r.cloze ? { text: r.text, say: [] } : { text: '<span class="listen">Listen and find the word</span>', listen: true, say: ['sw_find', swLine(r.target)] }; });
 
   // concepts first (colors, shapes), then reading (letters, beginning sounds, rhymes, sight words); math order is unchanged
   SK.forEach(function (s) { C.register(s); });
@@ -172,6 +172,8 @@
   // the age-appropriate rung instead (shapes level 2 at 4 and up); a toddler keeps the easy ones.
   function atLevel(p, subj) {
     var s = C.current(p, subj), lv = C.state(p, s.id).level || 0, Lv = A.Levels;
+    // quality1 band lock: a bonus question never comes from a skill under her floor (js/core/learn.js); use an in-band top skill
+    if (A.Learn && A.Learn.topList && subj !== 'concepts') { var gt = A.Learn.glTop(s.id); if (gt != null && gt < A.Learn.floor(p, subj)) { var tl = A.Learn.topList(p, subj); if (tl.length) { s = tl[Math.floor(Math.random() * tl.length)]; lv = (p.skills[s.id] || {}).level || 0; } } }
     // only Early Concepts is floored (its old saves sat at the very bottom); Reading / Math follow their adaptive ladders, which a grown-up may set lower on purpose
     if (subj !== 'concepts' || !Lv || !Lv.startFor || !Lv.grade) return { skill: s, level: lv };
     var g = Lv.grade(p, subj), f = g && g !== 'off' ? Lv.startFor(subj, g) : null; if (!f || f.soon || !C.byId[f.id]) return { skill: s, level: lv };

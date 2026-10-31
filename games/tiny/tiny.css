@@ -40,3 +40,13 @@ body { background: linear-gradient(#fff6e8, #ffe9f1); }
 @keyframes tbob { 50% { transform: translateY(-8px); } }
 @media (prefers-reduced-motion: reduce) { .ttile, .ttile.yay, .ttile.giggle, .tinyhero img { animation: none !important; transition: none; } }
 .tbar { padding-right: 84px; box-sizing: border-box; }   /* room for the grown-up gear in the corner */
+
+/* quality1 (C3): the "?" how-to button sits under the home button */
+#howtoBtn.q1help { position: fixed; top: 72px; left: 11px; z-index: 6; width: 46px; height: 46px; font-size: 26px; }
+/* quality1 polish: phone top bar. The first dot sat under the home button and the say-again button touched the last one. */
+@media (max-width: 600px) {
+  .tbar { padding: 0 72px 0 66px; gap: 10px; }
+  .tbar::before { display: none; }
+  .tbar .dots { flex: 1; justify-content: center; gap: 6px; }
+  .tbar .sayagain { width: 66px; height: 66px; font-size: 32px; flex: none; }
+}

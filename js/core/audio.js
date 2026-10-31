@@ -396,7 +396,7 @@
     A.emit('voice:start'); speaking = true;
     return plan(parts).then(function (pl) {
       if (tok !== TOK) return;
-      A.Voice.last = { tier: pl.tier, urls: pl.segs.map(function (s) { return s.url; }), text: textOf(parts), mode: 'speech' };
+      A.Voice.last = { tier: pl.tier, urls: pl.segs.map(function (s) { return s.url; }).filter(Boolean), text: textOf(parts), mode: 'speech' };
       if (pl.tier === 'speech') return speak(pl.segs[0].text, tok);
       // group consecutive clip segments; speak the (rare, mix-only) missing ones in between
       var chain = Promise.resolve(), run = [], pend = [];

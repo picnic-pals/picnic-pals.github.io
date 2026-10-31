@@ -87,6 +87,31 @@
   R.runGoal = function (little, age) { return little ? 12 : 13; };
   R.noFly = function (age) { return age != null && age <= 5; };
   R.stars = function (o) { return 1 + (o.won ? 1 : 0) + (o.won && o.runs >= o.goal && o.tricky >= 2 ? 1 : 0); };
+  /* quality1 A8: "where does the runner end up?" in plain words, about ONE runner (never "Double = 2" shorthand).
+     from = 1-3 (the runner's base), n = bases everyone runs, name = the runner's friend name when there is only one runner
+     (else null: "the runner on 2nd"), hitName = 'Single' | 'Double' | 'Triple'. Choices: 1st / 2nd / 3rd / Home minus 'from'. */
+  R.BASEN = ['home', '1st', '2nd', '3rd', 'home'];
+  R.whereChoices = function (from) { return [1, 2, 3, 4].filter(function (x) { return x !== from; }); };
+  R.whereQ = function (from, n, name, hitName) {
+    var to = Math.min(4, from + n), B = R.BASEN, who = name || ('the runner on ' + B[from]), ch = R.whereChoices(from);
+    var hit = String(hitName || '').toLowerCase(), art = /^[aeiou]/.test(hit) ? 'an ' : 'a ';
+    var text = (name ? name + ' is' : 'A runner is') + ' standing on ' + B[from] + ' base. The batter hits ' + art + hit + ', so everyone runs ' + n + (n === 1 ? ' base' : ' bases') + '. Where does ' + who + ' end up?';
+    return { text: text, from: from, to: to, n: n, choices: ch.map(function (x) { return x === 4 ? 'Home 🏠' : B[x]; }), answer: ch.indexOf(to),
+      explain: to === 4 ? 'Home. That\u2019s a run!' : B[to] + ' base.', run: to === 4 };
+  };
+  // a small diamond picture: the runner's base, then the bases she runs (dashed arrows, numbered 1, 2, ...)
+  R.diamondSvg = function (from, n) {
+    var P = [[50, 92], [92, 50], [50, 8], [8, 50]];   // home, 1st, 2nd, 3rd (counter-clockwise from home, like the field)
+    var h = '<svg class="bbdiamond" viewBox="-6 -6 112 112" width="120" height="120" role="img" aria-label="A baseball diamond: a runner on ' + R.BASEN[from] + ' base runs ' + n + (n === 1 ? ' base' : ' bases') + '">';
+    h += '<polygon points="50,92 92,50 50,8 8,50" fill="#9fd88a" stroke="#fff" stroke-width="3"/>';
+    for (var k = 0; k < n && from + k < 4; k++) { var a = P[(from + k) % 4], b = P[(from + k + 1) % 4], mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+      h += '<line x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '" stroke="#e8553d" stroke-width="4" stroke-dasharray="6 5" stroke-linecap="round"/>';
+      h += '<circle cx="' + mx + '" cy="' + my + '" r="8" fill="#fff" stroke="#e8553d" stroke-width="2"/><text x="' + mx + '" y="' + (my + 4) + '" text-anchor="middle" font-size="11" font-weight="800" fill="#c23b26">' + (k + 1) + '</text>'; }
+    P.forEach(function (q, i) { h += i === 0 ? '<polygon points="' + (q[0] - 7) + ',' + (q[1] - 5) + ' ' + (q[0] + 7) + ',' + (q[1] - 5) + ' ' + (q[0] + 7) + ',' + (q[1] + 2) + ' ' + q[0] + ',' + (q[1] + 8) + ' ' + (q[0] - 7) + ',' + (q[1] + 2) + '" fill="#fff" stroke="#888"/>'
+      : '<rect x="' + (q[0] - 6) + '" y="' + (q[1] - 6) + '" width="12" height="12" fill="#fff" stroke="#888" transform="rotate(45 ' + q[0] + ' ' + q[1] + ')"/>'; });
+    var r = P[from % 4]; h += '<circle cx="' + r[0] + '" cy="' + (r[1] - 13) + '" r="7" fill="#ff8ab3" stroke="#fff" stroke-width="2"/>';
+    return h + '</svg>';
+  };
   if (root && root.Arcade) root.Arcade.SluggerRules = R;
   if (typeof module !== 'undefined' && module.exports) module.exports = R;
 })(typeof window !== 'undefined' ? window : null);

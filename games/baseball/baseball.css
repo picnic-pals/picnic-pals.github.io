@@ -230,3 +230,16 @@ body.bonusing .sign { border-color: #c9b2ff; }
 .sbpic .rdot.new { background: #ff8fb6; border-color: #c2185b; } .sbpic i.gap { width: .45em; }
 .sbpic .sbv { font-size: 1.5em; min-width: 1.4em; text-align: right; } .sbpic .plus { color: #ff8fb6; font-size: .8em; }
 body.bonusing .sign .qpic.on { display: flex; align-items: center; }
+/* quality1 (A8): on a phone the base-running question stacks (words on top, the diamond under them), and the friend's
+   speech bubble is hidden during a question because the sign already shows the same words */
+@media (max-width: 600px) {
+  body.bonusing .sign .qrow { flex-wrap: wrap; }
+  body.bonusing .sign .qtxt { flex: 1 1 100%; order: 0; }
+  body.bonusing .sign .qpic.on { order: 1; margin: 0 auto; }
+  body.bonusing .sign { padding-bottom: 22px; }   /* room for the tag under the picture: it never covers the diamond */
+  body.bonusing .sign .qpic.on { flex: 1 1 auto; justify-content: center; }
+  body.bonusing .sign .bbdiamond { width: 124px; height: 124px; }
+  body.bonusing #friendBubble { display: none !important; }
+}
+/* quality1 polish: on a tablet the base-running picture is big enough to follow the numbered path at a glance */
+@media (min-width: 601px) { body.bonusing .sign .bbdiamond { width: 140px; height: 140px; } }

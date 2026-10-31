@@ -35,7 +35,7 @@
   };
   var PLURAL = { cherries: 1, blueberries: 1, jeans: 1, grapes: 1 };
   // reuse the bonus-question answer clips that are just the bare word ("c_apple" says "Apple."), else a new pw_<word> line
-  var ANS = {}; if (A.BonusQ) A.BonusQ.QS.forEach(function (q) { q.choices.forEach(function (c) { ANS[c.line] = 1; }); });
+  var ANS = {}; if (A.BonusQ) A.BonusQ.QS.forEach(function (q) { if (q.d > 2) return; q.choices.forEach(function (c) { ANS[c.line] = 1; }); });   // quality1: only the original (recorded) d1/d2 bank; the new d3/d4 answers have no clips yet
   function slug(w) { return String(w).toLowerCase().replace(/[^a-z0-9]+/g, '_'); }
   function lineFor(w) { var c = 'c_' + slug(w); return ANS[c] ? c : 'pw_' + slug(w); }
   E.PICS = PICS; E.lineFor = lineFor;

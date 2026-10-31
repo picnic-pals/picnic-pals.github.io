@@ -323,7 +323,7 @@
   // advance runners with the rules (R.advance: extra bases now and then, walks force runners). Returns { runs, done }.
   function advance(n, msPerBase, opt) {
     var pl = bat(), moves = [], plan = R.advance(G.bases, n, G.rnd || Math.random, opt), br = null;
-    if (plan.moves.some(function (m) { return m.r === 'B'; })) { br = runnerEl(pl); var p0 = posOnPath(0); place(br, p0.x - 60, p0.y + 14); batter.setAttribute('opacity', 0); }
+    if (plan.moves.some(function (m) { return m.r === 'B'; })) { br = runnerEl(pl); br.__who = pl.P && pl.P.blob; var p0 = posOnPath(0); place(br, p0.x - 60, p0.y + 14); batter.setAttribute('opacity', 0); }
     plan.moves.forEach(function (m) {
       var r = m.r === 'B' ? br : m.r;
       if (m.to >= 4) moves.push(runTo(r, m.from, 4, msPerBase).then(scoreRun.bind(null, pl, r)));
@@ -539,7 +539,7 @@
     var res = G._bonusRes; G._bonusRes = null;
     if (A.Age.preReader(bat().P) && q.explain) V.say([{ id: 'bbq_explain', text: (ok ? 'Yes! ' : '') + String(q.explain).replace(/<[^>]*>/g, ' ') }], { kind: ok ? 'chatter' : 'answer' });   // design2: read the answer aloud too
     G.bonusWait = ok ? A.Pace.ms('RESULT') : A.Pace.ms('HINT', q.explain || ''); return wait(G.bonusWait).then(function () {   // the beat: long enough to read the explanation
- document.body.classList.remove('bonusing'); G.q = null; G.busy = false; $('#cards').innerHTML = ''; $('#qTxt').innerHTML = ''; $('#qPic').innerHTML = ''; if (res) res(ok); });
+ document.body.classList.remove('bonusing'); G.q = null; G.busy = false; $('#cards').innerHTML = ''; $('#qTxt').innerHTML = ''; $('#qPic').innerHTML = ''; if (G.tagLater && G.top) rivalTag(G.tagLater); G.tagLater = null; if (res) res(ok); });
   }
   var BASEN = ['home', '1st', '2nd', '3rd', 'home'];
   function whereChoices(from) { return [1, 2, 3, 4].filter(function (x) { return x !== from; }); }   // 1st / 2nd / 3rd / Home minus the runner's base
@@ -549,11 +549,16 @@
     if (before) {   // "where does the runner end up?" — a runner on base, plain rule (no extra base)
       var lead = -1; for (var b = 2; b >= 0; b--) if (G.bases[b]) { lead = b; break; }
       // always 1st / 2nd / 3rd / Home minus the base the runner starts on (3 cards, so a runner on 3rd never gets a lone "Home")
-      var from = lead + 1, to = Math.min(4, from + z.bases), ch = whereChoices(from);
-      return ask({ kind: 'where', text: 'A runner is on ' + BASEN[from] + '. ' + z.name + ' = ' + z.bases + (z.bases === 1 ? ' base' : ' bases') + '! Where does the runner end up?', choices: ch.map(function (x) { return x === 4 ? 'Home 🏠' : BASEN[x]; }), answer: ch.indexOf(to), explain: BASEN[from] + ' + ' + z.bases + ' = ' + (to === 4 ? 'home: a run!' : BASEN[to] + ' base.'), tag: '🏃 Base-running question!' });
+      // quality1 A8: plain words about ONE runner (her friend's name when she is the only runner), and a little diamond of the path
+      var from = lead + 1, only = G.bases.filter(Boolean).length === 1, who = only && G.bases[lead] && G.bases[lead].__who, fr = who && A.Blobs && A.Blobs.byId[who];
+      var wq = R.whereQ(from, z.bases, fr ? fr.name : null, z.name);
+      return ask({ kind: 'where', text: wq.text, pic: R.diamondSvg(from, z.bases), choices: wq.choices, answer: wq.answer, explain: wq.explain, tag: '🏃 Base-running question!' });
     }
     var onb = G.bases.filter(Boolean).length;
-    if (little || (plan.runs === 0 && Math.random() < .5)) {
+    // quality1 band lock: only the question kinds in this child's band (js/core/learn.js sluggerKinds); none in band = no question
+    var okK = A.Learn && A.Learn.sluggerKinds ? A.Learn.sluggerKinds(bat().P) : null, kOk = function (k) { return !okK || okK.indexOf('bb_' + k) >= 0; };
+    if (okK && !little) { if (plan.runs > 0 && kOk('runs')) { /* below */ } else if (kOk('left') && plan.runs === 0) { /* below */ } else return Promise.resolve(); }
+    if (little || (plan.runs === 0 && Math.random() < .5 && (!okK || kOk('onbase')))) {
       var ans = little && plan.runs > 0 && Math.random() < .5 ? plan.runs : onb, isRuns = little && plan.runs > 0 && ans === plan.runs;
       if (isRuns) return ask({ kind: 'runs', text: 'How many runs scored? Count the stars!', pic: dots(plan.runs, 'run'), choices: choiceSet(plan.runs, n, 0, 8), answer: choiceSet(plan.runs, n, 0, 8).indexOf(plan.runs), explain: plan.runs + (plan.runs === 1 ? ' run!' : ' runs!'), tag: '⭐ Count the runs!' });
       return ask({ kind: 'onbase', text: 'How many runners are on base now?', pic: dots(onb, 'runner'), choices: choiceSet(onb, n, 0, 3), answer: choiceSet(onb, n, 0, 3).indexOf(onb), explain: onb + (onb === 1 ? ' runner' : ' runners') + ' on base.', tag: '🏃 Count the runners!' });
@@ -574,6 +579,7 @@
       if (them > 10) return Promise.resolve();
       var c0 = choiceSet(them, n, 0, 12); return ask({ kind: 'count', text: 'How many runs do the Sprouts have?', pic: sbPic([['riv', them, true]]), choices: c0, answer: c0.indexOf(them), explain: 'The Sprouts have ' + them + '.', tag: tag });
     }
+    if (them === me && A.Learn && A.Learn.sluggerKinds && A.Learn.sluggerKinds(P1).indexOf('bb_tied') < 0) return Promise.resolve();   // quality1: below her band
     if (them === me) { var add = A.rnd(1, 3), c1 = choiceSet(me + add, n, 0, 30); return ask({ kind: 'tied', text: 'You have ' + me + '. You get ' + add + ' more. How many now?', pic: sbPic([['me', me, false, add]]), choices: c1, answer: c1.indexOf(me + add), explain: me + ' + ' + add + ' = ' + (me + add) + '.', tag: tag }); }
     var win = Math.random() < .5, need = them - me + (win ? 1 : 0), c2 = choiceSet(need, n, 1, 30);
     return ask({ kind: win ? 'towin' : 'totie', text: 'How many more runs to ' + (win ? '<b>win</b>' : '<b>tie</b>') + '?', pic: sbPic([['riv', them], ['me', me]]), spoken: 'The Sprouts have ' + them + '. You have ' + me + '. How many more runs to ' + (win ? 'win' : 'tie') + '?', choices: c2, answer: c2.indexOf(need), explain: win ? (them - me) + ' more ties it. 1 more wins: ' + need + '.' : me + ' + ' + need + ' = ' + them + '. A tie!', tag: tag });
@@ -600,6 +606,11 @@
     var pre = A.Age.preReader(pl.P);   // design2: 5 and under: no "where does the runner end up?", only count-the-dots questions
     var bq = G.forceBonus != null ? G.forceBonus : (STORYB ? .2 : .25) > Math.random() ? (anyOn && z.k !== 'hr' && !pre && Math.random() < .5 ? 'where' : 'after') : null;
     if (bq === 'where' && (!anyOn || z.k === 'hr' || pre)) bq = 'after';
+    if (bq && A.Learn && A.Learn.sluggerKinds && G.forceBonus == null) {   // quality1 band lock: only kinds in her band
+      var okK = A.Learn.sluggerKinds(pl.P), canWhere = anyOn && z.k !== 'hr' && !pre && okK.indexOf('bb_where') >= 0;
+      if (bq === 'where' && !canWhere) bq = 'after';
+      if (bq === 'after' && !okK.some(function (k) { return /bb_(runs|onbase|left)/.test(k); })) bq = canWhere ? 'where' : null;
+    }
     return throwPitch().then(function () {
       FX.crack(); swing(true);
       var dir = A.rnd(0, 2), side = dir - 1, to, peak, ms, sc;
@@ -679,15 +690,17 @@
     var sim = G.forceRival != null ? { runs: G.forceRival, hits: G.forceRival, events: [] } : R.simHalf({ acc: R.rivalAcc(LITTLE, A.Age.of(P1)), little: LITTLE });
     RIV.hits += sim.hits;
     banner('Inning ' + G.inning + '<small>' + RIV.icon + ' ' + A.esc(RIV.name) + ' at bat</small>', 'inning rivalb', 1800);
-    $('#swingTag').innerHTML = RIV.icon + ' The ' + A.esc(RIV.name) + ' are batting…'; $('#swingTag').className = 'swingtag on rival';
+    rivalTag(RIV.icon + ' The ' + A.esc(RIV.name) + ' are batting…');
     var chain = wait(1500);
     for (var k = 0; k < sim.runs; k++) chain = chain.then(function () { RIV.runsBy[G.inning - 1]++; renderBoard(); SFX.tap(); popText('+1 Sprouts', HOME.x, HOME.y - 120, 'run riv'); B.anim(fielders[A.rnd(0, 2)].firstChild, 'hop', 400); return wait(420); });
     return chain.then(function () {
       var r = sim.runs;
-      $('#swingTag').innerHTML = RIV.icon + ' The ' + A.esc(RIV.name) + (r === 0 ? ' got no runs. Your turn!' : ' scored ' + r + (r === 1 ? ' run' : ' runs') + '. Your turn to bat!');
+      rivalTag(RIV.icon + ' The ' + A.esc(RIV.name) + (r === 0 ? ' got no runs. Your turn!' : ' scored ' + r + (r === 1 ? ' run' : ' runs') + '. Your turn to bat!'));
       return wait(1400);
     }).then(function () { G.top = false; });
   }
+  // quality1 polish: the rival team's news never covers a question on the sign; it waits until the question is done
+  function rivalTag(html) { if (G.q) { G.tagLater = html; return; } G.tagLater = null; $('#swingTag').innerHTML = html; $('#swingTag').className = 'swingtag on rival'; }
   function startHalf() {
     var pl = bat(); G.outs = 0; G.strikes = 0; G.pa = 0; G.halfRuns = 0; G.walkoffOn = false;
     var pre = RIVALON && G.half === 0 ? rivalHalf() : Promise.resolve();
@@ -853,7 +866,7 @@
     setElapsed: function (sec) { G.voiceDone = true; G.qT0 = Date.now() - sec * 1000; },
     ready: function () { return !!(G.phase === 'pitch' && G.q && G.accept && !G.busy); },
     set speed(v) { SPEED = v; }, get speed() { return SPEED; },
-    scoreQ: scoreQuestion, sbPic: sbPic,   // v2p1a test hooks
+    scoreQ: scoreQuestion, sbPic: sbPic, runQ: runQuestion,   // v2p1a test hooks (+ quality1: runQ for the base-running picture)
     total: totalRuns, endGame: endGame, R: R, RIV: RIV, rival: RIVALON, maxOuts: maxOuts, mercy: mercy, isBonus: function () { return !!(G.q && G.q.bonus); }, whereChoices: function (from) { return whereChoices(from).map(function (x) { return x === 4 ? 'Home 🏠' : BASEN[x]; }); }, story: STORYB ? { stop: SI, cfg: SC, end: endStory } : null, bases: function () { return G.bases.map(Boolean); }
   };
   if (STORYB) {

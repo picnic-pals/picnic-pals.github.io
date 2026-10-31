@@ -38,6 +38,13 @@
   var CVC = ['cat', 'dog', 'sun', 'pig', 'hen', 'bus', 'cup', 'map', 'bed', 'fox', 'jam', 'net', 'hat', 'top', 'rug', 'lip', 'van', 'web'];
   var SPELL = ['cat', 'dog', 'sun', 'pig', 'hen', 'cup', 'map', 'bed', 'fox', 'frog', 'fish', 'duck', 'milk', 'star', 'jump', 'cake'];
   var NUMW = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+  // pictures for the missing-letter words (so the word is clear with the sound off) and a small word list for the "makes another word" guard
+  var PIC = { cat: '🐱', dog: '🐶', sun: '☀️', pig: '🐷', hen: '🐔', bus: '🚌', cup: '🥤', map: '🗺️', bed: '🛏️', fox: '🦊', jam: '🍓', net: '🥅', hat: '🎩', top: '🪀', rug: '🧶', lip: '👄', van: '🚐', web: '🕸️',
+    frog: '🐸', fish: '🐟', duck: '🦆', milk: '🥛', star: '⭐', jump: '🦘', cake: '🎂', bird: '🐦', tree: '🌳', ship: '🚢' };
+  var WORDS3 = ('bat bad bag ban bed beg bet bib bid big bin bit bog bop bud bug bum bun bus but cab can cap cat cob cod cog cot cub cud cup cut dab dad dam den dig dim din dip dog dot dub dug fan fat fed fib fig fin fit fix fog fox fun fur gap gas gem get gum gun gut had ham has hat hem hen hid him hip his hit hog hop hot hub hug hum hut jab jam jet jig job jog jot jug kid kin kit lab lad lap led leg let lid lip lit log lot lug mad man map mat men met mid mix mob mom mop mud mug nab nag nap net nod not nut pad pal pan pat peg pen pet pig pin pit pod pop pot pub pug pun pup put rag ram ran rap rat red rib rid rig rim rip rob rod rot rub rug run rut sad sag sap sat set sip sit sob sod son sub sum sun tab tag tan tap ten tin tip top tot tub tug van vat vet wag web wed wet wig win wit yak yam yes yet zip ' +
+    'frog from fish dish wish duck deck dock luck milk mild silk star stir scar spar jump bump dump hump lump pump camp cake bake lake make rake take wake bird tree free ship shop chip whip slip drip trip flip frig').split(' ');
+  var WSET = {}; WORDS3.forEach(function (w) { WSET[w] = 1; });
+  function realWord(w) { return !!WSET[w]; }
   function sight() { var S = A.SightWords; return S ? S.PREPRIMER.concat(S.PRIMER).filter(function (w) { return w.length >= 2 && w !== 'I'; }) : ['the', 'and', 'see', 'go', 'my', 'is']; }
   // content factories (the UI draws them by cls)
   function cNum(v) { return { key: 'n' + v, cls: 'num', t: String(v), v: v, say: [v] }; }
@@ -67,7 +74,7 @@
     { id: 'p_animal', name: 'Animals', band: 'P', gen: function () { var a = pick(ANIMALS), snd = RNG() < .4 && a.id !== 'fish'; return { say: snd ? ['bp_says', 'bp_snd_' + a.id] : ['bp_pop_the', 'bp_ans_' + a.id], show: snd ? { text: a.snd } : { e: a.e }, need: 2, good: [cAn(a.id)], bad: others(ANIMALS.map(function (x) { return x.id; }), [a.id], 3).map(function (x) { return cAn(x); }) }; } },
     { id: 'p_letter', name: 'Letters', band: 'P', gen: function () { var l = pick(LETTERS); return { say: ['bp_pop_the', tx(l)], show: { text: l }, need: 1, good: [cLet(l)], bad: others(LETTERS, [l], 3).map(cLet) }; } },
     { id: 'p_num', name: 'Numbers', band: 'P', sub: 1, gen: function (cx) { var top = cx.sub ? 30 : 10, v = rnd(cx.sub ? 11 : 1, top), b = []; while (b.length < 3) { var x = rnd(1, top); if (x !== v && b.indexOf(x) < 0 && String(x).split('').reverse().join('') !== String(v)) b.push(x); } return { say: ['bp_pop_the', v], show: { text: String(v) }, need: 1, good: [cNum(v)], bad: b.map(cNum) }; } },
-    { id: 'p_begin', name: 'Beginning sounds', band: 'P', gen: function () { var w = pick(BEGIN); return { say: ['bp_starts', tx(w[1])], show: { e: w[2] }, need: 1, good: [cLet(w[0].toUpperCase())], bad: others(BEGIN.map(function (x) { return x[0].toUpperCase(); }), [w[0].toUpperCase()], 3).map(cLet) }; } },
+    { id: 'p_begin', name: 'Beginning sounds', band: 'P', gen: function () { var w = pick(BEGIN); return { say: ['bp_starts', tx(w[1])], ask: 'Which letter does it start with?', show: { e: w[2] }, need: 1, good: [cLet(w[0].toUpperCase())], bad: others(BEGIN.map(function (x) { return x[0].toUpperCase(); }), [w[0].toUpperCase()], 3).map(cLet) }; } },
     { id: 'p_bigger', name: 'The bigger number', band: 'P', gen: function () { var a = rnd(1, 9), b = a; while (b === a) b = rnd(1, 10); var hi = Math.max(a, b), lo = Math.min(a, b); return { say: ['bp_bigger', a, 'bp_or', b], show: { text: a + ' or ' + b }, need: 1, good: [cNum(hi)], bad: [cNum(lo)] }; } },
     { id: 'p_order', name: 'Pop 1 to 10 in order', band: 'P', sub: 1, gen: function (cx) { var n = cx.sub ? 10 : 5, seq = []; for (var i = 1; i <= n; i++) seq.push(cNum(i)); return { say: ['bp_order', n], show: { text: '1 → ' + n }, need: n, seq: seq, good: [], bad: [] }; } },
     { id: 'p_combo', name: 'Two-rule bubbles', band: 'P', gen: function () {
@@ -75,17 +82,40 @@
       var n = rnd(2, 4), b = pick(['duck', 'frog', 'cow', 'cat']); return { say: ['bp_pop_n', n, 'bp_ans_' + b], show: { text: n + ' ×', e: AN[b].e }, need: n, exact: true, good: [cAn(b)], bad: others(ANIMALS.map(function (x) { return x.id; }), [b], 3).map(function (x) { return cAn(x); }), countAloud: true }; } }
   ];
   var E_STEPS = [
-    { id: 'e_sight', name: 'Sight words', band: 'E', sub: 2, gen: function (cx) { var L = sight(), pool = cx.sub === 2 ? L.slice(40) : cx.sub ? L : L.slice(0, 40), w = pick(pool); return { say: ['bp_find_word', tx(w)], show: { text: '🔊' }, need: 1, good: [cWord(w)], bad: others(pool.filter(function (x) { return x[0] === w[0] || x.length === w.length; }).concat(shuffle(pool).slice(0, 6)), [w], 3).map(cWord) }; } },
+    { id: 'e_sight', name: 'Sight words', band: 'E', sub: 2, gen: function (cx) { var L = sight(), pool = cx.sub === 2 ? L.slice(40) : cx.sub ? L : L.slice(0, 40), w = pick(pool);
+      if (A.SightWords && A.SightWords.quiet && A.SightWords.quiet()) { var cz = clozeT(pool); if (cz) return cz; }   // no voice: a fill-in sentence instead of "the word you hear"
+      return { say: ['bp_find_word', tx(w)], ask: 'Pop the word you hear!', show: { text: '🔊' }, need: 1, good: [cWord(w)], bad: others(pool.filter(function (x) { return x[0] === w[0] || x.length === w.length; }).concat(shuffle(pool).slice(0, 6)), [w], 3).map(cWord) }; } },
     { id: 'e_numword', name: 'Number words', band: 'E', sub: 2, gen: function (cx) { var top = cx.sub ? 20 : 10, v = cx.sub === 2 ? rnd(11, 20) : rnd(1, top), b = others(Array.from({ length: top }, function (_, i) { return i + 1; }), [v], 3); return { say: ['bp_pop_the', tx(NUMW[v])], show: { text: NUMW[v] }, need: 1, good: [cNum(v)], bad: b.map(cNum) }; } },
     { id: 'e_add', name: 'Pop the answer', band: 'E', sub: 2, gen: function (cx) { var a, b; if (cx.sub === 2) { if (RNG() < .5) { a = rnd(11, 18); b = -rnd(2, 9); } else { a = rnd(4, 9); b = rnd(11 - a, 9); } } else if (cx.sub) { a = rnd(4, 9); b = rnd(11 - a, 9); } else { a = rnd(1, 6); b = rnd(1, 10 - a); } var s = a + b, bad = others([s - 2, s - 1, s + 1, s + 2, s + 10].filter(function (x) { return x > 0; }), [s], 3); return { say: b < 0 ? ['bp_answer', a, 'bp_minus', -b] : ['bp_answer', a, 'bp_plus', b], show: { text: b < 0 ? a + ' − ' + -b : a + ' + ' + b }, need: 1, good: [cNum(s)], bad: bad.map(cNum) }; } },
     { id: 'e_evenodd', name: 'Even and odd', band: 'E', sub: 2, gen: function (cx) { var even = RNG() < .5, g = [], b = [], lo = cx.sub === 2 ? 21 : 1, hi = cx.sub ? (cx.sub === 2 ? 60 : 30) : 20; for (var i = lo; i <= hi; i++) ((i % 2 === 0) === even ? g : b).push(i); return { say: ['bp_pop_the', even ? 'bp_even' : 'bp_odd'], show: { text: even ? 'even' : 'odd' }, need: 3, good: shuffle(g).slice(0, 6).map(cNum), bad: shuffle(b).slice(0, 5).map(cNum) }; } },
     { id: 'e_rhyme', name: 'Rhymes', band: 'E', sub: 2, gen: function (cx) { var f = pick(RHYMES), w = f[0], g = f.slice(1), b = []; RHYMES.forEach(function (o) { if (o !== f) b = b.concat(o.slice(0, 2)); }); return { say: ['bp_rhyme', tx(w)], show: { text: w }, need: cx.sub ? 3 : 2, good: g.map(cWord), bad: shuffle(b).slice(0, cx.sub === 2 ? 7 : 5).map(cWord) }; } },
-    { id: 'e_missing', name: 'The missing letter', band: 'E', sub: 2, gen: function (cx) { var w = cx.sub === 2 ? pick(['frog', 'fish', 'duck', 'milk', 'star', 'jump', 'cake', 'bird', 'tree', 'ship']) : pick(CVC), k = cx.sub ? rnd(0, w.length - 1) : 1, l = w[k], gap = w.slice(0, k) + '_' + w.slice(k + 1), pool = 'aeiou'.indexOf(l) >= 0 ? ['a', 'e', 'i', 'o', 'u'] : 'bcdfghjklmnprstw'.split(''); return { say: ['bp_missing', tx(w)], show: { text: gap }, need: 1, good: [cLet(l)], bad: others(pool, [l], 3).map(function (x) { return cLet(x); }), lower: true }; } },
+    { id: 'e_missing', name: 'The missing letter', band: 'E', sub: 2, gen: function (cx) { var w = cx.sub === 2 ? pick(['frog', 'fish', 'duck', 'milk', 'star', 'jump', 'cake', 'bird', 'tree', 'ship']) : pick(CVC), k = cx.sub ? rnd(0, w.length - 1) : 1, l = w[k], gap = w.slice(0, k) + '_' + w.slice(k + 1), pool = ('aeiou'.indexOf(l) >= 0 ? ['a', 'e', 'i', 'o', 'u'] : 'bcdfghjklmnprstw'.split('')).filter(function (x) { return !realWord(gap.replace('_', x)); });   // quality1: a wrong letter never makes another real word (s_n: not "sin")
+      return { say: ['bp_missing', tx(w)], ask: 'Which letter is missing? Pop it!', show: { text: gap, e: PIC[w] }, need: 1, good: [cLet(l)], bad: others(pool, [l], 3).map(function (x) { return cLet(x); }), lower: true }; } },
     { id: 'e_make10', name: 'Ways to make 10', band: 'E', sub: 2, gen: function (cx) { var M = cx.sub === 2 ? pick([12, 14, 15]) : cx.sub ? pick([5, 8, 10]) : 10, g = [], b = []; for (var a = 1; a < M; a++) { if (a > 9 || M - a > 9) continue; g.push(cSum(a, M - a)); var d = rnd(1, 9); if (a + d !== M) b.push(cSum(a, d)); } return { say: M === 10 ? ['bp_make10'] : ['bp_make', M], show: { text: '= ' + M }, need: 3, good: shuffle(g).slice(0, 6), bad: shuffle(b).slice(0, 5) }; } },
     { id: 'e_skip', name: 'Skip-counting', band: 'E', sub: 2, gen: function (cx) { var by = cx.sub === 2 ? pick([3, 4]) : cx.sub ? pick([5, 10]) : 2, seq = []; for (var i = 1; i <= 5; i++) seq.push(cNum(by * i)); return { say: ['bp_skip', by], show: { text: by + ', ' + by * 2 + ', …' }, need: 5, seq: seq, good: [], bad: [cNum(by * 2 + 1), cNum(by * 3 - 1)] }; } },
     { id: 'e_spell', name: 'Spell the word', band: 'E', sub: 2, gen: function (cx) { var pool = SPELL.filter(function (w) { return (cx.sub ? w.length >= 4 : w.length === 3) && new Set(w).size === w.length; }), w = pick(pool), seq = w.split('').map(function (l) { return cLet(l); });
-      return { say: ['bp_spell', tx(w)], show: { e: { cat: '🐱', dog: '🐶', sun: '☀️', pig: '🐷', hen: '🐔', cup: '🥤', map: '🗺️', bed: '🛏️', fox: '🦊', frog: '🐸', fish: '🐟', duck: '🦆', milk: '🥛', star: '⭐', jump: '🦘', cake: '🎂' }[w] || '🔤' }, need: w.length, seq: seq, good: [], bad: others('abdeghlmnoprstu'.split('').filter(function (x) { return w.indexOf(x) < 0; }), [], 3).map(cLet), word: w, lower: true }; } }
+      return { say: ['bp_spell', tx(w)], ask: 'Spell the word for the picture!', show: { e: { cat: '🐱', dog: '🐶', sun: '☀️', pig: '🐷', hen: '🐔', cup: '🥤', map: '🗺️', bed: '🛏️', fox: '🦊', frog: '🐸', fish: '🐟', duck: '🦆', milk: '🥛', star: '⭐', jump: '🦘', cake: '🎂' }[w] || '🔤' }, need: w.length, seq: seq, good: [], bad: others('abdeghlmnoprstu'.split('').filter(function (x) { return w.indexOf(x) < 0; }), [], 3).map(cLet), word: w, lower: true }; } }
+,
+    /* quality1: four more 1st-3rd grade kinds so a 7-8-year-old always has in-band bubbles (never below her floor) */
+    { id: 'e_tens', name: 'Tens and ones', band: 'E', sub: 2, gen: function (cx) {
+      if (!cx.sub) { var t = rnd(2, 9), o = rnd(1, 9); while (o === t) o = rnd(1, 9); var v = 10 * t + o;
+        return { say: ['q1_bp_tens1', t, 'q1_bp_tens2', o, 'q1_bp_tens3'], ask: 'Pop the number with ' + t + ' tens and ' + o + ' ones.', show: { text: t + ' tens, ' + o + ' ones' }, need: 1, good: [cNum(v)],
+          bad: others([10 * o + t, t + o, 10 * t, v + 10, v - 10, v + 1].filter(function (x) { return x > 0 && x !== v; }), [v], 3).map(cNum) }; }
+      var more = cx.sub === 1, n = more ? rnd(11, 89) : rnd(21, 99), ans = more ? n + 10 : n - 10;
+      return { say: [more ? 'q1_bp_more10' : 'q1_bp_less10', n], ask: 'Pop the number that is 10 ' + (more ? 'more' : 'less') + ' than ' + n + '.', show: { text: '10 ' + (more ? 'more' : 'less') + ' than ' + n }, need: 1, good: [cNum(ans)],
+        bad: others([more ? n - 10 : n + 10, more ? n + 1 : n - 1, ans + 1, ans - 1, n].filter(function (x) { return x > 0 && x !== ans; }), [ans], 3).map(cNum) }; } },
+    { id: 'e_sight3', name: 'Big kid words', band: 'E', sub: 1, gen: function (cx) { var G = A.Grade1Words || {}; return clozeT((cx.sub ? G.DOLCH3 : G.DOLCH2) || []) || clozeT(sight()); } },
+    { id: 'e_homo', name: 'Sound-alike words', band: 'E', gen: function () { var G = A.Grade1Words, i = rnd(0, G.HOMO.length - 1), h = G.HOMO[i], grp = G.HOMO_GROUPS[h[2]] || [h[1]];
+      return { say: ['q1_bp_cloze', 'hom_' + i], ask: 'Pop the word that fits:', show: { sent: h[0].replace('___', '____') }, need: 1, good: [cWord(h[1])], bad: grp.filter(function (w) { return w !== h[1]; }).map(cWord) }; } },
+    { id: 'e_prefix', name: 'Word parts', band: 'E', sub: 1, gen: function (cx) { var G = A.Grade1Words, a = pick(G.AFFIX[cx.sub ? 1 : 0]), tr = String(G.AFFIX_TRAPS[a[0]] || a[2]).split(' ');
+      return { say: ['aff_' + a[0]], ask: 'Which word means\u2026', show: { sent: '\u201c' + a[1] + '\u201d' }, need: 1, good: [cWord(a[0])], bad: tr.filter(function (w) { return w !== a[0]; }).map(cWord) }; } }
   ];
+  // a fill-in sentence from the curated sight-word bank (js/core/sightwords.js): one word fits, the others cannot
+  function clozeT(words) {
+    var S = A.SightWords; if (!S || !S.cloze) return null; var can = (words || []).filter(function (w) { return S.cloze(w); }); if (!can.length) return null;
+    var w = pick(can), c = S.cloze(w);
+    return { say: ['q1_bp_cloze', tx(c.text.replace('___', 'blank'))], ask: 'Pop the word that fits:', show: { sent: c.text.replace('___', '____') }, need: 1, good: [cWord(w)], bad: shuffle(c.bad).slice(0, 3).map(cWord), cloze: true };
+  }
   var LAD = { T: T_STEPS, P: P_STEPS, E: E_STEPS }, STEPS = {};
   [T_STEPS, P_STEPS, E_STEPS].forEach(function (L) { L.forEach(function (s, i) { s.ix = i; STEPS[s.id] = s; }); });
 
@@ -103,6 +133,22 @@
   }
   function sst(p, id) { var g = data(p), s = g.steps[id]; if (!s) s = g.steps[id] = { n: 0, ok: 0, days: {}, win: [], h5: [], fast: 0, status: 'locked' }; return s; }
   function startIx(p, b) { var a = age(p); if (b === 'T') return a != null && a >= 3 ? 1 : 0; if (b === 'P') return a != null && a >= 5 ? 3 : 0; return a == null || a <= 6 ? 0 : a === 7 ? 2 : 3; }
+  /* quality1 band lock (js/core/learn.js): a kind (at its first in-band sub-level) is "in band" when its grade tag is at or above
+     the child's floor for its subject and not past her ceiling. Kinds below the floor are marked done ('band', no reviews) and
+     never come back as filler, review, an easier target or a step-down. Without A.Learn (old Node tests) everything is in band. */
+  function LN() { return A.Learn && A.Learn.bubbleSub ? A.Learn : null; }
+  function inBand(p, id) { var Ln = LN(); if (!Ln) return true; var sb = Ln.bubbleSub(p, id); return sb >= 0 && Ln.kindOk(p, id, Math.max(sb, (data(p).steps[id] || {}).sub || 0)); }
+  function underCeil(p, id) { var Ln = LN(); if (!Ln) return true; var q = data(p).steps[id] || {}; return Ln.gl(id, q.sub || 0) == null || Ln.gl(id, q.sub || 0) <= Ln.ceil(p, Ln.subjOfKind(id)); }
+  function bandMark(p, L) {
+    var Ln = LN(); if (!Ln) return;
+    L.forEach(function (s) { var q = sst(p, s.id), sb = Ln.bubbleSub(p, s.id);
+      if (sb < 0) { if (q.status !== 'mastered') { q.status = 'mastered'; q.placed = true; q.by = 'band'; delete q.due; } }
+      else if (q.status !== 'mastered' && (q.sub || 0) < sb) { q.sub = sb; q.n = 0; q.ok = 0; q.days = {}; q.win = []; q.fast = 0; } });
+  }
+  function bandTop(p, L) {   // nothing left in band to learn or review: the highest kinds of the ladder (never easier filler)
+    var ok = L.filter(function (s) { return inBand(p, s.id); }); if (ok.length) return ok.slice(-3).map(function (s) { return s.id; });
+    var Ln = LN(); return L.slice().sort(function (a, b) { return Ln.glTop(b.id) - Ln.glTop(a.id); }).slice(0, 3).map(function (s) { return s.id; });
+  }
   var K = 2;   // kinds learning at the same time
   function track(p) {
     var g = data(p), b = bandOf(p), L = LAD[b], T = g.tracks[b];
@@ -110,18 +156,21 @@
       T = g.tracks[b] = { learn: [], probe: null, last: null, drop: { day: '', n: 0 }, dropNext: false };
       var i0 = startIx(p, b);
       L.forEach(function (s, i) { var q = sst(p, s.id); if (i < i0 && q.status !== 'mastered') { q.status = 'mastered'; q.placed = true; q.by = 'age'; } });
-      if (b !== 'T' && i0 < L.length - 1) { var plan = []; for (var k = i0 + 1; k <= Math.min(L.length - 1, i0 + 2); k += 1) plan.push(k); T.probe = { plan: plan, k: 0, n: 0, right: -1, from: i0 }; }
+      bandMark(p, L);
+      if (b !== 'T' && i0 < L.length - 1) { var plan = []; for (var k = i0 + 1; k <= Math.min(L.length - 1, i0 + 2); k += 1) if (inBand(p, L[k].id) && sst(p, L[k].id).status !== 'mastered') plan.push(k);
+        if (plan.length) T.probe = { plan: plan, k: 0, n: 0, right: -1, from: i0 }; }
     }
     fill(p, T, L); return T;
   }
-  function fill(p, T, L) {   // keep K kinds learning: the lowest not-yet-mastered kinds
+  function fill(p, T, L) {   // keep K kinds learning: the lowest not-yet-mastered kinds (in band, under the ceiling)
+    bandMark(p, L);
     T.learn = T.learn.filter(function (id) { return sst(p, id).status !== 'mastered'; });
-    for (var i = 0; i < L.length && T.learn.length < K; i++) { var id = L[i].id, s = sst(p, id); if (s.status !== 'mastered' && T.learn.indexOf(id) < 0 && !(s.rest > now())) { T.learn.push(id); if (s.status === 'locked') s.status = 'open'; } }
+    for (var i = 0; i < L.length && T.learn.length < K; i++) { var id = L[i].id, s = sst(p, id); if (s.status !== 'mastered' && T.learn.indexOf(id) < 0 && !(s.rest > now()) && underCeil(p, id)) { T.learn.push(id); if (s.status === 'locked') s.status = 'open'; } }
     T.learn.sort(function (a, b) { return STEPS[a].ix - STEPS[b].ix; });
   }
   function reached(p) { var b = bandOf(p), T = track(p); return LAD[b].filter(function (s) { var q = sst(p, s.id); return q.status === 'mastered' || T.learn.indexOf(s.id) >= 0; }).map(function (s) { return s.id; }); }
   var GAPS = [1, 3, 7, 14, 30];
-  function due(p) { var b = bandOf(p), t = now(); return LAD[b].filter(function (s) { var q = sst(p, s.id); return q.status === 'mastered' && q.by !== 'age' && q.due && q.due <= t; }).map(function (s) { return s.id; }); }
+  function due(p) { var b = bandOf(p), t = now(); return LAD[b].filter(function (s) { var q = sst(p, s.id); return q.status === 'mastered' && q.by !== 'age' && q.by !== 'band' && q.due && q.due <= t && inBand(p, s.id); }).map(function (s) { return s.id; }); }
   /* which kind the next round plays: warm-up / a due review (30%) / a learning kind, never the same kind twice in a row */
   /* no stuck spots: a kind learned on 7+ days still under 70% rests for 4 days (the next kind opens meanwhile), then comes back */
   function rest(p, T, L) {
@@ -138,12 +187,15 @@
     rest(p, T, L);
     var dd = due(p).filter(function (id) { return id !== T.last; }); if (dd.length && RNG() < .3) return { step: STEPS[dd[0]], why: 'review' };
     var cand = T.learn.filter(function (id) { return id !== T.last; });
-    if (!cand.length) { var m = reached(p).filter(function (id) { return id !== T.last && sst(p, id).status === 'mastered'; }); if (m.length) return { step: STEPS[pick(m.slice(-3))], why: 'review' }; cand = T.learn.slice(); }
-    if (!cand.length) { var all = reached(p).filter(function (id) { return id !== T.last; }); cand = all.length ? all.slice(-3) : [L[L.length - 1].id]; return { step: STEPS[pick(cand)], why: 'top' }; }
+    if (!cand.length) { var m = reached(p).filter(function (id) { return id !== T.last && sst(p, id).status === 'mastered' && inBand(p, id); }); if (m.length) return { step: STEPS[pick(m.slice(-3))], why: 'review' }; cand = T.learn.slice(); }
+    if (!cand.length) { var all = reached(p).filter(function (id) { return id !== T.last && inBand(p, id); }); cand = all.length ? all.slice(-3) : bandTop(p, L).filter(function (id) { return id !== T.last; }); if (!cand.length) cand = bandTop(p, L); return { step: STEPS[pick(cand)], why: 'top' }; }
     cand.sort(function (a, b) { return (sst(p, a).lr || 0) - (sst(p, b).lr || 0); });   // the kind played longest ago (every learning kind gets turns)
     return { step: STEPS[cand[0]], why: 'learn' };
   }
-  function ctxFor(p, s, friends) { var q = sst(p, s.id); return { p: p, sub: q.sub || 0, friends: friends && friends.length ? friends : ['strawberry'] }; }
+  // quality1 polish: a kind she already has (placed or mastered at sub-level 0) is never shown at a sub-level under her floor,
+  // e.g. an "easier target" of Pop the answer for an 8-year-old is at least its 1st-grade sub-level
+  function ctxFor(p, s, friends) { var q = sst(p, s.id), sub = q.sub || 0, Ln = LN(); if (Ln) { var sb = Ln.bubbleSub(p, s.id); if (sb > sub) sub = Math.min(sb, s.sub || 0); }
+    return { p: p, sub: sub, friends: friends && friends.length ? friends : ['strawberry'] }; }
   // a round: a kind and its targets (generated one at a time so the step can change mid-round after an easier target)
   function makeRound(p, o) {
     o = o || {}; var nk = nextKind(p), T = track(p); T.last = nk.step.id; T.seq = (T.seq || 0) + 1; sst(p, nk.step.id).lr = T.seq;
@@ -151,8 +203,8 @@
   }
   function makeTarget(p, R) {
     var T = track(p), id = R.step, why = R.why;
-    if (T.dropNext && why !== 'warmup') { T.dropNext = false; var L = LAD[bandOf(p)], ix = STEPS[id].ix; if (ix > 0) { id = L[ix - 1].id; why = 'easy'; } }
-    var s = STEPS[id], t = s.gen(ctxFor(p, s, R.friends)); t.step = id; t.why = why; t.got = 0; t.miss = 0; t.at = 0; return t;
+    if (T.dropNext && why !== 'warmup') { T.dropNext = false; var L = LAD[bandOf(p)], ix = STEPS[id].ix; if (ix > 0 && inBand(p, L[ix - 1].id)) { id = L[ix - 1].id; why = 'easy'; } }   // never an easier kind below the floor
+    var s = STEPS[id], cx = ctxFor(p, s, R.friends), t = s.gen(cx); t.step = id; t.sub = cx.sub; t.why = why; t.got = 0; t.miss = 0; t.at = 0; return t;
   }
   // which bubbles match: any (toddler free pops), a sequence (next one), or a good content key
   function matches(t, c) { if (t.any) return true; if (t.seq) return t.seq[t.got] && t.seq[t.got].key === c.key; return t.good.some(function (g) { return g.key === c.key; }); }
@@ -186,7 +238,7 @@
     if (s.status !== 'mastered' && top && ready(t.step, s)) { master(p, t.step, 'earned'); ev.mastered = t.step; return ev; }
     // plateau: 40+ pops, last 20 under 75% → step down one kind (re-earn 8 good pops there)
     if (s.n >= 40 && s.win.length >= 20 && s.win.reduce(function (a, b) { return a + b; }, 0) / 20 < .75 && st.ix > 0) {
-      var pv = LAD[bandOf(p)][st.ix - 1].id, q2 = sst(p, pv); if (q2.status === 'mastered') { q2.status = 'open'; q2.placed = false; q2.back = { n: 0, ok: 0 }; T.learn = [pv].concat(T.learn.filter(function (x) { return x !== pv; })).slice(0, K + 1); s.win = []; ev.stepDown = pv; }
+      var pv = LAD[bandOf(p)][st.ix - 1].id, q2 = sst(p, pv); if (q2.status === 'mastered' && inBand(p, pv)) { q2.status = 'open'; q2.placed = false; q2.back = { n: 0, ok: 0 }; T.learn = [pv].concat(T.learn.filter(function (x) { return x !== pv; })).slice(0, K + 1); s.win = []; ev.stepDown = pv; }
     }
     return ev;
   }
@@ -198,6 +250,6 @@
   function summary(p) { var b = bandOf(p), T = track(p); return { band: b, learn: T.learn.slice(), steps: LAD[b].map(function (s) { var q = sst(p, s.id); return { id: s.id, name: s.name, status: q.status, placed: !!q.placed, n: q.n, acc: q.n ? Math.round(100 * q.ok / q.n) : null }; }).filter(function (x) { return x.status !== 'locked'; }) }; }
   A.Bubble = { COLORS: COLORS, SHAPES: SHAPES, ANIMALS: ANIMALS, AN: AN, LETTERS: LETTERS, BEGIN: BEGIN, RHYMES: RHYMES, NUMW: NUMW, LAD: LAD, STEPS: STEPS, RULE: RULE, RULE_E: RULE_E,
     band: bandOf, toddler: toddler, stormOk: stormOk, fastMs: fastMs, data: data, state: sst, track: track, reached: reached, due: due, nextKind: nextKind, makeRound: makeRound, makeTarget: makeTarget,
-    matches: matches, record: record, ready: ready, roundStars: roundStars, finishRound: finishRound, friends: friends, summary: summary,
+    matches: matches, record: record, inBand: inBand, clozeT: clozeT, ready: ready, roundStars: roundStars, finishRound: finishRound, friends: friends, summary: summary,
     setClock: function (f) { NOWF = f; }, setRng: function (f) { RNG = f || Math.random; }, today: today };
 })(window.Arcade);

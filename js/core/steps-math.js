@@ -283,6 +283,7 @@
       r.hint = ''; return r;
     };
     if (oa) s.ask = function (lv, n) { var q = oa(L(), n); return q; };
+    else s.ask = function (lv, n) { return A.Questions.fromGen(s, lv, n); };   // quality1: an old skill with no ask of its own (wordprob) asks from its grid generator (was: askItem -> s.item is not a function)
     return s;
   }
   // T band: tiny counting steps below count to 10 (the old count10 is the 3rd step)
@@ -328,6 +329,43 @@
     steps: ['add10', 'sub10', 'make10', 'teen', 'missing'].map(function (id, i) { return wrapOld(id, 'k', i); }) });
   ladder({ id: 'wp', subject: 'math', band: 'E', grade: '1', strand: 'Add & subtract', std: '1.OA.1', introLine: null, groups: [{ id: 'g_wordprob', ids: ['wordprob'] }], steps: [wrapOld('wordprob', 'wp', 0)] });
   ladder({ id: 'eo', subject: 'math', band: 'E', grade: '1', strand: 'Numbers', std: '2.OA.3', introLine: null, groups: [{ id: 'g_evenodd', ids: ['evenodd'] }], steps: [wrapOld('evenodd', 'eo', 0)] });
+  /* quality1 (minimal B2, parent rule 2): 1st-grade place value, after word problems and before even/odd (i-Ready Classroom
+     Mathematics Grade 1: place value follows addition and subtraction within 20; Khan 1st grade "Place value"). Three steps only;
+     the full B2 ladder (hundreds, expanded form, ...) is a later pass. Old saves already past it get a 5-question test-out
+     (js/core/learn.js pvApi) instead of being sent back. */
+  function pvPic(t, o) { var h = '<span class="pv-pic" aria-hidden="true">'; for (var i = 0; i < t; i++) h += '<i class="pv-rod"></i>'; h += '<span class="pv-ones">'; for (var j = 0; j < o; j++) h += '<i class="pv-one"></i>'; return h + '</span></span>'; }
+  function pvCell(v) { return { label: String(v), fact: ['w_thats', v] }; }
+  function pvUniq(ans, list) { var out = []; list.forEach(function (x) { if (x !== ans && x > 0 && x < 100 && out.indexOf(x) < 0) out.push(x); }); return out; }
+  function pvTensItem() {
+    var t = rnd(1, 9), o = rnd(0, 9); if (o === t) o = (o + 3) % 10; var v = 10 * t + o, pic = Math.random() < .6;
+    return { key: 'pvt' + v, ans: v, wrong: pvUniq(v, [10 * o + t, t + o, v + 10, v - 10, v + 1]).slice(0, 3), text: pic ? 'How many in all?' : 'What number has ' + em(t + ' tens') + ' and ' + em(o + ' ones') + '?',
+      pic: pic ? pvPic(t, o) : '', say: pic ? ['q1_pv_count'] : ['q1_pv_tensones1', t, 'q1_pv_tensones2', o, 'q1_pv_tensones3'], cell: pvCell,
+      hint: function (l) { return box(pvPic(t, o), l >= 2 ? t + ' tens is ' + (10 * t) + ', and ' + o + ' ones more is <b>' + v + '</b>.' : 'Each long bar is a ten. Count the tens, then the ones.'); } };
+  }
+  function pvCompareItem() {
+    var a = rnd(10, 99), b, g = 0; do { b = Math.random() < .5 ? +String(a).split('').reverse().join('') : rnd(10, 99); } while ((b === a || b < 10) && g++ < 50); if (b === a || b < 10) b = a === 99 ? 98 : a + 1;
+    var hi = Math.max(a, b), hint = function (l) { return box('<span class="pv-cmp">' + pvPic(Math.floor(a / 10), a % 10) + '<b>' + a + '</b></span><span class="pv-cmp">' + pvPic(Math.floor(b / 10), b % 10) + '<b>' + b + '</b></span>',
+      l >= 2 ? '<b>' + hi + '</b> is greater.' : 'Compare the tens first. If the tens are the same, compare the ones.'); };
+    if (Math.random() < .5) { var ans = a > b ? 'L' : 'R';
+      return { key: 'pvc' + Math.min(a, b) + 'v' + hi, ans: ans, wrong: [ans === 'L' ? 'R' : 'L'], two: true, text: 'Which number is greater?', say: ['q1_pv_greater'],
+        cell: function (k) { var v = k === 'L' ? a : b; return { label: String(v), fact: ['w_thats', v] }; }, hint: hint }; }
+    var sg = a > b ? '>' : '<', NM = { '>': 'q1_pv_gt', '<': 'q1_pv_lt', '=': 'q1_pv_eq' };
+    return { key: 'pvs' + a + 'v' + b, ans: sg, wrong: ['<', '>', '='].filter(function (x) { return x !== sg; }), text: 'Which sign makes it true? ' + em(a + ' ' + BOX + ' ' + b), say: ['q1_pv_sign', a, 'q1_pv_and', b],
+      cell: function (k) { return { label: k, fact: [a, NM[k], b] }; }, hint: hint };
+  }
+  function pvTenItem() {
+    var more = Math.random() < .5, n = more ? rnd(10, 89) : rnd(20, 99), ans = more ? n + 10 : n - 10;
+    return { key: 'pv10' + (more ? 'm' : 'l') + n, ans: ans, wrong: pvUniq(ans, [more ? n + 1 : n - 1, more ? n - 10 : n + 10, ans + 1, ans - 1]).slice(0, 3), text: 'What is 10 ' + (more ? 'more' : 'less') + ' than ' + em(n) + '?',
+      say: [more ? 'q1_pv_10more' : 'q1_pv_10less', n], cell: pvCell,
+      hint: function (l) { return box(pvPic(Math.floor(n / 10), n % 10), l >= 2 ? '10 ' + (more ? 'more' : 'less') + ': one ' + (more ? 'more' : 'less') + ' ten, the ones stay the same. <b>' + ans + '</b>.' : 'Ten more adds one long bar. Ten less takes one away. The ones stay the same.'); } };
+  }
+  ladder({ id: 'pv', subject: 'math', band: 'E', grade: '1', strand: 'Place value', std: '1.NBT.2', after: 'wordprob', introLine: 'st_new_step', secs: [12, 13],
+    groups: [{ id: 'g_pv', ids: ['pv_tens', 'pv_compare', 'pv_ten_more'] }],
+    steps: [
+      { id: 'pv_tens', name: 'Tens and ones', short: '3 tens and 4 ones is 34', std: '1.NBT.2', item: pvTensItem },
+      { id: 'pv_compare', name: 'Compare two-digit numbers', short: '47 > 38', std: '1.NBT.3', item: pvCompareItem },
+      { id: 'pv_ten_more', name: '10 more, 10 less', short: '10 more than 36 is 46', std: '1.NBT.5', item: pvTenItem }
+    ] });
   ['k', 'wp', 'eo'].forEach(function (l) { LADDERS[l].steps.forEach(function (s) { s.ladder = l; s.band = LADDERS[l].band; s.intro = s.intro || { line: 'st_new_step', example: '' }; }); });
   LADDERS.t.steps[2].ladder = 't'; LADDERS.t.steps[2].band = 'T';
   // coach: steps use their own rule (§0.1); the type label shows on the grown-up page
@@ -445,14 +483,18 @@
   function nextOpen(p, id) { var n = C.nextSkill(id); while (n && C.state(p, n.id).status === 'mastered') n = C.nextSkill(n.id); return n; }
   // 2-3: math stays with picture counting (up to count to 20); the ceiling lifts by itself at age 4
   var BAND_TOP = { T: 'pk_count20' };
-  function overTop(p, id) { var top = BAND_TOP[band(p)], L0 = C.list('math'); return !!(top && C.byId[id] && C.subjectOf(C.byId[id]) === 'math' && L0.indexOf(C.byId[id]) > L0.indexOf(C.byId[top])); }
+  // quality1 (A7): the band top can come from js/core/learn.js (band P stops at teen numbers unless a grown-up or played mastery lifts it)
+  function bandTopOf(p) { return A.Steps && A.Steps.bandTop ? A.Steps.bandTop(p) : BAND_TOP[band(p)]; }
+  function overTop(p, id) { var top = bandTopOf(p), L0 = C.list('math'); return !!(top && C.byId[id] && C.subjectOf(C.byId[id]) === 'math' && L0.indexOf(C.byId[id]) > L0.indexOf(C.byId[top])); }
   function advance(p, s, ev) {
     var T = C.track(p, s.subject);
     if (p.math.pin) return;
     if (T.returnTo && T.returnTo !== s.id) { T.current = T.returnTo; T.returnTo = null; ev.back = true; return; }
     var nx = nextOpen(p, s.id);
     if (nx && overTop(p, nx.id)) {   // 2-3 at the ceiling: the picture-counting steps take turns (variety, not one step all month)
-      var L1 = C.list('math'), cyc = L1.slice(L1.indexOf(C.byId.t_count5), L1.indexOf(C.byId[BAND_TOP[band(p)]]) + 1).map(function (k) { return k.id; });
+      var L1 = C.list('math'), tb = bandTopOf(p), cyc = L1.slice(L1.indexOf(C.byId.t_count5), L1.indexOf(C.byId[tb]) + 1).map(function (k) { return k.id; });
+      if (band(p) === 'T' && A.Learn) { var flt = A.Learn.floor(p, 'math'), cyt = cyc.filter(function (id) { var v = A.Learn.glTop(id); return v == null || v >= flt; }); if (cyt.length >= 2) cyc = cyt; }   // quality1: never wrap down below her floor
+      if (band(p) !== 'T') { var fl = A.Learn ? A.Learn.floor(p, 'math') : 0; cyc = L1.slice(0, L1.indexOf(C.byId[tb]) + 1).filter(function (k) { var v = A.Learn ? A.Learn.glTop(k.id) : 9; return v == null || v >= fl; }).slice(-4).map(function (k) { return k.id; }); }   // quality1: band P top: its in-band top steps take turns
       ev.ladderTop = true; if (cyc.indexOf(s.id) >= 0) T.current = cyc[(cyc.indexOf(s.id) + 1) % cyc.length]; return; }
     if (!nx) {   // everything done: the top steps of her list take turns as mixed practice (no single step on repeat)
       var L2 = C.list(s.subject).filter(function (k) { return k.isStep; }).map(function (k) { return k.id; }), top = L2.slice(-4);
@@ -479,6 +521,8 @@
       if (acc >= .75) { st.checkAt = null; st.revN = (st.revN || 0) + 1; st.revAt = t + (st.revN >= 1 ? 14 : 7) * DAY; ev.checked = s.id;
         if (st.placed && ready(p, s.id).ok) { st.placed = false; st.earnedBy = 'review'; ev.mastered = s.id; }   // v2p2b: a placed step proven in played reviews counts as earned (friends come from played mastery)
         return { say: ['fb_review_good'], events: ev }; }
+      // quality1 (A3): one slip never reopens a step; only 2 reviews in a row under 70% do (learn.js softSlip)
+      if (A.Learn && A.Learn.softSlip(p, s.id, acc)) { st.checkAt = null; ev.slip = s.id; return { say: ['fb_keep_going'], events: ev }; }
       st.status = 'open'; st.reopen = 2; st.checkAt = null; ev.reopened = s.id;
       if (!p.math.pin && T.current !== s.id) { T.returnTo = T.returnTo || T.current; T.current = s.id; }
       return { say: ['fb_keep_going'], events: ev };
@@ -530,7 +574,7 @@
   function probePlan(p, sid) {
     var s = STEPS[sid], ids = C.list(s.subject).map(function (k) { return k.id; }), from = Math.max(0, ids.indexOf(sid)), left = ids.length - from, stride = Math.max(1, Math.ceil(left / PROBE_N)), plan = [];
     // a warm-up that starts in pre-K never places past make-5 (addition is earned in play, after the P gate)
-    var mk = ids.indexOf('pk_make5'), ttop = BAND_TOP[band(p)] && s.subject === 'math' ? ids.indexOf(BAND_TOP[band(p)]) : -1, last = ids.length - 1; while (last > from && !STEPS[ids[last]]) last--; var end = mk >= 0 && from < mk ? mk - 1 : last; if (ttop >= from) end = Math.min(end, ttop); left = end - from + 1; if (s.topic) { var BN0 = { T: 0, P: 1, E: 2 }; while (end > from && BN0[STEPS[ids[end]].band] > BN0[band(p)]) end--; left = end - from + 1; } stride = Math.max(1, Math.ceil(left / PROBE_N));
+    var mk = ids.indexOf('pk_make5'), ttop = bandTopOf(p) && s.subject === 'math' ? ids.indexOf(bandTopOf(p)) : -1, last = ids.length - 1; while (last > from && !STEPS[ids[last]]) last--; var end = mk >= 0 && from < mk ? mk - 1 : last; if (ttop >= from) end = Math.min(end, ttop); left = end - from + 1; var npv = ids.slice(from, end + 1).filter(function (x) { return /^pv_/.test(x); }).length; left -= npv; /* quality1: the 3 new place-value steps do not stretch the stride (same picks as before below them; a strong kid still warms up through place value and even/odd) */ if (s.topic) { var BN0 = { T: 0, P: 1, E: 2 }; while (end > from && BN0[STEPS[ids[end]].band] > BN0[band(p)]) end--; left = end - from + 1; } stride = Math.max(1, Math.ceil(left / PROBE_N));
     for (var i = from; i <= end; i += stride) plan.push(i);
     if (s.topic) { var BN = { T: 0, P: 1, E: 2 }; while (end > from && BN[STEPS[ids[end]].band] > BN[band(p)]) end--; plan = plan.filter(function (i) { return i <= end; }); }
     if (plan[plan.length - 1] !== end) plan.push(end);
@@ -550,7 +594,7 @@
     delete p.math.probeFromStart;
     var id = start < pr.ids.length ? pr.ids[start] : null, sk = id ? C.byId[id] : nextOpen(p, pr.ids[pr.ids.length - 1]);
     if (!sk && pr.subj === 'math') sk = C.byId[pr.ids[pr.ids.length - 1]];   // she showed it all: start at the top step
-    if (sk && overTop(p, sk.id)) sk = C.byId[BAND_TOP[band(p)]];
+    if (sk && overTop(p, sk.id)) sk = C.byId[bandTopOf(p)];
     if (sk && sk.topic && { T: 0, P: 1, E: 2 }[sk.band] > { T: 0, P: 1, E: 2 }[band(p)]) sk = C.byId[pr.ids[pr.from]];
     var mk = pr.ids.indexOf('pk_make5'); if (sk && pr.subj === 'math' && mk >= 0 && pr.from <= mk && pr.ids.indexOf(sk.id) > mk && !gateOk(p)) sk = C.byId.pk_make5;
     if (sk && !p.math.pin) { var s2 = C.state(p, sk.id); if (s2.status !== 'mastered') { s2.status = 'open'; s2.placed = false; } else if (sk.id === 'pk_make5' && s2.placed) { s2.status = 'open'; s2.placed = false; s2.checkAt = null; } T.current = sk.id; T.returnTo = null; }

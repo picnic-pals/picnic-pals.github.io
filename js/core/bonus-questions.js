@@ -18,7 +18,7 @@
     ['moonorbit', 'space', 2, 'What does the Moon go around and around?', [['🌍', 'Earth'], ['🪐', 'Saturn'], ['🔴', 'Mars']]],
     ['nightsky', 'space', 1, 'What do we see twinkling in the night sky?', [['⭐', 'stars'], ['🌈', 'a rainbow'], ['🦋', 'butterflies']]],
     ['spacesuit', 'space', 1, 'What does an astronaut wear in space?', [['🧑‍🚀', 'a space suit'], ['🩱', 'a swimsuit'], ['🧥', 'a raincoat']]],
-    ['biggest', 'space', 2, 'Which one is the biggest?', [['☀️', 'the Sun'], ['🌍', 'Earth'], ['🌙', 'the Moon']]],
+    ['biggest', 'space', 2, 'Which one is the biggest in real life?', [['☀️', 'the Sun', 1.5], ['🌍', 'Earth', 1], ['🌙', 'the Moon', .6]]],   // quality1: the pictures are drawn to real order of size
     ['sunstar', 'space', 2, 'The Sun is a big, hot...', [['⭐', 'star'], ['🌙', 'moon'], ['☁️', 'cloud']]],
     // ---- animals ----
     ['moo', 'animals', 1, 'Which animal says moo?', [['🐄', 'a cow'], ['🐈', 'a cat'], ['🦆', 'a duck']]],
@@ -145,11 +145,84 @@
     ['desert', 'world', 2, 'Where is it very hot and dry, with lots of sand?', [['🏜️', 'a desert'], ['🌲', 'a forest'], ['🧊', 'an iceberg']]],
     ['earthshape', 'world', 2, 'The Earth is round, like a...', [['⚽', 'ball'], ['📦', 'box'], ['🔺', 'triangle']]],
     ['city', 'world', 2, 'What do we call a big place with lots of buildings and streets?', [['🏙️', 'a city'], ['🌊', 'an ocean'], ['🌲', 'a forest']]],
-    ['penguinhome', 'world', 2, 'Many penguins live where it is very...', [['🥶', 'cold'], ['🔥', 'hot'], ['📢', 'loud']]]
+    ['penguinhome', 'world', 2, 'Many penguins live where it is very...', [['🥶', 'cold'], ['🔥', 'hot'], ['📢', 'loud']]],
+    /* ---- quality1: 1st grade (d 3) — NGSS 1-PS4 light and sound, 1-LS1/1-LS3 plants and animals, 1-ESS1 sky patterns; 1st-grade social studies ---- */
+    ['shadow', 'science', 3, 'What makes a shadow?', [['🔦', 'something blocking the light'], ['💧', 'water on the ground'], ['🎵', 'a loud sound']]],
+    ['vibrate', 'science', 3, 'When you pluck a guitar string, it shakes back and forth. That shaking makes...', [['🎵', 'sound'], ['💡', 'light'], ['❄️', 'snow']]],
+    ['mirror', 'science', 3, 'What bounces light back so you can see yourself?', [['🪞', 'a mirror'], ['🧱', 'a brick'], ['🧦', 'a sock']]],
+    ['roots', 'science', 3, 'Which part of a plant takes in water from the soil?', [['🌱', 'the roots'], ['🌸', 'the flower'], ['🍎', 'the fruit']]],
+    ['leafsun', 'science', 3, 'Which part of a plant catches sunlight to make food?', [['🍃', 'the leaves'], ['🌱', 'the roots'], ['🌰', 'the seed']]],
+    ['babylook', 'animals', 3, 'Baby animals usually look a lot like...', [['👪', 'their parents'], ['🪨', 'rocks'], ['☁️', 'clouds']]],
+    ['sunrise', 'space', 3, 'In the morning, where does the Sun come up?', [['🌅', 'in the east'], ['🌇', 'in the west'], ['⬆️', 'in the north']]],
+    ['moonphase', 'space', 3, 'The Moon seems to change shape during the month. What are these shapes called?', [['🌗', 'phases'], ['🌈', 'rainbows'], ['❄️', 'snowflakes']]],
+    ['longdays', 'seasons', 3, 'In which season are the days the longest?', [['🏖️', 'summer'], ['⛄', 'winter'], ['🍂', 'fall']]],
+    ['turtlesafe', 'animals', 3, 'How does a turtle stay safe from danger?', [['🐢', 'it hides in its shell'], ['🦅', 'it flies away'], ['🌳', 'it climbs a tree']]],
+    ['spines', 'animals', 3, 'Which animal has sharp spines to keep it safe?', [['🦔', 'a hedgehog'], ['🐇', 'a rabbit'], ['🐑', 'a sheep']]],
+    ['seedneeds', 'science', 3, 'What does a seed need to start growing?', [['💧', 'water and warmth'], ['🧊', 'ice and snow'], ['🪨', 'rocks and sand']]],
+    ['opaque', 'science', 3, 'Which one does NOT let light through?', [['🧱', 'a brick wall'], ['🪟', 'a clear window'], ['💧', 'clear water']]],
+    ['firefighter', 'world', 3, 'Who puts out fires in our town?', [['🧑‍🚒', 'firefighters'], ['🧑‍🍳', 'cooks'], ['🧑‍🌾', 'farmers']]],
+    ['mailcarrier', 'world', 3, 'Who brings letters to your home?', [['📬', 'a mail carrier'], ['🧑‍⚕️', 'a doctor'], ['🧑‍🍳', 'a chef']]],
+    ['needwant', 'world', 3, 'Which one is a NEED, something we must have to live?', [['🚰', 'water'], ['🎮', 'a video game'], ['🍭', 'a lollipop']]],
+    ['mapkey', 'world', 3, 'On a map, the box that tells what each little picture means is called the...', [['🔑', 'map key'], ['🚪', 'map door'], ['🧢', 'map cap']]],
+    ['globe', 'world', 3, 'What is a round model of the Earth called?', [['🌐', 'a globe'], ['📘', 'a book'], ['🎈', 'a balloon']]],
+    ['weekdays', 'world', 3, 'How many days are in one week?', [['7️⃣', 'seven'], ['5️⃣', 'five'], ['🔟', 'ten']]],
+    ['aftermonday', 'world', 3, 'Which day comes right after Monday?', [['📅', 'Tuesday'], ['📆', 'Sunday'], ['🗓️', 'Friday']]],
+    ['usflag', 'world', 3, 'The flag of the United States has stars and...', [['🇺🇸', 'stripes'], ['🔵', 'circles'], ['🔺', 'triangles']]],
+    ['loudest', 'science', 3, 'Which one makes the loudest sound?', [['🥁', 'a big drum'], ['🪶', 'a feather falling'], ['🐜', 'an ant walking']]],
+    ['hibernate', 'animals', 3, 'Some bears sleep through the long winter. What is that called?', [['🐻', 'hibernating'], ['🏊', 'swimming'], ['🎤', 'singing']]],
+    ['migrate', 'animals', 3, 'Many birds fly to warmer places for the winter. What is that called?', [['🐦', 'migrating'], ['💤', 'napping'], ['🍽️', 'eating']]],
+    ['planteater', 'animals', 3, 'Which animal eats only plants?', [['🐄', 'a cow'], ['🦁', 'a lion'], ['🦈', 'a shark']]],
+    ['camouflage', 'animals', 3, 'A green frog sits on a green leaf. Why is its color helpful?', [['🐸', 'it is hard to see'], ['📢', 'it is loud'], ['❄️', 'it stays cold']]],
+    ['gills', 'animals', 3, 'Fish breathe under water using their...', [['🐟', 'gills'], ['👂', 'ears'], ['🦶', 'feet']]],
+    ['insectlegs', 'animals', 3, 'How many legs does an insect have?', [['6️⃣', 'six'], ['8️⃣', 'eight'], ['4️⃣', 'four']]],
+    ['solid', 'science', 3, 'Which one is a solid?', [['🧱', 'a brick'], ['🥛', 'milk'], ['💨', 'steam']]],
+    ['pulldrawer', 'science', 3, 'When you open a drawer toward you, you...', [['🫳', 'pull it'], ['🫸', 'push it'], ['🎈', 'pop it']]],
+    ['wind', 'seasons', 3, 'What do we call moving air?', [['🌬️', 'wind'], ['🌧️', 'rain'], ['❄️', 'snow']]],
+    ['thermometer', 'seasons', 3, 'Which tool tells us how hot or cold it is?', [['🌡️', 'a thermometer'], ['📏', 'a ruler'], ['⏰', 'a clock']]],
+    ['recycle', 'world', 3, 'Putting old cans and paper in a special bin so they can be made into new things is called...', [['♻️', 'recycling'], ['🎨', 'painting'], ['🛌', 'resting']]],
+    ['nocturnal', 'animals', 3, 'Which animal sleeps in the day and is awake at night?', [['🦉', 'an owl'], ['🐔', 'a chicken'], ['🐝', 'a bee']]],
+    ['daystars', 'space', 3, 'Why can\u2019t we see the stars in the daytime?', [['☀️', 'the Sun is too bright'], ['☁️', 'the stars go away'], ['🌙', 'the Moon hides them']]],
+    ['earthspin', 'space', 3, 'Day and night happen because the Earth...', [['🌍', 'spins around'], ['🧊', 'gets cold'], ['🌧️', 'gets rainy']]],
+    ['healthysnack', 'body', 3, 'Which one is the healthiest snack?', [['🍎', 'an apple'], ['🍭', 'a lollipop'], ['🍩', 'a donut']]],
+    ['bones', 'body', 3, 'What hard parts inside your body hold you up?', [['🦴', 'your bones'], ['💇', 'your hair'], ['💅', 'your nails']]],
+    ['lungs', 'body', 3, 'What part of your body fills up with air when you breathe in?', [['🫁', 'your lungs'], ['🦶', 'your feet'], ['👂', 'your ears']]],
+    /* ---- quality1: 2nd grade (d 4) — NGSS 2-PS1 matter, 2-LS2/2-LS4 habitats and pollination, 2-ESS1/2-ESS2 land and water; 2nd-grade social studies ---- */
+    ['liquid', 'science', 4, 'Which one is a liquid?', [['🧃', 'juice'], ['🪨', 'a rock'], ['🧊', 'an ice cube']]],
+    ['steam', 'science', 4, 'Steam rising from a hot pot is a...', [['♨️', 'gas'], ['🪨', 'solid'], ['💧', 'liquid']]],
+    ['freezes', 'science', 4, 'When water gets very cold, it freezes and turns into...', [['🧊', 'ice'], ['💨', 'steam'], ['🧃', 'juice']]],
+    ['puddle', 'science', 4, 'A puddle dries up on a sunny day. Where did the water go?', [['☁️', 'into the air'], ['🪨', 'into a rock'], ['🌙', 'to the Moon']]],
+    ['erosion', 'world', 4, 'Wind and water slowly wear away rocks and soil. This is called...', [['🏞️', 'erosion'], ['🌈', 'a rainbow'], ['🌋', 'an eruption']]],
+    ['volcano', 'world', 4, 'Which kind of mountain can send out hot, melted rock?', [['🌋', 'a volcano'], ['🏔️', 'a snowy hill'], ['🏜️', 'a sand dune']]],
+    ['continents', 'world', 4, 'How many continents are there on Earth?', [['7️⃣', 'seven'], ['3️⃣', 'three'], ['🔟', 'ten']]],
+    ['uscontinent', 'world', 4, 'The United States is on which continent?', [['🌎', 'North America'], ['🌍', 'Africa'], ['🌏', 'Asia']]],
+    ['pacific', 'world', 4, 'Which one is an ocean?', [['🌊', 'the Pacific'], ['🏔️', 'the Rockies'], ['🏜️', 'the Sahara']]],
+    ['desertanimal', 'animals', 4, 'Which animal is best at living in the hot, dry desert?', [['🐪', 'a camel'], ['🐧', 'a penguin'], ['🐻‍❄️', 'a polar bear']]],
+    ['arcticanimal', 'animals', 4, 'Which animal lives on the cold Arctic ice?', [['🐻‍❄️', 'a polar bear'], ['🐪', 'a camel'], ['🦒', 'a giraffe']]],
+    ['pollen', 'science', 4, 'Bees help flowers make seeds by carrying...', [['🌼', 'pollen'], ['💧', 'rain'], ['🪨', 'pebbles']]],
+    ['dandelion', 'science', 4, 'How do dandelion seeds travel to new places?', [['🌬️', 'the wind blows them'], ['🦶', 'they walk'], ['🏊', 'they swim']]],
+    ['butterflyegg', 'animals', 4, 'What comes first in a butterfly\u2019s life?', [['🥚', 'an egg'], ['🦋', 'a butterfly'], ['🐛', 'a caterpillar']]],
+    ['mammal', 'animals', 4, 'Which animal is a mammal, with fur, that feeds its babies milk?', [['🐕', 'a dog'], ['🐍', 'a snake'], ['🐦', 'a bird']]],
+    ['reptile', 'animals', 4, 'Which animal is a reptile with dry, scaly skin?', [['🐊', 'a crocodile'], ['🐸', 'a frog'], ['🐟', 'a fish']]],
+    ['amphibian', 'animals', 4, 'Which animal starts life in water and later lives on land?', [['🐸', 'a frog'], ['🐈', 'a cat'], ['🐦', 'a bird']]],
+    ['iron', 'science', 4, 'Which material does a magnet pull?', [['🔩', 'iron'], ['🪵', 'wood'], ['🧻', 'paper']]],
+    ['months', 'world', 4, 'How many months are in one year?', [['🗓️', 'twelve'], ['📅', 'ten'], ['📆', 'seven']]],
+    ['aftermarch', 'world', 4, 'Which month comes right after March?', [['🌷', 'April'], ['❄️', 'January'], ['🎃', 'October']]],
+    ['quarter', 'world', 4, 'Which coin is worth the most?', [['🪙', 'a quarter'], ['🟤', 'a penny'], ['⚪', 'a nickel']]],
+    ['dime', 'world', 4, 'How many cents is a dime worth?', [['🔟', '10 cents'], ['5️⃣', '5 cents'], ['1️⃣', '1 cent']]],
+    ['northup', 'world', 4, 'On most maps, which direction is at the top?', [['⬆️', 'north'], ['⬇️', 'south'], ['➡️', 'east']]],
+    ['goods', 'world', 4, 'A baker makes bread to sell. Bread is a...', [['🍞', 'good'], ['💇', 'service'], ['🗳️', 'vote']]],
+    ['vote', 'world', 4, 'When people choose a leader by each picking one, they...', [['🗳️', 'vote'], ['💤', 'nap'], ['🎨', 'paint']]],
+    ['sunfood', 'science', 4, 'Plants make their own food using...', [['☀️', 'sunlight'], ['🧂', 'salt'], ['🌙', 'moonlight']]],
+    ['chocolate', 'science', 4, 'What happens to chocolate when it gets hot?', [['🍫', 'it melts'], ['🧊', 'it freezes'], ['💡', 'it glows']]],
+    ['soundwaves', 'science', 4, 'Sound moves through the air as...', [['〰️', 'vibrations'], ['🌈', 'colors'], ['❄️', 'snowflakes']]],
+    ['island', 'world', 4, 'Land with water all around it is called...', [['🏝️', 'an island'], ['⛰️', 'a mountain'], ['🏜️', 'a desert']]],
+    ['fossil', 'science', 4, 'What do we call the remains of plants or animals from long ago, saved in rock?', [['🦴', 'fossils'], ['🌱', 'seeds'], ['🧸', 'toys']]],
+    ['blood', 'body', 4, 'What does your heart pump all around your body?', [['🩸', 'blood'], ['🌬️', 'air'], ['🍔', 'food']]],
+    ['mercury', 'space', 4, 'Which planet is closest to the Sun?', [['☿️', 'Mercury'], ['🌍', 'Earth'], ['🪐', 'Saturn']]]
   ];
   function slug(t) { return 'c_' + String(t).toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''); }
   var QS = Q.map(function (x) {
-    return { id: x[0], line: 'q_' + x[0], cat: x[1], d: x[2], q: x[3], choices: x[4].map(function (c) { return { emoji: c[0], text: c[1], line: slug(c[1]) }; }), answer: 0 };
+    return { id: x[0], line: 'q_' + x[0], cat: x[1], d: x[2], q: x[3], choices: x[4].map(function (c) { var o = { emoji: c[0], text: c[1], line: slug(c[1]) }; if (c[2]) o.size = c[2]; return o; }), answer: 0 };
   });
   var BY = {}; QS.forEach(function (q) { BY[q.id] = q; });
   // pick a question for a player: never one of their recent ones, easier ones for little kids
@@ -157,8 +230,11 @@
     var b = p.bonus || (p.bonus = { asked: 0, right: 0, recent: [] }), little = A.Age.preReader(p);
     var recent = b.recent || [], keep = Math.min(60, QS.length - 10);
     var big = !little && A.Age.band && /^g/.test(A.Age.band(p));   // v2p1a: 6 and up get the harder (d 2) questions
-    var pool = QS.filter(function (q) { return recent.indexOf(q.id) < 0 && (!little || q.d === 1) && (!big || q.d === 2); });
-    if (!pool.length && big) pool = QS.filter(function (q) { return recent.indexOf(q.id) < 0; });   // all the harder ones asked lately: any not asked lately
+    // quality1 band lock: d = grade (1 Pre-K, 2 K, 3 1st, 4 2nd); the child's floor (js/core/learn.js) sets the lowest d, plus one band up
+    var minD = A.Learn && A.Learn.bonusMinD ? A.Learn.bonusMinD(p) : little ? 1 : big ? 2 : 1, maxD = little ? 1 : minD + 1;
+    if (!A.Learn && big) maxD = 2;
+    var pool = QS.filter(function (q) { return recent.indexOf(q.id) < 0 && q.d >= minD && q.d <= maxD; });
+    if (!pool.length) pool = QS.filter(function (q) { return recent.slice(-20).indexOf(q.id) < 0 && q.d >= minD && (little ? q.d === 1 : true); });   // all asked lately: any in band not asked very lately
     if (!pool.length) pool = QS.filter(function (q) { return recent.slice(-20).indexOf(q.id) < 0; });
     var q = pool[Math.floor(Math.random() * pool.length)];
     recent.push(q.id); while (recent.length > keep) recent.shift(); b.recent = recent; b.asked = (b.asked || 0) + 1;

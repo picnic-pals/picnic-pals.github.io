@@ -235,7 +235,9 @@
 .preview .big.bd svg, .nkprev .big.bd svg { width: 86%; height: 86%; }
 .opt .oa.bd svg { width: 88%; height: 88%; }
 /* Who's playing: fit 768px-tall screens (1366x768, 1024x768); the screen scrolls if it still doesn't fit, and the key hint sits in the footer row (never over the cards) */
-#players { -webkit-overflow-scrolling: touch; }
+#players, #games { -webkit-overflow-scrolling: touch; }
+/* quality1 (C1): Free Play scrolls by touch on a phone (the touchmove guard in ui.js needs .scroll on #games) */
+#games { overscroll-behavior: contain; touch-action: pan-y; }
 #players .whofoot { flex-wrap: wrap; padding-bottom: 6px; }
 #players .whofoot .hint-foot { position: static; }
 #players .who { padding-bottom: 14px; }
@@ -329,3 +331,19 @@
 .colorsc svg { width: 78%; height: auto; transform: rotate(-3deg); filter: drop-shadow(0 4px 0 #0000001a); }
 .colorsc .crayons { position: absolute; right: 2%; bottom: 0; display: flex; gap: 4px; transform: rotate(8deg); }
 .colorsc .crayons i { display: block; width: 12px; height: 54px; border-radius: 6px 6px 3px 3px; clip-path: polygon(50% 0, 100% 18%, 100% 100%, 0 100%, 0 18%); }
+/* quality1 polish: on a phone the music and gear buttons stay fixed while Free Play scrolls; a soft strip behind them keeps the
+   game tiles' words from running underneath the buttons */
+@media (max-width: 600px) {
+  #games.on::before { content: ''; position: fixed; top: 0; left: 0; right: 0; height: 76px; z-index: 50; pointer-events: none;
+    background: linear-gradient(180deg, #fbeefa 0, #fbeefaee 62%, #fbeefa00 100%); }
+}
+/* quality1 polish: the fixed music + gear buttons (top right) never sit on the logo or the "New player" title on a phone */
+@media (max-width: 600px) {
+  #players.on::before { content: ''; position: fixed; top: 0; left: 0; right: 0; height: 76px; z-index: 50; pointer-events: none;
+    background: linear-gradient(180deg, #fbeefa 0, #fbeefaee 62%, #fbeefa00 100%); }
+  #players .logo.picnic { margin-top: 58px; }
+  #newkid .topbar { padding-right: 132px; box-sizing: border-box; }
+  #newkid .nkt { font-size: 22px; white-space: nowrap; }
+  #newkid .topbar { gap: 10px; }
+  #newkid .topbar .backbtn { white-space: nowrap; flex: none; }
+}

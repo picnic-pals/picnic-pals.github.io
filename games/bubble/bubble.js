@@ -33,15 +33,22 @@
   function tint(c) { return c.col ? B.COLORS[c.col] : null; }
   /* ---------- the target card ---------- */
   function showTarget() {
-    var t = G.t, s = t.show || {}, h = '';
+    var t = G.t, s = t.show || {}, h = '<span class="ask">' + A.esc(askText(t)) + '</span>';   // C2: the ask is always on screen (mute-safe)
     if (s.col && !s.e) h += '<span class="sw" style="background:' + B.COLORS[s.col] + '"></span>';
     if (s.shape) h += '<span class="shp">' + shapeSvg(s.shape, '#ff8ab3') + '</span>';
     if (s.size) h += '<span class="sz ' + s.size + '"></span>';
     if (s.e) h += '<span class="emo' + (s.col ? ' tinted' : '') + '"' + (s.col ? ' style="background:' + B.COLORS[s.col] + '55"' : '') + '>' + s.e + '</span>';
     if (s.text) h += '<b class="' + (s.text.length > 6 ? 'long' : '') + '">' + A.esc(s.text) + '</b>';
+    if (s.sent) h += '<b class="sent">' + A.esc(s.sent) + '</b>';
     if (t.seq) h += '<span class="seq">' + t.seq.map(function (c, k) { return '<i class="' + (k < t.got ? 'on' : k === t.got ? 'now' : '') + '">' + (k < t.got || !t.word ? A.esc(c.t) : '_') + '</i>'; }).join('') + '</span>';
     else if (t.need > 1) h += '<span class="need">' + Array.from({ length: t.need }, function (_, k) { return '<i class="' + (k < t.got ? 'on' : '') + '"></i>'; }).join('') + '</span>';
     $('#target').innerHTML = h + '<span class="spk">🔊</span>';
+  }
+  // the on-screen ask: the kind's own line (never prints a word the child must find by ear), else the spoken words
+  function askText(t) {
+    if (t.ask) return t.ask;
+    var x = String((V.text && V.text(t.say || [])) || '').replace(/\s+/g, ' ').trim(); if (!x) return '';
+    x = x.charAt(0).toUpperCase() + x.slice(1); return /[.!?]$/.test(x) ? x : x + '!';
   }
   function dots() { var n = G.R.goal, h = ''; for (var k = 0; k < n; k++) h += '<i class="' + (k < G.res.pops ? 'on' : '') + '"></i>'; $('#dots').innerHTML = h; }
   /* ---------- bubbles ---------- */
@@ -180,5 +187,6 @@
     popGood: function () { var b = G.bubbles.find(function (x) { return !x.gone && !x.golden && B.matches(G.t, x.c); }); if (!b) { b = spawn(G.t.seq ? G.t.seq[G.t.got] : G.t.good[0]); } pop(b); return !!b; },
     popBad: function () { var b = G.bubbles.find(function (x) { return !x.gone && !x.golden && !B.matches(G.t, x.c); }); if (!b && G.t.bad && G.t.bad.length) b = spawn(G.t.bad[0]); if (b) pop(b); return !!b; },
     spawn: spawn, endRound: endRound, offerStorm: offerStorm };
-  start();
+  A.HowTo.button('bubble', '#sayBtn');   // quality1 (C3)
+  A.HowTo.first('bubble').then(start);
 })(window.Arcade);

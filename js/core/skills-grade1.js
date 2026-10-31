@@ -63,11 +63,11 @@
       var ok = pool.filter(function (w) { return !alike(w, T); });   // never a sound-alike (the prompt is audio only)
       var like = ok.filter(function (w) { return w.charAt(0) === T.charAt(0) || w.length === T.length; });
       function mk(w) { return { label: w, html: wordHtml(w), fact: w === T ? ['sw_that_says', swLine(w)] : ['rule_sight', swLine(T)], name: [], k: w.toLowerCase() }; }
-      return { text: LISTEN, listen: true, hint: SIGHT_HINT, say: ['rule_sight', swLine(T)], target: T,
-        good: function () { return mk(T); }, bad: function () { return mk(like.length && Math.random() < (L ? .6 : .45) ? pick(like) : pick(ok)); } };
+      return A.SightWords.mute({ text: LISTEN, listen: true, hint: SIGHT_HINT, say: ['rule_sight', swLine(T)], target: T,
+        good: function () { return mk(T); }, bad: function () { return mk(like.length && Math.random() < (L ? .6 : .45) ? pick(like) : pick(ok)); } }, pool, mk);
     } });
   var SIGHT_HINT = 'Tap 🔊 to hear it again. Listen for the first sound, then look for the letter that makes it.';
-  SK[2].ask = askFrom(SK[2].gen, function (r) { return { text: LISTEN, listen: true, say: ['sw_find', swLine(r.target)] }; });
+  SK[2].ask = askFrom(SK[2].gen, function (r) { return r.cloze ? { text: r.text, say: [] } : { text: LISTEN, listen: true, say: ['sw_find', swLine(r.target)] }; });
 
   /* ----- Opposites ----- L1: picture words; L2: words only, more pairs (and the word itself as a trap) */
   SK.push({ id: 'opposites', name: 'Opposites', short: 'Hot and cold, big and small', strand: 'Vocabulary', std: 'K.L.5b / 1.L.5', grade: 'K–1', subject: 'reading', sayFact: true, secs: [11, 12],
@@ -76,7 +76,7 @@
     gen: function (L) {
       var pool = G.OPP_LEVELS[L], T = pick(pool), O = G.OPP[T], tl = wl(T);
       function mk(w) { var l = wl(w), ok = w === O; return { label: w, html: !L && G.OPP_EMO[w] ? picWord(G.OPP_EMO[w], w) : wordHtml(w), fact: [l, ok ? 'w_opposite_of' : 'w_not_opposite', tl], name: [l], k: ok ? 'opp' : 'x:' + w }; }
-      var bads = pool.filter(function (w) { return w !== O && w !== T; });
+      var also = (G.OPP_ALSO && G.OPP_ALSO[T]) || [], bads = pool.filter(function (w) { return w !== O && w !== T && also.indexOf(w) < 0; });   // quality1: never a second right opposite
       return { text: 'Munch the opposite of ' + em((!L ? G.OPP_EMO[T] + ' ' : '') + T), hint: 'Think of the word that means the other way around, like hot and cold.', say: ['rule_opposite', tl], target: T,
         good: function () { return mk(O); }, bad: function () { return mk(L && Math.random() < .15 ? T : pick(bads)); } };
     } });
@@ -115,10 +115,23 @@
     gen: function (L) {
       var bank = G.LONG[L], all = Object.keys(bank), T = pick(all), like = bank[T].filter(function (w) { return !alike(w, T); }), pool = all.concat([].concat.apply([], all.map(function (w) { return bank[w]; })));
       pool = pool.filter(function (w, i) { return pool.indexOf(w) === i && !alike(w, T); });
+      // quality1 polish: mute fallback (like the sight-word cloze). When no voice can play, a picture names the word instead:
+      // "Which word is this? 🪁". Only picturable targets; the wrong words are its look-alikes (kit, bite) and other bank words,
+      // never one that could also name the picture (G.LONG_PIC_NOT). Checked by tools/content-lint.js.
+      if (A.SightWords && A.SightWords.quiet() || G.forceMute) {
+        var pics = all.filter(function (w) { return G.LONG_PIC[w]; });
+        if (pics.length) {
+          var P = pick(pics), not = G.LONG_PIC_NOT[P] || [], plike = bank[P].filter(function (w) { return !alike(w, P) && not.indexOf(w) < 0 && !G.LONG_PIC[w]; });
+          var ppool = pool.concat(T).filter(function (w, i, a) { return a.indexOf(w) === i && w !== P && !alike(w, P) && not.indexOf(w) < 0 && !G.LONG_PIC[w]; });
+          return { text: '<span class="lvpic">Which word is this? <span class="emo" aria-hidden="true">' + G.LONG_PIC[P] + '</span></span>', plainText: 'Which word is this?', listen: false, pic: true,
+            hint: L ? 'Look at the picture. Find the word with two vowels teaming up, like ai, ee, oa or ea.' : 'Look at the picture. Find the word with the magic e.', say: [], target: P,
+            good: function () { return wordCell(P, ['w_thats', wl(P)]); }, bad: function () { var w = plike.length && Math.random() < .65 ? pick(plike) : pick(ppool); return wordCell(w, []); } };
+        }
+      }
       return { text: LISTEN, listen: true, hint: L ? 'Listen for the long vowel. Look for two vowels teaming up, like ai, ee, oa or ea.' : 'Look for the word with the magic e.', say: ['rule_find_word', wl(T)], target: T,
         good: function () { return wordCell(T, ['w_thats', wl(T)]); }, bad: function () { var w = like.length && Math.random() < .65 ? pick(like) : pick(pool); return wordCell(w, ['rule_find_word', wl(T)]); } };
     } });
-  SK[SK.length - 1].ask = silentAsk(SK[SK.length - 1].gen, function (r) { return { text: LISTEN, listen: true, say: ['q_which_word', wl(r.target)] }; });
+  SK[SK.length - 1].ask = silentAsk(SK[SK.length - 1].gen, function (r) { return r.pic ? { text: r.text, say: [] } : { text: LISTEN, listen: true, say: ['q_which_word', wl(r.target)] }; });
 
   /* ----- Sight words, part 3: Dolch 2nd and 3rd grade ----- */
   SK.push({ id: 'sight3', name: 'Big kid sight words', short: 'Dolch 2nd and 3rd grade words', strand: 'Sight words', std: '2.RF.3f / 3.RF.3d', grade: '2–3', subject: 'reading', sayFact: true, listen: true, secs: [10, 11],
@@ -129,10 +142,10 @@
       var ok = pool.filter(function (w) { return w !== T && w !== same && !alike(w, T); });
       var like = ok.filter(function (w) { return w.charAt(0) === T.charAt(0) || w.length === T.length; });
       function mk(w) { return { label: w, html: wordHtml(w), fact: w === T ? ['sw_that_says', swLine(w)] : ['rule_sight', swLine(T)], name: [], k: w.toLowerCase() }; }
-      return { text: LISTEN, listen: true, hint: SIGHT_HINT, say: ['rule_sight', swLine(T)], target: T,
-        good: function () { return mk(T); }, bad: function () { return mk(like.length && Math.random() < hard(L) ? pick(like) : pick(ok)); } };
+      return A.SightWords.mute({ text: LISTEN, listen: true, hint: SIGHT_HINT, say: ['rule_sight', swLine(T)], target: T,
+        good: function () { return mk(T); }, bad: function () { return mk(like.length && Math.random() < hard(L) ? pick(like) : pick(ok)); } }, pool, mk);
     } });
-  SK[SK.length - 1].ask = silentAsk(SK[SK.length - 1].gen, function (r) { return { text: LISTEN, listen: true, say: ['sw_find', swLine(r.target)] }; });
+  SK[SK.length - 1].ask = silentAsk(SK[SK.length - 1].gen, function (r) { return r.cloze ? { text: r.text, say: [] } : { text: LISTEN, listen: true, say: ['sw_find', swLine(r.target)] }; });
 
   /* ----- Homophones: pick the word that fits the sentence (the sentence is read aloud; it sounds the same either way) ----- */
   SK.push({ id: 'homophones', name: 'Homophones', short: 'to · two · too, there · their', strand: 'Spelling / vocabulary', std: '2.L.2 / 3.L.2', grade: '2–3', subject: 'reading', sayFact: false, secs: [13, 14],

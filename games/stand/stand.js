@@ -78,9 +78,11 @@
   function hiNo(t) { return t.replace(/(but no [a-z ]+|No [a-z]+!|NOT round|ROUND|DOUBLE it all!|each)/g, '<em>$1</em>'); }
   function flipSoon(o) { setTimeout(function () { if (G.o === o && G.phase === 'order' && !G.miss && !G.flipped) { G.flipped = true; renderBubble(); } }, G.peeks ? 3000 : 4500); }
   function peek() { if (G.phase !== 'order' || !G.flipped) return; var o = G.o; G.peeks++; G.flipped = false; renderBubble(); say(o.ticketSay, 'tap'); flipSoon(o); }
+  // C2: the ask is always written in the speech bubble too (works with the sound off)
+  function ask(parts) { var b = $('#bubble'), l = b.querySelector('.ask'); if (!l) { l = A.el('<p class="ask"></p>'); b.insertBefore(l, b.firstChild); } var x = String(V.text(parts || []) || '').trim(); l.textContent = x ? x.charAt(0).toUpperCase() + x.slice(1) : ''; }
   function renderOrder() {
     var o = G.o, hint = G.miss > 0;
-    renderBubble();
+    renderBubble(); ask(o.say);
     var bins = $('#bins'); bins.innerHTML = ''; bins.className = 'bins n' + o.bins.length + (o.kind === 'pick' ? ' pick' : '');
     o.bins.forEach(function (id) {
       var it = S.BY[id], b = A.el('<button class="bin" data-id="' + id + '" aria-label="' + A.esc(it.name) + '">' + art(id) + (o.kind === 'build' && !G.tod ? '<small>' + A.esc(it.name) + '</small>' : '') + '</button>');
@@ -140,8 +142,9 @@
   }
   function renderPay() {
     var m = G.m, hint = G.miss > 0;
-    var tags = m.prices.map(function (v, k) { return (k ? '<span class="plus">+</span>' : '') + '<span class="tag">$' + v + '</span>'; }).join('');
-    bubble('<div class="prices">' + tags + (m.kind === 'enough' ? '<span class="q">Enough?</span>' : '') + (hint && m.kind !== 'enough' && m.prices.length > 1 ? '<span class="eq">= $' + m.total + '</span>' : '') + '</div>', 'pay');
+    var tags = m.change ? '<span class="tag">Costs $' + m.change.cost + '</span><span class="tag paid">Paid $' + m.change.paid + '</span><span class="q">Change?</span>'
+      : m.prices.map(function (v, k) { return (k ? '<span class="plus">+</span>' : '') + '<span class="tag">$' + v + '</span>'; }).join('');
+    bubble('<div class="prices">' + tags + (m.kind === 'enough' ? '<span class="q">Enough?</span>' : '') + (hint && m.kind !== 'enough' && !m.change && m.prices.length > 1 ? '<span class="eq">= $' + m.total + '</span>' : '') + '</div>', 'pay'); ask(m.say);
     var bins = $('#bins'); bins.innerHTML = ''; bins.className = 'bins wallet';
     var left = m.bills.slice(); G.taken.forEach(function (v) { var k = left.indexOf(v); if (k >= 0) left.splice(k, 1); });
     var run = 0;
@@ -151,7 +154,7 @@
       bins.appendChild(b); });
     var t = $('#tray');
     if (m.kind === 'enough') { t.innerHTML = '<div class="cashbox wal"><span class="lbl">' + A.esc(fname(G.c.friend)) + '\'s bills</span></div>'; }
-    else { t.innerHTML = '<div class="cashbox"><span class="lbl">Cash box</span><div class="pile">' + G.taken.map(function (v, k) { return '<button class="billbtn in" data-k="' + k + '" aria-label="Give back ' + v + ' dollars">' + billSvg(v) + '</button>'; }).join('') + '</div>' +
+    else { t.innerHTML = '<div class="cashbox"><span class="lbl">' + (m.change ? 'Change' : 'Cash box') + '</span><div class="pile">' + G.taken.map(function (v, k) { return '<button class="billbtn in" data-k="' + k + '" aria-label="Give back ' + v + ' dollars">' + billSvg(v) + '</button>'; }).join('') + '</div>' +
       (m.showTotal || hint ? '<span class="cnt">$' + sum(G.taken) + '</span>' : '') + '</div>';
       A.$$('#tray .billbtn.in').forEach(function (b) { b.addEventListener('click', function () { if (G.busy) return; G.taken.splice(+b.getAttribute('data-k'), 1); A.Audio.sfx('tap'); renderPay(); }); }); }
     var acts = $('#acts'); acts.innerHTML = '';
@@ -270,6 +273,7 @@
     A.Store.save();
     say(['ls_hello'].concat(G.plan.sunny ? ['ls_sunny'] : [])).then(function () { nextCustomer(); });
   }
-  (A.PlayTime ? A.PlayTime.checkpoint() : Promise.resolve(true)).then(function (ok) { if (ok) start(); });
+  A.HowTo.button('stand', '#sayBtn');   // quality1 (C3)
+  (A.PlayTime ? A.PlayTime.checkpoint() : Promise.resolve(true)).then(function (ok) { if (ok) A.HowTo.first('stand').then(start); });
   window.__stand = { G: G, P: function () { return P; }, S: S, next: nextCustomer, serve: serve, tapBin: function (id) { var b = A.$('#bins .bin[data-id="' + id + '"]'); if (b) tapBin(id, b); }, payAnswer: payAnswer, tipJar: tipJar, endDay: endDay, offerRush: offerRush, RUSH_MS: RUSH_MS, render: renderOrder, peek: peek };
 })(window.Arcade);

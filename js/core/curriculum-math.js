@@ -194,6 +194,7 @@
     var band = A.Age ? A.Age.band(p) : (p.age != null && p.age <= 5 ? 'pre' : 'g1');
     var base = band === 'toddler' || band === 'pre' ? { concepts: .4, reading: .3, math: .3 } : band === 'pk' ? { math: .45, reading: .4, concepts: .15 } : band === 'k' ? { math: .5, reading: .45, concepts: .05 } : { math: .6, reading: .3, concepts: .1 };
     if (p.levels && p.levels.concepts === 'off') base.concepts = 0;   // grown-up setting: Early Concepts off
+    if (A.Learn && A.Learn.mixBase) base = A.Learn.mixBase(p, base);   // quality1 (A2): a subject leaves the mix once the child is past it
     var tot = 0; have.forEach(function (id) { w[id] = base[id] || 0; tot += w[id]; });
     if (!tot) { w.math = 1; return w; }
     Object.keys(w).forEach(function (id) { w[id] /= tot; });
@@ -330,6 +331,8 @@
       }
       if (st.pending) return { say: ['fb_keep_going'], events: ev };   // a pending skill just stays in review
       // a failed spaced review reopens the skill: "needs practice" at its top level, practiced next, then back to the current skill
+      // quality1 (A3): one slip lowers the items' boxes (recordAnswer did that) but never reopens the skill; 2 reviews in a row under 70% do
+      if (st.status === 'mastered' && A.Learn && A.Learn.softSlip(p, s.id, acc)) { ev.slip = s.id; return { say: ['fb_keep_going'], events: ev }; }
       if (st.status === 'mastered') {
         st.status = 'open'; st.needsPractice = true; st.topPasses = 0; st.level = top; ev.reopened = s.id;
         if (!p.math.pin && T.current !== s.id) { T.returnTo = T.returnTo || T.current; T.current = s.id; }
@@ -360,7 +363,7 @@
     var fresh = !st.lvN, onLevel = round.level === st.level && !round.eased;
     if (onLevel) { st.lvN += tot; st.lvC += res.correct; if (tot) st.lvR = (st.lvR || 0) + 1; }
     var evidence = onLevel && st.lvN >= LEVEL_RULE.min && (st.lvR || 0) >= LEVEL_RULE.rounds && st.lvC / st.lvN >= LEVEL_RULE.acc && acc >= .8;
-    var f10 = res.first10, fast = onLevel && fresh && !!f10 && f10.n >= 10 && f10.right >= LEVEL_RULE.fastRight && !f10.hinted && !!f10.fast && fastOk(p, s.id);
+    var f10 = res.first10, fast = onLevel && (fresh || (A.Learn && st.lvN <= 2 * tot)) && !!f10 && f10.n >= 10 && f10.right >= LEVEL_RULE.fastRight && !f10.hinted && !!f10.fast && fastOk(p, s.id);
     if (fast) ev.fastTrack = true;
     var earned = evidence || fast;
     if (res.gaveUp) { // ran out of hearts: design2: only the 2nd Snack break in a row drops a level

@@ -200,7 +200,11 @@
     { id: 'm_enough', name: 'Do I have enough?', band: 'P', ok: function (p) { return !!mathMastered(p, 'add10'); }, params: function () { var price = rnd(2, 10), yes = RNG() < .5, have = yes ? rnd(price, Math.min(15, price + 4)) : rnd(Math.max(1, price - 4), price - 1); return { price: price, have: have }; },
       build: function (P) { return { kind: 'enough', prices: [P.price], total: P.price, have: P.have, bills: wallet(P.have, 0, P.have >= 5), ans: P.have >= P.price, say: ['ls_that_is', P.price, 'ls_dollars', 'ls_enough'] }; } },
     { id: 'm_three', name: 'Three items to $20', band: 'P', ok: function (p) { return !!mathMastered(p, 'make10'); }, params: function () { var a = rnd(2, 8), b = rnd(1, 6), c = rnd(1, Math.max(1, Math.min(6, 20 - a - b))); return { a: a, b: b, c: c }; },
-      build: function (P) { var t = P.a + P.b + P.c; return { kind: 'take', prices: [P.a, P.b, P.c], total: t, bills: wallet(t, rnd(1, 2), true), say: ['ls_price_is', P.a, 'ls_plus', P.b, 'ls_plus', P.c], showTotal: false }; } }
+      build: function (P) { var t = P.a + P.b + P.c; return { kind: 'take', prices: [P.a, P.b, P.c], total: t, bills: wallet(t, rnd(1, 2), true), say: ['ls_price_is', P.a, 'ls_plus', P.b, 'ls_plus', P.c], showTotal: false }; } },
+    // quality1: making change (2.OA.1 / 2.MD.8, whole dollars): it costs $C, the friend paid with a $5, $10 or $20 bill; give back the change
+    { id: 'm_change', name: 'Making change', band: 'E', ok: function (p) { return !!mathMastered(p, 'make10') && band(p) === 'E'; }, probe: false,
+      params: function () { var paid = pick([5, 10, 10, 20]), cost = rnd(1, paid - 1); return { paid: paid, cost: cost }; },
+      build: function (P) { var ch = P.paid - P.cost; return { kind: 'take', prices: [P.cost], change: { paid: P.paid, cost: P.cost }, total: ch, bills: wallet(ch, rnd(1, 2), ch >= 5), say: ['q1_ls_costs', P.cost, 'ls_dollars', 'q1_ls_paid', P.paid, 'ls_dollars', 'q1_ls_change'], showTotal: false }; } }
   ];
 
   /* ---------- ladder registry ---------- */
@@ -243,7 +247,21 @@
   }
   function sst(p, id) { var g = data(p), s = g.steps[id]; if (!s) s = g.steps[id] = { n: 0, ok: 0, hist: [], days: {}, fast: 0, status: 'locked' }; return s; }
   function topIx(p, L) { var t = L.top(p); return t ? L.ids.indexOf(t) : L.ids.length - 1; }
-  function stepOk(p, s) { var b = BN[band(p)]; return s.ok ? !!s.ok(p) && BN[s.band] <= b + 1 : BN[s.band] <= b; }   // a gated step may open one band early (e.g. a 5-year-old reader)
+  /* quality1 band lock (js/core/learn.js): a step whose grade tag (at its own sub-level) is under the child's floor is marked done
+     ('band') and never served as the current step, a rotation, or an easier customer; a step past her ceiling never opens.
+     A real missed order can still come back as review. Without A.Learn (old Node tests) nothing changes. */
+  function LN() { return A.Learn && A.Learn.bubbleSub ? A.Learn : null; }
+  function inBand(p, id) { var Ln = LN(); if (!Ln) return true; var sb = Ln.bubbleSub(p, id); return sb >= 0 && Ln.kindOk(p, id, Math.max(sb, (data(p).steps[id] || {}).sub || 0)); }
+  function underCeil(p, id) { var Ln = LN(); if (!Ln) return true; var v = Ln.gl(id, 0); return v == null || v <= Ln.ceil(p, Ln.subjOfKind(id)); }
+  function bandMark(p, L, T) {
+    var Ln = LN(); if (!Ln) return;
+    L.ids.forEach(function (id) { var q = sst(p, id), sb = Ln.bubbleSub(p, id);
+      if (sb < 0) { if (q.status !== 'mastered') { q.status = 'mastered'; q.placed = true; q.by = 'band'; } }
+      else if (sb > 0 && q.status !== 'mastered' && (q.sub || 0) < sb) q.sub = sb; });
+    if (T && T.cur && !inBand(p, T.cur)) { var ci = L.ids.indexOf(T.cur), bt = bandTop(p, L);
+      for (var k = ci + 1; k <= bt; k++) if (stepOk(p, L.steps[k]) && inBand(p, L.ids[k])) { T.cur = L.ids[k]; if (sst(p, T.cur).status === 'locked') sst(p, T.cur).status = 'open'; return; } }
+  }
+  function stepOk(p, s) { var b = BN[band(p)]; if (!underCeil(p, s.id)) return false; return s.ok ? !!s.ok(p) && BN[s.band] <= b + 1 : BN[s.band] <= b; }   // a gated step may open one band early (e.g. a 5-year-old reader)
   function bandTop(p, L) { // the highest step open to this kid: her band, or a step's own gate (reading / math mastery)
     var last = 0; L.steps.forEach(function (s, i) { if (stepOk(p, s)) last = i; }); return Math.min(last, topIx(p, L));
   }
@@ -255,13 +273,14 @@
       T = g.tracks[lad] = { cur: null, probe: null, drop: {}, weak: 0, last: [] };
       var st0 = L.start(p), i0 = Math.max(0, Math.min(L.ids.indexOf(st0), bandTop(p, L)));
       L.ids.forEach(function (id, i) { var s = sst(p, id); if (i < i0 && s.status !== 'mastered') { s.status = 'mastered'; s.placed = true; s.by = 'age'; } });
-      T.cur = L.ids[i0]; sst(p, T.cur).status = 'open';
+      T.cur = L.ids[i0]; sst(p, T.cur).status = 'open'; bandMark(p, L, T); i0 = L.ids.indexOf(T.cur);
       // warm-up probe (not for toddlers): strided picks from the start step up to the band top; stops at the first miss
       var top = bandTop(p, L);
       while (top > i0 && L.steps[top].probe === false) top--;   // stand2: harder steps are climbed by playing, never placed by the warm-up
-      if (!toddler(p) && top > i0) { var okIx = []; for (var k = i0; k <= top; k++) if (k === i0 || stepOk(p, L.steps[k])) okIx.push(k); var plan = okIx.filter(function (x, j) { return okIx.length <= 4 || j % 2 === 0; }); if (plan[plan.length - 1] !== top) plan.push(top); T.probe = { plan: plan, k: 0, right: -1, from: i0 }; }
+      if (!toddler(p) && top > i0) { var okIx = []; for (var k = i0; k <= top; k++) if (k === i0 || (stepOk(p, L.steps[k]) && inBand(p, L.ids[k]))) okIx.push(k); var plan = okIx.filter(function (x, j) { return okIx.length <= 4 || j % 2 === 0; }); if (plan[plan.length - 1] !== top) plan.push(top); T.probe = { plan: plan, k: 0, right: -1, from: i0 }; }
     }
     // a birthday can raise the band ceiling; never move a kid down
+    if (!T.probe) bandMark(p, L, T);
     var ci = L.ids.indexOf(T.cur), bt = bandTop(p, L); if (ci > bt) { T.cur = L.ids[bt]; }
     else if (sst(p, T.cur).status === 'mastered' && !T.probe) { var nx = nextOk(p, L, ci); if (nx >= 0 && nx <= bt) { T.cur = L.ids[nx]; if (sst(p, T.cur).status === 'locked') sst(p, T.cur).status = 'open'; } }
     return T;
@@ -273,11 +292,12 @@
     o = o || {}; var T = track(p, lad); if (!T) return null; var L = LADDERS[lad];
     if (T.probe && T.probe.k < T.probe.plan.length) return { step: STEPS[L.ids[T.probe.plan[T.probe.k]]], why: 'warmup' };
     var ci = L.ids.indexOf(T.cur), d = today(), dr = T.drop[T.cur] || {};
-    if (T.dropNext && ci > 0 && T.lastWhy !== 'easy') { T.dropNext = false; return { step: STEPS[L.ids[ci - 1]], why: 'easy' }; }
+    if (T.dropNext && ci > 0 && T.lastWhy !== 'easy' && inBand(p, L.ids[ci - 1])) { T.dropNext = false; return { step: STEPS[L.ids[ci - 1]], why: 'easy' }; }
     T.dropNext = false;
     var due = dueMissed(p, lad); if (due.length && RNG() < .3) { var m = due[0]; return { step: STEPS[m.step], why: 'missed', params: m.params, key: m.k }; }
     var top = bandTop(p, L), cs = sst(p, T.cur);
-    if (ci >= top && cs.status === 'mastered') { var lo = Math.max(0, top - 2), k = lo + Math.floor(RNG() * (top - lo + 1)); return { step: STEPS[L.ids[k]], why: 'rotate' }; }   // the band top: top steps take turns
+    if (ci >= top && cs.status === 'mastered') { var lo = Math.max(0, top - 2), rot = []; for (var j = lo; j <= top; j++) if (inBand(p, L.ids[j]) && stepOk(p, L.steps[j])) rot.push(j); if (!rot.length) rot = [top];
+      var k = rot[Math.floor(RNG() * rot.length)]; return { step: STEPS[L.ids[k]], why: 'rotate' }; }   // the band top: top steps take turns (in band only)   // the band top: top steps take turns
     return { step: STEPS[T.cur], why: 'cur' };
   }
   function makeOrder(p, lad, o) {
@@ -346,7 +366,7 @@
     if (s.n >= 30 && s.win.length >= 20 && s.win.reduce(function (a, b) { return a + b; }, 0) / 20 < ruleOf(o.step).acc - .10) {
       // stand2: step down to the step before (open again, placed or earned), 6 good answers there and back up; never bounce straight back
       var ci = L.ids.indexOf(o.step), pi = ci - 1; while (pi > 0 && !stepOk(p, L.steps[pi])) pi--;
-      if (pi >= 0 && ci > 0) { var pv = sst(p, L.ids[pi]); pv.status = 'open'; pv.placed = false; pv.back = { n: 0, ok: 0 }; T.cur = L.ids[pi]; s.hist = []; s.win = []; ev.stepDown = T.cur; }
+      if (pi >= 0 && ci > 0 && inBand(p, L.ids[pi])) { var pv = sst(p, L.ids[pi]); pv.status = 'open'; pv.placed = false; pv.back = { n: 0, ok: 0 }; T.cur = L.ids[pi]; s.hist = []; s.win = []; ev.stepDown = T.cur; }
     }
     return ev;
   }
@@ -378,6 +398,6 @@
   A.Stand = { ITEMS: ITEMS, BY: BY, COLORS: COLORS, BILLS: BILLS, UPGRADES: UPGRADES, upgrade: upgrade, owned: owned, LADDERS: LADDERS, STEPS: STEPS, ORDER: ORDER, ladder: ladder,
     band: band, toddler: toddler, moneyOpen: moneyOpen, mathCount10: mathCount10, mathMastered: mathMastered, readerOk: readerOk, stepOk: stepOk, data: data, state: sst, track: track, nextStep: nextStep, makeOrder: makeOrder, checkOrder: checkOrder, checkPay: checkPay,
     record: record, ready: ready, RULE: RULE, STEADY: STEADY, fastMs: fastMs, sunny: sunny, rushOk: rushOk, customers: customers, planDay: planDay, sillyOrder: sillyOrder, dayStars: dayStars, finishDay: finishDay,
-    summary: summary, bandTop: bandTop, bigReader: bigReader, count: count, seed01: seed01,
+    summary: summary, bandTop: bandTop, inBand: inBand, bigReader: bigReader, count: count, seed01: seed01,
     setClock: function (f) { NOWF = f; }, setRng: function (f) { RNG = f || Math.random; }, today: today };
 })(window.Arcade);

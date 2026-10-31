@@ -4,6 +4,8 @@
    tap the scenery for its sound. Your friend is the hero (Friend button: switch any time; each friend keeps their own story).
    Keys: ←/→ move · Enter/Space play/open · Esc back (place → world → menu) · F friend · B book. */
 (function (A) {
+  // quality1 polish: a node never hangs off the map's edge on a narrow screen (its half-width comes from CSS --hw)
+  function LX(x) { return 'left:clamp(var(--hw, 0px), ' + x + '%, calc(100% - var(--hw, 0px)))'; }
   'use strict';
   var S2 = A.Story2, ST = A.Story, V = A.Voice, UI = A.UI;
   var P = null, resolveFn = null, view = 'world', placeK = 0, sel = 0, root = null, busy = false;
@@ -30,12 +32,15 @@
 
   function build() {
     root = A.el('<section class="s2" id="s2map" aria-label="Story map"><div class="s2-top"><button class="s2-back" id="s2Back" aria-label="Back">◀</button>' +
-      '<div class="s2-title" id="s2Title"></div><button class="s2-book" id="s2Book" aria-label="Read the story book">📖</button>' +
-      '<button class="s2-hero" id="s2Hero" aria-label="Switch friend"><img alt=""><span class="nm"></span><span class="sw">🔄 Friend</span></button></div>' +
+      '<div class="s2-title" id="s2Title"></div><button class="s2-book" id="s2Book" aria-label="Read the story book">📖</button><button class="q1help" id="s2Help" aria-label="How to play" title="How to play">?</button>' +
+      '<button class="s2-hero" id="s2Hero" aria-label="Switch friend"><img alt=""><span class="nm"></span><span class="sw"><i>🔄</i> <b>Friend</b></span></button></div>' +
       '<div class="s2-stage" id="s2Stage"></div></section>');
     document.body.appendChild(root);
     root.querySelector('#s2Back').addEventListener('click', back);
     root.querySelector('#s2Hero').addEventListener('click', function () { if (!busy) friendPanel(); });
+    var reGuide = function () { var gd = root.querySelector('.s2-guide'), nb = root.querySelector('.s2-lv.cur'); if (gd && nb) placeGuide(gd, nb, gd.parentNode); };
+    window.addEventListener('resize', reGuide);
+    root.querySelector('#s2Help').addEventListener('click', function () { if (!busy && A.HowTo && !document.querySelector('.overlay.on')) { V.stop(); A.HowTo.show('story'); } });   // quality1 (C3)
     root.querySelector('#s2Book').addEventListener('click', function () { if (!busy && A.StoryBook) { V.stop(); A.StoryBook.open(P); } });
     document.addEventListener('keydown', onKey, true);
   }
@@ -50,13 +55,18 @@
     var R = S2.reachedList(P), cur = S2.currentPlace(P); root.querySelector('#s2Title').textContent = '🗺️ Picnic World'; root.style.removeProperty('--s2a'); root.style.removeProperty('--s2b'); root.dataset.place = '';
     var svg = '<svg class="s2-trail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + R.map(function (k) { return WXY[k].join(','); }).join(' ') + '"/></svg>';
     stg.insertAdjacentHTML('beforeend', svg);
-    R.forEach(function (k, j) { var pl = S2.PLACES[k], pr = S2.progress(P, k), b = A.el('<button class="s2-place' + (k === cur ? ' cur' : '') + (S2.done(P, k) ? ' done' : '') + '" data-k="' + k + '" style="left:' + WXY[k][0] + '%;top:' + WXY[k][1] + '%;--a:' + pl.theme[0] + ';--b:' + pl.theme[1] + '">' +
+    R.forEach(function (k, j) { var pl = S2.PLACES[k], pr = S2.progress(P, k), b = A.el('<button class="s2-place' + (k === cur ? ' cur' : '') + (S2.done(P, k) ? ' done' : '') + '" data-k="' + k + '" style="' + LX(WXY[k][0]) + ';top:' + WXY[k][1] + '%;--a:' + pl.theme[0] + ';--b:' + pl.theme[1] + '">' +
       '<span class="em">' + pl.emoji + '</span><span class="nm">' + A.esc(pl.name) + '</span><span class="pr">' + '⭐'.repeat(Math.min(pr.n, 6)) + '<i>' + pr.n + '/' + pr.of + '</i></span></button>');
       b.addEventListener('click', function () { if (!busy) openPlace(k); }); stg.appendChild(b); });
     var nx = R[R.length - 1] + 1; if (nx < S2.PLACES.length) { var f = A.el('<div class="s2-fog" aria-hidden="true" style="left:' + WXY[nx][0] + '%;top:' + WXY[nx][1] + '%"><span>☁️</span><span>☁️</span><span>☁️</span></div>'); stg.appendChild(f); }
     if (S2.waiting(P)) stg.appendChild(A.el('<div class="s2-note">🌙 A new path opens next time. Replay a place or pick a friend!</div>'));
     var hx = WXY[cur]; stg.appendChild(A.el('<img class="s2-me" alt="" src="' + img(S2.hero(P), 'happy') + '" style="left:' + hx[0] + '%;top:' + (hx[1] - 11) + '%">'));
     sel = Math.max(0, R.indexOf(cur)); focusSel();
+  }
+  function placeGuide(gd, nb, stg) {
+    var r = nb.getBoundingClientRect(), s = stg.getBoundingClientRect(), g = gd.getBoundingClientRect(), gw = g.width || 60; if (!s.width || !r.width) return;
+    var right = r.right - s.left + gw / 2 + 10, left = r.left - s.left - gw / 2 - 10;
+    gd.style.left = (right + gw / 2 <= s.width ? right : left >= gw / 2 ? left : right) + 'px'; gd.style.top = (r.top - s.top + r.height * .35) + 'px';
   }
   function renderPlace(stg) {
     var k = placeK, pl = S2.PLACES[k], L = S2.levels(P, k), cur = S2.current(P, k);
@@ -67,7 +77,7 @@
     stg.insertAdjacentHTML('beforeend', '<svg class="s2-trail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + xy.map(function (q) { return q.join(','); }).join(' ') + '"/></svg>');
     L.forEach(function (i, j) {
       var boss = S2.isBoss(i), ok = S2.playable(P, i), pass = S2.passed(P, i), r = ST.stopInfo(P, i) || {}, g = ST.gameOf(P, i), gi = ST.GAMES[g] ? ST.GAMES[g].icon : '';
-      var b = A.el('<button class="s2-lv' + (boss ? ' boss' : '') + (i === cur ? ' cur' : '') + (pass ? ' pass' : '') + (ok ? '' : ' off') + '" data-i="' + i + '" style="left:' + xy[j][0] + '%;top:' + xy[j][1] + '%"' + (ok ? '' : ' aria-disabled="true"') + '>' +
+      var b = A.el('<button class="s2-lv' + (boss ? ' boss' : '') + (i === cur ? ' cur' : '') + (pass ? ' pass' : '') + (ok ? '' : ' off') + '" data-i="' + i + '" style="' + LX(xy[j][0]) + ';top:' + xy[j][1] + '%"' + (ok ? '' : ' aria-disabled="true"') + '>' +
         '<span class="n">' + (boss ? '👑' : (j + 1)) + '</span>' + (ok && !boss ? '<span class="g">' + gi + '</span>' : '') + (pass ? '<span class="st">' + '⭐'.repeat(Math.max(1, Math.min(3, r.stars || 1))) + '</span>' : '') +
         (boss ? '<span class="bl">Mini boss</span>' : '') + '</button>');
       b.addEventListener('click', function () { if (busy) return; if (!ok) { sound('pop'); b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); return; } choose(i); });
@@ -75,7 +85,9 @@
     });
     var cj = Math.max(0, L.indexOf(cur)), cx = xy[cj];
     stg.appendChild(A.el('<img class="s2-me" alt="" src="' + img(S2.hero(P), 'happy') + '" style="left:' + cx[0] + '%;top:' + (cx[1] - 13) + '%">'));
-    stg.appendChild(A.el('<div class="s2-guide" aria-hidden="true" style="left:' + (cx[0] + 7) + '%;top:' + (cx[1] - 4) + '%">' + pl.guide + '</div>'));
+    var gd = A.el('<div class="s2-guide" aria-hidden="true" style="left:' + (cx[0] + 7) + '%;top:' + (cx[1] - 4) + '%">' + pl.guide + '</div>'); stg.appendChild(gd);
+    // quality1 polish: the guide stands BESIDE the current level (it sat on the node's number on phones, where nodes are wider than 7%)
+    var curB = stg.querySelector('.s2-lv[data-i="' + cur + '"]'); if (curB) { placeGuide(gd, curB, stg); if (window.requestAnimationFrame) requestAnimationFrame(function () { placeGuide(gd, curB, stg); }); }
     sel = cj; focusSel();
   }
   function items() { return A.$$(view === 'world' ? '.s2-place' : '.s2-lv', root); }
@@ -97,7 +109,9 @@
   }
   function back() {
     if (busy) return; sound('pop'); V.stop();
-    if (view === 'place' && !TOD()) { view = 'world'; render(); return; }   // toddlers: back goes straight home
+    // quality1 (C4): Back from a place goes to the world map, toddlers too once they have reached a 2nd place (so an earlier
+    // place can always be replayed); a toddler with one place goes straight home
+    if (view === 'place' && (!TOD() || S2.reachedList(P).length > 1)) { view = 'world'; render(); return; }
     close(); var f = resolveFn; resolveFn = null; if (f) f('back');
   }
   function friendPanel() {

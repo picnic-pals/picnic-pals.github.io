@@ -427,3 +427,37 @@ body.touchui .keys:not(.touch):not(.padkeys) { display: none !important; }
 .tp-emo + .tp-w { display: block; font-size: 16px; margin-top: 2px; }
 .tp-w.only { font-size: 22px; font-weight: 700; }
 .tp-q .tp-qe { font-size: 40px; vertical-align: middle; margin-left: 6px; }
+
+/* ---------- quality1 ---------- */
+/* A7: a picture beside every number for 4-5-year-olds (js/core/learn.js eqPic / numPic / dotsFor) */
+.pbpic { display: inline-flex; flex-direction: column; align-items: center; gap: .12em; line-height: 1.05; }
+.pbpic > b { font-size: .9em; }
+.pbpic .frame, .pb-frames .frame { font-size: .42em; }
+.pb-frames { display: inline-flex; flex-wrap: wrap; gap: .1em; justify-content: center; max-width: 7em; }
+.pb-row { display: inline-flex; align-items: center; gap: .15em; flex-wrap: wrap; justify-content: center; }
+.pb-op { font-style: normal; font-weight: 800; font-size: .6em; color: #6b4fa0; }
+.pb-qpic { display: inline-flex; align-items: center; gap: .3em; margin-left: .3em; vertical-align: middle; font-size: .9em; }
+.st-pic.pb-target { display: inline-block; margin-left: .3em; vertical-align: middle; }
+.pbpic.num .pb-frames { font-size: .9em; }
+/* 1st-grade place value: tens rods and ones cubes */
+.pv-pic { display: inline-flex; align-items: flex-end; gap: 4px; padding: 4px; vertical-align: middle; }
+.pv-rod { display: inline-block; width: 10px; height: 60px; border-radius: 3px; background: repeating-linear-gradient(to bottom, #5aa8ff 0 5px, #3d8be0 5px 6px); box-shadow: inset 0 0 0 1px #2f6fb5; }
+.pv-ones { display: inline-flex; flex-wrap: wrap-reverse; width: 30px; gap: 2px; align-content: flex-start; }
+.pv-one { display: inline-block; width: 8px; height: 8px; border-radius: 2px; background: #ffb347; box-shadow: inset 0 0 0 1px #c97a12; }
+.pv-cmp { display: inline-flex; flex-direction: column; align-items: center; margin: 0 .5em; }
+/* A8: the little baseball diamond beside "where does the runner end up?" */
+.bbdiamond { display: block; margin: 4px auto; width: 120px; height: 120px; }
+/* C2: the sight-word fill-in sentence (sound off) */
+.cloze { font-weight: 700; } .cloze .blank { display: inline-block; min-width: 3em; border-bottom: 3px solid currentColor; margin: 0 .15em; }
+/* quality1 (C3): the "?" how-to button and card */
+.q1help { flex: 0 0 auto; width: 56px; height: 56px; border-radius: 50%; border: 0; font-family: inherit; font-weight: 800; font-size: 32px; line-height: 1; color: #fff; background: linear-gradient(#ffd86b, #ffb000); box-shadow: 0 5px 0 #d99000; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.q1help:active { transform: translateY(3px); box-shadow: 0 2px 0 #d99000; }
+.overlay.howto .howto-art { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.overlay.howto .howto-art .he { font-size: 72px; line-height: 1; }
+.overlay.howto .howto-art .hf svg { width: 110px; height: 110px; }
+.overlay.howto .howto-lines { font-size: 22px; line-height: 1.4; font-weight: 700; margin: 8px 0 14px; }
+@media (max-width: 500px) { .q1help { width: 46px; height: 46px; font-size: 26px; } .overlay.howto .howto-lines { font-size: 19px; } }
+/* quality1 polish: game top bars style their buttons' font; the "?" keeps its own size */
+#howtoBtn.q1help, #s2Help.q1help { font-size: 34px; font-weight: 800; }
+@media (max-width: 600px) { #howtoBtn.q1help, #s2Help.q1help { font-size: 27px; } }
+.lvpic { font-weight: 700; } .lvpic .emo { font-size: 1.6em; vertical-align: middle; margin-left: .2em; }

@@ -107,7 +107,8 @@
   UI.gear({ onClose: function () { if (A.Music) A.Music.apply(); } });
   if (A.Music) A.Music.play('hub');
   function start() { st.kinds = kindsFor(); st.i = 0; st.t0 = Date.now(); ask(); }
+  A.HowTo.button('tiny', '#sayBtn');   // quality1 (C3)
   // play-time limit: check before the first prompt (never mid-round)
-  (A.PlayTime ? A.PlayTime.checkpoint() : Promise.resolve(true)).then(function (ok) { if (ok) { V.say(['tp_hello']).then(function () { start(); }); } });
+  (A.PlayTime ? A.PlayTime.checkpoint() : Promise.resolve(true)).then(function (ok) { if (ok) { A.HowTo.first('tiny').then(function () { return V.say(['tp_hello']); }).then(function () { start(); }); } });
   window.__tiny = { HOLD_MS: HOLD_MS, st: st, P: function () { return P; }, ask: ask, start: start, finish: finish };
 })(window.Arcade);
