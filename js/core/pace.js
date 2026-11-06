@@ -39,7 +39,7 @@
     L.ready = function () { return Date.now() - t0 >= ms; };
     // a press: true if it may advance now. Key repeat never advances; presses inside the lock are dropped (counted for tests).
     L.press = function (e) {
-      if (e && e.repeat) { L.dropped++; return false; }
+      if (e && typeof e === 'object' && e.repeat === true) { L.dropped++; return false; }
       if (!L.ready()) { L.dropped++; Pace.log.push({ tag: L.tag, at: Date.now() - t0, dropped: true }); return false; }
       return true;
     };

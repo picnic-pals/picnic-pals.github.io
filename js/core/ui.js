@@ -47,7 +47,7 @@
         (o.art ? '<div class="art' + (o.glow ? ' glow' : '') + '">' + (o.glow ? '<div class="rays"></div>' : '') + o.art + '</div>' : '') +
         (o.html || '') + (o.sub ? '<p>' + A.esc(o.sub) + '</p>' : '') +
         '<button class="bigbtn ' + (o.btnCls || 'mint') + '">' + A.esc(o.btn || 'OK') + '</button>' +
-        '<span class="kh">' + (A.isTouchOnly() ? '' : 'Press <kbd class="wide">Space</kbd> or <kbd class="wide">Enter</kbd>') + '</span>' + (A.Pad ? '<span class="ph">Press ' + A.Pad.g('a') + '</span>' : '') + '</div></div>');
+        '<span class="kh">' + (A.isTouchOnly() ? '👆 Tap' : 'Press <kbd class="wide">Space</kbd> or <kbd class="wide">Enter</kbd>') + '</span>' + (A.Pad ? '<span class="ph">Press ' + A.Pad.g('a') + '</span>' : '') + '</div></div>');
       document.body.appendChild(ov); UI.cardOpen = true;
       var btn = ov.querySelector('.bigbtn'), done = false, lastTap = 0;
       // the beat (js/core/pace.js): celebrations / results hold a moment; presses in the lock are dropped, never queued
@@ -410,18 +410,32 @@
      skip the first-play card (like breaks.js) unless localStorage blobArcade.howto = '1'. */
   var HOWTO = {
     munch: { e: '😋', title: 'Picnic Munch', lines: ['Read the question at the top.', 'Walk your friend to a right answer and munch it!'] },
-    bubble: { e: '🫧', title: 'Bubble Pop', lines: ['Listen, or read the card at the top.', 'Pop the bubbles that match!'] },
-    stand: { e: '🍋', title: 'Lemonade Stand', lines: ['Listen to the order, or read the ticket.', 'Tap what they ask for, then tap the big button!'] },
+    bubble: { e: '🫧', title: 'Bubble Pop',
+      steps: [{ e: '👂', t: 'Listen' }, { e: '👆', t: 'Pop match' }, { e: '⭐', t: 'Stars!' }],
+      lines: ['Listen, or look at the card.', 'Pop the matching bubble.', 'Get stars!'] },
+    stand: { e: '🍋', title: 'Lemonade Stand',
+      steps: [{ e: '📋', t: 'Recipe' }, { e: '👆', t: 'Tap in' }, { e: '🥤', t: 'Serve!' }],
+      lines: ['Read the recipe.', 'Tap ingredients into the pitcher.', 'Serve!'] },
     tiny: { e: '🧺', title: 'Tiny Picnic', lines: ['Listen for what to find.', 'Tap the picture. Every tap is OK!'] },
     story: { e: '🗺️', title: 'Story', lines: ['Walk the path with your friends.', 'Play each stop to find the missing star-snacks!'] }
   };
   function howtoAuto() { try { var v = localStorage.getItem('blobArcade.howto'); if (v === '1') return true; if (v === '0') return false; } catch (e) {} return !(typeof navigator !== 'undefined' && navigator.webdriver); }
+  function howtoBody(h) {
+    if (h.steps && h.steps.length) {
+      return '<div class="howto-steps" role="list">' + h.steps.map(function (s, i) {
+        return '<div class="howto-step" role="listitem"><span class="hs-e" aria-hidden="true">' + s.e + '</span><span class="hs-t">' + A.esc(s.t) + '</span>' +
+          (i < h.steps.length - 1 ? '<span class="hs-arrow" aria-hidden="true">→</span>' : '') + '</div>';
+      }).join('') + '</div>';
+    }
+    return '<p class="howto-lines">' + h.lines.map(A.esc).join('<br>') + '</p>';
+  }
   var HowTo = A.HowTo = { DATA: HOWTO,
     show: function (g) {
       var h = HOWTO[g]; if (!h || document.querySelector('.overlay.howto')) return Promise.resolve();
       var P = A.Store && A.Store.active && A.Store.active(), friend = P && A.Blobs && A.Blobs.forProfile ? A.Blobs.forProfile(P, { expr: 'happy' }) : '';
-      return UI.card({ cls: 'howto', tag: 'How to play', title: h.title, art: '<div class="howto-art"><span class="he" aria-hidden="true">' + h.e + '</span>' + (friend ? '<span class="hf">' + friend + '</span>' : '') + '</div>',
-        html: '<p class="howto-lines">' + h.lines.map(A.esc).join('<br>') + '</p>', btn: 'OK ▶', voice: ['q1_howto_' + g], minMs: 500 });
+      var pic = h.steps ? '' : '<div class="howto-art"><span class="he" aria-hidden="true">' + h.e + '</span>' + (friend ? '<span class="hf">' + friend + '</span>' : '') + '</div>';
+      return UI.card({ cls: 'howto' + (h.steps ? ' howto-pic' : ''), tag: 'How to play', title: h.title, art: pic,
+        html: howtoBody(h), btn: "Let's go!", voice: ['q1_howto_' + g], minMs: 500 });
     },
     seen: function (g) { var P = A.Store && A.Store.active && A.Store.active(); return !!(P && P.howto && P.howto[g]); },
     // first play: the card once, then the game starts. Resolves right away when already seen (or under automation).

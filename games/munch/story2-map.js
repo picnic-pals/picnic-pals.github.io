@@ -77,9 +77,9 @@
     stg.insertAdjacentHTML('beforeend', '<svg class="s2-trail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + xy.map(function (q) { return q.join(','); }).join(' ') + '"/></svg>');
     L.forEach(function (i, j) {
       var boss = S2.isBoss(i), ok = S2.playable(P, i), pass = S2.passed(P, i), r = ST.stopInfo(P, i) || {}, g = ST.gameOf(P, i), gi = ST.GAMES[g] ? ST.GAMES[g].icon : '';
-      var b = A.el('<button class="s2-lv' + (boss ? ' boss' : '') + (i === cur ? ' cur' : '') + (pass ? ' pass' : '') + (ok ? '' : ' off') + '" data-i="' + i + '" style="' + LX(xy[j][0]) + ';top:' + xy[j][1] + '%"' + (ok ? '' : ' aria-disabled="true"') + '>' +
+      var b = A.el('<button class="s2-lv' + (boss ? ' boss' : '') + (i === cur ? ' cur' : '') + (pass ? ' pass' : '') + (ok ? '' : ' off') + '" data-i="' + i + '" style="' + LX(xy[j][0]) + ';top:' + xy[j][1] + '%"' + (ok ? '' : ' aria-disabled="true"') + (pass && ok ? ' aria-label="Play again"' : '') + '>' +
         '<span class="n">' + (boss ? '👑' : (j + 1)) + '</span>' + (ok && !boss ? '<span class="g">' + gi + '</span>' : '') + (pass ? '<span class="st">' + '⭐'.repeat(Math.max(1, Math.min(3, r.stars || 1))) + '</span>' : '') +
-        (boss ? '<span class="bl">Mini boss</span>' : '') + '</button>');
+        (boss ? '<span class="bl">Mini boss</span>' : '') + (pass && ok ? '<span class="rp" aria-hidden="true">↻</span>' : '') + '</button>');
       b.addEventListener('click', function () { if (busy) return; if (!ok) { sound('pop'); b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); return; } choose(i); });
       stg.appendChild(b);
     });

@@ -131,11 +131,11 @@
     var C = A.Curriculum, cur = function (subj) { try { if (!C.list(subj).length) return ''; var sk = C.current(p, subj); return sk ? sk.name : 'All done!'; } catch (e) { return ''; } };
     var ST = A.Story, sd = ST.data(p), stopN = 0; Object.keys(sd.stops || {}).forEach(function (k) { var i = +k.split(':')[1]; if (sd.stops[k].passed && !sd.stops[k].placed && !ST.isSide(i)) stopN++; });
     var at = ST.STOPS[ST.unlockedTo(p)], story = sd.finished ? 'Story finished!' : stopN ? at.area.name + ' · ' + stopN + ' stops' : 'Story not started';
-    var x = R.stats(p), g = weekGoal(p), m = cur('math') || '—', rd = cur('reading') || '—';
+    var x = R.stats(p), g = null, m = cur('math') || '—', rd = cur('reading') || '—';
     return { math: m, reading: rd, story: story, friends: x.friends, friendsAll: x.friendsAll, goal: g,
       say: 'Math: ' + m + '. Reading: ' + rd + '. ' + story + '. ' + x.friends + ' friend' + (x.friends === 1 ? '' : 's') + '.' + (g ? ' ' + g.name + ', ' + g.have + ' of ' + g.need + '.' : '') };
   }
-  // design1: the only goal bar left is the weekly play-days goal (about playing, never about a prize or a friend to unlock)
+  // design1 weekly play-days goal; batch1: no longer shown anywhere (kept only so old callers do not break)
   function weekGoal(p) { var W = (R.CONFIG && R.CONFIG.weekly) || { days: 3 }, have = Math.min(R.weekDays ? R.weekDays(p) : (R.stats(p).weekDays || 0), W.days);
     return { id: 'week', icon: '📅', name: 'Play days this week', have: have, need: W.days, pct: Math.round(100 * have / W.days), done: have >= W.days }; }
   // Edit players (rename / delete) is behind the grown-up gate; delete asks the grown-up again
@@ -237,8 +237,10 @@
     me = A.Store.active(); if (!me) return go('players');
     $('#meAv').innerHTML = B.forProfile(me); $('#meAv').setAttribute('style', B.backdrop(me.color)); $('#meAv').classList.add('bd'); $('#meHi').textContent = 'Hi, ' + me.name + '!'; $('#meStars').textContent = me.stars;
     // design1 (2026-10-22): no "Next friend" / "Next prize" bars (unlocks are a surprise). Only the weekly play-days goal stays.
+    // batch1 (plan P1): the weekly play-days bar is gone too (a days-per-week target is pressure); no goal bars at all
     var gl = $('#goal'), lg = weekGoal(me), ng = $('#nextGoal');
-    if (ng) { ng.innerHTML = '<div class="ngrow lg" aria-label="' + A.esc(lg.name) + ', ' + lg.have + ' of ' + lg.need + '"><span class="gi gic">' + lg.icon + '</span><span><span class="gt">' + A.esc(lg.name) + ' (' + lg.have + '/' + lg.need + ')</span><div class="gb"><i style="width:' + lg.pct + '%"></i></div></span></div>';
+    if (ng) { ng.innerHTML = ''; ng.style.display = 'none'; }
+    if (false) { ng.innerHTML = '<div class="ngrow lg" aria-label="' + A.esc(lg.name) + ', ' + lg.have + ' of ' + lg.need + '"><span class="gi gic">' + lg.icon + '</span><span><span class="gt">' + A.esc(lg.name) + ' (' + lg.have + '/' + lg.need + ')</span><div class="gb"><i style="width:' + lg.pct + '%"></i></div></span></div>';
       var lgr = ng.querySelector('.lg'); if (lgr) { lgr.setAttribute('tabindex', '-1'); A.UI.tip(lgr, lg.done ? 'You played ' + lg.need + ' days this week. Hooray!' : 'Days you played this week: ' + lg.have + ' of ' + lg.need + '.', { label: false }); } }
     if (gl) { gl.innerHTML = ''; gl.style.display = 'none'; }
     var tiles = $('#tiles'); tiles.innerHTML = '';

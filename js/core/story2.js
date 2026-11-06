@@ -62,7 +62,7 @@
   function dayOf(t) { var d = new Date(t); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
   // the next place opens the day after its boss was first passed ("the path is ready tomorrow": a surprise saved for next time,
   // never a lock on anything already reached; replays and friend switches are always open). Migrated bosses open at once.
-  function bossDayOk(p, k) { var r = ST.data(p).stops[ST.path(p) + ':' + LEVELS[k][LEVELS[k].length - 1]]; if (!r || !r.passed) return false; if (r.migrated || !r.firstPassAt) return true; return dayOf(r.firstPassAt) !== dayOf(NOWF()); }
+  function bossDayOk(p, k) { var r = ST.data(p).stops[ST.path(p) + ':' + LEVELS[k][LEVELS[k].length - 1]]; return !!(r && r.passed); }   // next place opens right away once the boss is beaten (grown-up request 10/30: no waiting a day)
   function waiting(p) { var R = reachedList(p), k = R[R.length - 1]; return k < PLACES.length - 1 && bossPassed(p, k) && !bossDayOk(p, k); }
   function reached(p, k) { migrate(p); return k === 0 || (k < PLACES.length && bossDayOk(p, k - 1)); }
   function reachedList(p) { var out = []; for (var k = 0; k < PLACES.length; k++) { if (reached(p, k)) out.push(k); else break; } return out; }
@@ -135,7 +135,7 @@
     return c;
   };
   var baseRecord = ST.record;
-  ST.record = function (p, i, r) { var out = baseRecord(p, i, r); if (isBoss(i) && out.firstPass) { var x = ST.data(p).stops[ST.path(p) + ':' + i]; x.firstPassAt = NOWF(); out.bossDone = true; out.nextTomorrow = BOSS[i] < PLACES.length - 1; } return out; };
+  ST.record = function (p, i, r) { var out = baseRecord(p, i, r); if (isBoss(i) && out.firstPass) { var x = ST.data(p).stops[ST.path(p) + ':' + i]; x.firstPassAt = NOWF(); out.bossDone = true; out.nextTomorrow = false; } return out; };
   var basePlayable = ST.playable;
   ST.playable = function (p, i) { var k = placeOfStop(i); if (k >= 0 && ST.ON2) return playable(p, i) || (i < FIRST_NEW && basePlayable(p, i)); return basePlayable(p, i); };   // the maps use Story2.playable; game pages also accept the old trail rule for the original stops (the stand/bubble/slugger stop pages)
   A.Story2 = { PLACES: PLACES, LEVELS: LEVELS, BOSS: BOSS, FLAVOR: FLAVOR, STARTERS: STARTERS, placeOfStop: placeOfStop, levels: levels, isBoss: isBoss, simple: simple,

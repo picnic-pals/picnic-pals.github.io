@@ -54,15 +54,18 @@
   /* ---------- bubbles ---------- */
   var field = $('#field');
   function fw() { return field.clientWidth || 1000; } function fh() { return field.clientHeight || 600; }
+  // batch1 (plan P1): the left margin (the friend's corner) was a fixed 150 px, so on a 390 px portrait phone bubbles crowded the right
+  // side; now 12% of the field width, at most 150 px. The side bounce uses the same edge.
+  function LO() { return Math.min(150, Math.round(fw() * .12)); }
   function size(c) { var base = TOD ? 150 : 124; if (c.sz === 'big') return 184; if (c.sz === 'little') return 100; return base; }
   function spawn(c, o) {
-    o = o || {}; var d = size(c), lo = 150, hi = Math.max(lo + 1, fw() - d - 20), x0 = lo, best = -1;
+    o = o || {}; var d = size(c), lo = LO(), hi = Math.max(lo + 1, fw() - d - 20), x0 = lo, best = -1;
     for (var k = 0; k < 10; k++) {   // spread out: pick the spot farthest from bubbles still near the bottom (no stacked bubbles)
       var cx = lo + Math.random() * (hi - lo), near = G.bubbles.filter(function (q) { return !q.gone && q.y > fh() - 2.2 * Math.max(d, q.d); }), m = 1e9;
       near.forEach(function (q) { m = Math.min(m, Math.abs(q.x - cx)); }); if (m > best) { best = m; x0 = cx; } }
     var el = A.el('<button class="bub' + (c.cls ? ' ' + c.cls.split(' ').map(function (x) { return 'k-' + x; }).join(' ') : '') + (o.golden ? ' golden' : '') + '" style="width:' + d + 'px;height:' + d + 'px" aria-label="' + A.esc(o.golden ? 'golden bubble' : V.text(c.say || [])) + '">' + (o.golden ? '<span class="emo">✨</span>' : inner(c)) + '<i class="shine"></i></button>');
     var tc = tint(c); if (tc && !o.golden) el.style.setProperty('--tint', tc);
-    var b = { id: ++G.uid, c: c, el: el, d: d, x: x0, y: fh() + 10, vy: (TOD ? 40 : 50) * (G.storm.on ? 1.7 : 1) * (.85 + Math.random() * .3), ph: Math.random() * 6, amp: 6 + Math.random() * 18, fr: .7 + Math.random() * 1.1, ph2: Math.random() * 6, fr2: .25 + Math.random() * .5, vx: (Math.random() - .5) * 16, golden: !!o.golden, gone: false };
+    var b = { id: ++G.uid, c: c, el: el, d: d, x: x0, y: fh() + 10, vy: (TOD ? 40 : 50) * (G.storm.on ? 1.7 : 1) * (.7 + Math.random() * .65), ph: Math.random() * 6, amp: 6 + Math.random() * 18, fr: .7 + Math.random() * 1.1, ph2: Math.random() * 6, fr2: .25 + Math.random() * .5, vx: (Math.random() - .5) * 16, golden: !!o.golden, gone: false };
     el.addEventListener('pointerdown', function (e) { e.preventDefault(); pop(b); });
     if (G.t && B.matches(G.t, c)) el.classList.add('match');
     field.appendChild(el); G.bubbles.push(b); place(b); return b;
@@ -70,20 +73,27 @@
   function place(b) { b.el.style.transform = 'translate(' + Math.round(b.x + Math.sin(b.ph) * (b.amp || 14) + Math.sin(b.ph2 || 0) * 8) + 'px,' + Math.round(b.y) + 'px)'; }
   function remove(b) { b.gone = true; G.bubbles = G.bubbles.filter(function (x) { return x !== b; }); setTimeout(function () { b.el.remove(); }, 450); }
   function refreshMatch() { G.bubbles.forEach(function (b) { b.el.classList.toggle('match', !b.golden && !!G.t && B.matches(G.t, b.c)); }); }
-  function goods() { return G.bubbles.filter(function (b) { return !b.golden && !b.gone && B.matches(G.t, b.c); }).length; }
+  function goods() { var top = TOPY(); return G.bubbles.filter(function (b) { return !b.golden && !b.gone && b.y > top && B.matches(G.t, b.c); }).length; }   // 11/5: right ones about to drift behind the card don't count
   function nextContent() {
     var t = G.t; if (!t) return null;
     if (t.seq) { var left = t.seq.slice(t.got), onScreen = G.bubbles.map(function (b) { return b.c.key; }); var miss = left.filter(function (c) { return onScreen.indexOf(c.key) < 0; }); if (miss.length && Math.random() < .75) return miss[0]; var pool = t.seq.concat(t.bad); return pool[Math.floor(Math.random() * pool.length)]; }
     var gn = goods(), wantGood = gn < 2 || !t.bad.length || (gn < 3 && Math.random() < .35);
-    var pool = wantGood ? t.good : t.bad; return pool[Math.floor(Math.random() * pool.length)];
+    // batch1 (plan P2): decoys are drawn without replacement: a bubble already on screen is not blown again while another can be
+    // (no three "2"s at once); a right one is always on the way when none is up
+    var pool = wantGood ? t.good : t.bad, up = G.bubbles.filter(function (b) { return !b.gone && !b.golden; }).map(function (b) { return b.c.key; });
+    var fresh = pool.filter(function (c) { return up.indexOf(c.key) < 0; }); if (fresh.length) pool = fresh;
+    return pool[Math.floor(Math.random() * pool.length)];
   }
   function TOPY() { var r = $('#target').getBoundingClientRect(), f = field.getBoundingClientRect(); return Math.max(0, r.bottom - f.top - 10); }
   function tick(ts) {
     var dt = Math.min(.05, ((ts - (G.last || ts)) / 1000)); G.last = ts; var top = TOPY();
-    G.bubbles.forEach(function (b) { if (b.gone) return; if (b.bounce) { b.x += b.bounce * dt * 240; b.bounce *= .96; } b.y -= b.vy * dt; b.ph += dt * (b.fr || 1.2); b.ph2 = (b.ph2 || 0) + dt * (b.fr2 || 0); if (b.vx) { b.x += b.vx * dt; var mx = fw() - b.d - 20; if (b.x < 150 || b.x > mx) { b.vx = -b.vx; b.x = Math.max(150, Math.min(mx, b.x)); } } place(b); if (b.y < top + 40) b.el.style.opacity = Math.max(0, (b.y - top + 20) / 60); if (b.y < top - 20) remove(b); });   // drift away before the target card (nothing hides behind it)
+    G.bubbles.forEach(function (b) { if (b.gone) return; if (b.bounce) { b.x += b.bounce * dt * 240; b.bounce *= .96; } b.y -= b.vy * dt; b.ph += dt * (b.fr || 1.2); b.ph2 = (b.ph2 || 0) + dt * (b.fr2 || 0); if (b.vx) { b.x += b.vx * dt; var mx = fw() - b.d - 20; var lo0 = LO(); if (b.x < lo0 || b.x > mx) { b.vx = -b.vx; b.x = Math.max(lo0, Math.min(mx, b.x)); } } place(b); if (b.y < -b.d - 10) remove(b); });   // 11/5: bubbles stay poppable until they float off the top of the screen (they pass behind the target card)
     G.spawnT -= dt;
     var max = G.storm.on ? 10 : TOD ? 5 : 7;
-    if (G.phase === 'play' && G.spawnT <= 0 && G.bubbles.length < max) { var c = nextContent(); if (c) spawn(c); G.spawnT = G.storm.on ? .45 : TOD ? 1.6 : 1.25; $('#blower').classList.remove('blow'); void $('#blower').offsetWidth; $('#blower').classList.add('blow'); }
+    // 11/5: only bubbles below the target card count toward the cap (high ones are on their way out), and a new one waits until the
+    // newest has risen clear of the bottom, with a random gap, so bubbles don't rise together in a row
+    var low = G.bubbles.filter(function (q) { return !q.gone && q.y > top; }), newest = G.bubbles[G.bubbles.length - 1], clear = !newest || newest.gone || newest.y < fh() + 10 - newest.d * (G.storm.on ? .5 : .9);
+    if (G.phase === 'play' && G.spawnT <= 0 && clear && low.length < max) { var c = nextContent(); if (c) spawn(c); G.spawnT = G.storm.on ? .3 + Math.random() * .3 : (TOD ? 1.1 : .8) + Math.random() * (TOD ? 1.4 : 1.2); $('#blower').classList.remove('blow'); void $('#blower').offsetWidth; $('#blower').classList.add('blow'); }
     if (G.phase === 'play' && !G.goldenShown && G.goldenAt >= 0 && G.res.pops >= G.goldenAt) { G.goldenShown = true; spawn({ key: 'gold', cls: 'gold', say: ['bp_golden'] }, { golden: true }); }
     G.raf = requestAnimationFrame(tick);
   }
@@ -100,6 +110,8 @@
     if (!ok) {
       b.bounce = (b.x > fw() / 2 ? 1 : -1) * 1.2; b.vy *= .6; b.el.classList.remove('boing'); void b.el.offsetWidth; b.el.classList.add('boing');
       A.Audio.sfx('boing'); friendPose('happy', 'giggle'); var ev = B.record(P, t, { ok: false, ms: ms }, G.R); field.classList.add('hint');
+      // batch1 (plan: shortcut fix, from age 5): a wrong pop lets one right bubble float away, so popping everything is slower than looking
+      if (B.escapeOk && B.escapeOk(P)) { var esc = G.bubbles.filter(function (q) { return !q.gone && !q.golden && q !== b && B.matches(t, q.c); }).sort(function (x, y) { return x.y - y.y; })[0]; if (esc) { esc.vy = Math.max(esc.vy * 4, 260); esc.el.classList.add('escape'); G.res.escaped = (G.res.escaped || 0) + 1; } }
       say(['bp_giggle'], 'chatter').then(function () { if (G.t === t) say(t.say); });
       if (ev.warmupDone) {} return;
     }
@@ -128,7 +140,7 @@
     G.t = B.makeTarget(P, G.R); showTarget(); G.t0 = Date.now();
     var pre = G.R.why === 'warmup' ? ['bp_warmup'] : B.data(P).rounds === 0 ? ['bp_hello'] : [];
     // a few bubbles are already floating when the round starts (so the sky is never empty)
-    for (var k = 0; k < (TOD ? 3 : 4); k++) { var c0 = nextContent(), b0 = c0 && spawn(c0); if (b0) { b0.y = fh() * (.36 + .13 * k); b0.x = 160 + (fw() - 320) * (k / 3); place(b0); } }
+    for (var k = 0; k < (TOD ? 3 : 4); k++) { var c0 = nextContent(), b0 = c0 && spawn(c0); if (b0) { b0.y = fh() * (.36 + .13 * k); b0.x = LO() + 10 + Math.max(0, fw() - 2 * LO() - 20 - b0.d) * (k / 3); place(b0); } }
     say(pre.concat(G.t.say)); G.raf = requestAnimationFrame(tick);
   }
   function roundDone() {

@@ -1028,6 +1028,23 @@
     D.SKITS.forEach(function (k) { k.beats.forEach(function (b, i) { L.push(['br_' + k.id + '_' + (i + 1), b[0], 'Skit "' + k.title + '" beat ' + (i + 1)]); }); });
     sec('breaks', 'Fun breaks and coloring', 'later', 'Read by the device voice until recorded (p4). Giggly, playful, never a test: no right or wrong.', L);
   })();
+  // batch1 (2026-10-31): 2nd-grade math steps (2-digit adding and taking away, hundreds-tens-ones, skip counting) and the
+  // Lemonade Stand count-on order. Device voice until recorded. Numbers are separate parts (num_N clips / device voice).
+  sec('batch1', 'Batch 1: 2nd-grade math and Stand orders', 'later', 'Read by the device voice until recorded (batch1). Calm and clear, like a teacher reading a question. Numbers are spoken separately.', [
+    ['b1_pv_hto1', 'What number has', '+ number + "hundreds," + number + "tens and" + number + "ones?"'],
+    ['b1_pv_hundreds', 'hundreds,', 'between two numbers: "3" + "hundreds," + "4"'],
+    ['b1_pv_in', 'In', '+ number + ", what is the" + digit + "worth?" e.g. "In 345, what is the 4 worth?"'],
+    ['b1_pv_worth1', ', what is the', 'after the number (starts with a comma: a short pause)'],
+    ['b1_pv_worth2', 'worth?', 'end of "In 345, what is the 4 worth?"'],
+    ['b1_pv_makes_what', 'makes what number?', 'after "300 plus 40 plus 5"'],
+    ['b1_skip5', 'Count by fives. What comes next?'],
+    ['b1_skip10', 'Count by tens. What comes next?'],
+    ['b1_skip100', 'Count by hundreds. What comes next?'],
+    ['b1_ls_please_q', ', please?', 'Stand order ending: "Can I have" + 9 + "bananas" + ", please?" (starts with a comma: a short pause)'],
+    ['b1_ls_cup_has', 'My cup has', 'Stand count-on order: + number + "already."'],
+    ['b1_ls_already', 'already.', 'end of "My cup has 6 already."'],
+    ['b1_ls_how_many_more', 'How many more do they need?', 'Stand count-on help line']
+  ]);
   var BY = {}, ALL = [];
   S.forEach(function (s) { s.lines.forEach(function (l) { l.section = s.id; BY[l.id] = l; ALL.push(l); }); });
   // quality1: lines added by files that load later (js/core/learn.js content patches); same shape as sec(), merged into one section

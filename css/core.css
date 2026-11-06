@@ -456,7 +456,29 @@ body.touchui .keys:not(.touch):not(.padkeys) { display: none !important; }
 .overlay.howto .howto-art .he { font-size: 72px; line-height: 1; }
 .overlay.howto .howto-art .hf svg { width: 110px; height: 110px; }
 .overlay.howto .howto-lines { font-size: 22px; line-height: 1.4; font-weight: 700; margin: 8px 0 14px; }
-@media (max-width: 500px) { .q1help { width: 46px; height: 46px; font-size: 26px; } .overlay.howto .howto-lines { font-size: 19px; } }
+.overlay.howto.howto-pic .card { max-width: min(920px, 96vw); padding: 18px 18px 16px; }
+.overlay.howto .howto-steps { display: flex; align-items: stretch; justify-content: center; gap: 6px; margin: 4px 0 12px; flex-wrap: nowrap; }
+.overlay.howto .howto-step { position: relative; flex: 1 1 0; min-width: 0; max-width: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 14px 8px 12px; border-radius: 22px; background: linear-gradient(#fff8e8, #ffe7c2); box-shadow: 0 4px 0 #e8c48a; text-align: center; }
+.overlay.howto .howto-step .hs-e { font-size: 56px; line-height: 1; }
+.overlay.howto .howto-step .hs-t { font-size: 18px; font-weight: 800; line-height: 1.15; color: var(--ink); }
+.overlay.howto .howto-step .hs-arrow { position: absolute; right: -14px; top: 50%; transform: translateY(-50%); font-size: 22px; color: var(--ink2); z-index: 1; }
+@media (max-width: 500px) {
+  .q1help { width: 46px; height: 46px; font-size: 26px; }
+  .overlay.howto .howto-lines { font-size: 19px; }
+  .overlay.howto.howto-pic .card { padding: 14px 10px 12px; }
+  .overlay.howto.howto-pic h2 { font-size: 28px; margin: 4px 0 6px; }
+  .overlay.howto .howto-steps { gap: 4px; margin: 2px 0 8px; }
+  .overlay.howto .howto-step { padding: 10px 4px 8px; border-radius: 18px; box-shadow: 0 3px 0 #e8c48a; }
+  .overlay.howto .howto-step .hs-e { font-size: 40px; }
+  .overlay.howto .howto-step .hs-t { font-size: 14px; }
+  .overlay.howto .howto-step .hs-arrow { right: -11px; font-size: 16px; }
+  .overlay.howto.howto-pic .bigbtn { font-size: 22px; padding: 12px 22px; min-height: 52px; }
+}
+@media (max-height: 700px) {
+  .overlay.howto .howto-step .hs-e { font-size: 44px; }
+  .overlay.howto .howto-step { padding: 10px 6px 8px; }
+  .overlay.howto.howto-pic .howto-art .he { font-size: 48px; }
+}
 /* quality1 polish: game top bars style their buttons' font; the "?" keeps its own size */
 #howtoBtn.q1help, #s2Help.q1help { font-size: 34px; font-weight: 800; }
 @media (max-width: 600px) { #howtoBtn.q1help, #s2Help.q1help { font-size: 27px; } }

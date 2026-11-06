@@ -366,6 +366,102 @@
       { id: 'pv_compare', name: 'Compare two-digit numbers', short: '47 > 38', std: '1.NBT.3', item: pvCompareItem },
       { id: 'pv_ten_more', name: '10 more, 10 less', short: '10 more than 36 is 46', std: '1.NBT.5', item: pvTenItem }
     ] });
+  /* batch1 (2026-10-31): the first half of the 2nd-grade math ladder, after even/odd (i-Ready Classroom Mathematics Grade 2 /
+     Khan 2nd grade order; questions are our own): 2-digit adding and taking away without, then with regrouping (2.NBT.5),
+     hundreds-tens-ones to 1,000 (2.NBT.1, 2.NBT.3), comparing 3-digit numbers (2.NBT.4), skip counting by 5s, 10s, 100s (2.NBT.2).
+     Munch boards: "Munch the ones that make 59" with different 2-digit sums (or "Munch 345" style for place value).
+     Wrong answers are the real mistakes: forgetting to regroup, the ten off by one, digits swapped. */
+  function g2Ok(kind, a, b) {
+    var ao = a % 10, bo = b % 10;
+    if (kind === 'a2' || kind === 'a2r') { if (a + b > 99 || a < 10) return false; return kind === 'a2' ? ao + bo <= 9 : ao + bo >= 10 && ao > 0 && bo > 0; }
+    if (a - b < 1 || a < 20) return false; return kind === 's2' ? ao >= bo : ao < bo;
+  }
+  function g2Fact(kind) {
+    for (var g = 0; g < 200; g++) {
+      var a = rnd(kind[0] === 'a' ? 12 : 31, kind[0] === 'a' ? 78 : 98), b = Math.random() < .12 && a >= 20 ? rnd(3, 9) : rnd(11, kind[0] === 'a' ? 79 : a - 10);
+      if (g2Ok(kind, a, b)) return F(a, kind[0] === 'a' ? '+' : '-', b);
+    }
+    return kind[0] === 'a' ? F(34, '+', 25) : F(58, '-', 23);
+  }
+  function g2Goods(kind, T) {   // every fact of this kind that makes T (2-digit + 2-digit mostly; a few + one-digit)
+    var o = [], op = kind[0] === 'a' ? '+' : '-';
+    for (var a = 10; a <= 99; a++) { var b = op === '+' ? T - a : a - T; if (b >= 2 && g2Ok(kind, a, b) && (b >= 10 || Math.random() < .3)) o.push(F(a, op, b)); }
+    return o;
+  }
+  function g2Trap(f) {   // the classic slip: no regrouping (each column on its own, the smaller digit from the bigger one)
+    var at = Math.floor(f.a / 10), ao = f.a % 10, bt = Math.floor(f.b / 10), bo = f.b % 10;
+    if (f.op === '+') return (at + bt) * 10 + (ao + bo) % 10;
+    return (at - bt) * 10 + Math.abs(ao - bo);
+  }
+  function g2Wrong(f) { var v = f.v; return uniq([g2Trap(f), v + 10, v - 10, v + 1, v - 1].filter(function (x) { return x !== v && x > 0 && x < 200; })); }
+  function g2Hint(f, l) {
+    var at = Math.floor(f.a / 10) * 10, ao = f.a % 10, bt = Math.floor(f.b / 10) * 10, bo = f.b % 10, pic = pvPic(at / 10, ao) + '<i class="pb-op">' + (f.op === '+' ? '+' : '−') + '</i>' + pvPic(bt / 10, bo);
+    if (f.op === '+') {
+      if (ao + bo >= 10) return box(pic, l >= 2 ? at + ' + ' + bt + ' = ' + (at + bt) + '. ' + ao + ' + ' + bo + ' = ' + (ao + bo) + ', that is 1 more ten and ' + (ao + bo - 10) + ' ones. So <b>' + f.v + '</b>.' : 'Add the tens, then the ones. ' + ao + ' + ' + bo + ' is more than 9: trade 10 ones for 1 ten!');
+      return box(pic, l >= 2 ? at + ' + ' + bt + ' = ' + (at + bt) + ', and ' + ao + ' + ' + bo + ' = ' + (ao + bo) + '. So <b>' + f.v + '</b>.' : 'Add the tens: ' + at + ' + ' + bt + '. Then add the ones: ' + ao + ' + ' + bo + '.');
+    }
+    if (ao < bo) return box(pic, l >= 2 ? 'Trade a ten: ' + f.a + ' is ' + (Math.floor(f.a / 10) - 1) + ' tens and ' + (ao + 10) + ' ones. ' + (ao + 10) + ' − ' + bo + ' = ' + (ao + 10 - bo) + ', and ' + (Math.floor(f.a / 10) - 1) + ' tens − ' + bt / 10 + ' tens = ' + (Math.floor(f.a / 10) - 1 - bt / 10) + ' tens. So <b>' + f.v + '</b>.' : 'You cannot take ' + bo + ' ones from ' + ao + ' ones. Trade 1 ten for 10 ones first!');
+    return box(pic, l >= 2 ? at + ' − ' + bt + ' = ' + (at - bt) + ', and ' + ao + ' − ' + bo + ' = ' + (ao - bo) + '. So <b>' + f.v + '</b>.' : 'Take away the tens: ' + at + ' − ' + bt + '. Then the ones: ' + ao + ' − ' + bo + '.');
+  }
+  function g2Cell(f) { return { label: f.label, fact: [f.a, f.op === '+' ? 'w_plus' : 'w_minus', f.b, 'w_is', f.v], f: f, long: true }; }
+  function g2Gen(kind, s) {
+    return function () {
+      var f0 = g2Fact(kind), T = f0.v, goods = g2Goods(kind, T); if (!goods.length) goods = [f0];
+      var bads = [], g = 0;
+      while (bads.length < 30 && g++ < 400) { var x = g2Fact(kind); if (x.v !== T && Math.abs(x.v - T) <= 20 && (Math.abs(x.v - T) === 10 || Math.abs(x.v - T) <= 3 || g2Trap(x) === T || Math.random() < .25)) bads.push(x); }
+      if (!bads.length) bads = [F(f0.a, f0.op, f0.b + 1)];
+      return { text: 'Munch the ones that make ' + em(T), say: ['munch_rule_make', T], step: s.id, hint: '', target: T,
+        stepHint: function (cell, lvl) { return g2Hint(cell && cell.f && cell.f.v === T ? cell.f : pick(goods), lvl); }, worked: function (cell) { var w = pick(goods); return '<div class="worked st-worked"><p class="st-wq">Watch: <b>' + w.label + '</b></p><div class="st-steps"><div class="s1">' + g2Hint(w, 1) + '</div><div class="s2">' + g2Hint(w, 2) + '</div></div></div>'; },
+        good: function () { return g2Cell(pick(goods)); }, bad: function () { return g2Cell(pick(bads)); } };
+    };
+  }
+  function g2Ask(kind) {
+    return function (L, n) {
+      var f = g2Fact(kind), T = f.v, w = g2Wrong(f), vals = choices(T, w.slice(0, 4), n);
+      return { text: 'What’s ' + f.label + '?', say: ['bbq_whats', f.a, f.op === '+' ? 'w_plus' : 'w_minus', f.b], fact: g2Cell(f).fact, answer: vals.indexOf(T), target: f.label, f: f,
+        hint: g2Hint(f, 1), hint2: g2Hint(f, 2), choices: vals.map(function (v) { return { label: String(v), html: null, say: [v], value: v }; }) };
+    };
+  }
+  function hundredsPic(h, t, o) { var x = '<span class="pv-pic pv3" aria-hidden="true">'; for (var i = 0; i < h; i++) x += '<i class="pv-flat"></i>'; for (var j = 0; j < t; j++) x += '<i class="pv-rod"></i>'; x += '<span class="pv-ones">'; for (var k = 0; k < o; k++) x += '<i class="pv-one"></i>'; return x + '</span></span>'; }
+  function uniq3(ans, list) { var out = []; list.forEach(function (x) { if (x !== ans && x >= 100 && x <= 999 && out.indexOf(x) < 0) out.push(x); }); return out; }
+  function htoItem() {
+    var h = rnd(1, 9), t = rnd(0, 9), o = rnd(0, 9); if (t === o) t = (t + 4) % 10; var v = 100 * h + 10 * t + o, r = Math.random();
+    var swaps = uniq3(v, [100 * h + 10 * o + t, 100 * t + 10 * h + o, 100 * o + 10 * t + h, v + 100, v - 100, v + 10, v - 10]);
+    var hint = function (l) { return box(hundredsPic(h, t, o), l >= 2 ? h + ' hundreds is ' + (100 * h) + ', ' + t + ' tens is ' + (10 * t) + ', and ' + o + ' ones. Together: <b>' + v + '</b>.' : 'Each square is a hundred, each long bar is a ten. Count hundreds, then tens, then ones.'); };
+    if (r < .4) return { key: 'hto' + v, ans: v, wrong: swaps.slice(0, 3), text: 'What number has ' + em(h + ' hundreds') + ', ' + em(t + ' tens') + ' and ' + em(o + ' ones') + '?', say: ['b1_pv_hto1', h, 'b1_pv_hundreds', t, 'q1_pv_tensones2', o, 'q1_pv_tensones3'], cell: pvCell, hint: hint };
+    if (r < .7) return { key: 'exp' + v, ans: v, wrong: swaps.slice(0, 3), text: em((100 * h) + ' + ' + (10 * t) + ' + ' + o) + ' makes what number?', say: [100 * h, 'w_plus', 10 * t, 'w_plus', o, 'b1_pv_makes_what'], cell: pvCell, hint: hint };
+    var which = pick(t ? ['h', 't'] : ['h']), d = which === 'h' ? h : t, ans = which === 'h' ? 100 * h : 10 * t;
+    return { key: 'val' + v + which, ans: ans, wrong: uniq([d, which === 'h' ? 10 * h : 100 * t, which === 'h' ? 1000 : d * 1000].filter(function (x) { return x !== ans && x > 0; })).slice(0, 3), text: 'In ' + em(v) + ', what is the ' + em(d) + ' worth?', say: ['b1_pv_in', v, 'b1_pv_worth1', d, 'b1_pv_worth2'], cell: pvCell,
+      hint: function (l) { return box(hundredsPic(h, t, o), l >= 2 ? 'The ' + d + ' is in the ' + (which === 'h' ? 'hundreds' : 'tens') + ' place, so it is worth <b>' + ans + '</b>.' : 'Which place is the ' + d + ' in: hundreds, tens or ones?'); } };
+  }
+  function cmp3Item() {
+    var a = rnd(100, 999), b, g = 0, mode = Math.random();
+    do { b = mode < .35 ? Math.floor(a / 100) * 100 + rnd(0, 99) : mode < .6 ? +String(a).split('').reverse().join('') : rnd(100, 999); } while ((b === a || b < 100 || b > 999) && g++ < 50); if (b === a || b < 100 || b > 999) b = a === 999 ? 998 : a + 1;
+    var hi = Math.max(a, b), hint = function (l) { return box('<p class="st-big">' + a + ' &nbsp; ' + b + '</p>', l >= 2 ? '<b>' + hi + '</b> is greater.' : 'Compare the hundreds first. Same hundreds? Compare the tens, then the ones.'); };
+    if (Math.random() < .5) { var ans = a > b ? 'L' : 'R';
+      return { key: 'c3' + Math.min(a, b) + 'v' + hi, ans: ans, wrong: [ans === 'L' ? 'R' : 'L'], two: true, text: 'Which number is greater?', say: ['q1_pv_greater'],
+        cell: function (k) { var v = k === 'L' ? a : b; return { label: String(v), fact: ['w_thats', v] }; }, hint: hint }; }
+    var sg = a > b ? '>' : '<', NM = { '>': 'q1_pv_gt', '<': 'q1_pv_lt', '=': 'q1_pv_eq' };
+    return { key: 's3' + a + 'v' + b, ans: sg, wrong: ['<', '>', '='].filter(function (x) { return x !== sg; }), text: 'Which sign makes it true? ' + em(a + ' ' + BOX + ' ' + b), say: ['q1_pv_sign', a, 'q1_pv_and', b],
+      cell: function (k) { return { label: k, fact: [a, NM[k], b] }; }, hint: hint };
+  }
+  function skipItem() {
+    var by = pick([5, 10, 10, 100]), st = by === 5 ? 5 * rnd(1, 18) : by === 10 ? (Math.random() < .5 ? 10 * rnd(1, 8) : rnd(11, 59)) : (Math.random() < .5 ? 100 * rnd(1, 5) : 10 * rnd(11, 49)), nums = [st, st + by, st + 2 * by], ans = st + 3 * by;
+    var w = uniq([ans + 1, ans - 1, st + 2 * by + (by === 5 ? 10 : by === 10 ? 1 : 10), ans + by, by === 100 ? ans - 90 : ans + 5].filter(function (x) { return x !== ans && x > 0 && x !== nums[2]; }));
+    return { key: 'skip' + by + 'f' + st, ans: ans, wrong: w.slice(0, 3), text: 'Count by ' + by + 's. What comes next?', pic: track(nums.concat([null])), say: [by === 5 ? 'b1_skip5' : by === 10 ? 'b1_skip10' : 'b1_skip100'], cell: pvCell,
+      hint: function (l) { return box(l >= 2 ? track(nums.concat([ans])) : '', l >= 2 ? nums[2] + ' and ' + by + ' more is <b>' + ans + '</b>.' : by === 5 ? 'Fives end in 5, 0, 5, 0…' : by === 10 ? 'Counting by tens: the tens digit goes up by one, the ones stay the same.' : 'Counting by hundreds: the hundreds digit goes up by one.'); } };
+  }
+  ladder({ id: 'g2', subject: 'math', band: 'E', grade: '2', strand: 'Add & subtract within 100', std: '2.NBT.5', after: 'evenodd', introLine: 'st_new_step', secs: [16, 18],
+    groups: [{ id: 'g2_a', ids: ['a2_add', 's2_sub'] }, { id: 'g2_b', ids: ['a2_regroup', 's2_regroup'] }, { id: 'g2_c', ids: ['pv_hto', 'pv_cmp3', 'skip_count'] }],
+    steps: [
+      { id: 'a2_add', name: 'Add 2-digit numbers', short: '34 + 25 (no regrouping)', std: '2.NBT.5', kind: 'a2' },
+      { id: 's2_sub', name: 'Take away 2-digit numbers', short: '58 − 23 (no regrouping)', std: '2.NBT.5', kind: 's2' },
+      { id: 'a2_regroup', name: 'Add with regrouping', short: '38 + 47 (trade 10 ones for a ten)', std: '2.NBT.5', kind: 'a2r' },
+      { id: 's2_regroup', name: 'Take away with regrouping', short: '52 − 27 (trade a ten for 10 ones)', std: '2.NBT.5', kind: 's2r' },
+      { id: 'pv_hto', name: 'Hundreds, tens and ones', short: '3 hundreds, 4 tens, 5 ones is 345', std: '2.NBT.1', item: htoItem },
+      { id: 'pv_cmp3', name: 'Compare 3-digit numbers', short: '462 > 426', std: '2.NBT.4', item: cmp3Item },
+      { id: 'skip_count', name: 'Skip counting', short: 'By 5s, 10s and 100s', std: '2.NBT.2', item: skipItem }
+    ].map(function (s) { if (s.kind) { s.gen = g2Gen(s.kind, s); s.ask = g2Ask(s.kind); s.secs = [18, 20]; } return s; }) });
   ['k', 'wp', 'eo'].forEach(function (l) { LADDERS[l].steps.forEach(function (s) { s.ladder = l; s.band = LADDERS[l].band; s.intro = s.intro || { line: 'st_new_step', example: '' }; }); });
   LADDERS.t.steps[2].ladder = 't'; LADDERS.t.steps[2].band = 'T';
   // coach: steps use their own rule (§0.1); the type label shows on the grown-up page
@@ -390,6 +486,9 @@
     // steady path: lots of evidence a little under the bar still counts (2.5x the answers at 5 points lower, on 3+ days),
     // so a kid who is nearly there does not grind one step for weeks
     if (why.length && n >= Math.min(40, Math.max(20, Math.round(R.min * 2.5))) && acc >= R.acc - .05 && nd >= 3) why = [];
+    // batch1: a child cruising in this subject (A.Learn fit 'up': over 88% first try lately) masters a step after 10 first-try right
+    // answers in a row (on 2 days; on one day for a step under her own grade) instead of 12 at 85%, so a strong kid is not held
+    var sk1 = STEPS[sid]; if (why.length && sk1 && !sk1.topic && A.Learn && A.Learn.fitOf && A.Learn.fitOf(p, sk1.subject) === 'up') { var t8 = lg.slice(-10), a8 = t8.reduce(function (a, x) { return a + (x.c >= 1 ? 1 : 0); }, 0); var below = A.Learn.ownGrade && A.Learn.glTop(sid) != null && A.Learn.glTop(sid) < A.Learn.ownGrade(p); if (t8.length >= 10 && a8 >= 10 && (nd >= 2 || below)) why = []; }   // 2 separate days, unless the step is under her own grade (catching up)
     var st0 = p.skills && p.skills[sid], sk = STEPS[sid]; if (sk && sk.wrapOld && st0 && (st0.level || 0) < sk.subLevels - 1) why.push('level 2 not reached yet');
     return { ok: !why.length, acc: acc, n: n, days: nd, why: why };
   }
@@ -454,7 +553,9 @@
 
   /* ---------- rounds ---------- */
   function due(st, t) { return st.status === 'mastered' && ((st.checkAt && st.checkAt <= t) || (st.revAt && st.revAt <= t)) && !(st.lastCheck && t - st.lastCheck < 3 * 3600e3); }
-  function dueCheck(p, lad) { var t = now(), L = LADDERS[lad]; if (!L) return null; for (var i = 0; i < L.ids.length; i++) { var st = C.state(p, L.ids[i]); if (due(st, t)) return C.byId[L.ids[i]]; } return null; }
+  function dueCheck(p, lad) { var t = now(), L = LADDERS[lad]; if (!L) return null; var fl = A.Learn && A.Learn.floor ? A.Learn.floor(p, 'math') : 0;
+    // batch1: a check on a step under her floor is skipped (she is past it; missed facts still come back as review)
+    for (var i = 0; i < L.ids.length; i++) { var st = C.state(p, L.ids[i]), gv = A.Learn && A.Learn.glTop ? A.Learn.glTop(L.ids[i]) : null; if (!due(st, t)) continue; if (gv != null && gv < fl) { st.checkAt = null; st.revAt = t + 30 * DAY; continue; } return C.byId[L.ids[i]]; } return null; }
   var basePick = C.pickRound;
   C.pickRound = function (p, opt) {
     ctx.p = p; C.ensure(p);
@@ -533,7 +634,7 @@
       return { say: ['fb_one_more'], events: ev };
     }
     // stepped down to an already-earned step: back up after one strong round there
-    if (st.stepPractice) { if (acc >= .85 && tot >= 8) { st.stepPractice = false; advance(p, s, ev); ev.back = true; return { say: ['fb_great_job'], events: ev }; } return { say: ['fb_one_more'], events: ev }; }
+    if (st.stepPractice) { if (acc >= .85 && tot >= 8 && !(T.holdTo && A.today() < T.holdTo)) { T.holdTo = null; st.stepPractice = false; advance(p, s, ev); ev.back = true; return { say: ['fb_great_job'], events: ev }; } return { say: ['fb_one_more'], events: ev }; }
     if (st.status === 'mastered') { st.speedy = false; st.fsRun = 0; advance(p, s, ev); ev.again = true; return { say: ['fb_great_job'], events: ev }; }
     if (st.speedy && s.wrapOld && (st.level || 0) < s.subLevels - 1) { st.speedy = false; st.fsRun = 0; st.level++; st.subN = st.subC = 0; ev.levelUp = true; ev.speedy = true; return { say: ['st_speedy'], events: ev }; }
     if (st.speedy) { st.speedy = false; st.fsRun = 0; master(p, s, 'speedy', ev); ev.speedy = true; return { say: ['st_speedy'], events: ev }; }
@@ -547,7 +648,9 @@
     var RR = s.rule || RULE, rl = (K.data(p).log[s.id] || []).slice(-20), rec = rl.length ? rl.reduce(function (a, x) { return a + (x.c >= 1 ? 1 : x.c > 0 ? .5 : 0); }, 0) / rl.length : 1;
     if (st.plN >= (s.topic ? 20 : 40) && rec < RR.acc - .1 && !p.math.pin) {
       st.plN = 0; st.weak = 0; var pv0 = C.prevSkill(s.id);
-      if (pv0 && C.subjectOf(pv0) === s.subject) { var hw0 = stepDownTo(p, s, pv0); ev.stepDown = pv0.id; ev.plateau = true; return { say: ['fb_detour'], events: ev }; }
+      // batch1: a 2nd plateau on the same step means it is past her for now: she stays on earned work 3 days before trying again
+      st.plTimes = (st.plTimes || 0) + 1;
+      if (pv0 && C.subjectOf(pv0) === s.subject) { var hw0 = stepDownTo(p, s, pv0); if (st.plTimes >= 2 && T.returnTo) { var hd = new Date(); hd.setDate(hd.getDate() + 3); T.holdTo = A.today(hd); st.plTimes = 0; ev.hold = T.holdTo; } ev.stepDown = pv0.id; ev.plateau = true; return { say: ['fb_detour'], events: ev }; }
       var sib = C.list(s.subject).filter(function (k) { return k.id !== s.id && k.isStep && k.band === s.band && C.state(p, k.id).status !== 'mastered'; })[0];
       if (sib) { var ss = C.state(p, sib.id); if (ss.status === 'locked') ss.status = 'open'; ss.introduced = true; T.current = sib.id; T.returnTo = null; ev.sideways = sib.id; return { say: ['fb_one_more'], events: ev }; }
     }
@@ -568,21 +671,36 @@
   K.wantsPlacement = function (p, sid) {
     var s = STEPS[sid]; if (!s) return baseWants(p, sid);
     if (s.topic) return false;   // topics: no warm-up card (they are the light 'break' content); she starts at her band and fast-skip moves her on
-    var st = p.skills && p.skills[sid]; return !!(st && st.status !== 'mastered' && !probeDone(p, s.ladder) && C.track(p, s.subject).current === sid && !A.toddler(p));
+    var st = p.skills && p.skills[sid]; if (!(st && st.status !== 'mastered' && !probeDone(p, s.ladder) && C.track(p, s.subject).current === sid && !A.toddler(p))) return false;
+    // batch1: after her first warm-up in this subject, a new ladder's warm-up only runs while she is cruising (fit 'up': over 88%
+    // first try lately). A kid who earned the steps below at her level just keeps climbing in play; every extra warm-up was a
+    // fresh chance for a lucky streak to place her a grade too high (sim: an average 1st grader ended up on 2nd-grade steps).
+    var pb = p.math && p.math.probe || {}, before = Object.keys(pb).some(function (l) { return LADDERS[l] && (LADDERS[l].subject || 'math') === s.subject && !(LADDERS[l].steps[0] || {}).topic; });
+    if (before && A.Learn && A.Learn.fitOf && A.Learn.fitOf(p, s.subject) !== 'up') return false;
+    return true;
   };
   // plan: one item per step from the start step, about 6 picks: a long ladder strides (a right answer places every step up to it)
   function probePlan(p, sid) {
     var s = STEPS[sid], ids = C.list(s.subject).map(function (k) { return k.id; }), from = Math.max(0, ids.indexOf(sid)), left = ids.length - from, stride = Math.max(1, Math.ceil(left / PROBE_N)), plan = [];
     // a warm-up that starts in pre-K never places past make-5 (addition is earned in play, after the P gate)
-    var mk = ids.indexOf('pk_make5'), ttop = bandTopOf(p) && s.subject === 'math' ? ids.indexOf(bandTopOf(p)) : -1, last = ids.length - 1; while (last > from && !STEPS[ids[last]]) last--; var end = mk >= 0 && from < mk ? mk - 1 : last; if (ttop >= from) end = Math.min(end, ttop); left = end - from + 1; var npv = ids.slice(from, end + 1).filter(function (x) { return /^pv_/.test(x); }).length; left -= npv; /* quality1: the 3 new place-value steps do not stretch the stride (same picks as before below them; a strong kid still warms up through place value and even/odd) */ if (s.topic) { var BN0 = { T: 0, P: 1, E: 2 }; while (end > from && BN0[STEPS[ids[end]].band] > BN0[band(p)]) end--; left = end - from + 1; } stride = Math.max(1, Math.ceil(left / PROBE_N));
+    var mk = ids.indexOf('pk_make5'), ttop = bandTopOf(p) && s.subject === 'math' ? ids.indexOf(bandTopOf(p)) : -1, last = ids.length - 1; while (last > from && !STEPS[ids[last]]) last--; var end = mk >= 0 && from < mk ? mk - 1 : last; if (ttop >= from) end = Math.min(end, ttop); left = end - from + 1; var npv = ids.slice(from, end + 1).filter(function (x) { return /^pv_(tens|compare|ten_more)$/.test(x); }).length;   /* batch1: only the 3 quality1 place-value steps (the 2nd-grade pv_hto / pv_cmp3 count) */ left -= npv; /* quality1: the 3 new place-value steps do not stretch the stride (same picks as before below them; a strong kid still warms up through place value and even/odd) */ if (s.topic) { var BN0 = { T: 0, P: 1, E: 2 }; while (end > from && BN0[STEPS[ids[end]].band] > BN0[band(p)]) end--; left = end - from + 1; } stride = Math.max(1, Math.ceil(left / PROBE_N));
     for (var i = from; i <= end; i += stride) plan.push(i);
     if (s.topic) { var BN = { T: 0, P: 1, E: 2 }; while (end > from && BN[STEPS[ids[end]].band] > BN[band(p)]) end--; plan = plan.filter(function (i) { return i <= end; }); }
     if (plan[plan.length - 1] !== end) plan.push(end);
-    return { lad: s.ladder, subj: s.subject, ids: ids, from: from, plan: plan, k: 0, right: -1, asked: 0, askedIds: [], done: false };
+    // batch1: the FIRST pick above her own grade is asked twice in a row (two different items); both must be right to place past
+    // it (one lucky answer never lifts her a grade). Later picks are asked once (the warm-up stays short for little ones).
+    var own = A.Learn && A.Learn.ownGrade && !s.topic ? A.Learn.ownGrade(p) : null, dbl = false;
+    if (own != null) plan = [].concat.apply([], plan.map(function (i) { var v = A.Learn.glTop(ids[i]); if (!dbl && v != null && v > own) { dbl = true; return [i, i]; } return [i]; }));
+    return { lad: s.ladder, subj: s.subject, ids: ids, from: from, plan: plan, k: 0, right: -1, rightBefore: -1, asked: 0, askedIds: [], done: false };
   }
   function probeNext(pr) { return pr.done || pr.k >= pr.plan.length ? null : C.byId[pr.ids[pr.plan[pr.k]]]; }
   var PROBE_N = 7;
-  function probeAnswer(pr, ok) { pr.asked++; pr.askedIds.push(pr.ids[pr.plan[pr.k]]); if (ok) { pr.right = pr.plan[pr.k]; pr.k++; if (pr.k >= pr.plan.length) pr.done = true; } else pr.done = true; }
+  function probeAnswer(pr, ok) {
+    var ix = pr.plan[pr.k], again = pr.k > 0 && pr.plan[pr.k - 1] === ix;
+    pr.asked++; pr.askedIds.push(pr.ids[ix]);
+    if (ok) { if (!again) pr.rightBefore = pr.right; pr.right = ix; pr.k++; if (pr.k >= pr.plan.length) pr.done = true; }
+    else { if (again) pr.right = pr.rightBefore; pr.done = true; }   // batch1: the 2nd ask of an above-grade pick missed: that pick does not count
+  }
   // apply: steps up to the last right one are 'placed' (checked again in 3 days); the kid starts on the first step after it
   function probeFinish(p, pr) {
     var t = now(), start = pr.right < 0 ? pr.from : pr.right + 1, T = C.track(p, pr.subj), out = { placed: [], start: null }, pb = p.math.probe || (p.math.probe = {});
@@ -678,13 +796,18 @@
   // striding) climbs: a strong kid is back at her age level, or above, after one warm-up
   //   default by age: 2 tiny counting, 3 count to 10, 4 pre-K counting, 5 adding to 10, 6 doubles to 20, 7-8 make ten / story problems
   //   start:          2-3 tiny counting, 4 count to 10, 5 pre-K counting, 6 adding to 10, 7-8 doubles to 20
-  var M = { toddler: 't_count3', pre: 't_count3', pk: 'count10', k: 'pk_count10', g1: 'add10', g2: 'a_dbl', g3: 'a_dbl' };
+  // batch1: starts are never under the band (6-7: 1st-2nd grade, 8+: 2nd grade, the top content today); the warm-up climbs
+  var M = { toddler: 't_count3', pre: 't_count3', pk: 'count10', k: 'pk_count10', g1: 'a_dbl', g2: 'a_dbl', g3: 'evenodd' };
   Object.keys(M).forEach(function (b) { Lv.AGE_START[b].math = { id: M[b], level: 0 }; });
-  Lv.START.math.pk = 'pk_count10'; Lv.START.math.k = 'pk_compare';
+  Lv.START.math.pk = 'pk_count10'; Lv.START.math.k = 'pk_compare'; Lv.START.math[1] = 'a_dbl'; Lv.START.math[2] = 'evenodd';
   Lv.AGE_TEXT[2] = 'Tiny Picnic: counting to 3 and 5 with big pictures, colors'; Lv.AGE_TEXT[3] = 'counting to 3, 5 and 10, big & little letters, colors';
-  Lv.AGE_TEXT[4] = 'counting to 10 and up (a quick warm-up finds the level), beginning sounds, shapes';
-  Lv.AGE_TEXT[5] = 'counting to 20 and 30 and up (warm-up), first sight words'; Lv.AGE_TEXT[6] = 'adding to 10 and up (warm-up), short-vowel words';
-  Lv.AGE_TEXT[7] = 'doubles to 20 and up (warm-up), homophones'; Lv.AGE_TEXT[8] = 'doubles to 20 and up (warm-up), prefixes & suffixes'; Lv.AGE_TEXT.skip = Lv.AGE_TEXT[5];
+  Lv.AGE_TEXT[4] = 'counting to 10 and up (a quick warm-up finds the level), letters and beginning sounds (warm-up), shapes';
+  Lv.AGE_TEXT[5] = 'counting to 20 and 30 and up (warm-up), first sight words'; Lv.AGE_TEXT[6] = 'doubles and facts to 20 and up (warm-up), sh / ch / th words and up';
+  Lv.AGE_TEXT[7] = 'facts to 20 up to 2-digit adding (warm-up), sh / ch / th words and up (warm-up)'; Lv.AGE_TEXT[8] = 'even & odd, 2-digit adding and place value (warm-up), 3rd-grade sight words and up';
+  // batch1: reading starts in band too (6-7 on digraphs, 8 on 3rd-grade sight words); the reading warm-up climbs from there
+  Lv.AGE_START.pk.reading = { id: 'letters', level: 1 };   // batch1: 4 starts at pre-K letters (was K beginning sounds); the warm-up climbs
+  Lv.AGE_START.g1.reading = { id: 'digraph', level: 0 }; Lv.AGE_START.g2.reading = { id: 'digraph', level: 0 }; Lv.AGE_START.g3.reading = { id: 'sight3', level: 1 };
+  Lv.START.reading[1] = 'digraph'; Lv.START.reading[2] = 'longvowel'; Lv.AGE_TEXT.skip = Lv.AGE_TEXT[5];
 })(window.Arcade);
 
 /* v2p2b: tap-to-count on the tiny counting pictures (each tap lights the object and says the next number; no timer, no score) */

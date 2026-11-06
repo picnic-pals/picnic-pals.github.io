@@ -101,7 +101,8 @@
     ['cl_brush', 'Draw with your finger!', 'Brush tool'], ['cl_stickers', 'Drag a sticker onto your picture!', 'Sticker tool'],
     ['cl_undo', 'Oops! Back one step.', 'Undo'], ['cl_clear', 'Start over! A fresh page.', 'Start over'],
     ['cl_saved', 'Beautiful! It is in your gallery!', 'Saved to the gallery'], ['cl_gallery', 'Your gallery! Swipe to see your pictures.', 'Gallery'],
-    ['cl_newpage', 'A new picture to color!', 'A coloring page unlocked'], ['cl_full', 'Your gallery is full! A grown-up can make room.', 'Gallery cap']
+    ['cl_newpage', 'A new picture to color!', 'A coloring page unlocked'], ['cl_full', 'Your gallery is full! A grown-up can make room.', 'Gallery cap'],
+    ['cl_hang', 'Hang it in the gallery!', 'Done celebration'], ['cl_mix', 'Tap two colors to mix!', 'Mix colors'], ['cl_mixed', 'A new color!', 'Mixed swatch ready']
   ];
   // sound machine: each friend's silly sound (anything else: by index)
   var SOUNDS = { strawberry: 'sing', apple: 'boing', corn: 'laugh', blueberry: 'boing2', banana: 'slide', pear: 'sing2', carrot: 'burp', mochi: 'pop', pancake: 'drum' };

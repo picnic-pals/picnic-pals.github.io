@@ -195,7 +195,7 @@
   var RIVALON = !TWO && !STORYB, RIV = { name: R.RIVAL.name, icon: R.RIVAL.icon, runsBy: [], hits: 0, col: { c: '#4caf50', d: '#2e7d32' } };
   var LITTLE = A.Age.little(P1);
   function maxOuts() { return STORYB && SC && SC.outs ? SC.outs : R.outsFor(A.Age.little(bat().P)); }   // after9: a story stop is one big inning with SC.outs (4) outs
-  function mercy() { return STORYB ? 99 : R.mercyFor(A.Age.little(bat().P)); }
+  function mercy() { return STORYB ? (SC && SC.mercy ? SC.mercy : 99) : R.mercyFor(A.Age.little(bat().P)); }   // batch1: Story caps an inning at 5 runs too
   var G = { phase: 'intro', inning: 1, half: 0, outs: 0, strikes: 0, pa: 0, halfRuns: 0, missLast: false, recentAt: [], scoreQ: {}, bonusN: 0, hitN: 0, walkoff: false, bases: [null, null, null], q: null, accept: false, busy: false, sel: 0, qT0: 0, voiceDone: false, over: false, t0: Date.now(), recent: [], pitchN: 0, clockT: null, timer: null };
   function bat() { return PL[G.half]; }
 
@@ -701,11 +701,24 @@
   }
   // quality1 polish: the rival team's news never covers a question on the sign; it waits until the question is done
   function rivalTag(html) { if (G.q) { G.tagLater = html; return; } G.tagLater = null; $('#swingTag').innerHTML = html; $('#swingTag').className = 'swingtag on rival'; }
+  /* batch1: Slugger warm-up. A new player whose first game is Slugger gets the same short warm-up as Munch (UI.placement:
+     the step warm-up or the reading probe), so her first pitches are at her level, not at the age start. Was: C.pickRound(P)
+     with no warm-up (baseball.js:708), so a strong kid's first Slugger games were all age-start pitches. */
+  function slugWarm(P) {
+    if ((A.Store.settings && A.Store.settings.placement === false) || (A.toddler && A.toddler(P)) || P.guest) return Promise.resolve();
+    var r0 = C.pickRound(P, { placement: true }); if (!r0 || !r0.skill) return Promise.resolve();
+    if (!r0.placement) { G.firstRound = r0; return Promise.resolve(); }
+    var subj0 = C.subjectOf(r0.skill);
+    var check = function (sk) { return UI.placement(P, sk).then(function (r) { var nx = r && r.result === 'skip' && C.track(P, subj0).current; if (nx && A.Coach.wantsPlacement(P, nx) && A.Store.settings.placement !== false) return check(C.byId[nx]); }); };
+    return check(r0.skill).then(function () { A.Store.save(); }, function () { A.Store.save(); });
+  }
   function startHalf() {
     var pl = bat(); G.outs = 0; G.strikes = 0; G.pa = 0; G.halfRuns = 0; G.walkoffOn = false;
-    var pre = RIVALON && G.half === 0 ? rivalHalf() : Promise.resolve();
+    var warm = !TWO && !STORYB && !G.warmed ? slugWarm(pl.P) : Promise.resolve(); G.warmed = true;
+    var pre = warm.then(function () { return RIVALON && G.half === 0 ? rivalHalf() : null; });
     return pre.then(function () {
-      pl.round = STORYB ? { skill: C.byId[SC.skill], level: SC.level, story: true, review: false } : C.pickRound(pl.P); pl.hr = 0; pl.hw = 0; pl.t0 = Date.now();
+      var first = G.firstRound; G.firstRound = null;
+      pl.round = STORYB ? { skill: C.byId[SC.skill], level: SC.level, story: true, review: false } : first || C.pickRound(pl.P); pl.hr = 0; pl.hw = 0; pl.t0 = Date.now();
       if (pl.runsBy[G.inning - 1] == null) pl.runsBy[G.inning - 1] = 0;
       G.walkoffOn = RIVALON && G.inning === INNINGS && totalRuns(PL[0]) <= totalRuns(RIV);
       renderTurn(); renderBoard();
@@ -816,7 +829,7 @@
     var voice = out.passed ? ['fb_hooray', 'fb_you_got', stars, stars === 1 ? 'fb_star' : 'fb_stars'] : ['story_try_again'];   // existing lines only
     return wait(900).then(function () {
       return UI.card({ tag: st.area.emoji + (st.side ? ' ' + C.byId[SC.skill].name : ' Stop ' + st.n) + ' · ' + st.area.name, title: out.passed ? 'Stop cleared!' : 'So close!', html: html,
-        art: '<div class="' + (out.passed ? 'dance' : '') + '">' + blobOf(pl, { expr: out.passed ? 'happy' : 'sad' }) + '</div>', sub: out.passed ? '' : 'Try again! ' + SC.goalText + '.',
+        art: '<div class="' + (out.passed ? 'dance' : '') + '">' + blobOf(pl, { expr: out.passed ? 'happy' : 'idle' }) + '</div>', sub: out.passed ? '' : 'Try again! ' + SC.goalText + '.',
         btn: out.passed ? 'Map ▶' : 'Try again ▶', sfx: out.passed ? 'win' : 'soft', confetti: out.passed, voice: voice, cls: 'celebrate storyres bbstory' + (out.passed ? '' : ' tryagain'), minMs: 900 });
     }).then(function () { return A.Rewards.celebrate(P, rewards); })
       .then(function () { return A.PlayTime ? A.PlayTime.checkpoint().then(function (ok) { if (!ok) return new Promise(function () {}); }) : null; })

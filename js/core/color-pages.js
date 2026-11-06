@@ -22,6 +22,7 @@
   }
   var fl1 = flower(110, 500, 26), fl2 = flower(700, 520, 22);
   var PAGES = [
+    page('blank', 'Draw your own', null, [['paper', R(0, 0, 800, 600, 0)]], []),
     page('jammy', 'Jammy the strawberry', null, [SKY, SUN, ['cloud', cloud(80, 140)], ground(470), ['petals1', fl1[0]], ['center1', fl1[1]],
       ['body', 'M400 540 C 250 480 220 300 300 250 C 345 222 455 222 500 250 C 580 300 550 480 400 540 Z'],
       ['leaf1', 'M400 250 C 360 200 300 210 290 240 C 330 250 370 255 400 250 Z'], ['leaf2', 'M400 250 C 440 200 500 210 510 240 C 470 250 430 255 400 250 Z'],

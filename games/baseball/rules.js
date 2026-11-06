@@ -3,7 +3,8 @@
    OUTS: every wrong answer is an out (pop-up / foul tip / grounder, all caught by a friendly fielder). A right answer is
    a hit MOST of the time; a slow answer on an easy pitch is now and then a long fly ball that gets caught
    (CAUGHT_SLOW_EASY → CAUGHT_FAST_HARD by the same "power" as the hit odds; halved at age 4 and under).
-   Half-inning: 3 outs (age 4 and under: 4 outs — a gentler rule for preschoolers), or the mercy rule at MERCY runs.
+   Half-inning: 3 outs at every age (batch1, 2026-10-31; was 4 at age 4 and under), or the "5 runs, switch sides" cap (MERCY)
+   at every age, in free play and in Story (batch1; was 4 runs at 4 and under and no cap in Story).
    Occasionally (WALK) a batter walks before the pitch: ball four, take your base, no question. */
 (function (root) {
   'use strict';
@@ -16,8 +17,8 @@
   R.SLOW_EASY = [62, 27, 8, 3]; R.FAST_HARD = [26, 38, 24, 12]; R.LITTLE_SHIFT = 14;
   R.CAUGHT_SLOW_EASY = .10; R.CAUGHT_FAST_HARD = .06;   // design2: slow-easy was .26 (too many right answers caught)
   R.MERCY = 5; R.WALK = .05;
-  R.mercyFor = function (little) { return little ? 4 : R.MERCY; };
-  R.outsFor = function (little) { return little ? 4 : 3; };
+  R.mercyFor = function (little) { return R.MERCY; };   // batch1: 5 runs at every age (was 4 at 4 and under)
+  R.outsFor = function (little) { return 3; };          // batch1: 3 outs everywhere (was 4 at 4 and under)
   R.speedOf = function (sec, quick) { if (sec <= quick) return 1; if (sec >= 3 * quick) return 0; return (3 * quick - sec) / (2 * quick); };
   R.power = function (o) { var sp = o.speed != null ? o.speed : R.speedOf(o.sec || 0, o.quick || 2.5); return Math.max(0, Math.min(1, .55 * sp + .45 * (o.diff || 0))); };
   R.hitOdds = function (o) {
@@ -64,7 +65,9 @@
   /* the friendly rival team (solo games): it bats the top half, simulated with the same rules at a modest "accuracy"
      (RIVAL_ACC, a bit lower at 4 and under). Tuned with _test/slugger2-test.js so a kid at ~80% wins about 55-70%. */
   R.RIVAL = { name: 'Sprout Squad', short: 'SPROUTS', icon: '🥦' };
-  R.RIVAL_ACC = { big: .74, pre: .79, little: .77 };   // design2: little was .72   // design2: 'pre' = age 5 (no fly-outs for her, so a slightly sharper rival)
+  // batch1 (owner decision): rival .72 at 5 and under with 3 outs for everyone. Sim (_test/slugger2-test.js): an 80% kid wins
+  // 74% at 4 and 79% at 5 (target 55-70%); .79 gives 60% / 67%. Left at .72 pending the owner's call (_review/batch1/SUMMARY.md)
+  R.RIVAL_ACC = { big: .74, pre: .79, little: .79 };   // batch1 retune for 3 outs at every age: keeps an 80% kid winning 55-70% (was .72 at 5 and under: 74-79%)
   R.rivalAcc = function (little, age) { return little ? R.RIVAL_ACC.little : R.noFly(age) ? R.RIVAL_ACC.pre : R.RIVAL_ACC.big; };
   // one simulated half-inning. o: { acc, little, rnd, speed (0..1, default random), stretch, maxPA }
   R.simHalf = function (o) {

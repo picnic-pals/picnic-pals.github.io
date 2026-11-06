@@ -146,9 +146,11 @@
     // after9: ONE big inning with 4 outs at every age (was 2 innings, 3 outs / 4 at 4 and under: an 80% kid cleared 94-99%
     // and a 65% kid 67-85% on the first try). Goal 8 runs at 5 and under (no fly-outs there), 6 at 6+; a helper stop (after
     // two tries that didn't clear) is 2 runs fewer. Sim (_review/after9/sim/story-sim.js): first try ~80% kid 75-85%, 65% kid ~45%.
-    var c = config(p, i), goal = A.Age && A.Age.preReader(p) ? 8 : 6;
+    // batch1 (2026-10-31, parent pick): 2 innings x 3 outs like the real game, "5 runs, switch sides" in each inning, goal 7
+    // runs at 6+ and 8 at 5 and under (no fly-outs there); helper stop 2 fewer. Sim: _test/slugger2-test.js "story pass" column
+    var c = config(p, i), goal = A.Age && A.Age.preReader(p) ? 9 : 7;   // batch1 fix: 9 (was 8) at 5 and under so an 80% kid clears ~85%, not 91% (target 60-90%)
     if (c.helper) goal = Math.max(3, goal - 2);
-    c.game = 'slugger'; c.innings = 1; c.outs = 4; c.goal = goal; c.goalText = 'Score ' + goal + ' runs'; return c;
+    c.game = 'slugger'; c.innings = 2; c.outs = 3; c.mercy = 5; c.goal = goal; c.goalText = 'Score ' + goal + ' runs'; return c;
   }
 
   /* ---------- friend challenges: beat an area's challenge level under a target time to unlock a new blob ----------

@@ -164,3 +164,179 @@ body.tod .bubble .want .emo { font-size: 84px; } body.tod .bubble .want .drink s
   .cust .friend { height: 12vh; } .tray { min-height: 64px; } .bin { min-height: 76px; } .bin .emo { font-size: 40px; }
   .sbtn { min-height: 58px; } .ticket p { font-size: 18px; } .ticket.long p { font-size: 17px; }
 }
+
+/* batch1: the plate is a ten-frame (rows of 5) and its items shrink as it fills, so 15 fit with Serve on screen; on a phone the
+   page scrolls instead of clipping (plan P1, owner decision: big orders fit and scroll at 390x844 and 375x667). The count-on cup is
+   covered and shows how many are already inside. The count chip stays hidden until the first Serve on counting orders. */
+.pile.tf { display: grid; grid-template-columns: repeat(5, auto); justify-content: center; align-content: center; overflow: visible; max-height: none; }
+.pile.tf:not(.n2):not(.n3) { display: flex; }
+.pile.n2 .ti { width: 60px; height: 60px; } .pile.n2 .ti .emo { font-size: 42px; } .pile.n2 .ghost { width: 48px; height: 48px; margin: 4px; }
+.pile.n3 .ti { width: 50px; height: 50px; } .pile.n3 .ti .emo { font-size: 34px; } .pile.n3 .ghost { width: 40px; height: 40px; margin: 3px; }
+.cupspot.nocnt { padding-right: 14px; }
+.precup { position: relative; display: inline-flex; flex-direction: column; align-items: center; gap: 4px; margin-right: 10px; flex: 0 0 auto; background: #ffe9c7; border-radius: 22px; padding: 8px 8px 6px; box-shadow: inset 0 0 0 3px #f2d3a2; }
+.precup .pc svg path:nth-of-type(2) { stroke: #c9a8d8; }
+.precup .pc svg { width: 84px; height: 92px; display: block; }
+.precup .pc { position: relative; }
+.precup .pc::after { content: ''; position: absolute; left: 10px; right: 10px; top: 22px; height: 16px; border-radius: 8px; background: #f2b8cf; box-shadow: 0 3px 0 #d98aab; }
+.precup b { position: static; min-width: 44px; height: 44px; border-radius: 22px; background: #fff; color: #4a3b6b; font-size: 30px; font-weight: 800; display: grid; place-items: center; box-shadow: 0 0 0 3px #ffd23c; }
+
+/* ===== stand-r1 (2026-11-05): one-screen layout (no scrolling at 390x844, 820x1180 and both landscapes), a recipe card, a pitcher
+   that fills with the flavor's color, a patience face, a glass tip jar, brighter counter. These rules come last and win. ===== */
+html, body { height: 100%; overflow: hidden; }
+#stand { height: 100vh; height: 100dvh; min-height: 0; overflow: hidden; padding: 6px 12px 10px; gap: 6px; }
+#stand .tbar { min-height: 58px; padding-top: 12px; padding-bottom: 0; }
+.standrow { flex: 1 1 auto; min-height: 0; gap: 12px; }
+.cust { position: relative; min-height: 0; }
+/* the order: a recipe card */
+.bubble { background: #fffdf3; box-shadow: 0 0 0 3px #ffe08a, 0 6px 0 #f3c95a; border-radius: 26px; padding: 10px 14px; min-height: 0; gap: 6px; }
+.bubble::after { border-top-color: #fffdf3; }
+.rhead { display: flex; align-items: center; gap: 6px; font-size: 17px; font-weight: 800; color: #b5651d; background: #fff1c2; border-radius: 14px; padding: 2px 12px 2px 6px; }
+.rhead .emo { font-size: 24px; line-height: 1; } .rhead .svgi svg { width: 24px; height: 24px; display: block; }
+.rhead em { font-style: normal; font-size: 14px; color: #e0559a; margin-left: 2px; white-space: nowrap; }
+.rcard { display: flex; justify-content: center; }
+.wants { gap: 6px; }
+.want b { font-size: 40px; } .want .emo { font-size: 50px; }
+.wplus { font-style: normal; font-size: 34px; font-weight: 800; color: #ff7aa6; }
+.svgi { display: inline-grid; place-items: center; } .svgi svg { width: 1em; height: 1em; display: block; }
+.byeb { font-size: 54px; line-height: 1.1; }
+/* the patience face: a smile slowly turns into a "hmm" (never sad or angry) */
+.pat { position: absolute; right: 4px; bottom: 0; left: auto; top: auto; z-index: 3; display: flex; align-items: center; gap: 6px; background: #ffffffd9; border-radius: 18px; padding: 3px 10px 3px 4px; box-shadow: 0 3px 0 #0000000f; transition: opacity .3s; }
+.pat .face { font-size: 28px; line-height: 1; }
+.pat i { width: 64px; height: 12px; border-radius: 6px; background: #eef2f7; overflow: hidden; display: block; }
+.pat i b { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #7fd88f, #b6ea7a); border-radius: 6px; transition: width .25s linear; }
+.pat.low i b { background: linear-gradient(90deg, #ffd66b, #ffe9a6); }
+.pat.off { opacity: 0; pointer-events: none; }
+/* the counter: brighter wood, a striped mat for the pitcher */
+.counter { min-height: 0; gap: 8px; padding: 10px; background: linear-gradient(#ffe3b3, #ffc978); box-shadow: inset 0 -8px 0 #f2ac52, 0 6px 0 #e0953c; }
+.tray { flex: 1 1 auto; min-height: 0; }
+.cupspot { padding: 6px 84px 6px 6px; background: repeating-linear-gradient(135deg, #fff7e0 0 18px, #fff0c9 18px 36px); box-shadow: inset 0 0 0 4px #ffe1a0; min-height: 0; }
+.cupspot.nocnt { padding-right: 6px; }
+.cupspot .pile { min-width: 0; min-height: 0; padding: 0; background: none; border-radius: 0; }
+.cupspot { container-type: size; }
+.pitcher { position: relative; width: min(100cqh, 72cqw, 420px); height: min(100cqh, 72cqw, 420px); container-type: size; flex: 0 0 auto; }
+.pitcher .psvg { width: 100%; height: 100%; display: block; }
+.pitcher .psvg .juice { transition: fill .4s; }
+.pitcher .psvg .jlev { transition: transform .6s ease; }
+.pitcher .pile.tf, .pitcher .pile.tf.n2, .pitcher .pile.tf.n3 { position: absolute; left: 19%; right: 23%; top: 20%; bottom: 9%; display: flex; flex-wrap: wrap-reverse; align-content: flex-start; justify-content: center; gap: 0; overflow: visible; }
+.pitcher .pile .ti, .pitcher .pile.n2 .ti, .pitcher .pile.n3 .ti { width: 11.6cqw; height: 11.6cqw; animation: sdrop .35s ease-out; }
+.pitcher .pile .ti .emo, .pitcher .pile.n2 .ti .emo, .pitcher .pile.n3 .ti .emo { font-size: 10cqw; line-height: 1; }
+.pitcher .pile .ghost { width: 9cqw; height: 9cqw; margin: .9cqw; border-width: 3px; }
+.cnt { right: 8px; }
+.precup { margin-right: 6px; }
+/* ingredient bins */
+.bins { gap: 8px; flex-wrap: wrap; flex: 0 0 auto; }
+.bin { min-width: 0; min-height: 0; width: clamp(64px, 15vw, 104px); height: clamp(64px, 15vw, 104px); border-radius: 22px; padding: 4px; background: #fff; box-shadow: 0 5px 0 #f0c98a; }
+.bin .emo { font-size: clamp(34px, 8vw, 56px); } .bin small { font-size: 12px; line-height: 1.1; text-align: center; }
+.bin .svgi svg { width: 1em; height: 1em; }
+.acts { flex: 0 0 auto; display: flex; justify-content: center; gap: 10px; }
+.sbtn.undo { min-width: 76px; padding: 0 12px; background: #fff; color: #4a3b6b; box-shadow: 0 5px 0 #e3d6f0; }
+/* toddlers: two or three big pictures, and the pitcher they go into */
+.counter.pickmode .tray { display: flex; flex: 1 1 auto; }
+.counter.pickmode .bins { flex: 0 0 auto; gap: 16px; }
+.counter.pickmode .bin, .bins.pick .bin { width: clamp(110px, 26vw, 180px); height: clamp(110px, 26vw, 180px); max-width: none; min-height: 0; border-radius: 36px; }
+.counter.pickmode .bin .emo, .bins.pick .bin .emo { font-size: clamp(70px, 16vw, 120px); }
+/* money: smaller cartoon bills so a full wallet fits */
+.wallet { gap: 6px; }
+.billbtn { min-width: 0; min-height: 0; } .billbtn .bill { width: clamp(76px, 18vw, 120px); height: auto; }
+.billbtn.in .bill { width: clamp(56px, 12vw, 90px); height: auto; } .billbtn.in { min-width: 0; min-height: 0; }
+.cashbox .pile { gap: 4px; }
+.prices .tag { display: inline-flex; align-items: center; gap: 6px; font-size: 38px; padding: 4px 14px; }
+.prices .cups { position: relative; display: inline-flex; } .prices .cups .emo { font-size: 30px; } .prices .cups svg { width: 30px; height: 30px; }
+.prices .cups sub { position: absolute; right: -8px; bottom: -6px; font-size: 15px; background: #ff8ab3; color: #fff; border-radius: 10px; padding: 0 5px; line-height: 18px; }
+/* thanks: the tip flies in (3 for a first-try order) */
+.tipfly { flex-wrap: wrap; justify-content: center; max-width: 280px; } .tipfly .bill { width: 76px; } .tipfly .heart { font-size: 40px; }
+/* the tip-jar chip: a little glass jar (hidden while the jar question is asked) */
+.jarchip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 12px 2px 6px; font-size: 22px; background: #ffffffe6; }
+.jarchip .jsvg { width: 30px; height: 33px; display: block; } .jarchip b { color: #2f7a3b; }
+body.tipq .jarchip { display: none !important; }
+/* end of day: the counting jar is a real glass jar with a lid */
+.jar { background: linear-gradient(90deg, #e9f8ff 0%, #f8fdff 30%, #e3f4fd 100%); border-radius: 26px 26px 40px 40px; box-shadow: inset 0 0 0 5px #a9d8f0, 0 6px 0 #8fc7e2; padding: 14px 84px 14px 14px; margin-top: 22px; }
+.jar::before { display: none; }
+.jar .jarlid { position: absolute; left: 18%; right: 18%; top: -20px; height: 24px; border-radius: 10px; background: repeating-linear-gradient(90deg, #ffb347 0 14px, #ffa62b 14px 28px); box-shadow: 0 4px 0 #e08a1e; }
+.jarglass { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; gap: 4px; }
+.jt { min-width: 52px; min-height: 52px; }
+.jt .bill { width: 70px; height: auto; }
+.jarq { font-size: 30px; }
+/* the happy recap */
+.recap { display: flex; justify-content: center; gap: 18px; margin: 6px 0 2px; }
+.recap .rc { display: flex; flex-direction: column; align-items: center; background: #fff8e1; border-radius: 20px; padding: 8px 14px; box-shadow: 0 4px 0 #ffe0a0; min-width: 110px; }
+.recap .rc svg { width: 70px; height: 70px; } .recap .rc b { font-size: 34px; color: #4a3b6b; line-height: 1.1; } .recap .rc span { font-size: 15px; color: #8a6d3b; font-weight: 700; text-align: center; }
+.nfl { font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 8px; } .nfl .emo { font-size: 40px; } .nfl .svgi svg { width: 40px; height: 40px; }
+.nfart svg { width: 150px; height: 150px; animation: shop 1.2s ease infinite; }
+@media (prefers-reduced-motion: reduce) { .nfart svg, .pitcher .ti { animation: none; } }
+
+/* portrait (phones and iPads): friend + card on top, then pitcher, bins and buttons */
+@media (orientation: portrait) {
+  .standrow { flex-direction: column; gap: 8px; }
+  .cust { flex: 0 1 auto; flex-direction: row; align-items: center; justify-content: center; gap: 10px; padding: 0; max-height: 40%; }
+  .cust .friend { flex: 0 0 auto; height: clamp(90px, 15vh, 220px); max-width: 34%; }
+  .cust .bubble { flex: 0 1 auto; min-width: 0; max-width: 64%; max-height: 100%; }
+  .cust .bubble::after { left: auto; right: -16px; bottom: 30px; margin: 0; border: 12px solid transparent; border-left: 16px solid #fffdf3; border-right: 0; }
+  .counter { flex: 1 1 auto; }
+}
+@media (orientation: portrait) and (max-width: 600px) {
+  .cust .bubble { flex: 1 1 0; max-width: none; }
+  .cust { padding: 0 2px; }
+  #stand .tbar { min-height: 64px; }
+  .want b { font-size: 32px; } .want .emo { font-size: 40px; } .wplus { font-size: 26px; } .rhead { font-size: 15px; }
+  .sbtn { min-height: 60px; font-size: 24px; }
+  .bins { flex-wrap: nowrap; }
+}
+/* landscape: friend + card on the left; pitcher on the left of the counter, bins and buttons on the right */
+@media (orientation: landscape) {
+  .standrow { flex-direction: row; }
+  .cust { flex: 0 0 34%; justify-content: center; }
+  .pat { right: auto; left: 50%; transform: translateX(-50%); bottom: 0; }
+  .cust .friend { height: clamp(90px, 30vh, 300px); }
+  .cust .bubble { max-height: 62%; width: 100%; }
+  .counter { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: 1fr auto; grid-template-areas: 'tray bins' 'tray acts'; align-items: center; }
+  .counter .tray { grid-area: tray; height: 100%; } .counter .bins { grid-area: bins; display: grid; grid-template-columns: repeat(2, auto); align-content: center; justify-content: center; } .counter .acts { grid-area: acts; flex-wrap: wrap; }
+  .counter.pickmode .bins { grid-template-columns: repeat(1, auto); }
+  .counter.paying { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); }
+  .counter.paying .bins { grid-template-columns: repeat(3, auto); }
+  .counter.jarmode { grid-template-columns: minmax(0, 1fr) auto; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  #stand .tbar { min-height: 46px; padding-top: 6px; } #stand .sayagain { width: 48px; height: 48px; font-size: 24px; top: 6px; }
+  #stand .homebtn { width: 44px; height: 44px; } #howtoBtn.q1help { top: 56px; width: 40px; height: 40px; font-size: 22px; }
+  .cust .friend { height: 22vh; } .cust .bubble { max-height: 70%; padding: 6px 10px; }
+  .want b { font-size: 28px; } .want .emo { font-size: 34px; } .ticket p { font-size: 18px; } .ticket.long p { font-size: 15px; } .bubble .ask { font-size: 14px; } .bubble .line { font-size: 14px; } .rhead { font-size: 13px; }
+  .bin { width: 62px; height: 62px; } .bin .emo { font-size: 32px; } .bin small { display: none; }
+  .counter.pickmode .bin { width: 100px; height: 100px; } .counter.pickmode .bin .emo { font-size: 64px; }
+  .sbtn { min-height: 52px; font-size: 20px; min-width: 0; padding: 0 14px; }
+  .counter { padding: 8px; gap: 6px; }
+  .billbtn .bill { width: 70px; } .prices .tag { font-size: 26px; }
+}
+/* stand-r1: on a phone in portrait the "?" sits in the top bar (it covered the start of the order text) */
+@media (orientation: portrait) and (max-width: 600px) {
+  #howtoBtn.q1help { top: 10px; left: 66px; width: 44px; height: 44px; font-size: 24px; }
+  #stand .tbar { padding-left: 116px; padding-right: 128px; }
+}
+/* stand-r1: portrait gives the pitcher the whole mat width (the count chip sits in the top corner), so the ingredients are bigger */
+@media (orientation: portrait) {
+  .cupspot, .cupspot.nocnt { padding: 6px; }
+  .cupspot .cnt { top: 8px; right: 8px; transform: none; }
+  .pitcher { width: min(100cqh, 84cqw, 460px); height: min(100cqh, 84cqw, 460px); }
+  .cupspot:has(.precup) .pitcher { width: min(100cqh, 62cqw, 460px); height: min(100cqh, 62cqw, 460px); }
+}
+/* stand-r1 float (2026-11-05): ingredients float in the juice, each with its own bob / drift / turn; they swirl away on Serve */
+.pitcher .pile .ti.fl, .pitcher .pile.n2 .ti.fl, .pitcher .pile.n3 .ti.fl { position: absolute; width: 13cqw; height: 13cqw; margin: 0;
+  animation: ffloat var(--d, 5s) ease-in-out var(--fd, 0s) infinite; will-change: transform; transition: top .6s ease, opacity .5s, scale .5s; }
+.pitcher .pile .ti.fl .emo { font-size: 11cqw; line-height: 1; }
+.pitcher .pile .ti.fl.new { animation: fdrop .45s ease-out both, ffloat var(--d, 5s) ease-in-out var(--fd, 0s) infinite; }
+@keyframes fdrop { from { opacity: 0; translate: 0 -10cqw; scale: .6; } to { opacity: 1; translate: 0 0; scale: 1; } }
+@keyframes ffloat { 0%, 100% { transform: translate(0, 0) rotate(var(--r0, 0deg)); } 33% { transform: translate(var(--dx1, 0), var(--dy1, 0)) rotate(var(--r1, 0deg)); } 66% { transform: translate(var(--dx2, 0), var(--dy2, 0)) rotate(var(--r2, 0deg)); } }
+.pitcher .pile .ti.fl.gone { animation: fswirl .7s ease-in var(--out, 0ms) forwards; }
+@keyframes fswirl { to { transform: translate(0, 6cqw) rotate(200deg) scale(.1); opacity: 0; } }
+.pitcher .psvg { transition: transform .6s ease; transform-origin: 30% 80%; }
+.pitcher.pour .psvg { transform: rotate(-14deg); }
+.pitcher.pour .psvg .jlev { transition: transform .9s ease-in; transform: translateY(84px) !important; }
+@media (orientation: landscape) and (max-height: 500px) {
+  .pitcher .pile .ti.fl, .pitcher .pile.n2 .ti.fl, .pitcher .pile.n3 .ti.fl { width: 16cqw; height: 16cqw; } .pitcher .pile .ti.fl .emo { font-size: 13.5cqw; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pitcher .pile .ti.fl, .pitcher .pile.n2 .ti.fl, .pitcher .pile.n3 .ti.fl { animation: none; transition: none; transform: rotate(var(--r0, 0deg)); }
+  .pitcher .pile .ti.fl.gone { animation: none; opacity: 0; transition: opacity .4s; }
+  .pitcher .psvg, .pitcher.pour .psvg, .pitcher .psvg .jlev { transition: none; }
+  .pitcher.pour .psvg { transform: none; }
+}

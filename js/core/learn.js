@@ -4,9 +4,11 @@
    · GRADE TAGS: every skill / step / Bubble kind / Stand step / topic step / bonus bank / Slugger question kind has a numeric
      grade level `gl` (0 toddler, 1 Pre-K, 2 K, 3 1st, 4 2nd, 5 3rd; halves = in between). Skills also get s.gl and s.gradeTag.
    · BAND FLOOR per subject (floor(p, subj)): the lowest grade level that is still "in band" for this child.
-       base  = the grown-up's grade setting for the subject (one grade of slack) or else the age band (2-3: 0, 4-5: 1, 6-7: 2, 8+: 3)
+       base  = the bottom of the child's band: by age (2-3: 0, 4-5: 1, 6-7: 3, 8+: 5) or the band of the grown-up's grade pick
+               (batch1: no grade of slack; was 6-7: 2, 8+: 3, grade pick - 1)
        shown = the highest grade level the child has SHOWN in that subject (earned in play, or placed by a played warm-up / check;
-               never by age alone); floor = max(base, ceil(shown) - 1)
+               never by age alone); floor = max(base, shown - 0.5), paused while her recent first tries are under 60%
+       capped by the content that exists (capOf: math 2nd grade, reading 2nd-3rd, Stand / topics / Slugger 1st grade today)
        never above the grade level of the child's own current skill (her current work is never "below band").
      'other' (topics, Stand orders, bonus trivia, Slugger) = max(base, the lower of the math and reading floors, rounded down).
    · Every place that serves questions asks this layer: free-play rounds (pickRound), review and checks, topic rounds, Story stops,
@@ -32,6 +34,7 @@
     add10: 2.5, sub10: 2.5, make10: 2, teen: 2, missing: 3, wordprob: 3, evenodd: 4, compare: 2, add20: 3, sub20: 3,
     a_dbl: 3, a_ndbl: 3, a_ten: 3, s_teen1: 3, s_teen10: 3, s_10: 3, a_9: 3, a_8: 3, s_noX: 3, a_mk10: 3, s_split: 3, s_think: 3, a_mix: 3, s_mix: 3,
     pv_tens: 3, pv_compare: 3, pv_ten_more: 3,   // 1st-grade place value (1.NBT.2, 1.NBT.3, 1.NBT.5): the minimal B2 test-out
+    a2_add: 4, s2_sub: 4, a2_regroup: 4, s2_regroup: 4, pv_hto: 4, pv_cmp3: 4, skip_count: 4,   // batch1: 2nd grade (2.NBT.1-5)
     // reading
     letters: 1, begsound: 2, rhymes: 2, sight: 2, cvc: 2.5, digraph: 3, sight2: 3, opposites: 2.5, nounverb: 3, longvowel: [3, 4], sight3: [4, 5],
     homophones: 4.5, affixes: 4.5, comprehension: [3, 3.5],
@@ -75,10 +78,45 @@
   function glAt(s, level) { if (typeof s === 'string') s = C.byId[s]; if (!s) return null; return s.isStep && !s.wrapOld ? gl(s.id, 0) : gl(s.id, level || 0); }
 
   /* ---------- 2. band floors ---------- */
-  var AGE_FLOOR = { toddler: 0, pre: 0, pk: 1, k: 1, g1: 2, g2: 2, g3: 3, none: 1 };
+  /* batch1 (2026-10-31): no one-grade slack. The floor is the BOTTOM of the child's band (toddler 0, pre-K/K 1, 1st-2nd 3,
+     3rd+ 5); a grown-up's grade maps to the bottom of that grade's band (pk/k 1, 1st/2nd 3, 3rd+ 5). Was: age 6-7 -> K (2),
+     8 -> 1st (3), a grade pick -> one grade below it. A floor never goes above the content we have (contentCap below). */
+  var AGE_FLOOR = { toddler: 0, pre: 0, pk: 1, k: 1, g1: 3, g2: 3, g3: 5, none: 1 };
   var GRADE_GL = { pk: 1, k: 2, '1': 3, '2': 4, '3': 5, '4': 6, '5': 7 };
+  var GRADE_BAND = { pk: 1, k: 1, '1': 3, '2': 3, '3': 5, '4': 5, '5': 5 };
+  // the grade a child of this age is in (toddler 0 ... 3rd+ 5): placement needs a second right answer above it (batch1)
+  var OWN_GRADE = { toddler: 0, pre: 0, pk: 1, k: 2, g1: 3, g2: 4, g3: 5, none: 2 };
+  function ownGrade(p) { var b = A.Age && A.Age.band ? A.Age.band(p) : 'none'; return OWN_GRADE[b] != null ? OWN_GRADE[b] : 2; }
   function ageFloor(p) { var b = A.Age && A.Age.band ? A.Age.band(p) : 'none'; return AGE_FLOOR[b] != null ? AGE_FLOOR[b] : 1; }
-  function baseFloor(p, subj) { var g = p && p.levels && p.levels[subj]; if (g && GRADE_GL[g] != null) return Math.max(0, GRADE_GL[g] - 1); return ageFloor(p); }
+  function baseFloor(p, subj) { var g = p && p.levels && p.levels[subj]; if (g && GRADE_BAND[g] != null) return GRADE_BAND[g]; return ageFloor(p); }
+  /* content cap: a floor never asks for more than the content has. cap(ids, f) = the highest grade g <= f (half-grade steps)
+     with at least 2 of the ids (1 for a one-item family) reaching g. Today: math 2nd grade (4), reading 2nd-3rd (4.5),
+     Stand orders / topics / Slugger 1st grade (3). A 3rd+ child therefore gets the top of what exists until batch 3 adds more. */
+  function capOf(ids, f) {
+    if (!ids || !ids.length) return f; var need = Math.min(2, ids.length), tops = ids.map(glTop).filter(function (v) { return v != null; });
+    for (var g = Math.floor(f * 2) / 2; g > 0; g -= .5) { if (tops.filter(function (v) { return v >= g; }).length >= need) return g; }
+    return 0;
+  }
+  function subjCap(subj, f) { return capOf(C.list(subj).map(function (s) { return s.id; }), f); }
+  var famCache = {};
+  function famIds(id) {
+    var pre = String(id).split('_')[0], sj = subjOfKind(id), key = sj + ':' + pre; if (famCache[key]) return famCache[key];
+    var all = Object.keys(GL).concat(Object.keys(S.STEPS || {})), out = [];
+    all.forEach(function (k) { if (k.split('_')[0] === pre && subjOfKind(k) === sj && out.indexOf(k) < 0) out.push(k); });
+    return (famCache[key] = out);
+  }
+  // the floor for one Bubble kind / Stand step / topic step / Slugger kind / bonus bank: its subject floor, capped by its family
+  // topics: one family for all topic ladders (a ladder with no in-band step for her plays math instead; batch1)
+  var topicIds = null;
+  function topicFloor(p) { var f = floor(p, 'other'); if (!topicIds) { topicIds = []; Object.keys(S.LADDERS).forEach(function (k) { var L = S.LADDERS[k]; if (L.topic || (L.steps && L.steps[0] && L.steps[0].topic)) topicIds = topicIds.concat(L.ids); }); } return Math.min(f, capOf(topicIds, f)); }
+  function famFloor(p, id) { var f = floor(p, subjOfKind(id)); return Math.min(f, capOf(famIds(id), f)); }
+  /* fit (batch1): the last 20 first-try answers per subject. Over 88%: 'up' (mastery can come in one strong day, Munch gives
+     fewer free tries); under 60%: 'ease' (the floor relaxes to the band floor so she can step back inside her band). */
+  var FIT_N = 20, FIT_MIN = 20;
+  function fitLog(p, subj) { var l = ldata(p); l.fit = l.fit || {}; return l.fit[subj] || ''; }
+  function fitAcc(p, subj) { if (!p || !p.learn || !p.learn.fit) return null; var s = p.learn.fit[subj] || ''; if (s.length < FIT_MIN) return null; return s.split('').filter(function (c) { return c === '1'; }).length / s.length; }
+  function fitOf(p, subj) { var a = fitAcc(p, subj); return a == null ? 'ok' : a > .88 ? 'up' : a < .6 ? 'ease' : 'ok'; }
+  function fitNote(p, subj, ok) { if (!p || !subj || (subj !== 'math' && subj !== 'reading')) return; var l = ldata(p); l.fit = l.fit || {}; l.fit[subj] = (fitLog(p, subj) + (ok ? '1' : '0')).slice(-FIT_N); }
   // placed by something the child actually answered (warm-up / check / probe), or an old save's played position; never age alone
   function shownState(st) { return !!(st && st.status === 'mastered' && (!st.placed || /warmup|probe|check|compare|migrate/.test(st.placedBy || ''))); }
   function shown(p, subj) {
@@ -96,7 +134,10 @@
     if (!C.list(subj).length) return baseFloor(p, subj);
     var f = baseFloor(p, subj), sh = shown(p, subj), gset = p.levels && GRADE_GL[p.levels[subj]] != null;
     // a grade a grown-up picked on the grown-up page is the floor (their pick wins over what she showed in play)
-    if (sh >= 0 && !gset) f = Math.max(f, Math.ceil(sh) - 1);
+    // batch1: what she SHOWED lifts the floor to half a grade under it (was a whole grade under, rounded up); while her recent
+    // first-try answers are under 60% ('ease') the lift pauses and the band floor holds
+    if (sh >= 0 && !gset && fitOf(p, subj) !== 'ease') f = Math.max(f, sh - .5);
+    f = Math.min(f, subjCap(subj, f));
     // her current skill normally sets no higher floor than itself (a grown-up's pick, a slip-back). quality1: but when she has
     // already shown more AND open in-band skills exist (e.g. comprehension sitting after affixes in the list), the current skill
     // does not drag the floor down; the band lock then moves her to an in-band skill.
@@ -109,7 +150,7 @@
   }
   function otherFloor(p) {
     var b = ageFloor(p), fm = floor(p, 'math'), off = p.levels && p.levels.reading === 'off', fr = off || !C.list('reading').length ? fm : floor(p, 'reading');
-    return Math.max(b, Math.floor(Math.min(fm, fr)));
+    return Math.max(b, Math.min(fm, fr));   // batch1: not rounded down (a K-level 5-year-old's floor 1.5 drops pre-K extras)
   }
   // ceiling: 2-3 never past Pre-K-ish (1.5), 4-5 never past the K / 1st-grade line (2.5) unless a grown-up set the subject to 1st
   // grade or up, or a 5-year-old EARNED (in play) the top skill under that line; 6+ no ceiling
@@ -124,7 +165,7 @@
     return 2.5;
   }
   function subjOfKind(id) { return SUBJ_OF_KIND[id] || 'other'; }
-  function kindOk(p, id, sub) { var v = gl(id, sub); return v == null || (v >= floor(p, subjOfKind(id)) && v <= ceil(p, subjOfKind(id))); }
+  function kindOk(p, id, sub) { var v = gl(id, sub); return v == null || (v >= famFloor(p, id) && v <= ceil(p, subjOfKind(id))); }
 
   /* ---------- 3. A2: Early Concepts leaves the mix once the child is past it ---------- */
   function conceptsLive(p) {
@@ -173,7 +214,7 @@
     return { skill: cur, level: lv, review: false, inBand: true };
   }
   function inBandTopic(p, subj) {
-    var L = S.LADDERS[subj]; if (!L) return null; var f = floor(p, 'other'), BN = { T: 0, P: 1, E: 2 }, kb = BN[S.band(p)];
+    var L = S.LADDERS[subj]; if (!L) return null; var f = topicFloor(p), BN = { T: 0, P: 1, E: 2 }, kb = BN[S.band(p)];
     var ok = L.ids.filter(function (id) { var st = S.STEPS[id]; return BN[st.band] <= kb && (gl(id, 0) == null || gl(id, 0) >= f); });
     if (!ok.length) return null;
     var T = C.track(p, subj), i = ok.indexOf(T.current); return C.byId[ok[i >= 0 ? i : 0]] || null;
@@ -198,7 +239,7 @@
       return alt && alt.skill ? fixRound(p, alt, opt, depth + 1) : r;
     }
     if (r.topic || s.topic) {
-      var f0 = floor(p, 'other'), v0 = gl(s.id, 0);
+      var f0 = topicFloor(p), v0 = gl(s.id, 0);
       if (v0 != null && v0 < f0) {
         var t2 = inBandTopic(p, subj);
         if (t2) { C.track(p, subj).current = t2.id; var st2 = C.state(p, t2.id); if (st2.status === 'locked') st2.status = 'open'; st2.introduced = true; r.skill = t2; r.level = 0; r.bandFixed = 'topic'; return r; }
@@ -322,6 +363,8 @@
   };
 
   /* ---------- 7. A1: Story stops follow the child ---------- */
+  // batch1: her last 3 earned (played, not placed) skills in this subject that are still in her band
+  function earnedTop(p, subj) { var f = floor(p, subj); return C.list(subj).filter(function (s) { var st = p.skills && p.skills[s.id]; return st && st.status === 'mastered' && !st.placed && (glTop(s.id) == null || glTop(s.id) >= f); }).slice(-3); }
   function storyPick(p, subj, i, little, boss) {
     var f = floor(p, subj), cur = C.current(p, subj); if (!cur) return null;
     if (glTop(cur.id) != null && glTop(cur.id) < f && !cur.isStep) { var tl0 = topList(p, subj); if (tl0.length) cur = tl0[(i || 0) % tl0.length]; }   // her current fell under the floor: an in-band top skill
@@ -349,6 +392,12 @@
       } else if (subj === 'math' || subj === 'reading') {
         var f = floor(p, subj), v = glAt(sk, c.level);
         if (v != null && v < f) { var pk2 = storyPick(p, subj, i, true, false); if (pk2) { c.skill = pk2.skill; c.level = pk2.level; c.lifted = true; } }
+        // batch1: and never more than half a grade above her own current skill (a pre-K child at "count to 10" got the area's
+        // count-to-20 / K reading stops on the first try): a stop above her comes down to her current skill until she gets there
+        else { var cg = curGl(p, subj), ast = p.skills && p.skills[sk.id];
+          if (v != null && cg != null && v > cg + .5 && !(ast && ast.status === 'mastered')) { var pk3 = storyPick(p, subj, i, true, false); if (pk3 && (glAt(pk3.skill, pk3.level) || 0) < v) { c.skill = pk3.skill; c.level = pk3.level; c.lowered = true; } }
+          // batch1: she is finding this subject hard lately (under 60% first try): the stop uses a skill she has earned in her band
+          else if (fitOf(p, subj) === 'ease' && !(ast && ast.status === 'mastered')) { var er = earnedTop(p, subj); if (er.length) { var e0 = er[(i || 0) % er.length]; c.skill = e0.id; c.level = lowestLevelInBand(e0, floor(p, subj)); c.lowered = true; c.eased = true; } } }
       }
       return c;
     };
@@ -369,22 +418,26 @@
     var L = C.list(subj); return L.indexOf(s) < L.length - 1;
   }
   // how far ahead the child is in the OTHER core subject (in grade levels over her age band's floor)
-  function aheadElsewhere(p, subj) { var o = subj === 'math' ? 'reading' : 'math'; if (!C.list(o).length) return 0; var sh = shown(p, o); return sh < 0 ? 0 : sh - (ageFloor(p) + 1); }
+  function aheadElsewhere(p, subj) { var o = subj === 'math' ? 'reading' : 'math'; if (!C.list(o).length) return 0; var sh = shown(p, o); return sh < 0 ? 0 : sh - (Math.min(ageFloor(p), subjCap(o, ageFloor(p))) + 1); }
   function probePlan(p, sid) {
     var s = C.byId[sid], subj = C.subjectOf(s), cl = ceil(p, subj), L0 = C.list(subj), i0 = L0.indexOf(s);
     // quality1 polish: the probe never asks a skill above her ceiling, even one that sits between in-band skills in the list
     // (digraphs and 1st-grade sight words sit before opposites); those are neither asked nor placed
     var L = L0.filter(function (k, i) { var v0 = glAt(k, 0); return i <= i0 || v0 == null || v0 <= cl; }), from = L.indexOf(s), hi = L.length - 1;
     while (hi > from && glAt(L[hi], 0) > cl) hi--;
-    var norm = ageFloor(p) + 1 + (aheadElsewhere(p, subj) >= 1 ? 1 : 0);   // the age band's own grade, one band higher when strong elsewhere
+    var norm = Math.min(ageFloor(p), subjCap(subj, ageFloor(p))) + 1 + (aheadElsewhere(p, subj) >= 1 ? 1 : 0);   // batch1: capped band floor   // the age band's own grade, one band higher when strong elsewhere
     var first = from; for (var k = from; k <= hi; k++) { first = k; if (glAt(L[k], 0) >= norm) break; }
-    return { subj: subj, ids: L.map(function (x) { return x.id; }), from: from, lo: from, hi: hi, mid: Math.max(from, Math.min(hi, first)), asked: 0, right: -1, log: [], done: false, boost: aheadElsewhere(p, subj) >= 1 };
+    return { subj: subj, ids: L.map(function (x) { return x.id; }), from: from, lo: from, hi: hi, mid: Math.max(from, Math.min(hi, first)), asked: 0, right: -1, log: [], done: false, boost: aheadElsewhere(p, subj) >= 1, own: ownGrade(p) };
   }
-  function probeNext(pr) { if (pr.done || pr.asked >= PROBE_MAX || pr.lo > pr.hi) return null; var s = C.byId[pr.ids[pr.mid]]; return { skill: s, level: Math.max(0, (s.levels || [1]).length - 1) }; }
+  function probeNext(pr) { if (pr.done || pr.asked >= PROBE_MAX + (pr.extra || 0) || pr.lo > pr.hi) return null; var s = C.byId[pr.ids[pr.mid]]; return { skill: s, level: Math.max(0, (s.levels || [1]).length - 1) }; }
   function probeAnswer(pr, ok) {
+    // batch1: a right pick ABOVE her own grade is asked once more (another item of the same skill) before it counts, so one
+    // lucky answer never places a child a grade up; a miss on the second ask counts as a miss
+    var gm = glAt(C.byId[pr.ids[pr.mid]], 0);
+    if (ok && pr.own != null && gm != null && gm > pr.own && pr.conf !== pr.mid) { pr.conf = pr.mid; pr.asked++; pr.extra = (pr.extra || 0) + 1; return; }
     pr.asked++; pr.log.push({ id: pr.ids[pr.mid], ok: !!ok });
     if (ok) { pr.right = Math.max(pr.right, pr.mid); pr.lo = pr.mid + 1; } else pr.hi = pr.mid - 1;
-    if (pr.lo > pr.hi || pr.asked >= PROBE_MAX) pr.done = true; else pr.mid = Math.floor((pr.lo + pr.hi) / 2);
+    if (pr.lo > pr.hi || pr.asked >= PROBE_MAX + (pr.extra || 0)) pr.done = true; else pr.mid = Math.floor((pr.lo + pr.hi) / 2);
   }
   function probeFinish(p, pr) {
     var T = C.track(p, pr.subj), out = { placed: [], start: null }, t = now();
@@ -436,13 +489,16 @@
 
   /* ---------- 9. A3 review entry points + A4 Bubble / Stand + A10 bonus + A8 Slugger ---------- */
   // Bubble Pop / Lemonade Stand: a kind or step is in band for this child (its own sub-level)
-  function bubbleSub(p, id) { var n = glLevels(id), f = floor(p, subjOfKind(id)); for (var s = 0; s < n; s++) if (gl(id, s) >= f) return s; return -1; }   // first in-band sub-level, -1 = none
+  function bubbleSub(p, id) { var n = glLevels(id), f = famFloor(p, id); for (var s = 0; s < n; s++) if (gl(id, s) >= f) return s; return -1; }   // first in-band sub-level, -1 = none
   // Slugger: the base-running / scoreboard question kinds this child can get (never below her math floor; pre-readers count dots)
   function sluggerKinds(p) {
-    var pre = A.Age.preReader(p), f = floor(p, 'math'), all = pre ? ['bb_runs', 'bb_onbase', 'bb_count'] : ['bb_where', 'bb_runs', 'bb_left', 'bb_towin', 'bb_tied', 'bb_totie'];
-    var ok = all.filter(function (k) { return gl(k, 0) >= f; }); return ok.length ? ok : pre ? all : ['bb_where', 'bb_towin', 'bb_totie'];
+    var pre = A.Age.preReader(p), fm = floor(p, 'math'), f = famFloor(p, 'bb_where'), all = pre ? ['bb_runs', 'bb_onbase', 'bb_count'] : ['bb_where', 'bb_runs', 'bb_left', 'bb_towin', 'bb_tied', 'bb_totie'];
+    // batch1: a child working a grade or more above them (floor 3.5+: 2nd-grade math) gets no base-running questions at all
+    // (they are 1st-grade math); the pitches carry her level
+    var ok = all.filter(function (k) { return gl(k, 0) >= f; }); if (!pre && fm >= 3.5) return [];
+    return ok.length ? ok : pre ? all : ['bb_where', 'bb_towin', 'bb_totie'];
   }
-  function bonusMinD(p) { if (A.Age.preReader(p)) return 1; var f = floor(p, 'other'); return f >= 3 ? 3 : f >= 2 ? 2 : 1; }
+  function bonusMinD(p) { if (A.Age.preReader(p)) return 1; var f = famFloor(p, 'bonus_d1'); return f >= 3 ? 3 : f >= 2 ? 2 : 1; }
 
   /* ---------- 10. old saves: one idempotent, additive migration (nothing is ever removed) ---------- */
   var baseEnsure = C.ensure;
@@ -468,8 +524,8 @@
     ['q1_tq_abc', 'Which word comes first in ABC order?'], ['q1_tq_thunder', 'Thunder is the sound made by...'], ['tw_east', 'east', 'topic answer word'],
     ['q1_howto', 'How to play', 'Title of the how-to card'],
     ['q1_howto_munch', 'Read the question at the top. Walk your friend to a right answer and munch it!', 'How-to card: Picnic Munch'],
-    ['q1_howto_bubble', 'Listen, or read the card at the top. Pop the bubbles that match!', 'How-to card: Bubble Pop'],
-    ['q1_howto_stand', 'Listen to the order, or read the ticket. Tap what they ask for, then tap the big button!', 'How-to card: Lemonade Stand'],
+    ['q1_howto_bubble', 'Listen, or look at the card. Pop the matching bubble. Get stars!', 'How-to card: Bubble Pop'],
+    ['q1_howto_stand', 'Read the recipe. Tap ingredients into the pitcher. Serve!', 'How-to card: Lemonade Stand'],
     ['q1_howto_tiny', 'Listen for what to find. Tap the picture. Every tap is OK!', 'How-to card: Tiny Picnic'],
     ['q1_howto_story', 'Walk the path with your friends. Play each stop to find the missing star-snacks!', 'How-to card: Story'],
     ['q1_pv_count', 'How many in all? Count the tens, then the ones.'], ['q1_pv_tensones1', 'What number has', '+ number + "tens and"'], ['q1_pv_tensones2', 'tens and', '+ number + "ones?"'], ['q1_pv_tensones3', 'ones?'],
@@ -496,10 +552,24 @@
   patchTopics();
   if (A.VoiceLines && A.VoiceLines.add) A.VoiceLines.add('quality1', 'Quality pass 1 (new questions and asks)', 'later', 'Read by the device voice until recorded (quality1). Calm, clear, like a teacher reading a question.', Q1_LINES);
 
-  A.Learn = { GL: GL, gl: gl, glTop: glTop, glAt: glAt, gradeTag: gradeTag, GRADE_NAME: GRADE_NAME, subjOfKind: subjOfKind, tag: function (id, v) { GL[id] = v; tagSkills(); },
+  /* batch1: answers feed the fit log; a child cruising (fit 'up') can master a skill in one strong day */
+  var baseRec = C.recordAnswer;
+  C.recordAnswer = function (p, id, ok, opt) { var sig = baseRec.apply(this, arguments); try { var s = C.byId[id]; if (s && !(opt && opt.hint) && !(opt && opt.review)) fitNote(p, C.subjectOf(s), ok); } catch (e) {} return sig; };
+  var baseReady = K.ready;
+  K.ready = function (p, sid) {
+    var r = baseReady(p, sid); if (r.ok || !p) return r; var s = C.byId[sid]; if (!s || s.topic || fitOf(p, C.subjectOf(s)) !== 'up') return r;
+    var R = K.rule(sid); if (R.perItemDays || (R.days && r.days < Math.min(R.days, 2))) return r;   // spacing stays: at least 2 separate days   // word skills: each word right on separate days stays the rule (spacing is how words stick)
+    var need = Math.max(10, Math.ceil((R.min || 12) * .5)), lg = (K.data(p).log[sid] || []).slice(-need);
+    var acc = lg.length ? lg.reduce(function (a, x) { return a + (x.c >= 1 ? 1 : 0); }, 0) / lg.length : 0;
+    // word and passage skills (a distinct-items rule) keep their days rule: reading words sticks with spaced days
+    if (lg.length >= need && acc >= .95 && !(R.distinct && (r.distinct < Math.ceil(R.distinct * .6) || (R.days && r.days < R.days)))) { r.ok = true; r.fast = true; r.why = []; }
+    return r;
+  };
+  A.Learn = { GL: GL, gl: gl, glTop: glTop, glAt: glAt, gradeTag: gradeTag, GRADE_NAME: GRADE_NAME, subjOfKind: subjOfKind, tag: function (id, v) { GL[id] = v; famCache = {}; tagSkills(); },
     ageFloor: ageFloor, baseFloor: baseFloor, ceil: ceil, topList: topList, shown: shown, floor: floor, otherFloor: otherFloor, kindOk: kindOk, bubbleSub: bubbleSub,
     conceptsLive: conceptsLive, mixBase: mixBase, reviewOk: reviewOk, softSlip: softSlip, realMisses: realMisses, fixRound: fixRound,
     pBand: pBand, picturizeCell: picturizeCell, picturizeAsk: picturizeAsk, eqPic: eqPic, numPic: numPic, dotsFor: dotsFor, pTopOpen: pTopOpen,
     storyPick: storyPick, usesProbe: usesProbe, probePlan: probePlan, probeNext: probeNext, probeAnswer: probeAnswer, probeFinish: probeFinish, placementApi: placementApi, PROBE_MAX: PROBE_MAX, pvPast: pvPast, pvWants: pvWants, PV: PV,
-    sluggerKinds: sluggerKinds, bonusMinD: bonusMinD, tagSkills: tagSkills };
+    sluggerKinds: sluggerKinds, bonusMinD: bonusMinD, tagSkills: tagSkills,
+    capOf: capOf, ownGrade: ownGrade, topicFloor: topicFloor, subjCap: subjCap, famIds: famIds, famFloor: famFloor, fitOf: fitOf, fitAcc: fitAcc, fitNote: fitNote, AGE_FLOOR: AGE_FLOOR, GRADE_BAND: GRADE_BAND };
 })(window.Arcade);

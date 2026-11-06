@@ -204,7 +204,14 @@
   function makeTarget(p, R) {
     var T = track(p), id = R.step, why = R.why;
     if (T.dropNext && why !== 'warmup') { T.dropNext = false; var L = LAD[bandOf(p)], ix = STEPS[id].ix; if (ix > 0 && inBand(p, L[ix - 1].id)) { id = L[ix - 1].id; why = 'easy'; } }   // never an easier kind below the floor
-    var s = STEPS[id], cx = ctxFor(p, s, R.friends), t = s.gen(cx); t.step = id; t.sub = cx.sub; t.why = why; t.got = 0; t.miss = 0; t.at = 0; return t;
+    var s = STEPS[id], cx = ctxFor(p, s, R.friends), t = s.gen(cx);
+    // batch1 (plan P2): no target repeats one of the last 3 in this round (regenerate up to 8 times); decoys never repeat a key
+    var rec = R.recent || (R.recent = []), tk = function (x) { return id + '|' + JSON.stringify(x.say || []) + '|' + (x.good || []).map(function (g) { return g.key; }).join(',') + '|' + (x.seq || []).map(function (g) { return g.key; }).join(','); };
+    for (var tr = 0; tr < 8 && rec.indexOf(tk(t)) >= 0; tr++) t = s.gen(cx);
+    for (var tr2 = 0; tr2 < 8 && rec.length && rec[rec.length - 1] === tk(t); tr2++) t = s.gen(cx);   // a kind with only 2-3 targets: at least never the same one twice in a row
+    rec.push(tk(t)); if (rec.length > 3) rec.shift();
+    if (t.bad && t.bad.length) { var seen = {}, gk = {}; (t.good || []).forEach(function (g) { gk[g.key] = 1; }); t.bad = t.bad.filter(function (c) { if (seen[c.key] || gk[c.key]) return false; seen[c.key] = 1; return true; }); }
+    t.step = id; t.sub = cx.sub; t.why = why; t.got = 0; t.miss = 0; t.at = 0; return t;
   }
   // which bubbles match: any (toddler free pops), a sequence (next one), or a good content key
   function matches(t, c) { if (t.any) return true; if (t.seq) return t.seq[t.got] && t.seq[t.got].key === c.key; return t.good.some(function (g) { return g.key === c.key; }); }
@@ -228,7 +235,7 @@
     if (t.why === 'review') { var q = s; q.revOk = (q.revOk || 0) + (first ? 1 : 0); q.revN = (q.revN || 0) + 1; if (q.revN >= 6) { if (q.revOk / q.revN >= .8) q.gap = Math.min((q.gap || 0) + 1, GAPS.length - 1); else q.gap = 0; q.due = now() + GAPS[q.gap] * DAY; q.revOk = q.revN = 0; ev.reviewed = true; } return ev; }
     if (t.why === 'easy' || T.learn.indexOf(t.step) < 0) return ev;
     var st = STEPS[t.step];
-    if (st.sub && (s.sub || 0) < st.sub && ((s.n >= 12 && acc(s) >= .8) || (s.n >= 50 && acc(s) >= .6 && Object.keys(s.days).length >= 4))) {   // next level: 12 pops at 80%, or a keep-going kid after 50 pops on 4 days
+    if (st.sub && (s.sub || 0) < st.sub && ((s.n >= 12 && acc(s) >= .8) || (s.n >= 50 && acc(s) >= .7 && Object.keys(s.days).length >= 4))) {   // next level: 12 pops at 80%, or a keep-going kid after 50 pops on 4 days (batch1: at 70%+, was 60%: a kid at 60% was sent up to harder words)
       subUp(s); ev.subUp = true; return ev; }
     var fm = fastMs(p); if (first && fm && r.ms != null && r.ms <= fm) s.fast++; else s.fast = 0;
     var top = !st.sub || (s.sub || 0) >= st.sub;
@@ -244,12 +251,16 @@
   }
   function endProbe(p, T) { var pr = T.probe, L = LAD[bandOf(p)]; if (pr.right >= 0) for (var i = pr.from; i <= pr.right; i++) { var q = sst(p, L[i].id); if (q.status !== 'mastered') { q.status = 'mastered'; q.placed = true; q.by = 'warmup'; q.due = now() + 3 * DAY; q.gap = 1; } } T.probe = null; fill(p, T, L); }
   /* end of round: 1-3 stars like one Munch round (1 for the round, +1 for 80%+ right first time, +1 for the golden bubble or a won storm) */
-  function roundStars(res) { var s = 1; if (res.pops && res.first / res.pops >= .8) s++; if (res.golden || res.stormWon) s++; return Math.min(3, s); }
+  // batch1 (plan P2: stars follow effort): 1 for the round, +1 at 70%+ right first time, +1 at 90%+ (was +1 for the golden bubble,
+  // so about 2 a round whatever she did). The golden bubble and the storm stay as fun, not as stars.
+  function roundStars(res) { var s = 1, f = res.pops ? res.first / res.pops : 0; if (f >= .7) s++; if (f >= .9) s++; return Math.min(3, s); }
+  // wrong pops cost a right bubble (it floats away) from age 5; never for toddlers or Gentle play
+  function escapeOk(p) { var a = A.Age && A.Age.of ? A.Age.of(p) : p && p.age; return bandOf(p) !== 'T' && a != null && a >= 5; }
   function finishRound(p, res) { var g = data(p); g.rounds++; if (res.golden) g.golden++; if (res.stormTried) g.storm.tries++; if (res.stormWon) g.storm.wins++; g.lastDay = today(); return roundStars(res); }
   function friends(p) { var met = (A.Friends && A.Friends.of ? A.Friends.of(p) : Object.keys((p.unlocks && p.unlocks.blobs) || {})); if (p.blob && met.indexOf(p.blob) < 0) met = [p.blob].concat(met); return met.length ? met : ['strawberry']; }
   function summary(p) { var b = bandOf(p), T = track(p); return { band: b, learn: T.learn.slice(), steps: LAD[b].map(function (s) { var q = sst(p, s.id); return { id: s.id, name: s.name, status: q.status, placed: !!q.placed, n: q.n, acc: q.n ? Math.round(100 * q.ok / q.n) : null }; }).filter(function (x) { return x.status !== 'locked'; }) }; }
   A.Bubble = { COLORS: COLORS, SHAPES: SHAPES, ANIMALS: ANIMALS, AN: AN, LETTERS: LETTERS, BEGIN: BEGIN, RHYMES: RHYMES, NUMW: NUMW, LAD: LAD, STEPS: STEPS, RULE: RULE, RULE_E: RULE_E,
     band: bandOf, toddler: toddler, stormOk: stormOk, fastMs: fastMs, data: data, state: sst, track: track, reached: reached, due: due, nextKind: nextKind, makeRound: makeRound, makeTarget: makeTarget,
-    matches: matches, record: record, inBand: inBand, clozeT: clozeT, ready: ready, roundStars: roundStars, finishRound: finishRound, friends: friends, summary: summary,
+    matches: matches, record: record, inBand: inBand, clozeT: clozeT, ready: ready, roundStars: roundStars, escapeOk: escapeOk, finishRound: finishRound, friends: friends, summary: summary,
     setClock: function (f) { NOWF = f; }, setRng: function (f) { RNG = f || Math.random; }, today: today };
 })(window.Arcade);

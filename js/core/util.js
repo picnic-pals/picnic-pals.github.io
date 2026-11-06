@@ -86,5 +86,15 @@
   // wrong tap on each board costs no heart; it shows a hint instead (a snack that is right glows). Misses still count for
   // stars and the coach. Was: 56% of age-5 rounds (35% at 6) ended in a Snack break; sim now ~20% at 5 / ~25-33% at 6 for an
   // 80% kid (_review/after9). Returns the free misses per board (0 or 1).
-  A.munchFreeMisses = function (p) { if (!p || A.gentleMunch(p)) return 0; var a = ageOf(p); return a == null || a <= 6 ? 1 : 0; };
+  // batch1 (owner decision: keep 3 hearts at 6+, an ~80% kid should lose about 10-20% of rounds): every age with hearts gets free tries,
+  // one per 4 snacks on the board (8-9 snacks = 2, 10 = 3), and only 1 while she is cruising in that subject (A.Learn fit 'up':
+  // over 88% first try lately). Plus A.MUNCH_REGEN: 3 right munches in a row give a lost heart back (never more than 3).
+  // Sim (_review/batch1/sims/munch-hearts-b1.md), 80% kid: age 5 7%, 6 L1 13%, 6 top 19%, 7 19%, 8 18% Snack breaks (was 20/33/45/73/80%).
+  A.MUNCH_REGEN = 3;
+  A.munchFreeMisses = function (p, snacks, subj) {
+    if (!p || A.gentleMunch(p)) return 0;
+    if (subj && A.Learn && A.Learn.fitOf && A.Learn.fitOf(p, subj) === 'up') return 1;
+    var n = snacks; if (n == null) { var c = A.Age && A.Age.cellsPerBoard ? A.Age.cellsPerBoard(p) : [8, 9]; n = (c[0] + c[1]) / 2; }
+    return Math.max(1, Math.round(n / 4));
+  };
 })();

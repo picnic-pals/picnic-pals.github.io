@@ -37,9 +37,14 @@
     return r;
   }
   $('#saveBtn').addEventListener('click', function () {
-    var id = cl && cl.state().id, r = keep();
-    if (r === 'saved') { var b = $('#saveBtn'); b.classList.remove('done'); void b.offsetWidth; b.classList.add('done'); setTimeout(function () { gallery(id); }, 900); }
-    else if (r === 'full') UI.toast && UI.toast('The gallery is full! A grown-up can make room.');
+    if (!cl) return;
+    var id = cl.state().id;
+    if (cl.empty()) { say('cl_title'); return; }
+    A.Audio.sfx('pop');
+    cl.celebrate().then(function (r) {
+      if (r === 'saved') { A.Store.markPlayed(P); A.Store.save(); var b = $('#saveBtn'); b.classList.remove('done'); void b.offsetWidth; b.classList.add('done'); setTimeout(function () { gallery(id); }, 500); }
+      else if (r === 'full') { say('cl_full'); UI.toast && UI.toast('The gallery is full! A grown-up can make room.'); }
+    });
   });
   $('#backBtn').addEventListener('click', function () { A.Audio.sfx('tap'); keep(true); cl = null; pages(); });
   /* ---------- gallery ---------- */

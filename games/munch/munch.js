@@ -109,7 +109,8 @@
     });
     A.shuffle(cells);
     G.cells = cells; if (!cont) { G.hearts = 3; G.t0 = Date.now(); } G.team = { done: false };
-    G.freeMax = TWO ? 0 : A.munchFreeMisses(P1); G.free = G.freeMax;   // after9: hint-before-heart, fresh on every board
+    var fsj = null; try { fsj = A.Curriculum.subjectOf(PL[0].round.skill); } catch (e) { fsj = null; }
+    G.freeMax = TWO ? 0 : A.munchFreeMisses(P1, PL[0].nOk, fsj); G.free = G.freeMax; G.run = 0;   // after9 hint-before-heart; batch1: 1 per 4 snacks, fresh on every board
     PL[0].pos = TWO ? { r: ROWS - 1, c: COLS - 1 } : { r: 0, c: 0 };   // P1 (arrow keys, right hand) starts on the right
     if (TWO) PL[1].pos = { r: 0, c: 0 };                                 // P2 (WASD, left hand) starts on the left
     B.cell = -1; B.shown = false; B.used = false;
@@ -202,11 +203,11 @@
     if (!anim) { void board.offsetWidth; els.forEach(function (e) { e.style.transition = ''; }); }
   }
   function anim(pl, cls, ms) { A.Blobs.anim(pl.el, cls, ms); }
-  function renderHearts(lost) {
+  function renderHearts(lost, gained) {
     var h = $('#hearts'); h.className = 'hearts'; h.innerHTML = '';
     if (GENTLE && !TWO) { h.classList.add('gentle'); h.setAttribute('aria-hidden', 'true'); return; }   // gentle: no hearts to lose
-    for (var i = 0; i < 3; i++) { var s = document.createElement('span'); s.innerHTML = HEART; var sv = s.firstChild; if (i >= G.hearts) sv.classList.add('gone'); if (lost && i === G.hearts) sv.classList.add('pop'); h.appendChild(sv); }
-    if (G.freeMax && !TWO) { var fb = document.createElement('i'); fb.className = 'freetry' + (G.free > 0 ? '' : ' used'); fb.textContent = '💡'; fb.title = 'Free try: the first oops on a board gives a hint and keeps your hearts'; h.appendChild(fb); }
+    for (var i = 0; i < 3; i++) { var s = document.createElement('span'); s.innerHTML = HEART; var sv = s.firstChild; if (i >= G.hearts) sv.classList.add('gone'); if (lost && i === G.hearts) sv.classList.add('pop'); if (gained && i === G.hearts - 1) sv.classList.add('gainone'); h.appendChild(sv); }
+    if (G.freeMax && !TWO) for (var f = 0; f < G.freeMax; f++) { var fb = document.createElement('i'); fb.className = 'freetry' + (f < G.free ? '' : ' used'); fb.textContent = '💡'; fb.title = 'Free tries: an oops gives a hint and keeps your hearts'; h.appendChild(fb); }
   }
   // after9 hint-before-heart: the first oops on a board keeps the hearts and makes a right snack near the player glow
   function freeHint(pl) {
@@ -261,6 +262,8 @@
     anim(pl, 'chomp', 460); SFX.chomp();
     if (cell.ok) {
       cell.eaten = true; pl.correct++; pl.remaining--; var sig = C.recordAnswer(P, sid, true, ansOpt(pl, cell)); A.Pad.rumble(pl.i, 'light');
+      // batch1: 3 right munches in a row give a lost heart back (max 3)
+      if (!TWO && !GENTLE) { G.run = (G.run || 0) + 1; if (G.run >= (A.MUNCH_REGEN || 3)) { G.run = 0; if (G.hearts < 3) { G.hearts++; renderHearts(false, true); } } }
       setTimeout(function () { el.classList.add('eaten'); }, 160);
       setTimeout(function () { anim(pl, 'happy', 1000); }, 200); SFX.yay();
       var rc = el.getBoundingClientRect(); UI.sparkle(rc.left + rc.width / 2, rc.top + rc.height / 2); UI.plusText(rc.left + rc.width / 2, rc.top + rc.height * .3, '+1');
@@ -277,6 +280,7 @@
       if (PL.every(function (p) { return p.done; })) { endRound('done'); } else maybeBonus();
     } else {
       var wsig = null;
+      G.run = 0;
       if (!cell.tried) { cell.tried = true; pl.wrong++; wsig = C.recordAnswer(P, sid, false, ansOpt(pl, cell)); if (!TWO) { if (!GENTLE) { if (G.free > 0) { G.free--; renderHearts(); freeHint(pl); } else { G.hearts--; renderHearts(true); } } pl.lastMiss = cell; if (pl.wrong === 1 || pl.rule.stepHint) renderRule(); } diagnoseMiss(pl, cell); }
       el.classList.add('tried'); el.classList.remove('nope'); void el.offsetWidth; el.classList.add('nope');
       setTimeout(function () { pl.el.classList.remove('chomp'); anim(pl, 'wobble', 800); }, 140); SFX.oops();
@@ -361,7 +365,7 @@
   function coachAfter(pl, sig, cell) {
     if (!sig || TWO || !G.active) return;
     var P = pl.P, sid = pl.round.skill.id;
-    if (sig.streak) celebrateStreak(sig.streak);
+    // batch1 (plan P1): no "N in a row" celebrations (a run you can lose is pressure); hearts come back after 3 right instead
     if (sig.easeOff) easeOff(pl);
     if (sig.worked) { workedExample(pl); return; }
     if (sig.speedy) { UI.rain(50); SFX.yay(); talk(['st_speedy']); }
@@ -609,7 +613,7 @@
     foldBoards(pl);
     C.finishRound(P, pl.round, { correct: pl.correct, wrong: pl.wrong, ms: ms, gaveUp: true, boards: (pl.round && pl.round.board) || 1 });
     A.Store.addTime(P, 'munch', ms); A.Store.markPlayed(P); P.games.munch.streak = 0; A.Store.save();
-    UI.card({ title: 'Snack break!', art: '<div>' + A.Blobs.forProfile(P, { expr: 'sad' }) + '</div>', sub: "That's okay! Let's try again!", btn: 'Try again ▶', sfx: 'soft', voice: ['munch_snack'], cls: 'tryagain', minMs: 700 })
+    UI.card({ title: 'Snack break!', art: '<div>' + A.Blobs.forProfile(P, { expr: 'idle' }) + '</div>', sub: "That's okay! Let's try again!", btn: 'Try again ▶', sfx: 'soft', voice: ['munch_snack'], cls: 'tryagain', minMs: 700 })
       .then(ptGate).then(retryRound);
   }
   // "Try again": the same round again, straight away (no level card)
@@ -718,7 +722,7 @@
         })();
       })();
       function close(e) {
-        if (done || (e && e.repeat) || (e !== 'auto' && !csLock.ready())) { if (!done && e !== 'auto') csLock.dropped++; return; } done = true;
+        if (done || (e && e !== 'auto' && e.repeat === true) || (e !== 'auto' && !csLock.ready())) { if (!done && e !== 'auto') csLock.dropped++; return; } done = true;
         timers.forEach(clearTimeout); document.removeEventListener('keydown', onKey, true);
         ov.classList.add('bye'); setTimeout(function () { ov.remove(); UI.cardOpen = !!document.querySelector('.overlay.on'); resolve(); }, 220);
       }
@@ -824,7 +828,7 @@
     if (out.won && (out.firstWin || rewards.some(function (r) { return r.kind === 'blob' && r.id === c.blob; }))) chain = unlockScene(c);
     else chain = UI.card({ cls: 'celebrate storyres' + (out.won ? '' : ' tryagain'), tag: '⭐ Challenge · ' + c.a.name,
       title: out.won ? 'Challenge won!' : !fin ? (gaveUp ? 'Snack break!' : "Time's up!") : 'So close!',
-      art: '<div class="' + (out.won ? 'dance' : '') + '">' + A.Blobs.forProfile(P, { expr: out.won ? 'happy' : 'sad' }) + '</div>',
+      art: '<div class="' + (out.won ? 'dance' : '') + '">' + A.Blobs.forProfile(P, { expr: out.won ? 'happy' : 'idle' }) + '</div>',
       html: '<p class="chgoal">' + (fin ? 'Your time: <b>' + secs + 's</b> (goal ' + cc.target + 's)' : 'You munched <b>' + pl.correct + '</b> of ' + pl.nOk) + (fin && pl.wrong > cc.maxWrong ? '<br>Oops: ' + pl.wrong + ' (1 is OK)' : '') + (out.newBest ? '<br>🏅 New best time!' : '') + '</p>',
       sub: out.won ? '' : (A.Rewards.unlocked(P, 'blob', c.blob) ? 'Try again for a faster time!' : 'Good try! You can race again any time.'),
       btn: 'Map ▶', sfx: out.won ? 'win' : 'soft', confetti: out.won, voice: out.won ? (out.wins > 1 ? ['ch_won_again'] : ['fb_great_job']) : fin && pl.wrong > cc.maxWrong ? ['ch_fail_acc'] : ['fb_so_close', 'fb_try_again'], minMs: 800 });   // design1: not ch_fail_time (its clip says "…to meet your new friend")
@@ -877,7 +881,7 @@
     var title = soft ? 'Nice try!' : fin ? 'Stop cleared!' : out.passed ? 'You made it!' : gaveUp ? 'Snack break!' : "Time's up!";
     var voice = soft ? [{ id: 'munch_nice_try_stop', text: "Nice try! Let's play this stop again." }] : fin ? ['fb_hooray', 'fb_you_got', stars, stars === 1 ? 'fb_star' : 'fb_stars'] : out.passed ? ['munch_times_up', 'story_next'] : ['story_try_again'];
     if (out.newBestRun || out.newBestStop) voice.push('story_new_best'); else if (out.passed && pts.total >= 900) voice.push('story_great_score');
-    var card = UI.card({ tag: stop.area.emoji + (stop.side ? ' ' + C.byId[SR.cfg.skill].name : ' Stop ' + stop.n) + ' · ' + stop.area.name, title: title, html: html, art: '<div class="' + (out.passed ? 'dance' : '') + '">' + A.Blobs.forProfile(P, { expr: out.passed || soft ? 'happy' : 'sad' }) + '</div>',
+    var card = UI.card({ tag: stop.area.emoji + (stop.side ? ' ' + C.byId[SR.cfg.skill].name : ' Stop ' + stop.n) + ' · ' + stop.area.name, title: title, html: html, art: '<div class="' + (out.passed ? 'dance' : '') + '">' + A.Blobs.forProfile(P, { expr: out.passed || soft ? 'happy' : 'idle' }) + '</div>',
       btn: out.passed ? 'Map ▶' : 'Try again ▶', sfx: out.passed ? 'win' : 'soft', confetti: out.passed, voice: voice, cls: 'celebrate storyres' + (out.passed ? '' : ' tryagain'), minMs: 900 });
     countUp(document.querySelector('.overlay.storyres'));
     card.then(function () { return A.Rewards.celebrate(P, rewards); }).then(function () {
@@ -1008,7 +1012,7 @@
       .then(nextRound);
   }
 
-  window.__munch = { gentleStars: gentleStars, withBonus: withBonus, timerFor: timerFor, G: G, PL: PL, T: T, B: B, openBonus: openBonus, gentle: GENTLE, retryRound: retryRound, P: function () { return P1; }, two: TWO, mode: MODE, munch: munch, moveBy: function (a, b, c) { if (c === undefined) return moveBy(0, a, b); return moveBy(a, b, c); },
+  window.__munch = { cutscene: cutscene, gentleStars: gentleStars, withBonus: withBonus, timerFor: timerFor, G: G, PL: PL, T: T, B: B, openBonus: openBonus, gentle: GENTLE, retryRound: retryRound, P: function () { return P1; }, two: TWO, mode: MODE, munch: munch, moveBy: function (a, b, c) { if (c === undefined) return moveBy(0, a, b); return moveBy(a, b, c); },
     onCellTap: onCellTap, nextRound: nextRound, unlockScene: unlockScene, story: STORY, SR: function () { return SR; }, cutscene: cutscene, endRound: endRound, showStar: showStar, fitCells: fitCells, workedExample: workedExample, coachAfter: coachAfter, celebrateStreak: celebrateStreak, renderBoard: renderBoard, setTimeLeft: function (s) { T.left = s; renderTimer(); }, COLS: COLS,
     goTo: function (i, cell) { if (cell === undefined) { cell = i; i = 0; } var pl = PL[i]; pl.target = null; clearTimeout(pl.walkT); pl.walkT = null; pl.pos = { r: Math.floor(cell / COLS), c: cell % COLS }; place(true); checkStar(pl); } };
 })(window.Arcade);

@@ -76,10 +76,11 @@ A sentence plays in your voice once every piece of it is recorded. Until then it
 | Bubble Pop | Later | 87 |
 | Story mode v2 | Later | 33 |
 | Fun breaks and coloring | Later | 161 |
+| Batch 1: 2nd-grade math and Stand orders | Later | 13 |
 | Quality pass 1 (new questions and asks) | Later | 31 |
 | **Record first, total** | | **1121** |
-| Later (optional, upcoming games), total | | 2248 |
-| **Everything** | | **3369** |
+| Later (optional, upcoming games), total | | 2261 |
+| **Everything** | | **3382** |
 
 ## Arcade home & menus — record first (20)
 
@@ -3654,43 +3655,63 @@ Read by the device voice until recorded (p4). Giggly, playful, never a test: no 
 | 3337 | `br_k10_3.m4a` | Boing! The ball bounces on Bloop's head! | Skit "The Bouncy Ball" beat 3 |
 | 3338 | `br_k10_4.m4a` | Bloop is the ball now! Bounce, bounce! | Skit "The Bouncy Ball" beat 4 |
 
+## Batch 1: 2nd-grade math and Stand orders — later (13)
+
+Read by the device voice until recorded (batch1). Calm and clear, like a teacher reading a question. Numbers are spoken separately.
+
+| # | File name | Say this | Note |
+|---:|---|---|---|
+| 3339 | `b1_pv_hto1.m4a` | What number has | + number + "hundreds," + number + "tens and" + number + "ones?" |
+| 3340 | `b1_pv_hundreds.m4a` | hundreds, | between two numbers: "3" + "hundreds," + "4" |
+| 3341 | `b1_pv_in.m4a` | In | + number + ", what is the" + digit + "worth?" e.g. "In 345, what is the 4 worth?" |
+| 3342 | `b1_pv_worth1.m4a` | , what is the | after the number (starts with a comma: a short pause) |
+| 3343 | `b1_pv_worth2.m4a` | worth? | end of "In 345, what is the 4 worth?" |
+| 3344 | `b1_pv_makes_what.m4a` | makes what number? | after "300 plus 40 plus 5" |
+| 3345 | `b1_skip5.m4a` | Count by fives. What comes next? |  |
+| 3346 | `b1_skip10.m4a` | Count by tens. What comes next? |  |
+| 3347 | `b1_skip100.m4a` | Count by hundreds. What comes next? |  |
+| 3348 | `b1_ls_please_q.m4a` | , please? | Stand order ending: "Can I have" + 9 + "bananas" + ", please?" (starts with a comma: a short pause) |
+| 3349 | `b1_ls_cup_has.m4a` | My cup has | Stand count-on order: + number + "already." |
+| 3350 | `b1_ls_already.m4a` | already. | end of "My cup has 6 already." |
+| 3351 | `b1_ls_how_many_more.m4a` | How many more do they need? | Stand count-on help line |
+
 ## Quality pass 1 (new questions and asks) — later (31)
 
 Read by the device voice until recorded (quality1). Calm, clear, like a teacher reading a question.
 
 | # | File name | Say this | Note |
 |---:|---|---|---|
-| 3339 | `q1_bp_tens1.m4a` | Pop the number with | Bubble Pop tens and ones: + number, then "tens and" |
-| 3340 | `q1_bp_tens2.m4a` | tens and | + number, then "ones." |
-| 3341 | `q1_bp_tens3.m4a` | ones. |  |
-| 3342 | `q1_bp_more10.m4a` | Pop the number that is 10 more than | + number |
-| 3343 | `q1_bp_less10.m4a` | Pop the number that is 10 less than | + number |
-| 3344 | `q1_bp_cloze.m4a` | Pop the word that fits. | Followed by the sentence |
-| 3345 | `q1_ls_costs.m4a` | It costs | + number + "dollars" |
-| 3346 | `q1_ls_paid.m4a` | They paid | + number + "dollars" |
-| 3347 | `q1_ls_change.m4a` | How much change do they get back? |  |
-| 3348 | `q1_tq_abc.m4a` | Which word comes first in ABC order? |  |
-| 3349 | `q1_tq_thunder.m4a` | Thunder is the sound made by... |  |
-| 3350 | `tw_east.m4a` | east | topic answer word |
-| 3351 | `q1_howto.m4a` | How to play | Title of the how-to card |
-| 3352 | `q1_howto_munch.m4a` | Read the question at the top. Walk your friend to a right answer and munch it! | How-to card: Picnic Munch |
-| 3353 | `q1_howto_bubble.m4a` | Listen, or read the card at the top. Pop the bubbles that match! | How-to card: Bubble Pop |
-| 3354 | `q1_howto_stand.m4a` | Listen to the order, or read the ticket. Tap what they ask for, then tap the big button! | How-to card: Lemonade Stand |
-| 3355 | `q1_howto_tiny.m4a` | Listen for what to find. Tap the picture. Every tap is OK! | How-to card: Tiny Picnic |
-| 3356 | `q1_howto_story.m4a` | Walk the path with your friends. Play each stop to find the missing star-snacks! | How-to card: Story |
-| 3357 | `q1_pv_count.m4a` | How many in all? Count the tens, then the ones. |  |
-| 3358 | `q1_pv_tensones1.m4a` | What number has | + number + "tens and" |
-| 3359 | `q1_pv_tensones2.m4a` | tens and | + number + "ones?" |
-| 3360 | `q1_pv_tensones3.m4a` | ones? |  |
-| 3361 | `q1_pv_greater.m4a` | Which number is greater? |  |
-| 3362 | `q1_pv_sign.m4a` | Which sign goes between | + number + "and" + number |
-| 3363 | `q1_pv_and.m4a` | and |  |
-| 3364 | `q1_pv_gt.m4a` | is greater than | between two numbers |
-| 3365 | `q1_pv_lt.m4a` | is less than | between two numbers |
-| 3366 | `q1_pv_eq.m4a` | is equal to | between two numbers |
-| 3367 | `q1_pv_10more.m4a` | What is 10 more than | + number |
-| 3368 | `q1_pv_10less.m4a` | What is 10 less than | + number |
-| 3369 | `q1_pv_check.m4a` | Quick check! Tens and ones. | Place-value test-out card for players already past it |
+| 3352 | `q1_bp_tens1.m4a` | Pop the number with | Bubble Pop tens and ones: + number, then "tens and" |
+| 3353 | `q1_bp_tens2.m4a` | tens and | + number, then "ones." |
+| 3354 | `q1_bp_tens3.m4a` | ones. |  |
+| 3355 | `q1_bp_more10.m4a` | Pop the number that is 10 more than | + number |
+| 3356 | `q1_bp_less10.m4a` | Pop the number that is 10 less than | + number |
+| 3357 | `q1_bp_cloze.m4a` | Pop the word that fits. | Followed by the sentence |
+| 3358 | `q1_ls_costs.m4a` | It costs | + number + "dollars" |
+| 3359 | `q1_ls_paid.m4a` | They paid | + number + "dollars" |
+| 3360 | `q1_ls_change.m4a` | How much change do they get back? |  |
+| 3361 | `q1_tq_abc.m4a` | Which word comes first in ABC order? |  |
+| 3362 | `q1_tq_thunder.m4a` | Thunder is the sound made by... |  |
+| 3363 | `tw_east.m4a` | east | topic answer word |
+| 3364 | `q1_howto.m4a` | How to play | Title of the how-to card |
+| 3365 | `q1_howto_munch.m4a` | Read the question at the top. Walk your friend to a right answer and munch it! | How-to card: Picnic Munch |
+| 3366 | `q1_howto_bubble.m4a` | Listen, or read the card at the top. Pop the bubbles that match! | How-to card: Bubble Pop |
+| 3367 | `q1_howto_stand.m4a` | Listen to the order, or read the ticket. Tap what they ask for, then tap the big button! | How-to card: Lemonade Stand |
+| 3368 | `q1_howto_tiny.m4a` | Listen for what to find. Tap the picture. Every tap is OK! | How-to card: Tiny Picnic |
+| 3369 | `q1_howto_story.m4a` | Walk the path with your friends. Play each stop to find the missing star-snacks! | How-to card: Story |
+| 3370 | `q1_pv_count.m4a` | How many in all? Count the tens, then the ones. |  |
+| 3371 | `q1_pv_tensones1.m4a` | What number has | + number + "tens and" |
+| 3372 | `q1_pv_tensones2.m4a` | tens and | + number + "ones?" |
+| 3373 | `q1_pv_tensones3.m4a` | ones? |  |
+| 3374 | `q1_pv_greater.m4a` | Which number is greater? |  |
+| 3375 | `q1_pv_sign.m4a` | Which sign goes between | + number + "and" + number |
+| 3376 | `q1_pv_and.m4a` | and |  |
+| 3377 | `q1_pv_gt.m4a` | is greater than | between two numbers |
+| 3378 | `q1_pv_lt.m4a` | is less than | between two numbers |
+| 3379 | `q1_pv_eq.m4a` | is equal to | between two numbers |
+| 3380 | `q1_pv_10more.m4a` | What is 10 more than | + number |
+| 3381 | `q1_pv_10less.m4a` | What is 10 less than | + number |
+| 3382 | `q1_pv_check.m4a` | Quick check! Tens and ones. | Place-value test-out card for players already past it |
 
 ---
 *Generated from `js/core/voice-lines.js` by `tools/build-recording-script.js`. File names can end in .m4a, .mp3, .wav or .webm.*
