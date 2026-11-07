@@ -85,21 +85,21 @@
   /* ----- Action words vs naming words ----- L1: action words with pictures; L2: words only, action OR naming words */
   var VB = Object.keys(G.VERBS), NN = Object.keys(G.NOUNS);
   SK.push({ id: 'nounverb', name: 'Action words', short: 'Find the action word (verbs vs nouns)', strand: 'Grammar', std: '1.L.1b / 1.L.1e', grade: '1', subject: 'reading', sayFact: true, secs: [11, 12],
-    levels: ['Action words (with pictures)', 'Action words or naming words'],
+    levels: ['Action words (with pictures)', 'Action words or words for people, animals and things'],
     intro: { line: 'skill_nounverb', example: picWord(G.VERBS.jump, 'jump') + ' ' + picWord(G.VERBS.swim, 'swim') + ' ' + picWord(G.VERBS.eat, 'eat') },
     gen: function (L) {
       var T = L && Math.random() < .4 ? 'noun' : 'verb';
       var vs = L ? VB.concat(G.VERBS2) : VB, ns = L ? NN.concat(G.NOUNS2) : NN;
       function mk(w, kind) { var l = wl(w), emoj = kind === 'verb' ? G.VERBS[w] : G.NOUNS[w];
         return { label: w, html: !L && emoj ? picWord(emoj, w) : wordHtml(w), fact: [l, kind === 'verb' ? 'w_is_action' : 'w_is_naming'], name: [l], k: kind }; }
-      return { text: 'Munch the ' + em(T === 'verb' ? 'action words' : 'naming words'), hint: T === 'verb' ? 'Can you do it? Then munch it!' : 'Is it a thing, an animal or a person?', say: [T === 'verb' ? 'rule_verbs' : 'rule_nouns'], target: T,
+      return { text: 'Munch the ' + em(T === 'verb' ? 'action words' : 'words for people, animals or things'), hint: T === 'verb' ? 'Can you do it? Then munch it!' : 'Is it a thing, an animal or a person?', say: T === 'verb' ? ['rule_verbs'] : [{ text: 'Munch the words for people, animals or things.' }], target: T,
         good: function () { return T === 'verb' ? mk(pick(vs), 'verb') : mk(pick(ns), 'noun'); }, bad: function () { return T === 'verb' ? mk(pick(ns), 'noun') : mk(pick(vs), 'verb'); } };
     } });
   SK[4].ask = function (L, n) {   // one right answer: the good kind once, the other kind for the rest
     var r = SK[4].gen(L), good = r.good(), cells = [good], seen = {}; seen[good.label] = 1;
     for (var g = 0; cells.length < n && g < 200; g++) { var b = r.bad(); if (!seen[b.label]) { seen[b.label] = 1; cells.push(b); } }
     var arr = A.shuffle(cells.slice());
-    return { text: 'Which one is ' + (r.target === 'verb' ? 'an ' + em('action word') : 'a ' + em('naming word')) + '?', say: [r.target === 'verb' ? 'q_verb' : 'q_noun'], fact: good.fact, answer: arr.indexOf(good), target: r.target,
+    return { text: r.target === 'verb' ? 'Which one is an ' + em('action word') + '?' : 'Which word names a ' + em('person, animal or thing') + '?', say: r.target === 'verb' ? ['q_verb'] : [{ text: 'Which word names a person, animal or thing?' }], fact: good.fact, answer: arr.indexOf(good), target: r.target,
       choices: arr.map(function (c) { return { label: c.label, html: c.html, say: c.name, k: c.k }; }) };
   };
 

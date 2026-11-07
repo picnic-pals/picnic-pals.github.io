@@ -82,3 +82,66 @@
 
 /* replay: a beaten level shows a small play-again badge (tap to replay; no repeat prizes) */
 .s2-lv .rp { position: absolute; top: -10px; right: -10px; width: 34px; height: 34px; border-radius: 50%; background: #ff8fb3; color: #fff; border: 3px solid #fff; font-size: 20px; font-weight: 700; line-height: 28px; text-align: center; box-shadow: 0 2px 0 rgba(0,0,0,.15); }
+
+/* Approved illustrated worlds. Pan a proportional canvas on small screens; never crop the marker coordinates. */
+.s2-art-stage { overflow: auto; overscroll-behavior: contain; background: #fff4df !important; touch-action: pan-x pan-y; }
+.s2-art-board { position: relative; width: max(100%, 900px); aspect-ratio: 8 / 5; min-height: 562.5px; }
+.s2-map-paint { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.s2 .s2-art-lv, .s2.s2-tod .s2-art-lv { width: 52px; height: 52px; border-width: 3px; --hw: 0px; animation: none; background: #fff6df; box-shadow: 0 3px 0 #806351; }
+.s2 .s2-art-lv .n, .s2.s2-tod .s2-art-lv .n { font-size: 25px; }
+.s2 .s2-art-lv.boss, .s2.s2-tod .s2-art-lv.boss { width: 68px; height: 68px; background: #fff1cb; }
+.s2-art-lv.off { border-style: dashed; opacity: .92; }
+.s2-art-lv.pass { background: #d5efc9; }
+.s2-art-lv.cur { border-color: #b24e70; }
+.s2-marker-boss { width: 100%; height: 100%; object-fit: contain; }
+.s2-stop-label { position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%); width: 130px; padding: 4px 5px; font-size: 13px; line-height: 1.15; font-weight: 700; border-radius: 10px; background: #fff9ed; color: #49374c; box-shadow: 0 2px 0 #ba9e85; pointer-events: none; }
+.s2-drawn-stars { display: flex; justify-content: center; height: 13px; margin-top: 3px; }
+.s2-drawn-stars svg { width: 13px; height: 13px; fill: #b77b20; }
+.s2-art-hero { position: absolute; width: 52px; height: 52px; object-fit: contain; transform: translate(-110%, -125%); pointer-events: none; }
+.s2-back, .s2-book { font: inherit; font-size: 14px; font-weight: 700; }
+.s2-story { z-index: 120; padding: 12px; background: rgba(52,37,58,.62); overflow-y: auto; }
+.s2-story-card { width: min(900px, 100%); margin: auto; padding: 16px; border: 4px solid #fff; border-radius: 25px; background: #fff7e8; text-align: center; color: #3b2d55; box-shadow: 0 8px 0 #48344644; }
+.s2-story-card h2 { margin: 0 0 10px; font-size: clamp(22px, 4vw, 32px); }
+.s2-story-card p { font-size: clamp(17px, 2.5vw, 23px); line-height: 1.35; margin: 12px auto; max-width: 650px; }
+.s2-scene { position: relative; width: 100%; aspect-ratio: 8/5; border-radius: 16px; overflow: hidden; }
+.s2-scene > img:first-child { width: 100%; height: 100%; display: block; }
+.s2-scene .s2-freed { position: absolute; object-fit: contain; object-position: center bottom; }
+.s2-portrait { width: min(300px, 50vw); max-height: 40vh; object-fit: contain; }
+.s2-story-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.s2-story-actions button { min-height: 48px; cursor: pointer; }
+.s2-read { border: 2px solid #b8998c; background: #fff; color: #49374c; border-radius: 18px; padding: 8px 14px; font: inherit; }
+.s2-unlock .kh, .s2-unlock .ph { display: none; }
+.s2-unlock .card { max-height: 95dvh; overflow-y: auto; }
+.s2-fight-banner { display: flex; justify-content: center; gap: 10px; align-items: center; min-height: 44px; background: #fff0ce; color: #49374c; border-radius: 15px; }
+.s2-fight-banner img { width: 48px; height: 48px; object-fit: contain; }
+.s2-fighting .timer .clock { display: none; }
+@media (max-height: 650px) { .s2-story-card { max-width: 740px; padding: 10px; } .s2-scene { max-height: 47vh; width: auto; margin: auto; } .s2-story-card p { margin: 7px auto; font-size: 16px; } }
+@media (prefers-reduced-motion: reduce) { .s2-art-hero, .s2-unlock * { animation-duration: .01ms !important; } }
+
+/* Same basket sequence as the hub, scoped here because game pages do not load hub.css. */
+.s2-unlock .card .art { margin: 0 auto; height: auto; }
+.s2-unlock .fbasket { position: relative; width: min(170px, 26vh); aspect-ratio: 1; margin: -6px auto 0; }
+.s2-unlock .fbasket span { position: absolute; inset: 0; opacity: 0; } .s2-unlock .fbasket img { width: 100%; height: 100%; display: block; }
+.s2-unlock .fbasket .fb1 { animation: fbShow 0s 0s forwards, fbHide 0s .95s forwards; } .s2-unlock .fbasket .fb1 img { animation: fbShake .3s ease-in-out 3; transform-origin: 50% 90%; }
+.s2-unlock .fbasket .fb2 { animation: fbShow 0s .95s forwards, fbHide 0s 1.25s forwards; }
+.s2-unlock .fbasket .fb3 { animation: fbShow 0s 1.25s forwards, fbHide 0s 1.55s forwards; }
+.s2-unlock .fbasket .fb4 { animation: fbShow 0s 1.55s forwards; } .s2-unlock .fbasket .fb4 img { animation: fbPop .5s 1.55s cubic-bezier(.3, 1.5, .5, 1) both; transform-origin: 50% 85%; }
+.s2-unlock .card .fbname { margin: 0 0 12px; font-size: 26px; line-height: 1.1; font-weight: 700; color: var(--ink, #4a3b6b); opacity: 0; animation: fbShow .3s 1.8s forwards; }
+@keyframes fbShow { to { opacity: 1; } } @keyframes fbHide { to { opacity: 0; } }
+@keyframes fbShake { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
+@keyframes fbPop { 0% { transform: translateY(14%) scale(.9); } 100% { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .s2-unlock .fbasket span, .s2-unlock .fbasket img, .s2-unlock .fbname { animation: none !important; } .s2-unlock .fbasket .fb4, .s2-unlock .fbname { opacity: 1; } }
+.s2-unlock .card .art { display: block; width: min(260px, 60vw); height: auto; }
+.s2-unlock .card .art .fbasket { width: min(220px, 32vh); height: auto; }
+.s2-story { background: #eadccd; }
+.s2-art-board { width: max(100%, var(--s2-map-width, 900px)); }
+.s2-pan-note { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); border-radius: 12px; padding: 6px 12px; background: #fff9ed; font-size: 13px; pointer-events: none; }
+@media (min-width: 901px) { .s2-pan-note { display: none; } }
+
+/* Illustrated overview, with anonymous CSS fog for places not reached yet. */
+.s2-world-thumb { width: 84px; height: 52px; object-fit: cover; border-radius: 14px; }
+.s2-world-initial { display: grid; place-items: center; width: 54px; height: 54px; background: #fff7de; border-radius: 50%; font-size: 30px; }
+.s2-world-star svg { width: 13px; height: 13px; fill: #a66e24; }
+.s2-cloud { width: 95px; height: 42px; background: #fff; border-radius: 55%; position: relative; }
+.s2-cloud::before, .s2-cloud::after { content: ''; position: absolute; bottom: 10px; width: 45px; height: 45px; background: #fff; border-radius: 50%; left: 12px; }
+.s2-cloud::after { left: 42px; width: 38px; height: 38px; }

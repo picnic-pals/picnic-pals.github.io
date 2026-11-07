@@ -145,6 +145,7 @@
       $('#ruleTxt').innerHTML = pl.rule.text + (pl.rule.stepHint && pl.wrong > 0 ? '<span class="hint st">' + pl.rule.stepHint(pl.lastMiss, pl.wrong >= 2 ? 2 : 1) + '</span>' : pl.rule.hint && pl.wrong > 0 ? '<span class="hint">' + pl.rule.hint + '</span>' : '');   // v2p2a: a step shows a picture hint (ten-frame / number line) after a miss, to the answer after 2
       var chip = $('#levelChip'), s = pl.round.skill;
       chip.textContent = pl.round.story ? pl.round.stop.area.emoji + ' Stop ' + pl.round.stop.n + ' · ' + pl.round.stop.area.name : pl.round.review ? 'Review: ' + s.name : pl.round.testOut ? 'Test-out: ' + s.name + ' · 5 to skip ahead' : s.name + (s.isStep ? '' : ' · Level ' + (pl.round.level + 1)) + (pl.round.boards > 1 ? ' · Board ' + pl.round.board + ' of ' + pl.round.boards : '');
+      if (pl.round.story && SR && SR.cfg && SR.cfg.boss && A.Story2.PLACES[A.Story2.placeOfStop(SR.i)].art) chip.textContent = 'Mini boss: ' + SR.cfg.bossName;
       chip.classList.toggle('review', !!pl.round.review);
       return;
     }
@@ -207,14 +208,14 @@
     var h = $('#hearts'); h.className = 'hearts'; h.innerHTML = '';
     if (GENTLE && !TWO) { h.classList.add('gentle'); h.setAttribute('aria-hidden', 'true'); return; }   // gentle: no hearts to lose
     for (var i = 0; i < 3; i++) { var s = document.createElement('span'); s.innerHTML = HEART; var sv = s.firstChild; if (i >= G.hearts) sv.classList.add('gone'); if (lost && i === G.hearts) sv.classList.add('pop'); if (gained && i === G.hearts - 1) sv.classList.add('gainone'); h.appendChild(sv); }
-    if (G.freeMax && !TWO) for (var f = 0; f < G.freeMax; f++) { var fb = document.createElement('i'); fb.className = 'freetry' + (f < G.free ? '' : ' used'); fb.textContent = '💡'; fb.title = 'Free tries: an oops gives a hint and keeps your hearts'; h.appendChild(fb); }
+    if (G.freeMax && !TWO) for (var f = 0; f < G.freeMax; f++) { var fb = document.createElement('i'); fb.className = 'freetry' + (f < G.free ? '' : ' used'); fb.textContent = document.body.classList.contains('s2-fighting') ? '?' : '💡'; fb.title = 'Free tries: an oops gives a hint and keeps your hearts'; h.appendChild(fb); }
   }
   // after9 hint-before-heart: the first oops on a board keeps the hearts and makes a right snack near the player glow
   function freeHint(pl) {
     pl.freeHinted = true; var best = -1, bd = 1e9;
     G.cells.forEach(function (c, i) { if (!c.ok || c.eaten || (TWO && c.owner !== pl.i)) return; var d = Math.abs(Math.floor(i / COLS) - pl.pos.r) + Math.abs(i % COLS - pl.pos.c); if (d < bd) { bd = d; best = i; } });
     cellEls.forEach(function (e) { e.classList.remove('nudge'); }); if (best >= 0) cellEls[best].classList.add('nudge');
-    setTimeout(function () { if (!G.active) return; bubble('💡 Free try! No heart lost. Try the glowing one!'); talk(['coach_easy_one'], false); }, 1500);
+    setTimeout(function () { if (!G.active) return; bubble((document.body.classList.contains('s2-fighting') ? '' : '💡 ') + 'Free try! No heart lost. Try the glowing one!'); talk(['coach_easy_one'], false); }, 1500);
   }
   function bubble(t) { var b = $('#bubble'); $('#bubbleMsg').textContent = t; b.classList.remove('say'); void b.offsetWidth; b.classList.add('say'); }
   // talk(): the bubble always shows the words; the voice follows the player's "How much talking" setting (A.Talk). kind defaults to chatter (Full only).
@@ -746,6 +747,7 @@
   function met(list) { var P = P1, out = list.filter(function (b, i) { return list.indexOf(b) === i && (A.Store.STARTER_BLOBS.indexOf(b) >= 0 || A.Rewards.unlocked(P, 'blob', b)); }); return out.length ? out : [A.Store.STARTER_BLOBS[0]]; }
   function storyMap(from, to) {
     stopTimer(); G.active = false; M.play('hub');
+    var banner = document.querySelector('.s2-fight-banner'); if (banner) banner.remove(); document.body.classList.remove('s2-fighting');
     $('#game').classList.remove('on');
     if (ST.placeAtLevel(P1)) { A.Store.save(); if (from == null) { from = to = ST.unlockedTo(P1); } }   // story starts at the player's level
     // story2: the world map + place maps (games/munch/story2-map.js); ?map=1 keeps the old single island map (tests, comparisons)
@@ -765,7 +767,13 @@
       var cfg = ST.config(P1, i), R = ST.run(P1), stop = ST.STOPS[i], practice = !stop.side && (R.done || i !== R.stop);
       SR = { i: i, cfg: cfg, practice: practice };
       PL[0].round = { skill: C.byId[cfg.skill], level: cfg.level, nOk: cfg.nOk, timeX: cfg.timeX, story: true, stop: stop, review: false };
-      var chain = Promise.resolve(), sd0 = ST.data(P1); sd0.seen = sd0.seen || {};
+      var artBoss = cfg.boss && A.Story2 && A.Story2.PLACES[A.Story2.placeOfStop(i)].art;
+      var oldBanner = document.querySelector('.s2-fight-banner'); if (oldBanner) oldBanner.remove(); document.body.classList.toggle('s2-fighting', !!artBoss);
+      if (artBoss) { var place = A.Story2.PLACES[A.Story2.placeOfStop(i)];
+        var banner = A.el('<div class="s2-fight-banner"><img alt="" src="' + A.Story2.artURL(place, A.Story2.bossBeaten(P1, place.ix) ? 'portrait_rematch' : 'portrait') + '"><b>Mini boss: ' + A.esc(place.boss) + '</b></div>');
+        $('#game .top').insertAdjacentElement('afterend', banner);
+      }
+      var chain = artBoss && !retry ? A.StoryMap2.encounter(P1, i) : Promise.resolve(), sd0 = ST.data(P1); sd0.seen = sd0.seen || {};
       var slug = ST.gameOf(P1, i) === 'slugger';   // game mix: this stop is a Snack Slugger game (story.js gameOf)
       var stand = ST.gameOf(P1, i) === 'stand', bub = ST.gameOf(P1, i) === 'bubble';   // stand1: a Lemonade Stand stop (games/stand, ?mode=story&stop=i)
       if (retry) { if (bub) return goBubble(i); if (stand) return goStand(i); if (slug) return goSlugger(i); M.play('game'); startLevel(); return Promise.resolve(); }
@@ -775,7 +783,7 @@
       var sd = ST.data(P1), firstSide = stop.side && !sd.seen['area:' + stop.area.id];
       if (firstSide) sd.seen['area:' + stop.area.id] = Date.now();
       var beatSeen = sd0.seen['beat:' + stop.area.id];   // each area's story card plays once
-      if ((!practice && stop.lv === 0 && !stop.side && !beatSeen) || firstSide) chain = chain.then(function () {
+      if (!artBoss && ((!practice && stop.lv === 0 && !stop.side && !beatSeen) || firstSide)) chain = chain.then(function () {
         var a = stop.area; sd0.seen['beat:' + a.id] = Date.now(); A.Store.save();
         // design1: an area guide the player hasn't met yet (e.g. Crunch, Vinnie) stays a surprise: Jammy tells that area's story
         // instead, without the guide's name (read by the browser voice; the recorded beat line names the guide)
@@ -785,13 +793,14 @@
       });
       // quality1 (rule 2): the very first Munch stop of a subject runs the same quick check as free Munch (UI.placement), so a
       // strong kid is never kept on below-band stops just because Story came first. The stop then re-reads its skill.
-      if (!slug && !stand && !bub && !(A.toddler && A.toddler(P1)) && A.Coach && A.Store.settings.placement !== false) chain = chain.then(function () {
+      if (!artBoss && !slug && !stand && !bub && !(A.toddler && A.toddler(P1)) && A.Coach && A.Store.settings.placement !== false) chain = chain.then(function () {
         var sk0 = C.byId[cfg.skill], subj0 = sk0 && C.subjectOf(sk0), cur0 = subj0 && C.current(P1, subj0);
         if (!cur0 || !A.Coach.wantsPlacement(P1, cur0.id)) return;
         return UI.placement(P1, cur0).then(function () { A.Store.save(); cfg = ST.config(P1, i); SR.cfg = cfg;
           PL[0].round = { skill: C.byId[cfg.skill], level: cfg.level, nOk: cfg.nOk, timeX: cfg.timeX, story: true, stop: stop, review: false }; });
       });
       return chain.then(function () {
+        if (artBoss) return;
         var parts = stop.side ? ['area_' + stop.area.id].concat(cfg.helper ? ['story_helper'] : []) : ['story_stop', stop.n].concat(cfg.helper ? ['story_helper'] : practice ? ['story_practice'] : []);
         if (stop.side && cfg.boss) return cutscene({ title: 'Mini boss!', sub: stop.area.emoji + ' ' + cfg.bossName + ' · ' + C.byId[cfg.skill].name, voice: ['s2_boss'], heroes: [P1], friends: met(A.Story2 ? [A.Story2.hero(P1)] : ['strawberry']) });
         if (stop.side) return cutscene({ title: C.byId[cfg.skill].name + '!', sub: stop.area.emoji + ' ' + stop.area.name + (cfg.helper ? ' · a little easier' : ''), voice: parts, heroes: [P1], friends: met([stop.area.friend, 'mochi', 'strawberry', 'carrot', 'grapes']) });
@@ -870,6 +879,18 @@
     A.Store.earnStars(P, stars, 'story'); var rewards = A.Rewards.check(P); A.Store.save();
     $('#starCount').textContent = P.stars;
     if (out.passed) M.jingle();
+    if (SR.cfg.boss && A.Story2.PLACES[A.Story2.placeOfStop(SR.i)].art && A.StoryMap2) {
+      var bossI = SR.i;
+      $('#game').classList.remove('on');
+      var resultPanel = out.rescue ? A.StoryMap2.victory(P, bossI, out.rescue) : A.StoryMap2.retryBoss(P, bossI);
+      return resultPanel.then(function (action) {
+        return Promise.resolve(ptGate()).then(function () {
+          if (action === 'retry') { $('#game').classList.add('on'); return playStop(bossI, true); }
+          if (action === 'rematch') { $('#game').classList.add('on'); return playStop(bossI); }
+          return storyMap(null, bossI);
+        });
+      });
+    }
     var R = ST.run(P), pts = out.pts, stop = ST.STOPS[SR.i];
     var rows = [['🍪 Snacks', pts.snacks], ['🎯 Accuracy', pts.accuracy], ['⏱ Time bonus', pts.time], ['✨ Perfect', pts.perfect]].filter(function (r) { return r[1] > 0 || r[0].indexOf('Snacks') >= 0; });
     var html = (gaveUp ? '' : '<div class="stars">' + [0, 1, 2].map(function (i) { return '<span>' + UI.STAR.replace('<svg', '<svg class="' + (i < stars ? 'got' : '') + '" style="animation-delay:' + (.3 + i * .3).toFixed(2) + 's"') + '</span>'; }).join('') + '</div>') +

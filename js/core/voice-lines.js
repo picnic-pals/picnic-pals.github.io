@@ -1011,10 +1011,10 @@
     var S2 = A.Story2 || {}, L = [
       ['s2_world', 'Here is our picnic world! Tap a place.'], ['s2_new_place', 'Yay! A new place!'], ['s2_boss', 'Mini boss! A big, fun challenge. Take your time.'],
       ['s2_who', 'Who is the hero? Pick a friend.'], ['s2_tomorrow', 'Hooray! You did the mini boss! A new path will be ready next time.'], ['s2_switched', 'Now the hero is', 'Followed by the friend name (device voice)'],
-      ['s2_place_meadow', 'Berry Meadow! Butterflies and flowers everywhere.'], ['s2_place_lagoon', 'Letter Lagoon! Hop along the lily pads with the frog.'],
-      ['s2_place_hills', 'Muffin Hills! Ding ding, the muffin bells are ringing.'], ['s2_place_woods', 'Word Woods! The fireflies glow and the owl says hoo hoo.'],
+      ['s2_place_meadow', 'Berry Meadow! Butterflies and flowers everywhere.'], ['s2_place_lagoon', 'Lemonade Lagoon! Follow the sugar stepping stones.'],
+      ['s2_place_hills', 'Muffin Hills! Ding ding, the muffin bells are ringing.'], ['s2_place_woods', 'Pretzel Grove! Follow the reading trail.'],
       ['s2_place_peaks', 'Pancake Peaks! Up, up the fluffy mountains.'], ['s2_place_bay', 'Melon Bay! Splash in the waves and find the shells.'],
-      ['s2_place_caves', 'Cookie Caves! Sparkly crystals, drip, drop.']
+      ['s2_place_caves', 'Cookie Caves! Follow the sprinkle trail.']
     ];
     Object.keys(S2.FLAVOR || {}).forEach(function (h) { L.push(['s2_tag_' + h, S2.FLAVOR[h].tag, 'Hero line at a new place (' + h + ')']); L.push(['s2_bosscheer_' + h, S2.FLAVOR[h].boss, 'Hero cheer before a mini boss (' + h + ')']); });
     (A.StoryBook2Text || []).forEach(function (pg, i) { ['simple', 'rich'].forEach(function (v) { if (pg && pg[v]) L.push(['story2_intro_' + (i + 1) + '_' + v, pg[v], 'Intro page ' + (i + 1) + ' (' + v + '); {hero} and {food} are filled in by the device voice']); }); });

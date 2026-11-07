@@ -11,7 +11,7 @@
   var TODDLER_OK = { dance: 1, peek: 1, sounds: 1, dress: 1, concert: 1, pop: 1, weather: 1, color: 1, skit: 1, joke: 1 };
   var WEEK = 7 * 864e5, pending = false, open = null, NOW = function () { return Date.now(); };
   function on() { try { if (A.Store && A.Store.settings && A.Store.settings.breaks === false) return false; if (localStorage.getItem('blobArcade.breaks') === '1') return true; if (localStorage.getItem('blobArcade.breaks') === '0') return false; } catch (e) {} return !(typeof navigator !== 'undefined' && navigator.webdriver); }
-  function data(p) { var b = p.breaks || (p.breaks = {}); if (b.n == null) b.n = 0; if (!b.next) b.next = 5 + (Math.random() < .5 ? 0 : 1); b.hist = b.hist || []; b.jokes = b.jokes || []; b.skits = b.skits || []; return b; }
+  function data(p) { var b = p.breaks || (p.breaks = {}); if (b.n == null) b.n = 0; if (!b.next) b.next = 5 + (Math.random() < .5 ? 0 : 1); if (b.popBest == null) b.popBest = 0; b.hist = b.hist || []; b.jokes = b.jokes || []; b.skits = b.skits || []; return b; }
   function toddler(p) { return !!(A.toddler && A.toddler(p)); }
   function reader(p) { var a = A.Age ? A.Age.of(p) : p.age; return !toddler(p) && ((a != null && a >= 6) || (A.StoryBook && A.StoryBook.isReader && A.StoryBook.isReader(p))); }
   function met(p) { var m = A.Story2 && A.Story2.met ? A.Story2.met(p) : (A.Blobs.STARTERS || []).slice(); var h = A.Story2 && A.Story2.hero ? A.Story2.hero(p) : p.blob; if (h && m.indexOf(h) > 0) { m.splice(m.indexOf(h), 1); m.unshift(h); } return m; }
@@ -220,10 +220,18 @@
   };
   B.pop = function (c) {
     var n = 0, end = Date.now() + 10000, colors = ['#ff8fc7', '#4fa3ff', '#ffe14d', '#6fd36a', '#a77bff', '#ffa53b'];
+    var saved = data(c.p), pops = 0, initialBest = saved.popBest;
+    var score = el('<div class="pp-score" aria-live="polite"></div>'), record = el('<div class="pp-record" role="status"></div>');
+    c.stage.appendChild(score); c.stage.appendChild(record);
+    function count() { score.textContent = 'Pops: ' + pops + ' · Best: ' + saved.popBest; }
+    count();
     function spawn() {
       if (Date.now() > end) { c.say('br_done'); c.ready(); return; }
       var b = el('<button class="pp-b" style="left:' + (5 + Math.random() * 85) + '%;--c:' + colors[n++ % colors.length] + ';animation-duration:' + (4 + Math.random() * 3) + 's" aria-label="Pop"></button>');
-      b.addEventListener('pointerdown', function (e) { e.stopPropagation(); if (b.classList.contains('popped')) return; b.classList.add('popped'); SND.pop(); setTimeout(function () { b.remove(); }, 300); });
+      b.addEventListener('pointerdown', function (e) { e.stopPropagation(); if (b.classList.contains('popped')) return; b.classList.add('popped'); pops++;
+        if (pops > saved.popBest) { saved.popBest = pops; A.Store.save(); }
+        if (pops === initialBest + 1) record.textContent = 'New record!';
+        count(); SND.pop(); setTimeout(function () { b.remove(); }, 300); });
       b.addEventListener('animationend', function () { b.remove(); }); c.stage.appendChild(b); c.later(spawn, 380);
     }
     c.say('br_pop'); spawn(); c.friend(c.friends[0], 'pp-friend', 'cheering');

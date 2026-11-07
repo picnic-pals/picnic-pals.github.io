@@ -356,7 +356,11 @@
   C.list('math').forEach(picturizeGen);
   var baseMake = Q.make;
   Q.make = function (skill, level, opt) {
-    var q = baseMake(skill, level, opt), s = typeof skill === 'string' ? C.byId[skill] : skill, p = S.ctx.p;
+    var previous = S.ctx.p, p = opt && opt.profile || previous, q;
+    // Placement can ask below the grade floor; always generate for the actual player.
+    S.ctx.p = p;
+    try { q = baseMake(skill, level, opt); } finally { S.ctx.p = previous; }
+    var s = typeof skill === 'string' ? C.byId[skill] : skill;
     if (s && C.subjectOf(s) === 'math' && pBand(p)) picturizeAsk(q);
     if (q && !q.text) q.text = q.plain || '';
     return q;

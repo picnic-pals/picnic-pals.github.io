@@ -73,18 +73,24 @@
 
   /* ---------- placement check (coach v2): 5 quick, low-stakes questions when a skill first opens ----------
      Resolves { score, result: 'skip' | 'higher' | 'normal' }. No hearts, no timer, no "wrong" sound: a missed one just glows the answer. */
+  // Shared question overlays get one replay control, outside the prompt's layout.
+  function promptReplay(ov, q) {
+    var button = A.el('<button class="pc-replay" aria-label="Hear the prompt again">🔊</button>');
+    button.addEventListener('click', function () { if (q.say) A.Voice.say(q.say, { kind: 'tap' }); });
+    ov.appendChild(button);
+  }
   UI.placement = function (P, skill) {
     var api = A.Learn && A.Learn.placementApi ? A.Learn.placementApi(P, skill) : null;   // quality1: step warm-up, reading probe or place-value test-out
     if (api || (skill && skill.isStep && A.Steps)) return UI.warmup(P, skill, api);
     var C = A.Curriculum, K = A.Coach, Q = A.Questions, top = skill.levels.length - 1, n = K.PLACE_N, score = 0, i = 0;
     function one() {
       return new Promise(function (resolve) {
-        var q = Q.make(skill, top, { choices: 3 });
+        var q = Q.make(skill, top, { choices: 3, profile: P });
         var ov = A.el('<div class="overlay on placement-card" role="dialog" aria-modal="true" aria-label="Quick check"><div class="card">' +
           '<span class="tag">Warm-up game · ' + (i + 1) + ' of ' + n + '</span><div class="pc-dots">' + Array.apply(null, Array(n)).map(function (_, k) { return '<i class="' + (k < i ? 'done' : k === i ? 'now' : '') + '"></i>'; }).join('') + '</div>' +
           '<div class="pc-q">' + q.text + '</div>' + (q.pic ? '<div class="pc-pic">' + q.pic + '</div>' : '') +
           '<div class="pc-opts">' + q.choices.map(function (c, k) { return '<button class="pc-opt" data-i="' + k + '"><kbd>' + (k + 1) + '</kbd>' + (c.html || A.esc(c.label)) + '</button>'; }).join('') + '</div></div></div>');
-        document.body.appendChild(ov); ov.__q = q; UI.cardOpen = true;
+        document.body.appendChild(ov); ov.__q = q; UI.cardOpen = true; promptReplay(ov, q);
         var btns = A.$$('.pc-opt', ov), done = false, t0 = Date.now();
         function pickIt(k) {
           if (done || Date.now() - t0 < A.Pace.CFG.FRESH_Q) return; done = true; var ok = k === q.answer;
@@ -105,7 +111,7 @@
         document.addEventListener('keydown', onKey, true);
         btns.forEach(function (b, k) { b.addEventListener('click', function () { pickIt(k); }); });
         setTimeout(function () { try { btns[0].focus({ preventScroll: true }); } catch (e) {} }, 50);
-        if (q.say) A.Voice.say(q.say);
+        if (q.say) A.Voice.say(q.say, { kind: q.listen ? 'listen' : 'prompt' });
       });
     }
     function loop() { if (i >= n) return Promise.resolve(); return one().then(function () { i++; return loop(); }); }
@@ -125,12 +131,12 @@
     var n = api.n;
     function one(it) {
       return new Promise(function (resolve) {
-        if (S) S.ctx.p = P; var q = Q.make(it.skill, it.level || 0, { choices: 3 });
+        if (S) S.ctx.p = P; var q = Q.make(it.skill, it.level || 0, { choices: 3, profile: P });
         var ov = A.el('<div class="overlay on placement-card" role="dialog" aria-modal="true" aria-label="Warm-up"><div class="card">' +
           '<span class="tag">Warm-up</span><div class="pc-dots">' + Array.apply(null, Array(n)).map(function (_, k) { return '<i class="' + (k < i ? 'done' : k === i ? 'now' : '') + '"></i>'; }).join('') + '</div>' +
           '<div class="pc-q">' + q.text + '</div>' + (q.pic ? '<div class="pc-pic">' + q.pic + '</div>' : '') +
           '<div class="pc-opts">' + q.choices.map(function (c, k) { return '<button class="pc-opt" data-i="' + k + '"><kbd>' + (k + 1) + '</kbd>' + (c.html || A.esc(c.label)) + '</button>'; }).join('') + '</div></div></div>');
-        document.body.appendChild(ov); ov.__q = q; UI.cardOpen = true;
+        document.body.appendChild(ov); ov.__q = q; UI.cardOpen = true; promptReplay(ov, q);
         var btns = A.$$('.pc-opt', ov), done = false, t0 = Date.now();
         function pickIt(k) {
           if (done || Date.now() - t0 < A.Pace.CFG.FRESH_Q) return; done = true; var ok = k === q.answer;
@@ -149,7 +155,7 @@
         document.addEventListener('keydown', onKey, true);
         btns.forEach(function (b, k) { b.addEventListener('click', function () { pickIt(k); }); });
         setTimeout(function () { try { btns[0].focus({ preventScroll: true }); } catch (e) {} }, 50);
-        if (q.say) A.Voice.say(q.say);
+        if (q.say) A.Voice.say(q.say, { kind: q.listen ? 'listen' : 'prompt' });
       });
     }
     function loop() { if (i >= n) return Promise.resolve(); var it = api.next(); if (!it) return Promise.resolve(); return one(it).then(function () { i++; return loop(); }); }

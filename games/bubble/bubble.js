@@ -17,7 +17,7 @@
     goldenAt: -1, goldenShown: false, storm: { on: false, n: 0, left: 0 }, tst: Date.now(), raf: 0, spawnT: 0 };
   function img(id, pose) { return A.ROOT + 'assets/picnic/friends/' + id + '/' + (pose || 'front') + '_256.webp'; }
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
-  function say(parts, kind) { return V.say(parts, { kind: kind || 'prompt', bubble: false }); }
+  function say(parts, kind) { return V.say(parts, { kind: kind || (G.t && G.t.listen ? 'listen' : 'prompt'), bubble: false }); }
   /* ---------- art ---------- */
   function shapeSvg(s, c) { var f = B.COLORS[c] || c || '#ff8ab3', d = { circle: '<circle cx="50" cy="50" r="34"/>', square: '<rect x="18" y="18" width="64" height="64" rx="8"/>', triangle: '<path d="M50 14 L86 82 H14 Z" stroke-linejoin="round"/>',
       star: '<path d="M50 10 L61 38 L91 39 L67 57 L76 87 L50 70 L24 87 L33 57 L9 39 L39 38 Z" stroke-linejoin="round"/>', heart: '<path d="M50 84 C20 62 10 46 18 30 C26 16 44 18 50 32 C56 18 74 16 82 30 C90 46 80 62 50 84 Z"/>' }[s];
@@ -42,7 +42,7 @@
     if (s.sent) h += '<b class="sent">' + A.esc(s.sent) + '</b>';
     if (t.seq) h += '<span class="seq">' + t.seq.map(function (c, k) { return '<i class="' + (k < t.got ? 'on' : k === t.got ? 'now' : '') + '">' + (k < t.got || !t.word ? A.esc(c.t) : '_') + '</i>'; }).join('') + '</span>';
     else if (t.need > 1) h += '<span class="need">' + Array.from({ length: t.need }, function (_, k) { return '<i class="' + (k < t.got ? 'on' : '') + '"></i>'; }).join('') + '</span>';
-    $('#target').innerHTML = h + '<span class="spk">🔊</span>';
+    $('#target').innerHTML = h;
   }
   // the on-screen ask: the kind's own line (never prints a word the child must find by ear), else the spoken words
   function askText(t) {
@@ -64,7 +64,7 @@
       var cx = lo + Math.random() * (hi - lo), near = G.bubbles.filter(function (q) { return !q.gone && q.y > fh() - 2.2 * Math.max(d, q.d); }), m = 1e9;
       near.forEach(function (q) { m = Math.min(m, Math.abs(q.x - cx)); }); if (m > best) { best = m; x0 = cx; } }
     var el = A.el('<button class="bub' + (c.cls ? ' ' + c.cls.split(' ').map(function (x) { return 'k-' + x; }).join(' ') : '') + (o.golden ? ' golden' : '') + '" style="width:' + d + 'px;height:' + d + 'px" aria-label="' + A.esc(o.golden ? 'golden bubble' : V.text(c.say || [])) + '">' + (o.golden ? '<span class="emo">✨</span>' : inner(c)) + '<i class="shine"></i></button>');
-    var tc = tint(c); if (tc && !o.golden) el.style.setProperty('--tint', tc);
+    var tc = tint(c) || ['#ed5d91', '#ffad32', '#38b998', '#9462e8', '#e8bb25', '#4397eb'][G.uid % 6]; if (tc && !o.golden) el.style.setProperty('--tint', tc);
     var b = { id: ++G.uid, c: c, el: el, d: d, x: x0, y: fh() + 10, vy: (TOD ? 40 : 50) * (G.storm.on ? 1.7 : 1) * (.7 + Math.random() * .65), ph: Math.random() * 6, amp: 6 + Math.random() * 18, fr: .7 + Math.random() * 1.1, ph2: Math.random() * 6, fr2: .25 + Math.random() * .5, vx: (Math.random() - .5) * 16, golden: !!o.golden, gone: false };
     el.addEventListener('pointerdown', function (e) { e.preventDefault(); pop(b); });
     if (G.t && B.matches(G.t, c)) el.classList.add('match');
@@ -76,6 +76,15 @@
   function goods() { var top = TOPY(); return G.bubbles.filter(function (b) { return !b.golden && !b.gone && b.y > top && B.matches(G.t, b.c); }).length; }   // 11/5: right ones about to drift behind the card don't count
   function nextContent() {
     var t = G.t; if (!t) return null;
+    if (t.good.some(function (c) { return c.cls === 'word'; })) {
+      // One of each word, including bubbles still fading out after a target change.
+      // Reserve entering bubbles too; if the word bank is all up, wait rather than repeat.
+      var wordsUp = Array.prototype.map.call(field.querySelectorAll('.bub.k-word'), function (el) { return el.textContent.trim().toLowerCase(); });
+      function unused(c) { return wordsUp.indexOf(String(c.t).toLowerCase()) < 0; }
+      var right = t.good.filter(unused), decoys = t.bad.filter(unused);
+      var words = right.length ? right : decoys; // replace a departed target at the next normal spawn
+      return words.length ? words[Math.floor(Math.random() * words.length)] : null;
+    }
     if (t.seq) { var left = t.seq.slice(t.got), onScreen = G.bubbles.map(function (b) { return b.c.key; }); var miss = left.filter(function (c) { return onScreen.indexOf(c.key) < 0; }); if (miss.length && Math.random() < .75) return miss[0]; var pool = t.seq.concat(t.bad); return pool[Math.floor(Math.random() * pool.length)]; }
     var gn = goods(), wantGood = gn < 2 || !t.bad.length || (gn < 3 && Math.random() < .35);
     // batch1 (plan P2): decoys are drawn without replacement: a bubble already on screen is not blown again while another can be

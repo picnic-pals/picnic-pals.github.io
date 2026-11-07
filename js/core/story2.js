@@ -1,6 +1,6 @@
 /* Picnic Pals — Story mode v2 (story2, 2026-10-29, owner-approved Phase 3 plan). No DOM here; the maps live in games/munch/story2-map.js.
    · A world of PLACES. Each place has its own map: 4 trail stops + a gentle mini boss (main places) or its 6 side stops, the last one
-     the mini boss (Letter Lagoon, Word Woods). A place shows only once it is reached (the boss of the place before it was passed);
+     the mini boss (Lemonade Lagoon, Pretzel Grove). A place shows only once it is reached (the boss of the place before it was passed);
      nothing about later places is ever shown or named.
    · Levels ARE the existing Story stops (saves stay by stop index + path, so Munch / Slugger / Stand / Bubble stops all keep working).
      Main-place bosses are extra side-style stops appended after every other stop (old indices never move).
@@ -16,14 +16,19 @@
   var ST = A.Story; if (!ST) return;
   var STARTERS = ['strawberry', 'apple', 'corn', 'blueberry'];
   var PLACES = [
-    { id: 'meadow', name: 'Berry Meadow', emoji: '🌼', areas: ['meadow', 'cliffs'], guide: '🐰', deco: ['🦋', '🌷', '🐝', '🌼', '🦋', '🌷'], sound: 'chirp', boss: 'the Giant Dandelion Puff', bossEmoji: '🌬️', theme: ['#c8f2b8', '#fff6c8'] },
-    { id: 'lagoon', name: 'Letter Lagoon', emoji: '🪷', areas: ['lagoon'], guide: '🐸', deco: ['🪷', '🫧', '💧', '🪷', '🫧', '🐟'], sound: 'ribbit', boss: 'the Big Lily Pad Hop', bossEmoji: '🐸', theme: ['#a8e4f0', '#d8f6ff'] },
-    { id: 'hills', name: 'Muffin Hills', emoji: '🧁', areas: ['beach', 'woods'], guide: '🐿️', deco: ['🧁', '🌳', '🍂', '🧁', '🌳', '🔔'], sound: 'bell', boss: 'the Tall Muffin Tower', bossEmoji: '🧁', theme: ['#ffe6c2', '#fff4e0'] },
-    { id: 'woods', name: 'Word Woods', emoji: '🌲', areas: ['wordwoods'], guide: '🦉', deco: ['🌲', '✨', '🍄', '🌲', '✨', '🌙'], sound: 'hoot', boss: 'the Sleepy Owl Riddle', bossEmoji: '🦉', theme: ['#9fd59a', '#d9f2c8'] },
-    { id: 'peaks', name: 'Pancake Peaks', emoji: '🥞', areas: ['grove', 'town'], guide: '🐐', deco: ['🥞', '⛰️', '☁️', '🍯', '⛰️', '🥞'], sound: 'whoosh', boss: 'the Wobbly Pancake Stack', bossEmoji: '🥞', theme: ['#e6dcff', '#fff1d6'] },
-    { id: 'bay', name: 'Melon Bay', emoji: '🍉', areas: ['caves', 'bay'], guide: '🦀', deco: ['🍉', '🌊', '🐚', '⛵', '🌊', '🐚'], sound: 'wave', boss: 'the Great Sand Castle', bossEmoji: '🏰', theme: ['#b8e2ff', '#fff0c8'] },
-    { id: 'caves', name: 'Cookie Caves', emoji: '🍪', areas: ['volcano', 'lighthouse'], guide: '🐛', deco: ['🍪', '💎', '✨', '🍪', '💎', '🕯️'], sound: 'drip', boss: 'the Cookie Crystal Cave', bossEmoji: '💎', theme: ['#d6cdea', '#f3ecff'] }
+    { id: 'meadow', name: 'Berry Meadow', emoji: '🌼', areas: ['meadow', 'cliffs'], guide: '🐰', deco: ['🦋', '🌷', '🐝', '🌼', '🦋', '🌷'], sound: 'chirp', boss: 'Bramble', bossEmoji: '🌬️', theme: ['#c8f2b8', '#fff6c8'] },
+    { id: 'lagoon', name: 'Lemonade Lagoon', emoji: '🪷', areas: ['lagoon'], guide: '🐸', deco: ['🪷', '🫧', '💧', '🪷', '🫧', '🐟'], sound: 'ribbit', boss: 'Zest', bossEmoji: '🐸', theme: ['#a8e4f0', '#d8f6ff'] },
+    { id: 'hills', name: 'Muffin Hills', emoji: '🧁', areas: ['beach', 'woods'], guide: '🐿️', deco: ['🧁', '🌳', '🍂', '🧁', '🌳', '🔔'], sound: 'bell', boss: 'Tower', bossEmoji: '🧁', theme: ['#ffe6c2', '#fff4e0'] },
+    { id: 'woods', name: 'Pretzel Grove', emoji: '🌲', areas: ['wordwoods'], guide: '🦉', deco: ['🌲', '✨', '🍄', '🌲', '✨', '🌙'], sound: 'hoot', boss: 'Knot', bossEmoji: '🦉', theme: ['#9fd59a', '#d9f2c8'] },
+    { id: 'peaks', name: 'Pancake Peaks', emoji: '🥞', areas: ['grove', 'town'], guide: '🐐', deco: ['🥞', '⛰️', '☁️', '🍯', '⛰️', '🥞'], sound: 'whoosh', boss: 'Flapjack', bossEmoji: '🥞', theme: ['#e6dcff', '#fff1d6'] },
+    { id: 'bay', name: 'Melon Bay', emoji: '🍉', areas: ['caves', 'bay'], guide: '🦀', deco: ['🍉', '🌊', '🐚', '⛵', '🌊', '🐚'], sound: 'wave', boss: 'Rindy', bossEmoji: '🏰', theme: ['#b8e2ff', '#fff0c8'] },
+    { id: 'caves', name: 'Cookie Caves', emoji: '🍪', areas: ['volcano', 'lighthouse'], guide: '🐛', deco: ['🍪', '💎', '✨', '🍪', '💎', '🕯️'], sound: 'drip', boss: 'Crumble', bossEmoji: '💎', theme: ['#d6cdea', '#f3ecff'] }
   ];
+  // Approved art metadata: original marker centres and freed-friend slots, without review-only assets.
+  var WORLD_ART = {"meadow":{"friend":"mochi","size":[1600,1000],"markers":[{"level":1,"landmark":"strawberry_bush","landmark_name":"Strawberry Bush","x":300,"y":770},{"level":2,"landmark":"blueberry_bush","landmark_name":"Blueberry Bush","x":545,"y":600},{"level":3,"landmark":"blackberry_bush","landmark_name":"Blackberry Bush","x":830,"y":760},{"level":4,"landmark":"picking_crate","landmark_name":"Picking Crate","x":1110,"y":610},{"level":5,"landmark":"jam_puddle_picnic","landmark_name":"Jam Puddle Picnic","x":930,"y":390},{"landmark":"bramble_jam_spot","landmark_name":"Bramble's Jam Spot","x":1300,"y":358,"boss":"Bramble"}],"freedSlot":{"x":520,"y":560,"w":240,"h":300,"ground_y":850}},"lagoon":{"friend":"banana","size":[1600,1000],"markers":[{"level":1,"landmark":"sugar_dunes","landmark_name":"Sugar Dunes","x":330,"y":752},{"level":2,"landmark":"lemon_grove","landmark_name":"Lemon Tree Grove","x":575,"y":585},{"level":3,"landmark":"ice_cube_pier","landmark_name":"Ice-Cube Pier","x":830,"y":752},{"level":4,"landmark":"mint_patch","landmark_name":"Mint Patch","x":1085,"y":612},{"level":5,"landmark":"lemonade_stand","landmark_name":"Lemonade Stand","x":1010,"y":372},{"landmark":"zest_island","landmark_name":"Zest's Lemon Island","x":1305,"y":236,"boss":"Zest"}],"freedSlot":{"x":430,"y":600,"w":240,"h":260,"ground_y":850}},"caves":{"friend":"cookie","size":[1600,1000],"markers":[{"level":1,"landmark":"cupcake_mound","landmark_name":"Cupcake Mound","x":300,"y":770},{"level":2,"landmark":"brownie_ledge","landmark_name":"Brownie Ledge","x":545,"y":600},{"level":3,"landmark":"milkshake_pool","landmark_name":"Milkshake Pool","x":830,"y":760},{"level":4,"landmark":"cherry_pie_slice","landmark_name":"Cherry Pie Slice","x":1110,"y":610},{"level":5,"landmark":"bakery_oven","landmark_name":"Bakery Oven","x":930,"y":390},{"landmark":"crumble_cave","landmark_name":"Crumble's Cave","x":1300,"y":338,"boss":"Crumble"}],"freedSlot":{"x":680,"y":560,"w":240,"h":300,"ground_y":850}},"peaks":{"friend":"pancake","size":[1600,1000],"markers":[{"level":1,"landmark":"oatmeal_hot_springs","landmark_name":"Oatmeal Hot Springs","x":300,"y":800},{"level":2,"landmark":"bacon_bridge","landmark_name":"Bacon Bridge","x":545,"y":606},{"level":3,"landmark":"syrup_falls","landmark_name":"Syrup Falls","x":790,"y":768},{"level":4,"landmark":"butter_glacier","landmark_name":"Butter Glacier","x":1090,"y":630},{"level":5,"landmark":"egg_yolk_ridge","landmark_name":"Egg Yolk Ridge","x":930,"y":400},{"landmark":"griddle_summit","landmark_name":"Flapjack's Griddle Summit","x":1300,"y":358,"boss":"Flapjack"}],"freedSlot":{"x":530,"y":560,"w":240,"h":300,"ground_y":860}},"bay":{"friend":"watermelon","size":[1600,1000],"markers":[{"level":1,"landmark":"cantaloupe_cove","landmark_name":"Cantaloupe Cove","x":300,"y":800},{"level":2,"landmark":"melon_ball_tide_pools","landmark_name":"Melon Ball Tide Pools","x":560,"y":708},{"level":3,"landmark":"popsicle_pier","landmark_name":"Popsicle Pier","x":800,"y":590},{"level":4,"landmark":"coconut_lighthouse","landmark_name":"Coconut Lighthouse","x":1080,"y":666},{"level":5,"landmark":"kiwi_island","landmark_name":"Kiwi Island","x":860,"y":390},{"landmark":"seed_splash","landmark_name":"Rindy's Seed Splash","x":1300,"y":346,"boss":"Rindy"}],"freedSlot":{"x":440,"y":560,"w":240,"h":300,"ground_y":870}}};
+  PLACES.forEach(function (pl) { pl.art = WORLD_ART[pl.id] || null; });
+  function artURL(pl, file) { return A.ROOT + "art/worlds/" + pl.id + "/" + file + ".png"; }
+  function bossBeaten(p, k) { return !!((meta(p).bossBeaten || {})[PLACES[k].id]); }
   // starter plot flavors (each hero's own short line on the world map and at every new place; name-free voice + {hero} text)
   var FLAVOR = {
     strawberry: { how: 'plans the way', tag: 'With a picnic plan, we will find everyone!', boss: 'A plan and a smile. You can do it!' },
@@ -130,15 +135,28 @@
       var kk = placeOfStop(i), Lk = LEVELS[kk], last = ST.STOPS[Lk[Lk.length - 3]], f2 = ST.fitStop(p, last.area.skill, 1, ST.path(p) === 'little');
       c.skill = f2.skill; c.level = f2.level; c.capped = !!f2.capped;
     }
-    if (isBoss(i)) { c.boss = true; c.nOk = simple(p) ? 5 : ST.path(p) === 'little' ? 7 : 10; c.timeX = (c.timeX || 1) * 1.5; c.bossName = PLACES[BOSS[i]].boss; }
+    if (isBoss(i)) { c.boss = true; c.nOk = simple(p) ? 5 : ST.path(p) === 'little' ? 7 : 10; c.timeX = (c.timeX || 1) * 1.5; c.bossName = PLACES[BOSS[i]].boss; if (PLACES[BOSS[i]].art && bossBeaten(p, BOSS[i]) && !simple(p)) c.nOk += 2; }
     else if (simple(p)) c.nOk = Math.min(c.nOk, 5);
     return c;
   };
   var baseRecord = ST.record;
-  ST.record = function (p, i, r) { var out = baseRecord(p, i, r); if (isBoss(i) && out.firstPass) { var x = ST.data(p).stops[ST.path(p) + ':' + i]; x.firstPassAt = NOWF(); out.bossDone = true; out.nextTomorrow = false; } return out; };
+  ST.record = function (p, i, r) {
+    var out = baseRecord(p, i, r);
+    if (isBoss(i) && out.firstPass) { var x = ST.data(p).stops[ST.path(p) + ':' + i]; x.firstPassAt = NOWF(); out.bossDone = true; out.nextTomorrow = false; }
+    if (isBoss(i) && out.passed) {
+      var k = BOSS[i], pl = PLACES[k];
+      if (pl.art) {
+        var m = meta(p), flags = m.bossBeaten || (m.bossBeaten = {}), first = !flags[pl.id];
+        var fresh = first && A.Rewards.freeFriend(p, pl.art.friend);
+        flags[pl.id] = flags[pl.id] || NOWF();
+        out.rescue = { place: k, first: first, fresh: !!fresh, friend: pl.art.friend };
+      }
+    }
+    return out;
+  };
   var basePlayable = ST.playable;
   ST.playable = function (p, i) { var k = placeOfStop(i); if (k >= 0 && ST.ON2) return playable(p, i) || (i < FIRST_NEW && basePlayable(p, i)); return basePlayable(p, i); };   // the maps use Story2.playable; game pages also accept the old trail rule for the original stops (the stand/bubble/slugger stop pages)
-  A.Story2 = { PLACES: PLACES, LEVELS: LEVELS, BOSS: BOSS, FLAVOR: FLAVOR, STARTERS: STARTERS, placeOfStop: placeOfStop, levels: levels, isBoss: isBoss, simple: simple,
+  A.Story2 = { artURL: artURL, bossBeaten: bossBeaten, PLACES: PLACES, LEVELS: LEVELS, BOSS: BOSS, FLAVOR: FLAVOR, STARTERS: STARTERS, placeOfStop: placeOfStop, levels: levels, isBoss: isBoss, simple: simple,
     reached: reached, reachedList: reachedList, done: done, finished: finished, playable: playable, current: current, currentPlace: currentPlace, progress: progress,
     hero: hero, heroName: heroName, foodName: foodName, pals: pals, fill: fill, flavor: flavor, met: met, switchHero: switchHero, askHero: askHero, heroes: heroes, meta: meta,
     migrate: migrate, capV2: capV2, passed: passed, waiting: waiting, setClock: function (f) { NOWF = f || function () { return Date.now(); }; } };
@@ -153,7 +171,7 @@
     { simple: '{hero} and the friends are sad. "We can find them," said {hero}. "Let\'s go!"', rich: '{hero} and the other friends stared at the empty blanket. Then {hero} stood tall. "Let\'s go! We will follow the paths and find every single friend."' }
   ];
   // toddlers (the simple version) play every story level as Munch: one game to learn, no Slugger/Stand/Bubble rules
-  var baseGameOf = ST.gameOf; ST.gameOf = function (p, i) { if (ST.ON2 && simple(p) && A.toddler && A.toddler(p)) return 'munch'; return baseGameOf(p, i); };
+  var baseGameOf = ST.gameOf; ST.gameOf = function (p, i) { if (ST.ON2 && isBoss(i) && PLACES[BOSS[i]].art) return 'munch'; if (ST.ON2 && simple(p) && A.toddler && A.toddler(p)) return 'munch'; return baseGameOf(p, i); };
   // the old island map (?map=1, remembered for the tab) keeps the old play rules; ?map=2 goes back to places
   ST.ON2 = true; try { var q = (window.location && location.search) || ''; if (/[?&]map=2\b/.test(q)) ST.ON2 = true; else if (/[?&]map=1\b/.test(q) || (window.sessionStorage && sessionStorage.getItem('blobArcade.map1') === '1')) ST.ON2 = false; } catch (e) {}
 })(window.Arcade);

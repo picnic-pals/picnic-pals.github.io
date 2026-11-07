@@ -14,7 +14,7 @@ body { background: linear-gradient(#a9dcff 0%, #d7f0ff 62%, #bdeaa8 62%, #a3dd8e
 .dots i { width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: inset 0 0 0 3px #b9dcff; transition: background .4s; }
 .dots i.on { background: #7cc4ff; box-shadow: inset 0 0 0 3px #4fa6ef; }
 /* the target card */
-.target { position: absolute; z-index: 4; left: 50%; top: 84px; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 30px; padding: 10px 56px 10px 22px; min-height: 92px; box-sizing: border-box; box-shadow: 0 6px 0 #cfe3f2; cursor: pointer; max-width: 80%; }
+.target { position: absolute; z-index: 4; left: 50%; top: 84px; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 30px; padding: 12px 20px; min-height: 0; box-sizing: border-box; box-shadow: 0 6px 0 #cfe3f2; cursor: pointer; max-width: 80%; }
 .target b { font-size: 54px; font-weight: 800; color: #4a3b6b; letter-spacing: 1px; white-space: nowrap; } .target b.long { font-size: 40px; }
 .target .emo { font-size: 60px; line-height: 1; border-radius: 50%; } .target .emo.tinted { padding: 6px; }
 .target .sw { width: 70px; height: 70px; border-radius: 50%; box-shadow: inset 0 -6px 0 #0002; }
@@ -23,8 +23,7 @@ body { background: linear-gradient(#a9dcff 0%, #d7f0ff 62%, #bdeaa8 62%, #a3dd8e
 .target { flex-wrap: wrap; justify-content: center; row-gap: 4px; }
 .target .ask { flex-basis: 100%; text-align: center; font-size: 22px; font-weight: 800; color: #4a3b6b; line-height: 1.2; }
 .target b.sent { font-size: 30px; white-space: normal; text-align: center; letter-spacing: 0; line-height: 1.25; max-width: 640px; }
-@media (max-width: 600px) { .target .ask { font-size: 17px; } .target b { font-size: 40px; } .target b.long { font-size: 28px; } .target b.sent { font-size: 22px; } .target { max-width: 94%; padding: 8px 44px 8px 14px; } }
-.target .spk { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 26px; }
+@media (max-width: 600px) { .target .ask { font-size: 17px; } .target b { font-size: 40px; } .target b.long { font-size: 28px; } .target b.sent { font-size: 22px; } .target { max-width: 94%; padding: 10px 16px; } }
 .target .need { display: flex; gap: 6px; } .target .need i { width: 18px; height: 18px; border-radius: 50%; background: #e4f2ff; box-shadow: inset 0 0 0 3px #9fd0f7; } .target .need i.on { background: #ffc94d; box-shadow: none; }
 .target .seq { display: flex; gap: 6px; } .target .seq i { min-width: 44px; height: 52px; border-radius: 14px; background: #eef7ff; font-style: normal; font-size: 32px; font-weight: 800; color: #9ab; display: flex; align-items: center; justify-content: center; padding: 0 6px; }
 .target .seq i.on { background: #c9f5d3; color: #3a7a4b; } .target .seq i.now { box-shadow: inset 0 0 0 3px #ff8ab3; }
@@ -35,7 +34,7 @@ body { background: linear-gradient(#a9dcff 0%, #d7f0ff 62%, #bdeaa8 62%, #a3dd8e
 /* the field and its bubbles */
 .field { position: absolute; inset: 0; z-index: 3; }
 .bub { position: absolute; left: 0; top: 0; border: 0; padding: 0; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; will-change: transform; touch-action: none;
-  background: radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--tint, #bfe6ff) 55%, transparent) 0 58%, color-mix(in srgb, var(--tint, #9fd6ff) 80%, #fff) 70%, #ffffffcc 74%, color-mix(in srgb, var(--tint, #8ccaff) 60%, transparent) 100%);
+  background: radial-gradient(circle at 35% 25%, #fff 0%, color-mix(in srgb, var(--tint, #ed5d91) 55%, #fff) 18%, var(--tint, #ed5d91) 65%, color-mix(in srgb, var(--tint, #ed5d91) 85%, #49345f) 100%);
   box-shadow: inset -8px -10px 18px #ffffff66, inset 6px 8px 14px #ffffff55, 0 6px 14px #3a86c022; }
 .bub .shine { position: absolute; left: 20%; top: 14%; width: 26%; height: 18%; border-radius: 50%; background: #ffffffd9; transform: rotate(-30deg); pointer-events: none; }
 .bub .emo { font-size: 58px; line-height: 1; pointer-events: none; } .bub .emo.q { opacity: .75; }
@@ -87,3 +86,6 @@ body { background: linear-gradient(#a9dcff 0%, #d7f0ff 62%, #bdeaa8 62%, #a3dd8e
 
 /* batch1: a right bubble floats away after a wrong pop (age 5+) */
 .bub.escape { opacity: .55; transition: opacity .6s; }
+
+/* Opaque color and a dark edge stay visible against both sky stops. */
+.bub { border: 3px solid #49345f; }

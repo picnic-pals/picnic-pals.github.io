@@ -93,11 +93,26 @@
     } });
   SK[1].ask = askFrom(SK[1].gen, function (r) { return { text: 'Which one is ' + (/^[aeiou]/.test(r.target) ? 'an ' : 'a ') + em(r.target) + '?', say: ['q_which_is', 'sh_' + r.target] }; });
 
+  // Content lock, independent of adaptive placement's deliberately lowered skill floor.
+  function olderLetters() {
+    var p = A.Steps && A.Steps.ctx.p || A.Store && A.Store.active();
+    if (!p || A.toddler(p)) return false;
+    var grade = p.levels && p.levels.reading;
+    return A.Age.of(p) >= 6 || /^[1-9]$/.test(grade || '');
+  }
+  var START_WORDS = { b: ['ball', 'bear', 'bus'], c: ['cat', 'cup', 'car'], d: ['dog', 'duck', 'drum'], f: ['fish', 'fan', 'fox'], m: ['moon', 'mouse', 'map'], n: ['nest', 'net', 'nose'], p: ['pig', 'pan', 'pen'], s: ['sun', 'sock', 'seal'], t: ['tiger', 'tent', 'top'] };
+  function startsRule() {
+    var letters = Object.keys(START_WORDS), T = pick(letters);
+    function mk(ch) { var w = pick(START_WORDS[ch]); return { label: w, html: wordHtml(w), fact: [{ text: w + ' starts with ' + ch.toUpperCase() }], name: [{ text: w }], k: ch }; }
+    return { starts: true, listen: true, text: 'Munch the words that start with ' + em(T.toUpperCase()), hint: 'Listen for the first sound.', say: ['rule_begins', 'lt_' + T], target: T,
+      good: function () { return mk(T); }, bad: function () { return mk(pick(others(letters, T))); } };
+  }
   /* ----- Letters (Reading & Words) ----- */
   SK.push({ id: 'letters', name: 'Letters', short: 'Find the letter (upper- and lowercase)', strand: 'Letters', std: 'PK / K.RF.1d', grade: 'PK', subject: 'reading', sayFact: true, secs: [9, 10],
     levels: ['Big letters (A B C)', 'Big and little letters (B b)'],
     intro: { line: 'skill_letters', example: ltrHtml('B') + ' ' + ltrHtml('b') + ' &nbsp;=&nbsp; B' },
     gen: function (L) {
+      if (olderLetters()) return startsRule();
       var pool = L ? E.LETTERS_BOTH : E.LETTERS, T = pick(pool);
       function mk(ch) { var up = !L || Math.random() < .5, s = up ? ch.toUpperCase() : ch; return { label: s, html: ltrHtml(s), fact: ['w_thats', 'lt_' + ch], name: ['lt_' + ch], k: ch }; }
       return { text: 'Munch the letter ' + em(L ? T.toUpperCase() + ' ' + T : T.toUpperCase()), hint: L ? 'Big ' + T.toUpperCase() + ' and little ' + T + '!' : 'Find ' + T.toUpperCase() + '!',
@@ -105,7 +120,7 @@
         good: function () { return mk(T); },
         bad: function () { var close = (E.LETTER_CLOSE[T] || '').split('').filter(function (x) { return pool.indexOf(x) >= 0; }); return mk(close.length && Math.random() < (L ? .55 : .3) ? pick(close) : pick(others(pool, T))); } };
     } });
-  SK[2].ask = askFrom(SK[2].gen, function (r) { return { text: 'Which one is the letter ' + em(r.target.toUpperCase()) + '?', say: ['q_which_letter', 'lt_' + r.target] }; });
+  SK[2].ask = askFrom(SK[2].gen, function (r) { if (r.starts) return { listen: true, text: 'Which one starts with ' + em(r.target.toUpperCase()) + '?', say: ['q_which_starts', 'lt_' + r.target] }; return { text: 'Which one is the letter ' + em(r.target.toUpperCase()) + '?', say: ['q_which_letter', 'lt_' + r.target] }; });
 
   /* ----- Beginning sounds (Reading & Words) ----- */
   SK.push({ id: 'begsound', name: 'Beginning sounds', short: 'Pictures that start with a letter’s sound', strand: 'Phonics', std: 'K.RF.2d / K.RF.3a', grade: 'PK–K', subject: 'reading', sayFact: true, secs: [11, 12],

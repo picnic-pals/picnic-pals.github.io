@@ -1,7 +1,7 @@
 /* Blob Arcade — word & picture banks for the first non-math skills (pre-K / K): colors, shapes, letters,
    beginning sounds, rhymes and Dolch pre-primer sight words. Plain data + tiny helpers, no DOM.
    Loaded after story.js / bonus-questions.js and BEFORE voice-lines.js, so the voice lines below (A.EarlyWords.VOICE)
-   and the "Letter Lagoon" island area are part of the normal voice catalog. The skills themselves are in skills-early.js.
+   and the "Lemonade Lagoon" island area are part of the normal voice catalog. The skills themselves are in skills-early.js.
    Picture rules: only emoji whose everyday name is clear (no 🐰 "rabbit/bunny", 🐴 "horse/pony", 🕸️ "web/spider web"). */
 (function (A) {
   'use strict';
@@ -114,8 +114,8 @@
   Object.keys(PICS).forEach(function (w) { var l = lineFor(w); if (/^pw_/.test(l) && !seen[l]) { seen[l] = 1; V.push([l, w]); } });
   E.VOICE = V;
 
-  /* ---------- Story mode: Letter Lagoon (a side trip on Picnic Island, one stop per skill, open from the start) ---------- */
-  if (A.Story && A.Story.addArea) A.Story.addArea({ id: 'lagoon', name: 'Letter Lemonade Lagoon', emoji: '🍋', friend: 'blueberry', bg: '#a8e4f0', x: 44, y: 86, side: true,
+  /* ---------- Story mode: Lemonade Lagoon (a side trip on Picnic Island, one stop per skill, open from the start) ---------- */
+  if (A.Story && A.Story.addArea) A.Story.addArea({ id: 'lagoon', name: 'Lemonade Lagoon', emoji: '🍋', friend: 'blueberry', bg: '#a8e4f0', x: 44, y: 86, side: true,
     stops: words('colors shapes letters begsound rhymes sight'), skill: 'colors',
-    beat: "Splish splash! Welcome to Letter Lemonade Lagoon. Colors, shapes, letters and words are floating in the lemonade. Let's munch them!" });
+    beat: "Splish splash! Welcome to Lemonade Lagoon. Colors, shapes, letters and words are floating in the lemonade. Let's munch them!" });
 })(window.Arcade);

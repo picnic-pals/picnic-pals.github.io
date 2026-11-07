@@ -62,7 +62,7 @@
     var mixTxt = SUBJ.filter(function (x) { return W[x.id]; }).map(function (x) { return Math.round(W[x.id] * 100) + '% ' + x.name; }).join(' · ');
     h += '<div class="mixbox"><label><b>Subject mix</b> <select data-mix aria-label="Subject mix"><option value="mixed"' + (p.mix === 'mixed' || !p.mix ? ' selected' : '') + '>Mixed (by age)</option>' +
       SUBJ.map(function (x) { return '<option value="' + x.id + '"' + (p.mix === x.id ? ' selected' : '') + '>Only ' + x.name + '</option>'; }).join('') + '</select></label>' +
-      '<p class="muted">Free Play, 2 Players, ' + A.TITLES.baseball + ' and bonus questions: <b data-mixtxt>' + mixTxt + '</b>. Mixed: age 3 and under gets about 40% Early Concepts, 30% letters &amp; sounds, 30% math; age 4 about 45% math, 40% reading, 15% Early Concepts; age 5 about 50% math, 45% reading, 5% Early Concepts; age 6 and up about 60% math, 30% reading, 10% Early Concepts. Story mode keeps its own areas (Letter Lagoon and Word Woods have the reading skills).</p></div>';
+      '<p class="muted">Free Play, 2 Players, ' + A.TITLES.baseball + ' and bonus questions: <b data-mixtxt>' + mixTxt + '</b>. Mixed: age 3 and under gets about 40% Early Concepts, 30% letters &amp; sounds, 30% math; age 4 about 45% math, 40% reading, 15% Early Concepts; age 5 about 50% math, 45% reading, 5% Early Concepts; age 6 and up about 60% math, 30% reading, 10% Early Concepts. Story mode keeps its own areas (Lemonade Lagoon and Pretzel Grove have the reading skills).</p></div>';
     if (A.Levels) {   // per-subject start level (grade); changing it moves that ladder's start, adaptive up / down from there
       h += '<div class="mixbox lvbox"><b>Levels</b> ' + SUBJ.map(function (x) {
         var cur = (p.levels && p.levels[x.id]) || 'auto', opts = [['auto', 'Auto (by age: ' + A.Levels.autoName(p, x.id) + ')']].concat(A.Levels.GRADES).concat(x.id === 'concepts' ? [['off', 'Off']] : []);
@@ -85,7 +85,7 @@
       C().SKILLS.forEach(function (s) { if (C().subjectOf(s) === x.id) h += skillRow(p, s); });
       h += '</tbody></table></section>';
     });
-    h += '<h3>Sight words</h3><p class="muted">The Dolch Pre-Primer words are now the “Sight words” skill in Reading &amp; Words (' + A.TITLES.munch + ', Baseball, Letter Lagoon). Word lists: ' + A.SightWords.lists.map(function (l) { return l.name + ' (' + l.words.length + ' words)'; }).join(', ') + '.</p>';
+    h += '<h3>Sight words</h3><p class="muted">The Dolch Pre-Primer words are now the “Sight words” skill in Reading &amp; Words (' + A.TITLES.munch + ', Baseball, Lemonade Lagoon). Word lists: ' + A.SightWords.lists.map(function (l) { return l.name + ' (' + l.words.length + ' words)'; }).join(', ') + '.</p>';
     b.innerHTML = h;
     A.$$('[data-kid]', b).forEach(function (x) { x.addEventListener('click', function () { st.kid = x.dataset.kid; render(); }); });
     var an = b.querySelector('[data-anon]'); if (an) an.addEventListener('change', function () { st.anon = an.checked; });

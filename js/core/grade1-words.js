@@ -1,7 +1,7 @@
 /* Blob Arcade — word & picture banks for the 1st-grade Reading & Words skills: CVC words (short vowels), digraphs
    sh / ch / th, Dolch primer + 1st-grade sight words, opposites, and action words vs naming words.
    Plain data + tiny helpers, no DOM. Load right after early-words.js (adds to A.EarlyWords: PICS, VOICE) and BEFORE
-   voice-lines.js, so the voice lines below and the "Word Woods" island side trip are in the normal voice catalog.
+   voice-lines.js, so the voice lines below and the "Pretzel Grove" island side trip are in the normal voice catalog.
    The skills themselves are in skills-grade1.js. */
 (function (A) {
   'use strict';
@@ -170,8 +170,8 @@
   G.LONG.forEach(function (lv) { Object.keys(lv).forEach(function (w) { wl(w); lv[w].forEach(wl); }); });
   G.DOLCH2.concat(G.DOLCH3).forEach(function (w) { add(A.SightWords.lineId(w), w, 'Dolch 2nd / 3rd grade sight word'); });
 
-  /* ---------- Story mode: Word Woods (a second side trip, one stop per 1st-grade skill, open from the start) ---------- */
-  if (A.Story && A.Story.addArea) A.Story.addArea({ id: 'wordwoods', name: 'Word Waffle Woods', emoji: '🧇', friend: 'corn', bg: '#bfe6a8', stroke: '#8fcf78', x: 85, y: 96, side: true,
+  /* ---------- Story mode: Pretzel Grove (a second side trip, one stop per 1st-grade skill, open from the start) ---------- */
+  if (A.Story && A.Story.addArea) A.Story.addArea({ id: 'wordwoods', name: 'Pretzel Grove', emoji: '🧇', friend: 'corn', bg: '#bfe6a8', stroke: '#8fcf78', x: 85, y: 96, side: true,
     stops: words('cvc longvowel sight3 homophones affixes comprehension'), skill: 'cvc',
-    beat: "Hello, reader! Welcome to Word Waffle Woods. Every waffle tree here has a word on it. Let's read them and munch them!" });
+    beat: "Hello, reader! Welcome to Pretzel Grove. Every waffle tree here has a word on it. Let's read them and munch them!" });
 })(window.Arcade);

@@ -31,14 +31,14 @@
   function sound(k) { if (A.Store.settings && A.Store.settings.sfx === false) return; (SOUNDS[k] || SOUNDS.pop)(); A.StoryMap2.lastSound = k; }
 
   function build() {
-    root = A.el('<section class="s2" id="s2map" aria-label="Story map"><div class="s2-top"><button class="s2-back" id="s2Back" aria-label="Back">◀</button>' +
-      '<div class="s2-title" id="s2Title"></div><button class="s2-book" id="s2Book" aria-label="Read the story book">📖</button><button class="q1help" id="s2Help" aria-label="How to play" title="How to play">?</button>' +
-      '<button class="s2-hero" id="s2Hero" aria-label="Switch friend"><img alt=""><span class="nm"></span><span class="sw"><i>🔄</i> <b>Friend</b></span></button></div>' +
+    root = A.el('<section class="s2" id="s2map" aria-label="Story map"><div class="s2-top"><button class="s2-back" id="s2Back" aria-label="Back">Back</button>' +
+      '<div class="s2-title" id="s2Title"></div><button class="s2-book" id="s2Book" aria-label="Read the story book">Book</button><button class="q1help" id="s2Help" aria-label="How to play" title="How to play">?</button>' +
+      '<button class="s2-hero" id="s2Hero" aria-label="Switch friend"><img alt=""><span class="nm"></span><span class="sw"><i>F</i> <b>Friend</b></span></button></div>' +
       '<div class="s2-stage" id="s2Stage"></div></section>');
     document.body.appendChild(root);
     root.querySelector('#s2Back').addEventListener('click', back);
     root.querySelector('#s2Hero').addEventListener('click', function () { if (!busy) friendPanel(); });
-    var reGuide = function () { var gd = root.querySelector('.s2-guide'), nb = root.querySelector('.s2-lv.cur'); if (gd && nb) placeGuide(gd, nb, gd.parentNode); };
+    var reGuide = function () { var stage = root.querySelector('.s2-art-stage'); if (stage) stage.style.setProperty('--s2-map-width', Math.max(900, stage.clientHeight * 1.6) + 'px'); var gd = root.querySelector('.s2-guide'), nb = root.querySelector('.s2-lv.cur'); if (gd && nb) placeGuide(gd, nb, gd.parentNode); };
     window.addEventListener('resize', reGuide);
     root.querySelector('#s2Help').addEventListener('click', function () { if (!busy && A.HowTo && !document.querySelector('.overlay.on')) { V.stop(); A.HowTo.show('story'); } });   // quality1 (C3)
     root.querySelector('#s2Book').addEventListener('click', function () { if (!busy && A.StoryBook) { V.stop(); A.StoryBook.open(P); } });
@@ -47,19 +47,20 @@
   function isOpen() { return !!root && root.classList.contains('on'); }
   function heroChip() { var h = S2.hero(P), b = root.querySelector('#s2Hero'); b.querySelector('img').src = img(h); b.querySelector('.nm').textContent = S2.heroName(h); b.dataset.hero = h; }
   function render() {
-    heroChip(); var stg = root.querySelector('#s2Stage'); stg.innerHTML = ''; root.dataset.view = view;
+    var note = root.querySelector('.s2-pan-note'); if (note) note.remove();
+    heroChip(); var stg = root.querySelector('#s2Stage'); stg.innerHTML = ''; stg.classList.remove('s2-art-stage'); root.dataset.view = view;
     if (view === 'world') return renderWorld(stg);
     renderPlace(stg);
   }
   function renderWorld(stg) {
-    var R = S2.reachedList(P), cur = S2.currentPlace(P); root.querySelector('#s2Title').textContent = '🗺️ Picnic World'; root.style.removeProperty('--s2a'); root.style.removeProperty('--s2b'); root.dataset.place = '';
+    var R = S2.reachedList(P), cur = S2.currentPlace(P); root.querySelector('#s2Title').textContent = 'Picnic World'; root.style.removeProperty('--s2a'); root.style.removeProperty('--s2b'); root.dataset.place = '';
     var svg = '<svg class="s2-trail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + R.map(function (k) { return WXY[k].join(','); }).join(' ') + '"/></svg>';
     stg.insertAdjacentHTML('beforeend', svg);
     R.forEach(function (k, j) { var pl = S2.PLACES[k], pr = S2.progress(P, k), b = A.el('<button class="s2-place' + (k === cur ? ' cur' : '') + (S2.done(P, k) ? ' done' : '') + '" data-k="' + k + '" style="' + LX(WXY[k][0]) + ';top:' + WXY[k][1] + '%;--a:' + pl.theme[0] + ';--b:' + pl.theme[1] + '">' +
-      '<span class="em">' + pl.emoji + '</span><span class="nm">' + A.esc(pl.name) + '</span><span class="pr">' + '⭐'.repeat(Math.min(pr.n, 6)) + '<i>' + pr.n + '/' + pr.of + '</i></span></button>');
+      '<span class="em">' + (pl.art ? '<img class="s2-world-thumb" alt="" src="' + S2.artURL(pl, 'map') + '">' : '<span class="s2-world-initial">' + pl.name.charAt(0) + '</span>') + '</span><span class="nm">' + A.esc(pl.name) + '</span><span class="pr">' + Array(Math.min(pr.n, 6) + 1).join('<span class="s2-world-star">' + UI.STAR + '</span>') + '<i>' + pr.n + '/' + pr.of + '</i></span></button>');
       b.addEventListener('click', function () { if (!busy) openPlace(k); }); stg.appendChild(b); });
-    var nx = R[R.length - 1] + 1; if (nx < S2.PLACES.length) { var f = A.el('<div class="s2-fog" aria-hidden="true" style="left:' + WXY[nx][0] + '%;top:' + WXY[nx][1] + '%"><span>☁️</span><span>☁️</span><span>☁️</span></div>'); stg.appendChild(f); }
-    if (S2.waiting(P)) stg.appendChild(A.el('<div class="s2-note">🌙 A new path opens next time. Replay a place or pick a friend!</div>'));
+    var nx = R[R.length - 1] + 1; if (nx < S2.PLACES.length) { var f = A.el('<div class="s2-fog" aria-hidden="true" style="left:' + WXY[nx][0] + '%;top:' + WXY[nx][1] + '%"><span class="s2-cloud"></span><span class="s2-cloud"></span><span class="s2-cloud"></span></div>'); stg.appendChild(f); }
+    if (S2.waiting(P)) stg.appendChild(A.el('<div class="s2-note">A new path opens next time. Replay a place or pick a friend!</div>'));
     var hx = WXY[cur]; stg.appendChild(A.el('<img class="s2-me" alt="" src="' + img(S2.hero(P), 'happy') + '" style="left:' + hx[0] + '%;top:' + (hx[1] - 11) + '%">'));
     sel = Math.max(0, R.indexOf(cur)); focusSel();
   }
@@ -70,6 +71,7 @@
   }
   function renderPlace(stg) {
     var k = placeK, pl = S2.PLACES[k], L = S2.levels(P, k), cur = S2.current(P, k);
+    if (pl.art) return renderArtPlace(stg, pl, L, cur);
     root.querySelector('#s2Title').textContent = pl.emoji + ' ' + pl.name; root.style.setProperty('--s2a', pl.theme[0]); root.style.setProperty('--s2b', pl.theme[1]); root.dataset.place = pl.id;
     pl.deco.forEach(function (d, j) { var e = A.el('<button class="s2-deco" aria-label="scenery" style="left:' + (6 + j * 16 + (j % 2) * 4) + '%;top:' + (j % 2 ? 84 : 14 + (j % 3) * 4) + '%;animation-delay:' + (j * .7) + 's">' + d + '</button>');
       e.addEventListener('click', function () { e.classList.remove('wig'); void e.offsetWidth; e.classList.add('wig'); sound(pl.sound); }); stg.appendChild(e); });
@@ -90,19 +92,44 @@
     var curB = stg.querySelector('.s2-lv[data-i="' + cur + '"]'); if (curB) { placeGuide(gd, curB, stg); if (window.requestAnimationFrame) requestAnimationFrame(function () { placeGuide(gd, curB, stg); }); }
     sel = cj; focusSel();
   }
+  // Keep the 1600:1000 art and its marker centres together. Small screens pan rather than crop/stretch the map.
+  function renderArtPlace(stg, pl, L, cur) {
+    root.querySelector('#s2Title').textContent = pl.name;
+    root.dataset.place = pl.id; stg.classList.add('s2-art-stage');
+    stg.style.setProperty('--s2-map-width', Math.max(900, stg.clientHeight * 1.6) + 'px');
+    root.appendChild(A.el('<div class="s2-pan-note">Swipe sideways to explore</div>'));
+    var board = A.el('<div class="s2-art-board"><img class="s2-map-paint" alt="" src="' + S2.artURL(pl, 'map') + '"></div>');
+    stg.appendChild(board);
+    L.forEach(function (i, j) {
+      var boss = S2.isBoss(i), mark = pl.art.markers[boss ? 5 : S2.LEVELS[pl.ix].indexOf(i)], ok = S2.playable(P, i), pass = S2.passed(P, i), r = ST.stopInfo(P, i) || {};
+      var portrait = S2.artURL(pl, S2.bossBeaten(P, pl.ix) ? 'portrait_rematch' : 'portrait');
+      var stars = pass ? '<span class="s2-drawn-stars">' + Array(Math.max(1, Math.min(3, r.stars || 1)) + 1).join(UI.STAR) + '</span>' : '';
+      var b = A.el('<button class="s2-lv s2-art-lv' + (boss ? ' boss' : '') + (i === cur ? ' cur' : '') + (pass ? ' pass' : '') + (ok ? '' : ' off') + '" data-i="' + i + '" style="left:' + (mark.x / pl.art.size[0] * 100) + '%;top:' + (mark.y / pl.art.size[1] * 100) + '%"' + (ok ? '' : ' aria-disabled="true"') + ' aria-label="' + A.esc(mark.landmark_name + (boss ? ', mini boss ' + pl.boss : ', level ' + (j + 1)) + (pass ? ', play again' : '')) + '">' +
+        (boss ? '<img class="s2-marker-boss" alt="" src="' + portrait + '">' : '<span class="n">' + (j + 1) + '</span>') +
+        '<span class="s2-stop-label">' + A.esc(mark.landmark_name) + stars + '</span></button>');
+      b.addEventListener('click', function () { if (!busy && ok) choose(i); else if (!busy) sound('pop'); }); board.appendChild(b);
+    });
+    var currentB = board.querySelector('[data-i="' + cur + '"]');
+    if (currentB) {
+      var me = A.el('<img class="s2-art-hero" alt="Your friend is here" src="' + img(S2.hero(P), 'happy') + '">');
+      me.style.left = currentB.style.left; me.style.top = currentB.style.top; board.appendChild(me);
+      requestAnimationFrame(function () { stg.scrollLeft = Math.max(0, currentB.offsetLeft - stg.clientWidth / 2); });
+    }
+    sel = Math.max(0, L.indexOf(cur)); focusSel();
+  }
   function items() { return A.$$(view === 'world' ? '.s2-place' : '.s2-lv', root); }
-  function focusSel() { var it = items(); it.forEach(function (b, j) { b.classList.toggle('sel', j === sel); }); }
+  function focusSel() { var it = items(); it.forEach(function (b, j) { b.classList.toggle('sel', j === sel); }); if (view === 'place' && S2.PLACES[placeK].art && it[sel]) it[sel].scrollIntoView({ block: 'nearest', inline: 'center' }); }
   function openPlace(k, quiet) {
     placeK = k; view = 'place'; sound(S2.PLACES[k].sound); render();
     var m = S2.meta(P), seenKey = S2.hero(P) + ':' + S2.PLACES[k].id, sd = ST.data(P); sd.seen = sd.seen || {};
     if (!quiet) { var first = !sd.seen['place2:' + S2.PLACES[k].id]; sd.seen['place2:' + S2.PLACES[k].id] = Date.now(); A.Store.save();
-      say(['s2_place_' + S2.PLACES[k].id].concat(first ? [{ id: 's2_tag_' + (S2.FLAVOR[S2.hero(P)] ? S2.hero(P) : 'other'), text: S2.flavor(P).tag }] : [])); }
+      say([{ text: S2.PLACES[k].name + '!' }].concat(first ? [{ id: 's2_tag_' + (S2.FLAVOR[S2.hero(P)] ? S2.hero(P) : 'other'), text: S2.flavor(P).tag }] : [])); }
     A.StoryMap2.lastPlace = k; void m; void seenKey;
   }
   function choose(i) {
     busy = true; sound('pop'); var boss = S2.isBoss(i), pl = S2.PLACES[S2.placeOfStop(i)];
     var go = function () { busy = false; close(); var f = resolveFn; resolveFn = null; if (f) f(i); };
-    if (!boss) return go();
+    if (!boss || pl.art) return go();
     // the mini boss: a bigger fun challenge, never scary, no pressure (any result is fine; try again any time)
     UI.card({ cls: 'storycard s2boss', tag: pl.emoji + ' ' + pl.name, title: 'Mini boss: ' + pl.boss + '!', art: '<div class="jump"><img src="' + img(S2.hero(P), 'happy') + '" alt="" style="width:150px"></div><div class="s2-bossart">' + pl.bossEmoji + '</div>',
       sub: 'A big, fun challenge. ' + S2.flavor(P).boss + ' Take your time.', btn: "Let's try ▶", voice: ['s2_boss', { id: 's2_bosscheer_' + (S2.FLAVOR[S2.hero(P)] ? S2.hero(P) : 'other'), text: S2.flavor(P).boss }], minMs: 500 }).then(go);
@@ -150,8 +177,8 @@
     o = o || {}; P = p; S2.migrate(p); if (!root) build(); busy = false; root.classList.toggle('s2-tod', TOD());
     var sd = ST.data(p); sd.seen = sd.seen || {}; sd.seen.prologue = sd.seen.prologue || Date.now();   // the picture book is the prologue in v2
     root.classList.add('on'); var to = o.to != null ? +o.to : null, k = to != null ? S2.placeOfStop(to) : -1;
-    if (k >= 0 && S2.reached(p, k)) { placeK = S2.done(p, k) && S2.reached(p, k + 1) && o.from != null && S2.isBoss(+o.from) ? k + 1 : k; view = 'place'; openPlace(placeK, true); if (placeK !== k) say(['s2_new_place', 's2_place_' + S2.PLACES[placeK].id]); }
-    else if (TOD() && S2.currentPlace(p) >= 0) { openPlace(S2.currentPlace(p), true); say(['s2_place_' + S2.PLACES[S2.currentPlace(p)].id]); }
+    if (k >= 0 && S2.reached(p, k)) { placeK = S2.done(p, k) && S2.reached(p, k + 1) && o.from != null && S2.isBoss(+o.from) ? k + 1 : k; view = 'place'; openPlace(placeK, true); if (placeK !== k) say(['s2_new_place', { text: S2.PLACES[placeK].name + '!' }]); }
+    else if (TOD() && S2.currentPlace(p) >= 0) { openPlace(S2.currentPlace(p), true); say([{ text: S2.PLACES[S2.currentPlace(p)].name + '!' }]); }
     else { view = 'world'; render(); say(['s2_world']); }
     if (o.from != null && S2.isBoss(+o.from) && S2.waiting(p)) say(['s2_tomorrow']);
     A.Store.save();
@@ -160,5 +187,50 @@
     chain.then(askNew);
     return new Promise(function (res) { resolveFn = res; });
   }
-  A.StoryMap2 = { open: open, close: close, isOpen: isOpen, render: function () { render(); }, openPlace: openPlace, friendPanel: friendPanel, back: back, choose: choose, sound: sound, view: function () { return view; }, place: function () { return placeK; }, lastSound: null, lastPlace: null, lastSwitch: null };
+  /* Art boss panels: explicit buttons, optional narration, keyboard/touch parity. Locked art is never composited with a face. */
+  function bossPanel(o) {
+    return new Promise(function (resolve) {
+      var prior = document.activeElement;
+      var ov = A.el('<div class="overlay on s2-story" role="dialog" aria-modal="true" aria-label="' + A.esc(o.title) + '"><div class="s2-story-card"><h2>' + A.esc(o.title) + '</h2>' + o.art + '<p>' + A.esc(o.text) + '</p><div class="s2-story-actions">' + o.buttons.map(function (b) { return '<button class="bigbtn" data-action="' + b[0] + '">' + A.esc(b[1]) + '</button>'; }).join('') + '<button class="s2-read" data-action="read">Hear again</button></div></div></div>');
+      var done = false;
+      function read() { V.stop(); say([{ text: o.title + '. ' + o.text }], 'name'); }
+      function finish(value) { if (done) return; done = true; V.stop(); document.removeEventListener('keydown', key, true); ov.remove(); UI.cardOpen = !!document.querySelector('.overlay.on'); if (prior && prior.isConnected) prior.focus({ preventScroll: true }); resolve(value); }
+      function key(e) {
+        if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); return finish(o.buttons.some(function (b) { return b[0] === 'skip'; }) ? 'skip' : o.buttons.some(function (b) { return b[0] === 'map'; }) ? 'map' : o.buttons[0][0]); }
+        if (e.key === 'Tab') { var bs = A.$$('button', ov), at = bs.indexOf(document.activeElement); e.preventDefault(); e.stopImmediatePropagation(); bs[(at + (e.shiftKey ? bs.length - 1 : 1)) % bs.length].focus(); }
+        if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat && document.activeElement && ov.contains(document.activeElement)) document.activeElement.click(); }
+      }
+      ov.addEventListener('click', function (e) { var b = e.target.closest('[data-action]'); if (b) { if (b.dataset.action === 'read') read(); else finish(b.dataset.action); } });
+      document.body.appendChild(ov); UI.cardOpen = true; document.addEventListener('keydown', key, true); ov.querySelector('button').focus(); read();
+    });
+  }
+  function sceneArt(pl, which, freed) {
+    var html = '<div class="s2-scene"><img alt="' + (which === 'locked_scene' ? 'A friend waits as a faceless silhouette' : 'The way is open') + '" src="' + S2.artURL(pl, which) + '">';
+    if (freed) { var q = pl.art.freedSlot; html += '<img class="s2-freed" alt="' + A.esc(S2.heroName(pl.art.friend)) + '" src="' + img(pl.art.friend, 'happy') + '" style="left:' + (q.x / 16) + '%;top:' + ((q.ground_y - q.h) / 10) + '%;width:' + (q.w / 16) + '%;height:' + (q.h / 10) + '%">'; }
+    return html + '</div>';
+  }
+  function encounter(p, i) {
+    var k = S2.placeOfStop(i), pl = S2.PLACES[k], rematch = S2.bossBeaten(p, k);
+    return bossPanel({ title: (rematch ? 'Rematch: ' : 'Mini boss: ') + pl.boss,
+      art: rematch ? '<img class="s2-portrait" alt="' + pl.boss + ' is ready for a rematch" src="' + S2.artURL(pl, 'portrait_rematch') + '">' : sceneArt(pl, 'locked_scene'),
+      text: rematch ? pl.boss + ' is ready to play again! Same skills, a few more snacks. Take your time.' : pl.boss + ' has a picnic friend trapped here. Let’s solve the snack challenge and open the way!',
+      buttons: rematch ? [['next', 'Play rematch']] : [['next', 'Let’s play'], ['skip', 'Skip story']] });
+  }
+  function retryBoss(p, i) {
+    var pl = S2.PLACES[S2.placeOfStop(i)];
+    return bossPanel({ title: 'Nice try with ' + pl.boss + '!', art: '<img class="s2-portrait" alt="' + pl.boss + '" src="' + S2.artURL(pl, S2.bossBeaten(p, pl.ix) ? 'portrait_rematch' : 'portrait') + '">',
+      text: 'Every try is practice. Play again or explore the map!', buttons: [['retry', 'Try again'], ['map', 'Back to map']] });
+  }
+  function victory(p, i, rescue) {
+    var pl = S2.PLACES[S2.placeOfStop(i)], name = S2.heroName(pl.art.friend), chain = Promise.resolve();
+    if (rescue.first) {
+      chain = bossPanel({ title: pl.boss + ' steps aside!', art: sceneArt(pl, 'defeat'), text: 'You did it! The way is open. Our picnic friend can come out!', buttons: [['next', 'Continue']] }).then(function () {
+        if (rescue.fresh) return A.Rewards.celebrateRescue(p, rescue.friend);
+        return bossPanel({ title: name + ' is safe!', art: sceneArt(pl, 'defeat', true), text: name + ' is safe and says thanks!', buttons: [['next', 'Hooray!']] });
+      });
+    }
+    return chain.then(function () { return bossPanel({ title: rescue.first ? 'Back together!' : 'Well played!', art: sceneArt(pl, 'defeat', true),
+      text: name + ' is safe. Play ' + pl.boss + ' again or explore the map.', buttons: [['map', 'Back to map'], ['rematch', 'Rematch']] }); });
+  }
+  A.StoryMap2 = { retryBoss: retryBoss, encounter: encounter, victory: victory, open: open, close: close, isOpen: isOpen, render: function () { render(); }, openPlace: openPlace, friendPanel: friendPanel, back: back, choose: choose, sound: sound, view: function () { return view; }, place: function () { return placeK; }, lastSound: null, lastPlace: null, lastSwitch: null };
 })(window.Arcade);

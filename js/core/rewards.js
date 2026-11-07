@@ -392,6 +392,22 @@
     return '<div class="fbasket" aria-hidden="true"><span class="fb1">' + u('basket_closed') + '</span><span class="fb2">' + u('basket_opening') + '</span><span class="fb3">' + u('basket_open') + '</span>' +
       '<span class="fb4">' + u('reveal_' + id) + '</span></div><p class="fbname">' + A.esc(charName(id)) + '</p>';
   }
+  // Boss rescues share the normal unlock registry: mastery skips them automatically.
+  // Remove an already queued reveal too, so a mastery unlock just before a rescue never celebrates twice.
+  function freeFriend(p, id) {
+    p.unlocks = p.unlocks || {}; var b = p.unlocks.blobs || (p.unlocks.blobs = {});
+    var fresh = !b[id] && p.blob !== id;
+    if (fresh) b[id] = Date.now();
+    pace(p).queue = pace(p).queue.filter(function (it) { return it.kind !== 'blob' || it.id !== id; });
+    return fresh;
+  }
+  function celebrateRescue(p, id) {
+    var name = charName(id);
+    return A.UI.card({ tag: 'Friend freed!', title: name + ' is free!', art: revealHTML(id),
+      sub: 'Welcome to the picnic! You can play as ' + name + '.', btn: 'Hooray!', sfx: 'unlock',
+      voice: [{ text: name + ' is free! Welcome to the picnic, ' + name + '!' }], voiceKind: 'name',
+      cls: 'reward newfriend s2-unlock', minMs: 1800 });
+  }
   /* end of session (back in the hub): ONE card with up to CONFIG.cardsPerSession prizes (biggest first); extras stay queued */
   var ORDER = { epic: 0, rare: 1, uncommon: 2 };
   function takeSession(p) { var P = pace(p); P.queue.sort(function (a, b) { return (a.tier in ORDER ? ORDER[a.tier] : 2) - (b.tier in ORDER ? ORDER[b.tier] : 2); });
@@ -436,7 +452,7 @@
     return chain;
   }
 
-  A.Rewards = { CONFIG: CONFIG, BADGES: BADGES, badge: badge, stats: stats, weeksMet: weeksMet, weekDays: weekDays, charRule: charRule, charProgress: charProgress, charHint: charHint, nextFriend: nextFriend,
+  A.Rewards = { freeFriend: freeFriend, celebrateRescue: celebrateRescue, CONFIG: CONFIG, BADGES: BADGES, badge: badge, stats: stats, weeksMet: weeksMet, weekDays: weekDays, charRule: charRule, charProgress: charProgress, charHint: charHint, nextFriend: nextFriend,
     characters: function () { return CONFIG.characters; }, popQuizTheme: popQuizTheme, effort: effort, furniturePrice: furniturePrice, applyRoomPrices: applyRoomPrices, grandfather: grandfather, pace: pace,
     longGoal: longGoal, goals: goals, takeSession: takeSession, celebrateSession: celebrateSession, revealHTML: revealHTML, hasRevealArt: hasRevealArt, lockedArt: lockedArt, itemName: itemName, tierOf: tierOf, learnedLine: learnedLine,
     STICKERS: STICKERS, stickerById: STK_BY, stickerSVG: stickerSVG, OUTFIT_COST: OUTFIT_COST, COLOR_COST: COLOR_COST, unlocked: unlocked, check: check, celebrate: celebrate, nextGoal: nextGoal,
