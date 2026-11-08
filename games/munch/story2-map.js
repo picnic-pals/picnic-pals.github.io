@@ -107,7 +107,7 @@
       var b = A.el('<button class="s2-lv s2-art-lv' + (boss ? ' boss' : '') + (i === cur ? ' cur' : '') + (pass ? ' pass' : '') + (ok ? '' : ' off') + '" data-i="' + i + '" style="left:' + (mark.x / pl.art.size[0] * 100) + '%;top:' + (mark.y / pl.art.size[1] * 100) + '%"' + (ok ? '' : ' aria-disabled="true"') + ' aria-label="' + A.esc(mark.landmark_name + (boss ? ', mini boss ' + pl.boss : ', level ' + (j + 1)) + (pass ? ', play again' : '')) + '">' +
         (boss ? '<img class="s2-marker-boss" alt="" src="' + portrait + '">' : '<span class="n">' + (j + 1) + '</span>') +
         '<span class="s2-stop-label">' + A.esc(mark.landmark_name) + stars + '</span></button>');
-      b.addEventListener('click', function () { if (!busy && ok) choose(i); else if (!busy) sound('pop'); }); board.appendChild(b);
+      b.addEventListener('click', function () { if (!busy && ok) choose(i); else if (!busy) { sound('pop'); lockedNudge(board, cur); } }); board.appendChild(b);
     });
     var currentB = board.querySelector('[data-i="' + cur + '"]');
     if (currentB) {
@@ -125,6 +125,13 @@
     if (!quiet) { var first = !sd.seen['place2:' + S2.PLACES[k].id]; sd.seen['place2:' + S2.PLACES[k].id] = Date.now(); A.Store.save();
       say([{ text: S2.PLACES[k].name + '!' }].concat(first ? [{ id: 's2_tag_' + (S2.FLAVOR[S2.hero(P)] ? S2.hero(P) : 'other'), text: S2.flavor(P).tag }] : [])); }
     A.StoryMap2.lastPlace = k; void m; void seenKey;
+  }
+  // batch-1107c: a locked level used to look almost like an open one and a tap did nothing (felt frozen to a 4-year-old):
+  // now the open level bounces and a short note says where to go
+  function lockedNudge(board, cur) {
+    var c = board.querySelector('[data-i="' + cur + '"]'); if (c) { c.classList.remove('nudge'); void c.offsetWidth; c.classList.add('nudge'); }
+    var old = root.querySelector('.s2-lock-note'); if (old) old.remove();
+    var n = A.el('<div class="s2-lock-note" role="status">Play the bouncing level first!</div>'); root.appendChild(n); setTimeout(function () { n.remove(); }, 2200);
   }
   function choose(i) {
     busy = true; sound('pop'); var boss = S2.isBoss(i), pl = S2.PLACES[S2.placeOfStop(i)];

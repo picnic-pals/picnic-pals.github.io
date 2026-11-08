@@ -89,3 +89,9 @@ body { background: linear-gradient(#a9dcff 0%, #d7f0ff 62%, #bdeaa8 62%, #a3dd8e
 
 /* Opaque color and a dark edge stay visible against both sky stops. */
 .bub { border: 3px solid #49345f; }
+/* batch-1107c: phone fit: smaller bubble text to match the smaller bubbles, a slimmer target card */
+@media (max-width: 480px), (max-height: 560px) {
+  .bub .emo { font-size: 42px; } .bub .tx { font-size: 36px; } .bub .tx.long { font-size: 22px; } .bub.k-sum .tx { font-size: 26px; } .bub .snd { font-size: 22px; }
+  .target { top: 70px; padding: 8px 14px; gap: 8px; } .target b { font-size: 32px; } .target .emo { font-size: 42px; } .target .sw { width: 50px; height: 50px; } .target .shp svg { width: 52px; height: 52px; }
+  .sayagain { width: 56px; height: 56px; font-size: 26px; }
+}

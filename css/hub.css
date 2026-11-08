@@ -347,3 +347,6 @@
   #newkid .topbar { gap: 10px; }
   #newkid .topbar .backbtn { white-space: nowrap; flex: none; }
 }
+
+/* Food Fight: picnic cards, original pip artwork. */
+.tile.foodfight .scene { background:linear-gradient(155deg,#fff0bd,#ffd4df); }

@@ -58,8 +58,12 @@
       gen: function (L) {
         var N = L ? rnd(4, 10) : rnd(1, 5), max = L ? 10 : 6;
         function mk(v) { var dots = v > 0 && Math.random() < (L ? .35 : .5); return { label: String(v), html: dots ? frame(v) : null, fact: v !== N ? ['w_thats', v, 'w_not', N] : ['w_thats', v] }; }
-        return { text: 'Munch the number ' + em(N), hint: 'Look for ' + N + ' dots too!', say: ['munch_rule_number', N],
-          good: function () { return mk(N); }, bad: function () { var v; do { v = rnd(0, max); } while (v === N); return mk(v); } };
+        // qbatch-1107: same value, different look (numeral, ten-frame, and at level 1 a + b), so targets are not all copies of one numeral
+        var gi = 0;
+        function goodN() { var k = gi++ % (L ? 3 : 2); if (k === 0) return { label: String(N), fact: ['w_thats', N] }; if (k === 1) return { label: String(N), html: frame(N), fact: ['w_thats', N] };
+          var a = rnd(0, N); return { label: a + ' + ' + (N - a), fact: [a, 'w_plus', N - a, 'w_is', N] }; }
+        return { text: 'Munch the number ' + em(N) + ' ' + frame(N), hint: 'Look for ' + N + ' dots too!', say: ['munch_rule_number', N],
+          good: goodN, bad: function () { var v; do { v = rnd(0, max); } while (v === N); if (L && Math.random() < .3) { var a = rnd(0, v); return { label: a + ' + ' + (v - a), fact: [a, 'w_plus', v - a, 'w_is', v, 'w_not', N] }; } return mk(v); } };
       } },
     { id: 'compare', name: 'Bigger & smaller', short: 'Compare numbers to 20', strand: 'Counting', std: 'K.CC.7 / 1.NBT.3', grade: '1', sayFact: true,
       levels: ['Numbers to 10', 'Numbers to 20'],

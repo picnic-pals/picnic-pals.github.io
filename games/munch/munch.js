@@ -97,12 +97,14 @@
       if (A.Steps) A.Steps.ctx.p = pl.P;
       var R = pl.round.skill.gen(pl.round.level), mine = TWO ? N / 2 : N, cpb = A.Age.cellsPerBoard(pl.P), nOk = TWO ? A.rnd(5, 6) : pl.round.nOk || A.rnd(cpb[0], cpb[1]), i;
       var pickable = A.Coach && A.Coach.pickItem && !R.rc && R.hom == null && typeof R.target !== 'string' && !pl.P.guest;
+      var seen = {}, ck = function (c) { return c.label + '|' + (c.html || ''); };   // qbatch-1107: distinct targets and distractors when the rule allows it
+      var fresh = function (fn) { var c, t = 0; do { c = fn(); } while (seen[ck(c)] && ++t < 12); seen[ck(c)] = 1; return c; };
       for (i = 0; i < nOk; i++) {
-        var g = R.good();
-        if (pickable) { var cands = [g, R.good(), R.good()].map(function (c) { return { key: c.label, cell: c }; }); g = A.Coach.pickItem(pl.P, pl.round.skill.id, cands).cell; }   // coach v2: expected success near 80-85%
+        var g = fresh(R.good);
+        if (pickable) { var cands = [g, R.good(), R.good()].filter(function (c, k) { return !k || !seen[ck(c)]; }).map(function (c) { return { key: c.label, cell: c }; }); g = A.Coach.pickItem(pl.P, pl.round.skill.id, cands).cell; }   // coach v2: expected success near 80-85%
         g.ok = true; g.owner = pl.i; cells.push(g);
       }
-      for (i = nOk; i < mine; i++) { var b = R.bad(); b.ok = false; b.owner = pl.i; cells.push(b); }
+      for (i = nOk; i < mine; i++) { var b = fresh(R.bad); b.ok = false; b.owner = pl.i; cells.push(b); }
       pl.workedShown = false; pl.easedOff = false; pl.workedOpen = false; pl.lastAns = 0; pl.diag = null; pl.diagSeen = {}; pl.lastMiss = null;
       pl.rule = R; pl.nOk = nOk; pl.remaining = nOk; pl.correct = 0; pl.wrong = 0; pl.done = false; pl.doneAt = 0; pl.busy = false;
       pl.target = null; clearTimeout(pl.walkT); pl.walkT = null; if (!cont) pl.bonusStar = false;
@@ -464,6 +466,8 @@
     document.body.appendChild(ov); B.el = ov; UI.cardOpen = true;
     A.$$('.choice', ov).forEach(function (b) { b.addEventListener('click', function () { answer(+b.dataset.k); }); b.addEventListener('pointerenter', function () { if (!B.answered) select(+b.dataset.k); }); });
     ov.querySelector('[data-again]').addEventListener('click', function (e) { e.stopPropagation(); readQuestion(true); });
+    // batch-1107c: tap outside the card to skip the bonus question (nothing recorded)
+    UI.skipOutside(ov, function () { if (!B.open || B.answered) return; B.answered = true; B.readTok++; V.stop(); ov.remove(); B.el = null; B.open = false; UI.cardOpen = !!document.querySelector('.overlay.on'); poke(); });
     select(0); readQuestion();
   }
   function readQuestion(all) {
@@ -783,12 +787,14 @@
       var sd = ST.data(P1), firstSide = stop.side && !sd.seen['area:' + stop.area.id];
       if (firstSide) sd.seen['area:' + stop.area.id] = Date.now();
       var beatSeen = sd0.seen['beat:' + stop.area.id];   // each area's story card plays once
-      if (!artBoss && ((!practice && stop.lv === 0 && !stop.side && !beatSeen) || firstSide)) chain = chain.then(function () {
+      // batch-1107c: the old island map's area card (e.g. "Counting Cornfield") showed before Berry Meadow level 1 on the new world map; story2 places have their own intro
+      var s2place = A.Story2 && A.StoryMap2 && A.Story2.placeOfStop(i) >= 0 && !(function () { try { return sessionStorage.getItem('blobArcade.map1') === '1'; } catch (e) { return false; } })();
+      if (!artBoss && !s2place && ((!practice && stop.lv === 0 && !stop.side && !beatSeen) || firstSide)) chain = chain.then(function () {
         var a = stop.area; sd0.seen['beat:' + a.id] = Date.now(); A.Store.save();
         // design1: an area guide the player hasn't met yet (e.g. Crunch, Vinnie) stays a surprise: Jammy tells that area's story
         // instead, without the guide's name (read by the browser voice; the recorded beat line names the guide)
         var gf = met([a.friend])[0] === a.friend ? a.friend : (A.Story2 ? A.Story2.hero(P1) : 'strawberry'), gName = A.Blobs.byId[a.friend].name, beat = a.beat, bv = ['area_' + a.id, 'beat_' + a.id];
-        if (gf !== a.friend) { beat = beat.split(/(?<=[.!?])\s+/).filter(function (x) { return x.indexOf(gName) < 0 && !/^(Hi|Hello)\b/.test(x); }).join(' ') || 'Let\'s find the star-snacks here!'; bv = ['area_' + a.id, { text: beat }]; }
+        if (gf !== a.friend) { beat = (beat.match(/[^.!?]+[.!?]*\s*/g) || [beat]).map(function (x) { return x.trim(); }).filter(function (x) { return x.indexOf(gName) < 0 && !/^(Hi|Hello)\b/.test(x); }).join(' ') || 'Let\'s find the star-snacks here!'; bv = ['area_' + a.id, { text: beat }]; }
         return UI.card({ cls: 'storycard beat', tag: a.emoji + ' ' + a.name, title: A.Blobs.byId[gf].name + ' says…', art: '<div class="jump">' + A.Blobs.svg({ blob: gf, expr: 'happy' }) + '</div>', sub: beat, btn: 'OK ▶', voice: bv, minMs: 600 });
       });
       // quality1 (rule 2): the very first Munch stop of a subject runs the same quick check as free Munch (UI.placement), so a

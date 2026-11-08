@@ -13,6 +13,7 @@
     { id: 'munch', name: A.TITLES.munch, sub: 'Number munching math', cls: 'munch', href: 'games/munch/index.html', ready: true, voice: ['hub_lets_go'], say: ['munch_title'], tip: 'Walk around the picnic and munch the right answers. Math and words!' },
     { id: 'baseball', name: A.TITLES.baseball, sub: 'Math at the ballpark', cls: 'base', href: 'games/baseball/index.html', ready: true, voice: ['bb_play_ball'], say: ['bb_title'], tip: 'Beat the Sprout Squad! Right answers are hits, misses are outs. Score more runs to win.' },
     { id: 'stand', name: A.TITLES.stand, sub: 'Serve your friends', cls: 'stand', href: 'games/stand/index.html', ready: true, all: true, voice: ['ls_title'], say: ['ls_title'], tip: 'Run a lemonade stand! Fill each friend\'s order and count the tips.' },
+    { id: 'foodfight', name: A.TITLES.foodfight, sub: 'Flip, compare & splat', cls: 'foodfight', href: 'games/foodfight/index.html', ready: true, all: true, voice: [{ text: 'Food Fight' }], say: [{ text: 'Food Fight' }], tip: 'Play picnic cards with Sunny. Tap who has more, or less. Ten flips, lots of splats!' },
     { id: 'bubble', name: A.TITLES.bubble, sub: 'Pop the right bubbles', cls: 'bubble', href: 'games/bubble/index.html', ready: true, all: true, voice: ['bp_title'], say: ['bp_title'], tip: 'Pop the bubbles your friend asks for: colors, animals, letters, numbers, words.' },
     // p4: Coloring (all ages; toddlers get Fill + Stickers). No stars, no right or wrong; pictures go to the kid's Gallery.
     { id: 'color', name: A.TITLES.color, sub: 'Color, stickers & gallery', cls: 'color', href: 'games/color/index.html', ready: true, all: true, voice: ['cl_title'], say: ['cl_title'], tip: 'Color pictures of your friends and places. Tap to fill, draw with a brush, add stickers, and save to your gallery.' },
@@ -30,6 +31,9 @@
         '<circle cx="160" cy="34" r="16" fill="#ffd23f"/><path d="M100 30 C 60 30 56 70 70 92 C 80 108 120 108 130 92 C 144 70 140 30 100 30Z" fill="#ff6f8f"/><path d="M84 30 C 90 18 110 18 116 30 C 106 26 94 26 84 30Z" fill="#6fd36a"/>' +
         '<g fill="none" stroke="#3b2d55" stroke-width="3.5" stroke-linecap="round"><rect x="8" y="8" width="184" height="124" rx="14"/><path d="M100 30 C 60 30 56 70 70 92 C 80 108 120 108 130 92 C 144 70 140 30 100 30Z"/><circle cx="160" cy="34" r="16"/><path d="M36 48 c 8 -10 22 -10 30 0"/><path d="M88 62 a3 3 0 1 0 .1 0 M112 62 a3 3 0 1 0 .1 0 M90 78 q10 8 20 0"/></g></svg>' +
         '<span class="crayons"><i style="background:#ff5d5d"></i><i style="background:#ffe14d"></i><i style="background:#4fa3ff"></i><i style="background:#a77bff"></i></span></div>';
+    }
+    if (g.id === 'foodfight') {
+      return '<svg class="sc" viewBox="0 0 100 75" aria-hidden="true"><g transform="translate(16 8) rotate(-10 20 28)"><image href="art/food-fight/back.png" width="35" height="51"/></g><g transform="translate(52 14) rotate(10 18 26)"><rect width="35" height="51" rx="5" fill="#fff8e7" stroke="#ad7954"/><text x="4" y="13" font-size="12" font-weight="700" fill="#b63442">5</text><image href="art/food-fight/strawberry-pip.png" x="10" y="16" width="18" height="24"/></g></svg>';
     }
     if (g.id === 'tiny') {   // big, simple: three food friends on the picnic blanket
       var R0 = A.ROOT + 'assets/picnic/friends/';

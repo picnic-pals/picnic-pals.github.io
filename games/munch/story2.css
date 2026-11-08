@@ -145,3 +145,10 @@
 .s2-cloud { width: 95px; height: 42px; background: #fff; border-radius: 55%; position: relative; }
 .s2-cloud::before, .s2-cloud::after { content: ''; position: absolute; bottom: 10px; width: 45px; height: 45px; background: #fff; border-radius: 50%; left: 12px; }
 .s2-cloud::after { left: 42px; width: 38px; height: 38px; }
+
+/* batch-1107c: locked art levels look locked; a tap on one bounces the open level */
+.s2-art-lv.off { border-style: dashed; opacity: 1; background: #ddd8e4 !important; color: #8a849a; filter: grayscale(.6); }
+.s2-art-lv.off .n { opacity: .55; }
+.s2-art-lv.nudge { animation: s2nudge .5s ease 2 !important; }
+@keyframes s2nudge { 0%,100% { transform: translate(-50%,-50%) scale(1); } 50% { transform: translate(-50%,-50%) scale(1.25); } }
+.s2-lock-note { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 60; background: #fff; border: 3px solid #b24e70; color: #4a3550; font-weight: 800; padding: 10px 18px; border-radius: 18px; box-shadow: 0 4px 0 #0002; }

@@ -34,6 +34,10 @@
   var AN = {}; ANIMALS.forEach(function (a) { AN[a.id] = a; });
   var LETTERS = 'ABCDEFGHIJKLMNOPRSTW'.split('');
   var BEGIN = [['b', 'ball', '⚽'], ['c', 'cat', '🐱'], ['d', 'dog', '🐶'], ['f', 'fish', '🐟'], ['h', 'hat', '🎩'], ['m', 'moon', '🌙'], ['p', 'pig', '🐷'], ['s', 'sun', '☀️'], ['t', 'tree', '🌳'], ['k', 'kite', '🪁'], ['l', 'leaf', '🍃'], ['r', 'rain', '🌧️']];
+  // batch-1107c: muted play: only pictures nobody names two ways (ball / soccer, hat / top hat, leaf, rain are left out), and no
+  // "which animal says moo?" (the sound is the clue)
+  var BEGIN_CLEAR = ['cat', 'dog', 'fish', 'pig', 'sun', 'moon', 'tree'];
+  function quietNow() { return !!(A.SightWords && A.SightWords.quiet && A.SightWords.quiet()); }
   var RHYMES = [['cat', 'hat', 'bat', 'mat', 'rat', 'sat'], ['dog', 'log', 'frog', 'hog', 'fog'], ['sun', 'run', 'fun', 'bun'], ['pig', 'big', 'dig', 'wig'], ['hen', 'ten', 'pen', 'men'], ['top', 'hop', 'mop', 'pop']];
   var CVC = ['cat', 'dog', 'sun', 'pig', 'hen', 'bus', 'cup', 'map', 'bed', 'fox', 'jam', 'net', 'hat', 'top', 'rug', 'lip', 'van', 'web'];
   var SPELL = ['cat', 'dog', 'sun', 'pig', 'hen', 'cup', 'map', 'bed', 'fox', 'frog', 'fish', 'duck', 'milk', 'star', 'jump', 'cake'];
@@ -71,10 +75,10 @@
   var P_STEPS = [
     { id: 'p_shape', name: 'Shapes', band: 'P', gen: function () { var s = pick(Object.keys(SHAPES)); return { say: ['bp_pop_the', 'bp_shs_' + s], show: { shape: s }, need: 2, good: [cShape(s)], bad: others(Object.keys(SHAPES), [s], 3).map(function (x) { return cShape(x); }) }; } },
     { id: 'p_color', name: 'Colors', band: 'P', gen: function () { var c = pick(CN); return { say: ['bp_pop_the', 'bp_c_' + c, 'bp_ones'], show: { col: c }, need: 2, good: [cCol(c)], bad: others(CN, [c], 3).map(cCol) }; } },
-    { id: 'p_animal', name: 'Animals', band: 'P', gen: function () { var a = pick(ANIMALS), snd = RNG() < .4 && a.id !== 'fish'; return { say: snd ? ['bp_says', 'bp_snd_' + a.id] : ['bp_pop_the', 'bp_ans_' + a.id], show: snd ? { text: a.snd } : { e: a.e }, need: 2, good: [cAn(a.id)], bad: others(ANIMALS.map(function (x) { return x.id; }), [a.id], 3).map(function (x) { return cAn(x); }) }; } },
+    { id: 'p_animal', name: 'Animals', band: 'P', gen: function () { var a = pick(ANIMALS), snd = !quietNow() && RNG() < .4 && a.id !== 'fish'; return { say: snd ? ['bp_says', 'bp_snd_' + a.id] : ['bp_pop_the', 'bp_ans_' + a.id], show: snd ? { text: a.snd } : { e: a.e }, need: 2, good: [cAn(a.id)], bad: others(ANIMALS.map(function (x) { return x.id; }), [a.id], 3).map(function (x) { return cAn(x); }) }; } },
     { id: 'p_letter', name: 'Letters', band: 'P', gen: function () { var l = pick(LETTERS); return { say: ['bp_pop_the', tx(l)], show: { text: l }, need: 1, good: [cLet(l)], bad: others(LETTERS, [l], 3).map(cLet) }; } },
     { id: 'p_num', name: 'Numbers', band: 'P', sub: 1, gen: function (cx) { var top = cx.sub ? 30 : 10, v = rnd(cx.sub ? 11 : 1, top), b = []; while (b.length < 3) { var x = rnd(1, top); if (x !== v && b.indexOf(x) < 0 && String(x).split('').reverse().join('') !== String(v)) b.push(x); } return { say: ['bp_pop_the', v], show: { text: String(v) }, need: 1, good: [cNum(v)], bad: b.map(cNum) }; } },
-    { id: 'p_begin', name: 'Beginning sounds', band: 'P', gen: function () { var w = pick(BEGIN); return { say: ['bp_starts', tx(w[1])], ask: 'Which letter does it start with?', show: { e: w[2] }, need: 1, good: [cLet(w[0].toUpperCase())], bad: others(BEGIN.map(function (x) { return x[0].toUpperCase(); }), [w[0].toUpperCase()], 3).map(cLet) }; } },
+    { id: 'p_begin', name: 'Beginning sounds', band: 'P', gen: function () { var w = pick(quietNow() ? BEGIN.filter(function (x) { return BEGIN_CLEAR.indexOf(x[1]) >= 0; }) : BEGIN); return { say: ['bp_starts', tx(w[1])], ask: 'Which letter does it start with?', show: { e: w[2] }, need: 1, good: [cLet(w[0].toUpperCase())], bad: others(BEGIN.map(function (x) { return x[0].toUpperCase(); }), [w[0].toUpperCase()], 3).map(cLet) }; } },
     { id: 'p_bigger', name: 'The bigger number', band: 'P', gen: function () { var a = rnd(1, 9), b = a; while (b === a) b = rnd(1, 10); var hi = Math.max(a, b), lo = Math.min(a, b); return { say: ['bp_bigger', a, 'bp_or', b], show: { text: a + ' or ' + b }, need: 1, good: [cNum(hi)], bad: [cNum(lo)] }; } },
     { id: 'p_order', name: 'Pop 1 to 10 in order', band: 'P', sub: 1, gen: function (cx) { var n = cx.sub ? 10 : 5, seq = []; for (var i = 1; i <= n; i++) seq.push(cNum(i)); return { say: ['bp_order', n], show: { text: '1 → ' + n }, need: n, seq: seq, good: [], bad: [] }; } },
     { id: 'p_combo', name: 'Two-rule bubbles', band: 'P', gen: function () {

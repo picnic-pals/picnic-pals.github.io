@@ -1056,3 +1056,7 @@
   }
   A.VoiceLines = { sections: S, byId: BY, all: ALL, add: add, EXTS: ['mp3', 'm4a', 'wav', 'webm', 'ogg'] };
 })(window.Arcade);
+/* batch-1107c: the lemon friend was renamed (placeholder name -> Sunny). Its old built-in clips still say the old name,
+   so drop them; the device voice reads the new text until new clips are recorded. */
+(function () { var M = window.ARCADE_TTS_MANIFEST; if (!M || !M.files) return;
+  ['blob_lemon', 'fr_lemon_hi', 'fr_lemon_likes', 'fr_lemon_dislikes', 'fr_lemon_food'].forEach(function (k) { delete M.files[k]; }); })();

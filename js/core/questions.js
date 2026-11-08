@@ -70,6 +70,46 @@
       return numQ({ text: 'Which number is ' + em(even ? 'even' : 'odd') + '?', say: [even ? 'bbq_even' : 'bbq_odd'], fact: [T, even ? 'w_is_even' : 'w_is_odd'] }, vals, T);
     }
   };
+  /* qbatch-1107: Baseball variants on the same facts (exactly one correct of n). Same skill and range as the base fact;
+     only the representation changes: true equation, hidden part (number bond), number-line spot, strategy (make 10). */
+  function tx(id, t) { return [{ id: 'qb_' + id, text: t }]; }
+  function choicesFrom(o, labels, right) { var arr = A.shuffle(labels.slice()); o.choices = arr.map(function (l) { return { label: l, say: [{ id: 'qb_c', text: l.replace('−', 'minus') }] }; }); o.answer = arr.indexOf(right); return o; }
+  function bondPic(a, b, T, hide) { return '<span class="qb-bond"><b class="w">' + T + '</b><span><b' + (hide === 0 ? ' class="q">?' : '>' + a) + '</b><b' + (hide === 1 ? ' class="q">?' : '>' + b) + '</b></span></span>'; }
+  function linePic(lo, hi, at) { var h = '<span class="qb-line">'; for (var v = lo; v <= hi; v++) h += '<i class="' + (v === at ? 'at' : '') + '">' + (v === lo || v === hi || v % 5 === 0 ? '<em>' + v + '</em>' : '') + '</i>'; return h + '</span>'; }
+  var VAR = {
+    trueEq: function (a, b, T, n, lo, hi) {
+      var right = a + ' + ' + b + ' = ' + T, set = [right], g = 0;
+      while (set.length < n && g++ < 60) { var w = T + pick([-2, -1, 1, 2]); if (w < lo || w > hi) continue; var aa = rnd(Math.max(0, w - 10), Math.min(10, w)), l = aa + ' + ' + (w - aa) + ' = ' + T; if (set.indexOf(l) < 0) set.push(l); }
+      return set.length === n ? choicesFrom({ text: 'Which one is ' + em('true') + '?', say: tx('true', 'Which one is true?'), fact: [a, 'w_plus', b, 'w_is', T], variant: 'trueEq' }, set, right) : null;
+    },
+    bond: function (a, b, T, n, lo, hi) { var h = rnd(0, 1), m = h ? b : a; return numQ({ text: 'What is the hidden part?', pic: bondPic(a, b, T, h), say: tx('bond', 'What is the hidden part?'), fact: [a, 'w_plus', b, 'w_is', T], variant: 'bond' }, near(m, n, 0, 10), m); },
+    bondFixed: function (a, b, T, h, n) { var m = h ? b : a; return numQ({ text: 'What is the hidden part?', pic: bondPic(a, b, T, h), say: tx('bond', 'What is the hidden part?'), fact: ['w_thats', m], variant: 'bond' }, near(m, n, 0, 20), m); },
+    line: function (a, b, T, n, lo, hi) { var L0 = T > 10 ? 10 : 0, L1 = L0 + 10; if (T > L1) return null; return numQ({ text: 'What number is the star on?', pic: linePic(L0, L1, T), say: tx('line', 'What number is the star on?'), fact: ['w_thats', T], variant: 'line' }, near(T, n, L0, L1, [-1, 1, -2, 2]), T); },
+    strategy: function (a, b, T, n) {
+      var big = Math.max(a, b), sm = Math.min(a, b); if (big < 8 || big > 9 || T <= 10) return null; var give = 10 - big, right = '10 + ' + (sm - give);
+      var set = [right, '10 + ' + sm, '10 + ' + (sm - give + 1), big + ' + ' + (sm - give)].filter(function (x, i, z) { return z.indexOf(x) === i; }).slice(0, n);
+      return set.length === n ? choicesFrom({ text: big + ' + ' + sm + ' is the same as…', say: tx('strat', big + ' plus ' + sm + ' is the same as'), fact: [big, 'w_plus', sm, 'w_is', T], variant: 'strategy' }, set, right) : null;
+    }
+  };
+  function withVariants(base, lo, hi, keys) {
+    return function (L, n) {
+      var q = base(L, n); if (Math.random() < .4) return q;
+      var m = String(q.text).match(/(\d+) \+ (\d+)/); if (!m) return q; var a = +m[1], b = +m[2], T = a + b;
+      var k = pick(keys), v = VAR[k](a, b, T, n, lo, hi); return v || q;
+    };
+  }
+  ASK.add10 = withVariants(ASK.add10, 0, 12, ['trueEq', 'bond', 'line']);
+  ASK.add20 = withVariants(ASK.add20, 8, 20, ['trueEq', 'bond', 'line', 'strategy', 'strategy']);
+  // Original PV100 visual vocabulary; no recorded speech is required.
+  A.PV100 = {
+    blocks: function (t, o) { var h = '<span class="pv-pic" aria-label="' + t + ' tens and ' + o + ' ones">'; for (var i = 0; i < t; i++) h += '<i class="pv-rod"></i>'; h += '<span class="pv-ones">'; for (var j = 0; j < o; j++) h += '<i class="pv-one"></i>'; return h + '</span></span>'; },
+    blocks3: function (h, t, o) { var x = '<span class="pv-pic pv3">'; for (var i = 0; i < h; i++) x += '<i class="pv-flat"></i>'; return x + this.blocks(t, o) + '</span>'; },
+    chart: function (n, more) { var start = Math.floor((n - 1) / 10) * 10 - (more ? 0 : 10) + 1, h = '<span class="pv100-chart" aria-label="Two rows of a hundred chart">'; for (var i = 0; i < 20; i++) { var v = start + i; h += '<span' + (v === n ? ' class="from"' : '') + '>' + (v === n + (more ? 10 : -10) ? '?' : v) + '</span>'; } return h + '</span>'; },
+    line: function (a, b, op) { var tens = Math.floor(b / 10) * 10, ones = b % 10, mid = op === '+' ? a + tens : a - tens, sign = op === '+' ? '+' : '−';
+      return '<svg class="pv100-line" viewBox="0 0 320 100" role="img" aria-label="Start at ' + a + ', jump ' + sign + tens + ', then ' + sign + ones + '. Find the endpoint."><path d="M15 78H305 M25 78Q85 0 155 78 M155 78Q220 20 295 78" fill="none" stroke="#476e9b" stroke-width="3"/><g font-size="17" text-anchor="middle" fill="#263f5e"><text x="25" y="98">' + a + '</text><text x="155" y="98">' + mid + '</text><text x="295" y="98">?</text><text x="85" y="30">' + sign + tens + '</text><text x="225" y="43">' + sign + ones + '</text></g></svg>'; }
+  };
+  A.QVariants = VAR;
+
   Object.keys(ASK).forEach(function (id) { if (C.byId[id] && !C.byId[id].ask) C.byId[id].ask = ASK[id]; });
 
   // any skill with only a Munch generator: rule = question, one good cell + distinct bad cells
@@ -101,7 +141,12 @@
     var sid = round.skill.id || round.skill, sk = C.byId[sid], L = ladder((sk && sk.subject) || 'math'), /* each subject is its own ladder */ idx = L.findIndex(function (x) { return x.skill.id === sid && x.level === round.level; });
     if (idx < 0) return { skill: C.byId[sid], level: round.level, hard: offset > 0, easy: offset < 0, atLevel: true, offset: offset };
     var here = L[idx], little = p && A.Age.little(p);
-    if (offset < 0) { if (idx > 0 && !round.review) return { skill: L[idx - 1].skill, level: L[idx - 1].level, atLevel: false, offset: -1 }; return { skill: here.skill, level: here.level, easy: true, atLevel: true, offset: -1 }; }
+    if (offset < 0) {
+      // batch-1107c (band lock): the easier pitch comes from the step below only as review of a real miss there; otherwise it is
+      // the same step, made easier (fewer choices)
+      var prev = idx > 0 ? L[idx - 1] : null, missed = prev && p && A.Coach && A.Coach.mostMissed ? A.Coach.mostMissed(p, prev.skill.id, 1) : [];
+      if (prev && !round.review && missed && missed.length && missed[0].m > 0) return { skill: prev.skill, level: prev.level, atLevel: false, offset: -1, review: true };
+      return { skill: here.skill, level: here.level, easy: true, atLevel: true, offset: -1 }; }
     if (offset === 0) return { skill: here.skill, level: here.level, atLevel: true, offset: 0 };
     if (offset < 1) return { skill: here.skill, level: here.level, hard: true, atLevel: true, offset: .5 };
     var nx = L[idx + 1];

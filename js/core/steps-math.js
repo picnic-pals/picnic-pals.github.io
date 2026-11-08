@@ -205,13 +205,34 @@
   var ctx = { p: null };
   function stOf(s) { try { return ctx.p ? C.state(ctx.p, s.id) : null; } catch (e) { return null; } }
 
+  var pvRecent = {}, pvOwner = null;
+  function pvStep(s) { return /^(pv_(tens|compare|ten_more|hto|cmp3)|[as]2_(add|sub|regroup))$/.test(s.id); }
+  function freshPV(s, channel, make, keyOf) {
+    if (pvOwner !== ctx.p) { pvOwner = ctx.p; pvRecent = {}; }
+    var key = channel + s.id, seen = pvRecent[key] || (pvRecent[key] = []), x, k, g = 0;
+    do { x = make(); k = keyOf(x); } while (seen.indexOf(k) >= 0 && ++g < 500);
+    seen.push(k); if (seen.length > 64) seen.shift(); return x;
+  }
+  function pvItem(s, channel) { return pvStep(s) ? freshPV(s, channel, function () { return s.item(stOf(s), ctx.p); }, function (x) { return x.key; }) : s.item(stOf(s), ctx.p); }
+  // Equivalent numeric forms keep repeated answer tiles from becoming identical copies.
+  function pvLook(v, n) { var c = pvCell(v), t = Math.floor(v / 10), o = v % 10;
+    if (n === 1) c.label = (t * 10) + ' + ' + o;
+    if (n === 2) c.label = t + ' tens + ' + o + ' ones';
+    if (n === 3) c.label = (v - 1) + ' + 1';
+    if (n === 4) c.label = (v + 1) + ' − 1';
+    if (n === 5) c.label = (v + 10) + ' − 10';
+    if (n === 6) c.label = '1 + ' + (v - 1);
+    if (n >= 7) c.label = (v + n) + ' − ' + n;
+    c.long = n > 0; return c;
+  }
   function genItem(s) {
     return function (L) {
-      var it = s.item(stOf(s), ctx.p), pool = it.wrong.slice();
+      var it = pvItem(s, 'board'), pool = it.wrong.slice(), looks = {}, usedLooks = {}, badN = 0;
+      function cell(v) { var k = String(v), n = looks[k] || 0, c; do { c = pvStep(s) && typeof v === 'number' ? pvLook(v, n++) : it.cell(v); } while (pvStep(s) && typeof v === 'number' && usedLooks[c.label]); looks[k] = n; usedLooks[c.label] = true; return c; }
       return { text: it.text + (it.pic ? '<span class="st-pic">' + it.pic + '</span>' : ''), plain: it.text, say: it.say, target: it.key, step: s.id, item: it, pictures: !!it.pictures,
         hint: '', stepHint: function (cell, lvl) { return it.hint(lvl); }, worked: function () { return worked(s, it); },
-        good: function () { var c = it.cell(it.ans); c.k = String(it.ans); return c; },
-        bad: function () { var c = it.cell(pick(pool)); c.k = c.label; return c; } };
+        good: function () { var c = cell(it.ans); c.k = String(it.ans); return c; },
+        bad: function () { var c = cell(pvStep(s) ? pool[badN++ % pool.length] : pick(pool)); c.k = c.label; return c; } };
     };
   }
   function cellF(f, sid) {
@@ -223,6 +244,15 @@
     var miss = p ? missedList(p).map(function (m) { return m.k; }) : [], hot = fam.filter(function (f) { return miss.indexOf(f.label) >= 0; });
     return hot.length && Math.random() < .5 ? pick(hot) : pick(fam);
   }
+  // batch-1107c: a step with few facts for T still gets different-looking targets on one board, same fact, same band:
+  // look 0 = a + b, 1 = b + a (adding), 2 = the fact with a ten-frame picture of the first number
+  function lookOf(c, f, k, think) {
+    if (think || !k) return c; k = k % 3;
+    if (k === 1 && f.op === '+' && f.a !== f.b) { c.label = f.b + ' + ' + f.a; c.fact = [f.b, 'w_plus', f.a, 'w_is', f.v]; c.look = 'swap'; return c; }
+    if (k === 1 && A.Learn && A.Learn.dotsFor && f.a <= 20 && f.b <= 20) { c.html = '<span class="lk-pic">' + A.esc(c.label) + '<span class="lk-row">' + A.Learn.dotsFor(f.a) + A.Learn.dotsFor(f.b) + '</span></span>'; c.long = true; c.look = 'both'; return c; }
+    if (A.Learn && A.Learn.dotsFor && f.a <= 20) { c.html = '<span class="lk-pic">' + A.esc(c.label) + A.Learn.dotsFor(f.a) + '</span>'; c.long = true; c.look = 'frame'; }
+    return c;
+  }
   function genFacts(s) {
     return function (L) {
       var p = ctx.p, fam = s.facts(), due = s.id === 's_think' ? [] : dueFacts(p, s.ladder), T;
@@ -232,15 +262,15 @@
       var think = s.id === 's_think', rvLeft = rv.length, n = 0;
       return { text: think ? 'Munch where ' + BOX + ' is ' + em(T) : 'Munch the ones that make ' + em(T), say: [think ? 'munch_rule_missing' : 'munch_rule_make', T], step: s.id, hint: '',
         stepHint: function (cell, lvl) { return factHint(hintFact(cell && cell.f, goods, T, s.id), lvl, s.id); }, target: T, worked: function (cell) { return worked(s, null, cell && cell.f || goods[0]); },
-        good: function () { n++; var f = rvLeft > 0 && Math.random() < .35 ? rv[--rvLeft] : pick(goods); var c = cellF(f, s.id); if (rv.indexOf(f) >= 0) c.review = true; return c; },
-        bad: function () { var f = bads.length >= 2 && Math.random() < .7 ? pick(bads) : nearFact(pick(goods)); return cellF(f, s.id); } };
+        good: function () { n++; var f = rvLeft > 0 && Math.random() < .35 ? rv[--rvLeft] : goods[(n - 1) % goods.length]; var c = lookOf(cellF(f, s.id), f, Math.floor((n - 1) / goods.length), think); if (rv.indexOf(f) >= 0) c.review = true; return c; },
+        bad: function () { var f = bads.length >= 2 && Math.random() < .7 ? pick(bads) : nearFact(pick(goods)); return lookOf(cellF(f, s.id), f, rnd(0, 2), think); } };   // distractors use the same looks (no look is a giveaway)
     };
   }
   function choices(ans, wrong, n) { var w = A.shuffle(wrong.slice()).slice(0, n - 1); return A.shuffle([ans].concat(w)); }
   function askItem(s) {
     return function (L, n) {
-      n = Math.min(n, s.maxChoices || n); var it = s.item(stOf(s), ctx.p), vals = choices(it.ans, it.wrong, Math.min(n, it.wrong.length + 1));
-      return { text: it.text, pic: it.pic || null, say: it.say, fact: it.cell(it.ans).fact || [], answer: vals.indexOf(it.ans), target: it.key, hint: it.hint(1), hint2: it.hint(2), pictures: !!it.pictures,
+      n = Math.min(n, s.maxChoices || n); var it = pvItem(s, 'pitch'), vals = choices(it.ans, it.wrong, Math.min(n, it.wrong.length + 1));
+      return { variant: it.variant || (pvStep(s) ? 'compare' : null), text: it.text, pic: it.pic || null, say: it.say, fact: it.cell(it.ans).fact || [], answer: vals.indexOf(it.ans), target: it.key, hint: it.hint(1), hint2: it.hint(2), pictures: !!it.pictures,
         choices: vals.map(function (v) { var c = it.cell(v); return { label: c.label, html: c.html || null, say: c.fact && c.fact.length ? c.fact.slice(-1) : [c.label], value: v, long: !!c.long }; }) };
     };
   }
@@ -249,6 +279,13 @@
       var p = ctx.p, due = s.id === 's_think' ? [] : dueFacts(p, s.ladder), f = due.length && Math.random() < .3 ? due[0] : (/mix$/.test(s.id) ? weighted(p, s.facts()) : pick(s.facts())), T = f.v;
       var w = within([T - 1, T + 1, T - 2, T + 2, T + 10, T - 10], 0, 20, T), vals = choices(T, w.slice(0, 4), n);
       var think = s.id === 's_think';
+      // qbatch-1107: same fact, another look (true equation, hidden part, number line, make-10 strategy); exactly one right choice
+      var VV = A.QVariants;
+      if (VV && !think && Math.random() < .55) {
+        var ks = f.op === '+' ? ['trueEq', 'bond', 'line'].concat(Math.max(f.a, f.b) >= 8 && T > 10 ? ['strategy', 'strategy'] : []) : ['bondSub', 'line'], k = pick(ks);
+        var v = k === 'bondSub' ? VV.bondFixed(f.b, T, f.a, 1, n) : VV[k](f.a, f.b, T, n, 0, 20);
+        if (v) { v.target = f.label; v.f = f; v.fact = cellF(f, s.id).fact; v.hint = factHint(f, 1, s.id); v.hint2 = factHint(f, 2, s.id); return v; }
+      }
       return { text: think ? f.b + ' + ' + em('?') + ' = ' + f.a : 'What’s ' + f.label + '?', say: think ? [f.b, 'w_plus', 'bbq_what_makes', f.a] : ['bbq_whats', f.a, f.op === '+' ? 'w_plus' : 'w_minus', f.b], fact: cellF(f, s.id).fact,
         answer: vals.indexOf(T), target: f.label, f: f, hint: factHint(f, 1, s.id), hint2: factHint(f, 2, s.id), choices: vals.map(function (v) { return { label: String(v), html: null, say: [v], value: v }; }) };
     };
@@ -333,14 +370,16 @@
      Mathematics Grade 1: place value follows addition and subtraction within 20; Khan 1st grade "Place value"). Three steps only;
      the full B2 ladder (hundreds, expanded form, ...) is a later pass. Old saves already past it get a 5-question test-out
      (js/core/learn.js pvApi) instead of being sent back. */
-  function pvPic(t, o) { var h = '<span class="pv-pic" aria-hidden="true">'; for (var i = 0; i < t; i++) h += '<i class="pv-rod"></i>'; h += '<span class="pv-ones">'; for (var j = 0; j < o; j++) h += '<i class="pv-one"></i>'; return h + '</span></span>'; }
+  function pvPic(t, o) { return A.PV100.blocks(t, o); }
   function pvCell(v) { return { label: String(v), fact: ['w_thats', v] }; }
   function pvUniq(ans, list) { var out = []; list.forEach(function (x) { if (x !== ans && x > 0 && x < 100 && out.indexOf(x) < 0) out.push(x); }); return out; }
   function pvTensItem() {
-    var t = rnd(1, 9), o = rnd(0, 9); if (o === t) o = (o + 3) % 10; var v = 10 * t + o, pic = Math.random() < .6;
-    return { key: 'pvt' + v, ans: v, wrong: pvUniq(v, [10 * o + t, t + o, v + 10, v - 10, v + 1]).slice(0, 3), text: pic ? 'How many in all?' : 'What number has ' + em(t + ' tens') + ' and ' + em(o + ' ones') + '?',
-      pic: pic ? pvPic(t, o) : '', say: pic ? ['q1_pv_count'] : ['q1_pv_tensones1', t, 'q1_pv_tensones2', o, 'q1_pv_tensones3'], cell: pvCell,
-      hint: function (l) { return box(pvPic(t, o), l >= 2 ? t + ' tens is ' + (10 * t) + ', and ' + o + ' ones more is <b>' + v + '</b>.' : 'Each long bar is a ten. Count the tens, then the ones.'); } };
+    var t = rnd(1, 9), o = rnd(0, 9), v = t * 10 + o, k = pick(['blocks', 'expanded', 'tensCount']), ans = k === 'tensCount' ? t : v;
+    return { key: 'pv' + k + v, variant: k, ans: ans,
+      wrong: k === 'tensCount' ? uniq([o, t + 1, t - 1, v].filter(function (x) { return x !== ans && x >= 0; })).slice(0, 3) : pvUniq(v, [10 * o + t, t + o, v + 10, v - 10, v + 1]).slice(0, 3),
+      text: k === 'blocks' ? 'How many in all?' : k === 'expanded' ? em(t * 10 + ' + ' + o) + ' makes what number?' : 'How many full tens are in ' + em(v) + '?',
+      pic: k === 'blocks' ? pvPic(t, o) : '', say: [{ id: 'pv100_' + k, text: k === 'blocks' ? 'How many in all?' : k === 'expanded' ? t * 10 + ' plus ' + o + ' makes what number?' : 'How many full tens are in ' + v + '?' }], cell: pvCell,
+      hint: function (l) { return box(pvPic(t, o), l >= 2 ? t + ' tens and ' + o + ' ones make ' + v + '. The answer is <b>' + ans + '</b>.' : 'A long rod is one ten. Count the rods, then the single ones.'); } };
   }
   function pvCompareItem() {
     var a = rnd(10, 99), b, g = 0; do { b = Math.random() < .5 ? +String(a).split('').reverse().join('') : rnd(10, 99); } while ((b === a || b < 10) && g++ < 50); if (b === a || b < 10) b = a === 99 ? 98 : a + 1;
@@ -355,7 +394,8 @@
   }
   function pvTenItem() {
     var more = Math.random() < .5, n = more ? rnd(10, 89) : rnd(20, 99), ans = more ? n + 10 : n - 10;
-    return { key: 'pv10' + (more ? 'm' : 'l') + n, ans: ans, wrong: pvUniq(ans, [more ? n + 1 : n - 1, more ? n - 10 : n + 10, ans + 1, ans - 1]).slice(0, 3), text: 'What is 10 ' + (more ? 'more' : 'less') + ' than ' + em(n) + '?',
+    var chart = Math.random() < .6;
+    return { variant: chart ? 'chart' : 'tenMoreLess', pic: chart ? A.PV100.chart(n, more) : '', key: 'pv10' + (more ? 'm' : 'l') + n, ans: ans, wrong: pvUniq(ans, [more ? n + 1 : n - 1, more ? n - 10 : n + 10, ans + 1, ans - 1]).slice(0, 3), text: chart ? 'Start at ' + em(n) + '. Jump one row ' + (more ? 'down' : 'up') + '. Where do you land?' : 'What is 10 ' + (more ? 'more' : 'less') + ' than ' + em(n) + '?',
       say: [more ? 'q1_pv_10more' : 'q1_pv_10less', n], cell: pvCell,
       hint: function (l) { return box(pvPic(Math.floor(n / 10), n % 10), l >= 2 ? '10 ' + (more ? 'more' : 'less') + ': one ' + (more ? 'more' : 'less') + ' ten, the ones stay the same. <b>' + ans + '</b>.' : 'Ten more adds one long bar. Ten less takes one away. The ones stay the same.'); } };
   }
@@ -393,7 +433,7 @@
     if (f.op === '+') return (at + bt) * 10 + (ao + bo) % 10;
     return (at - bt) * 10 + Math.abs(ao - bo);
   }
-  function g2Wrong(f) { var v = f.v; return uniq([g2Trap(f), v + 10, v - 10, v + 1, v - 1].filter(function (x) { return x !== v && x > 0 && x < 200; })); }
+  function g2Wrong(f) { var v = f.v; return uniq([g2Trap(f), v + 10, v - 10, v + 1, v - 1].filter(function (x) { return x !== v && x >= 0 && x <= 100; })); }
   function g2Hint(f, l) {
     var at = Math.floor(f.a / 10) * 10, ao = f.a % 10, bt = Math.floor(f.b / 10) * 10, bo = f.b % 10, pic = pvPic(at / 10, ao) + '<i class="pb-op">' + (f.op === '+' ? '+' : '−') + '</i>' + pvPic(bt / 10, bo);
     if (f.op === '+') {
@@ -410,28 +450,30 @@
       var bads = [], g = 0;
       while (bads.length < 30 && g++ < 400) { var x = g2Fact(kind); if (x.v !== T && Math.abs(x.v - T) <= 20 && (Math.abs(x.v - T) === 10 || Math.abs(x.v - T) <= 3 || g2Trap(x) === T || Math.random() < .25)) bads.push(x); }
       if (!bads.length) bads = [F(f0.a, f0.op, f0.b + 1)];
+      goods = A.shuffle(goods); bads = A.shuffle(bads.filter(function (f, i, a) { return a.map(function (x) { return x.label; }).indexOf(f.label) === i; })); var gn = 0, bn = 0;
+      function next(pool, n) { var f = pool[n % pool.length]; return n < pool.length ? g2Cell(f) : pvLook(f.v, 1 + n - pool.length); }
       return { text: 'Munch the ones that make ' + em(T), say: ['munch_rule_make', T], step: s.id, hint: '', target: T,
         stepHint: function (cell, lvl) { return g2Hint(cell && cell.f && cell.f.v === T ? cell.f : pick(goods), lvl); }, worked: function (cell) { var w = pick(goods); return '<div class="worked st-worked"><p class="st-wq">Watch: <b>' + w.label + '</b></p><div class="st-steps"><div class="s1">' + g2Hint(w, 1) + '</div><div class="s2">' + g2Hint(w, 2) + '</div></div></div>'; },
-        good: function () { return g2Cell(pick(goods)); }, bad: function () { return g2Cell(pick(bads)); } };
+        good: function () { return next(goods, gn++); }, bad: function () { return next(bads, bn++); } };
     };
   }
   function g2Ask(kind) {
     return function (L, n) {
-      var f = g2Fact(kind), T = f.v, w = g2Wrong(f), vals = choices(T, w.slice(0, 4), n);
-      return { text: 'What’s ' + f.label + '?', say: ['bbq_whats', f.a, f.op === '+' ? 'w_plus' : 'w_minus', f.b], fact: g2Cell(f).fact, answer: vals.indexOf(T), target: f.label, f: f,
+      var f = freshPV({ id: kind }, 'pitch', function () { return g2Fact(kind); }, function (x) { return x.label; }), T = f.v, w = g2Wrong(f), vals = choices(T, w.slice(0, 4), n), line = Math.random() < .5;
+      return { variant: line ? 'openLine' : 'model', pic: line ? A.PV100.line(f.a, f.b, f.op) : pvPic(Math.floor(f.a / 10), f.a % 10) + '<b> ' + f.op + ' </b>' + pvPic(Math.floor(f.b / 10), f.b % 10), text: 'What’s ' + f.label + '?', say: ['bbq_whats', f.a, f.op === '+' ? 'w_plus' : 'w_minus', f.b], fact: g2Cell(f).fact, answer: vals.indexOf(T), target: f.label, f: f,
         hint: g2Hint(f, 1), hint2: g2Hint(f, 2), choices: vals.map(function (v) { return { label: String(v), html: null, say: [v], value: v }; }) };
     };
   }
-  function hundredsPic(h, t, o) { var x = '<span class="pv-pic pv3" aria-hidden="true">'; for (var i = 0; i < h; i++) x += '<i class="pv-flat"></i>'; for (var j = 0; j < t; j++) x += '<i class="pv-rod"></i>'; x += '<span class="pv-ones">'; for (var k = 0; k < o; k++) x += '<i class="pv-one"></i>'; return x + '</span></span>'; }
+  function hundredsPic(h, t, o) { return A.PV100.blocks3(h, t, o); }
   function uniq3(ans, list) { var out = []; list.forEach(function (x) { if (x !== ans && x >= 100 && x <= 999 && out.indexOf(x) < 0) out.push(x); }); return out; }
   function htoItem() {
-    var h = rnd(1, 9), t = rnd(0, 9), o = rnd(0, 9); if (t === o) t = (t + 4) % 10; var v = 100 * h + 10 * t + o, r = Math.random();
+    var h = rnd(1, 9), t = rnd(0, 9), o = rnd(0, 9); while (t === h) t = (t + 1) % 10; while (o === h || o === t) o = (o + 1) % 10; var v = 100 * h + 10 * t + o, r = Math.random();
     var swaps = uniq3(v, [100 * h + 10 * o + t, 100 * t + 10 * h + o, 100 * o + 10 * t + h, v + 100, v - 100, v + 10, v - 10]);
     var hint = function (l) { return box(hundredsPic(h, t, o), l >= 2 ? h + ' hundreds is ' + (100 * h) + ', ' + t + ' tens is ' + (10 * t) + ', and ' + o + ' ones. Together: <b>' + v + '</b>.' : 'Each square is a hundred, each long bar is a ten. Count hundreds, then tens, then ones.'); };
-    if (r < .4) return { key: 'hto' + v, ans: v, wrong: swaps.slice(0, 3), text: 'What number has ' + em(h + ' hundreds') + ', ' + em(t + ' tens') + ' and ' + em(o + ' ones') + '?', say: ['b1_pv_hto1', h, 'b1_pv_hundreds', t, 'q1_pv_tensones2', o, 'q1_pv_tensones3'], cell: pvCell, hint: hint };
-    if (r < .7) return { key: 'exp' + v, ans: v, wrong: swaps.slice(0, 3), text: em((100 * h) + ' + ' + (10 * t) + ' + ' + o) + ' makes what number?', say: [100 * h, 'w_plus', 10 * t, 'w_plus', o, 'b1_pv_makes_what'], cell: pvCell, hint: hint };
+    if (r < .4) return { variant: 'blocks3', pic: hundredsPic(h, t, o), key: 'hto' + v, ans: v, wrong: swaps.slice(0, 3), text: 'What number has ' + em(h + ' hundreds') + ', ' + em(t + ' tens') + ' and ' + em(o + ' ones') + '?', say: ['b1_pv_hto1', h, 'b1_pv_hundreds', t, 'q1_pv_tensones2', o, 'q1_pv_tensones3'], cell: pvCell, hint: hint };
+    if (r < .7) return { variant: 'expanded', key: 'exp' + v, ans: v, wrong: swaps.slice(0, 3), text: em((100 * h) + ' + ' + (10 * t) + ' + ' + o) + ' makes what number?', say: [100 * h, 'w_plus', 10 * t, 'w_plus', o, 'b1_pv_makes_what'], cell: pvCell, hint: hint };
     var which = pick(t ? ['h', 't'] : ['h']), d = which === 'h' ? h : t, ans = which === 'h' ? 100 * h : 10 * t;
-    return { key: 'val' + v + which, ans: ans, wrong: uniq([d, which === 'h' ? 10 * h : 100 * t, which === 'h' ? 1000 : d * 1000].filter(function (x) { return x !== ans && x > 0; })).slice(0, 3), text: 'In ' + em(v) + ', what is the ' + em(d) + ' worth?', say: ['b1_pv_in', v, 'b1_pv_worth1', d, 'b1_pv_worth2'], cell: pvCell,
+    return { variant: 'digitValue', key: 'val' + v + which, ans: ans, wrong: uniq([d, which === 'h' ? 10 * h : 100 * t, which === 'h' ? 1000 : d * 1000].filter(function (x) { return x !== ans && x > 0; })).slice(0, 3), text: 'In ' + em(v) + ', what is the ' + em(d) + ' worth?', say: ['b1_pv_in', v, 'b1_pv_worth1', d, 'b1_pv_worth2'], cell: pvCell,
       hint: function (l) { return box(hundredsPic(h, t, o), l >= 2 ? 'The ' + d + ' is in the ' + (which === 'h' ? 'hundreds' : 'tens') + ' place, so it is worth <b>' + ans + '</b>.' : 'Which place is the ' + d + ' in: hundreds, tens or ones?'); } };
   }
   function cmp3Item() {
@@ -447,7 +489,9 @@
   }
   function skipItem() {
     var by = pick([5, 10, 10, 100]), st = by === 5 ? 5 * rnd(1, 18) : by === 10 ? (Math.random() < .5 ? 10 * rnd(1, 8) : rnd(11, 59)) : (Math.random() < .5 ? 100 * rnd(1, 5) : 10 * rnd(11, 49)), nums = [st, st + by, st + 2 * by], ans = st + 3 * by;
-    var w = uniq([ans + 1, ans - 1, st + 2 * by + (by === 5 ? 10 : by === 10 ? 1 : 10), ans + by, by === 100 ? ans - 90 : ans + 5].filter(function (x) { return x !== ans && x > 0 && x !== nums[2]; }));
+    // batch-1107c: by 100s the near misses are real counting slips (one hundred too far, counted on by ten, the tens changed),
+    // never 601 / 599, which no hundreds count can land on
+    var w = uniq((by === 100 ? [ans + 100, nums[2] + 10, ans + 10, ans - 10] : [ans + 1, ans - 1, st + 2 * by + (by === 5 ? 10 : 1), ans + by, ans + 5]).filter(function (x) { return x !== ans && x > 0 && x !== nums[2]; }));
     return { key: 'skip' + by + 'f' + st, ans: ans, wrong: w.slice(0, 3), text: 'Count by ' + by + 's. What comes next?', pic: track(nums.concat([null])), say: [by === 5 ? 'b1_skip5' : by === 10 ? 'b1_skip10' : 'b1_skip100'], cell: pvCell,
       hint: function (l) { return box(l >= 2 ? track(nums.concat([ans])) : '', l >= 2 ? nums[2] + ' and ' + by + ' more is <b>' + ans + '</b>.' : by === 5 ? 'Fives end in 5, 0, 5, 0…' : by === 10 ? 'Counting by tens: the tens digit goes up by one, the ones stay the same.' : 'Counting by hundreds: the hundreds digit goes up by one.'); } };
   }

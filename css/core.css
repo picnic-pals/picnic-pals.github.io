@@ -486,3 +486,51 @@ body.touchui .keys:not(.touch):not(.padkeys) { display: none !important; }
 
 /* The sole warm-up replay control stays top-right, without widening its prompt. */
 .placement-card .pc-replay { position:fixed; top:14px; right:14px; z-index:2; width:56px; height:56px; border:0; border-radius:50%; background:#fff; font-size:28px; cursor:pointer; touch-action:manipulation; }
+
+/* ---------- qbatch-1107: readable counting dots ----------
+   Bigger, high-contrast dots with clear gaps; five-frame / ten-frame grid kept. Bigger quantities
+   (two frames, teen numbers) get more room instead of smaller dots. Floor of 13px per dot on phones. */
+.frame { gap: max(.12em, 4px); padding: max(.14em, 4px); background: #fff; border: 2px solid #7a5aa8; border-radius: .25em; }
+.frame i { width: max(.5em, 13px); height: max(.5em, 13px); background: #fff; box-shadow: inset 0 0 0 2px #b9a8d6; }
+.frame i.on { background: #e0336f; box-shadow: inset 0 0 0 2px #9c1748; }
+.frame i.on.b { background: #2f7fd8; box-shadow: inset 0 0 0 2px #1d5aa0; }
+.frames2 { gap: max(.12em, 4px); }
+.frames2 .frame { padding: max(.14em, 4px); gap: max(.12em, 4px); }
+.frames2 .frame i { width: max(.5em, 13px); height: max(.5em, 13px); }
+.pbpic .frame, .pb-frames .frame { font-size: .6em; }
+.pb-frames { max-width: none; gap: max(.14em, 4px); }
+/* qbatch-1107: Baseball variant pictures (number bond, number line) */
+.qb-bond { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; font-weight: 800; }
+.qb-bond b { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 3px solid #7a5aa8; color: #3b2a5a; font-size: 22px; margin: 0 8px; }
+.qb-bond b.w { border-color: #e0336f; } .qb-bond b.q { background: #fff3c4; }
+.qb-line { display: inline-flex; align-items: flex-end; border-bottom: 3px solid #3b2a5a; padding: 0 4px 0; margin: 18px 0 20px; }
+.qb-line i { position: relative; width: clamp(14px, 4.2vw, 26px); height: 12px; border-left: 2px solid #3b2a5a; font-style: normal; }
+.qb-line i em { position: absolute; top: 14px; left: -10px; width: 20px; text-align: center; font-style: normal; font-size: 13px; color: #3b2a5a; }
+.qb-line i.at::after { content: ''; position: absolute; left: -9px; top: -20px; width: 16px; height: 16px; background: #e0336f; clip-path: polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+
+/* batch-1107c: skip note on question cards */
+.pc-skipnote { display: block; margin-top: 8px; font-size: 13px; font-weight: 700; color: #7a6a90; opacity: .85; }
+/* batch-1107c: phone fit for question cards (warm-up, quick check): smaller answer buttons in one row, the question picture bigger */
+@media (max-width: 480px), (max-height: 560px) {
+  .placement-card .card { padding: 14px 12px; }
+  .pc-q { font-size: 20px; margin: 4px 0 6px; }
+  .pc-opts { flex-wrap: nowrap; gap: 8px; }
+  .pc-opt { min-width: 0; flex: 1 1 0; min-height: 58px; padding: 6px 6px; border-radius: 16px; font-size: 20px; gap: 4px; flex-direction: column; }
+  .pc-opt kbd { display: none; }
+  .pc-opt .frame, .pc-opt .pb-frames .frame { font-size: 15px; }
+  .pc-opt .pbpic > b { font-size: 22px; }
+  .pc-pic .st-objs i { font-size: 34px; }
+  .pc-pic .st-objs.big i { font-size: 44px; margin: 2px 4px; }
+}
+
+/* PV100: fixed-size base-ten units stay readable on phones. */
+.pv-pic { max-width:100%; flex-wrap:wrap; box-sizing:border-box; }
+.pv-rod { width:13px; min-width:13px; height:130px; background:repeating-linear-gradient(to bottom,#5aa8ff 0 12px,#2f6fb5 12px 13px); flex-shrink:0; }
+.pv-one { width:13px; min-width:13px; height:13px; flex-shrink:0; }
+.pv-ones { width:43px; min-width:43px; flex-shrink:0; }
+.pv100-chart { display:grid; grid-template-columns:repeat(10,minmax(0,1fr)); width:320px; max-width:100%; margin:10px auto; font:700 16px sans-serif; }
+.pv100-chart span { border:1px solid #8ba3bd; padding:7px 0; text-align:center; background:#fff; }
+.pv100-chart .from { background:#ffdf8b; outline:2px solid #805c24; z-index:1; }
+.pv100-line { display:block; width:320px; max-width:100%; height:auto; margin:10px auto; }
+
+.pv-flat { display:inline-block; width:130px; min-width:130px; height:130px; flex-shrink:0; border-radius:3px; background-color:#98d7b0; background-image:repeating-linear-gradient(to right,transparent 0 12px,#39795b 12px 13px),repeating-linear-gradient(to bottom,transparent 0 12px,#39795b 12px 13px); box-shadow:inset 0 0 0 1px #39795b; }

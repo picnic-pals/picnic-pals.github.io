@@ -57,7 +57,9 @@
   // batch1 (plan P1): the left margin (the friend's corner) was a fixed 150 px, so on a 390 px portrait phone bubbles crowded the right
   // side; now 12% of the field width, at most 150 px. The side bounce uses the same edge.
   function LO() { return Math.min(150, Math.round(fw() * .12)); }
-  function size(c) { var base = TOD ? 150 : 124; if (c.sz === 'big') return 184; if (c.sz === 'little') return 100; return base; }
+  // batch-1107c: bubbles scale down on small phones (same big/little ratios, still >= 72px to tap)
+  function phoneK() { var w = Math.min(window.innerWidth || 800, (window.innerHeight || 800) * 1.2); return w >= 600 ? 1 : Math.max(.72, w / 600 + .1); }
+  function size(c) { var k = phoneK(), base = TOD ? 150 : 124; if (c.sz === 'big') return Math.round(184 * k); if (c.sz === 'little') return Math.round(100 * k); return Math.round(base * k); }
   function spawn(c, o) {
     o = o || {}; var d = size(c), lo = LO(), hi = Math.max(lo + 1, fw() - d - 20), x0 = lo, best = -1;
     for (var k = 0; k < 10; k++) {   // spread out: pick the spot farthest from bubbles still near the bottom (no stacked bubbles)

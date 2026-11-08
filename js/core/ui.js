@@ -79,6 +79,12 @@
     button.addEventListener('click', function () { if (q.say) A.Voice.say(q.say, { kind: 'tap' }); });
     ov.appendChild(button);
   }
+  // batch-1107c: tap outside a question card to skip it; a small note says so
+  function skipOutside(ov, fn) {
+    var card = ov.querySelector('.card'); if (card) card.appendChild(A.el('<span class="pc-skipnote">Tap outside to skip</span>'));
+    ov.addEventListener('click', function (e) { if (card && !card.contains(e.target) && !e.target.closest('.pc-replay')) fn(); });
+  }
+  UI.skipOutside = skipOutside;
   UI.placement = function (P, skill) {
     var api = A.Learn && A.Learn.placementApi ? A.Learn.placementApi(P, skill) : null;   // quality1: step warm-up, reading probe or place-value test-out
     if (api || (skill && skill.isStep && A.Steps)) return UI.warmup(P, skill, api);
@@ -111,6 +117,8 @@
         document.addEventListener('keydown', onKey, true);
         btns.forEach(function (b, k) { b.addEventListener('click', function () { pickIt(k); }); });
         setTimeout(function () { try { btns[0].focus({ preventScroll: true }); } catch (e) {} }, 50);
+        // batch-1107c: a tap outside the question card skips it (not counted)
+        skipOutside(ov, function () { if (done) return; done = true; document.removeEventListener('keydown', onKey, true); ov.remove(); UI.cardOpen = !!document.querySelector('.overlay.on'); resolve(); });
         if (q.say) A.Voice.say(q.say, { kind: q.listen ? 'listen' : 'prompt' });
       });
     }
@@ -155,6 +163,8 @@
         document.addEventListener('keydown', onKey, true);
         btns.forEach(function (b, k) { b.addEventListener('click', function () { pickIt(k); }); });
         setTimeout(function () { try { btns[0].focus({ preventScroll: true }); } catch (e) {} }, 50);
+        // batch-1107c: a tap outside the question card skips it (an "I don't know": the warm-up stops here, never places higher)
+        skipOutside(ov, function () { if (done) return; done = true; api.answer(false); document.removeEventListener('keydown', onKey, true); ov.remove(); UI.cardOpen = !!document.querySelector('.overlay.on'); resolve(); });
         if (q.say) A.Voice.say(q.say, { kind: q.listen ? 'listen' : 'prompt' });
       });
     }

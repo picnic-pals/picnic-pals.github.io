@@ -14,7 +14,9 @@
 
   /* ---------- pictures ---------- */
   function emo(w) { return '<span class="ea-emo" aria-hidden="true">' + E.PICS[w] + '</span>'; }
-  function picCell(w, fact) { var p = E.pic(w); return { label: w, html: emo(w), fact: fact, name: [p.line], k: w }; }
+  // batch-1107c: with the sound off, a picture cell also shows its word, so a picture with two names (bear / teddy) is not a guess
+  function quiet() { return !!(A.SightWords && A.SightWords.quiet && A.SightWords.quiet()); }
+  function picCell(w, fact) { var p = E.pic(w); return { label: w, html: emo(w) + (quiet() ? '<small class="picw">' + A.esc(w) + '</small>' : ''), fact: fact, name: [p.line], k: w }; }
   // a blob of paint (color swatch)
   function swatch(id, cls) {
     var c = COL[id];
