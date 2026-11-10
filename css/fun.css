@@ -2,11 +2,68 @@
 .brk { position: fixed; inset: 0; z-index: 9000; display: flex; flex-direction: column; opacity: 0; transition: opacity .25s; font-family: inherit; color: #3b2d55; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
 .brk.on { opacity: 1; }
 .brk-bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 30%, #fff6fb, #ffe1f0 55%, #e7dcff); }
-.brk-dance .brk-bg { background: radial-gradient(circle at 50% 20%, #8e6cff, #4b2e9a 70%); }
-.brk-weather .brk-bg { background: linear-gradient(#bfe6ff, #e9f7ff 70%, #c9f0c2 70%); }
+.brk-dance .brk-bg {
+  background-color: #4b2e9a;
+  background-image: url("../art/backgrounds/break_dance_1920x1080.jpg");
+  background-image: image-set(
+    url("../art/backgrounds/break_dance_1920x1080.webp") type("image/webp"),
+    url("../art/backgrounds/break_dance_1920x1080.jpg") type("image/jpeg")
+  );
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+@media (min-width: 1400px), (min-resolution: 2dppx) and (min-width: 900px) {
+  .brk-dance .brk-bg {
+    background-image: url("../art/backgrounds/break_dance_2560x1440.jpg");
+    background-image: image-set(
+      url("../art/backgrounds/break_dance_2560x1440.webp") type("image/webp"),
+      url("../art/backgrounds/break_dance_2560x1440.jpg") type("image/jpeg")
+    );
+  }
+}
+.brk-weather .brk-bg {
+  background-color: #bfe6ff;
+  background-image: url("../art/backgrounds/break_weather_1920x1080.jpg");
+  background-image: image-set(
+    url("../art/backgrounds/break_weather_1920x1080.webp") type("image/webp"),
+    url("../art/backgrounds/break_weather_1920x1080.jpg") type("image/jpeg")
+  );
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+@media (min-width: 1400px), (min-resolution: 2dppx) and (min-width: 900px) {
+  .brk-weather .brk-bg {
+    background-image: url("../art/backgrounds/break_weather_2560x1440.jpg");
+    background-image: image-set(
+      url("../art/backgrounds/break_weather_2560x1440.webp") type("image/webp"),
+      url("../art/backgrounds/break_weather_2560x1440.jpg") type("image/jpeg")
+    );
+  }
+}
 .brk-pop .brk-bg { background: linear-gradient(#c9ecff, #fff3fa); }
 .brk-peek .brk-bg { background: linear-gradient(#bde8ff, #e8f8ff 55%, #b7e8a6 55%); }
-.brk-concert .brk-bg { background: radial-gradient(ellipse at 50% 100%, #ffd76a, #ff9ec7 45%, #6b4fd1); }
+.brk-concert .brk-bg {
+  background-color: #6b4fd1;
+  background-image: url("../art/backgrounds/break_concert_1920x1080.jpg");
+  background-image: image-set(
+    url("../art/backgrounds/break_concert_1920x1080.webp") type("image/webp"),
+    url("../art/backgrounds/break_concert_1920x1080.jpg") type("image/jpeg")
+  );
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+@media (min-width: 1400px), (min-resolution: 2dppx) and (min-width: 900px) {
+  .brk-concert .brk-bg {
+    background-image: url("../art/backgrounds/break_concert_2560x1440.jpg");
+    background-image: image-set(
+      url("../art/backgrounds/break_concert_2560x1440.webp") type("image/webp"),
+      url("../art/backgrounds/break_concert_2560x1440.jpg") type("image/jpeg")
+    );
+  }
+}
 .brk-color .brk-bg { background: #fff8ef; }
 .brk-stage { position: relative; flex: 1; overflow: hidden; }
 .brk-skip { position: absolute; top: 14px; right: 14px; z-index: 5; min-width: 132px; min-height: 64px; border: 0; border-radius: 32px; background: #fff; color: #3b2d55; font: inherit; font-size: 26px; font-weight: 700; box-shadow: 0 5px 0 rgba(59,45,85,.18); cursor: pointer; }
@@ -111,7 +168,11 @@ button.bf { border: 0; background: none; padding: 0; cursor: pointer; }
 .wx-flake { font-size: 44px; color: #fff; text-shadow: 0 0 6px #9bd0ff; } .wx-flake.caught { animation: ppPop .4s ease forwards !important; }
 .wx-drop { width: 4px; height: 28px; border-radius: 2px; background: #4fa3ff; pointer-events: none; } .wx-spark { font-size: 34px; color: #ffd23f; pointer-events: none; }
 @keyframes fall { to { transform: translateY(calc(100vh + 80px)); } }
-[data-wx="rain"] ~ .brk-bg, .brk-weather [data-wx="rain"] { background: linear-gradient(rgba(120,140,170,.35), transparent 70%); }
+/* rain tint overlays the painted sky; keep background-image */
+.brk-weather .brk-stage[data-wx="rain"]::before {
+  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(rgba(120,140,170,.35), transparent 70%);
+}
 .wx-rainbow { position: absolute; left: 50%; top: 18%; width: 90vmin; height: 45vmin; transform: translateX(-50%); border-radius: 45vmin 45vmin 0 0; background: radial-gradient(circle at 50% 100%, transparent 45%, #a77bff 45%, #a77bff 50%, #4fa3ff 50%, #4fa3ff 55%, #6fd36a 55%, #6fd36a 60%, #ffe14d 60%, #ffe14d 65%, #ffa53b 65%, #ffa53b 70%, #ff5d5d 70%, #ff5d5d 75%, transparent 75%); animation: rbIn 3s ease forwards; clip-path: inset(0 100% 0 0); }
 @keyframes rbIn { to { clip-path: inset(0 0 0 0); } }
 .wx-burst { position: fixed; z-index: 9100; font-size: 60px; transform: translate(-50%, -50%); animation: ppPop .9s ease forwards; pointer-events: none; }

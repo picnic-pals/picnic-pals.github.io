@@ -35,9 +35,12 @@
     a_dbl: 3, a_ndbl: 3, a_ten: 3, s_teen1: 3, s_teen10: 3, s_10: 3, a_9: 3, a_8: 3, s_noX: 3, a_mk10: 3, s_split: 3, s_think: 3, a_mix: 3, s_mix: 3,
     pv_tens: 3, pv_compare: 3, pv_ten_more: 3,   // 1st-grade place value (1.NBT.2, 1.NBT.3, 1.NBT.5): the minimal B2 test-out
     a2_add: 4, s2_sub: 4, a2_regroup: 4, s2_regroup: 4, pv_hto: 4, pv_cmp3: 4, skip_count: 4,   // batch1: 2nd grade (2.NBT.1-5)
+    time_hour_half: 3, time_5min: 4,   // qtime: 1.MD.B.3 then 2.MD.C.7
+    coin_values: 3, money_coins: 4,   // qcoins: G1 coin ID/value, then 2.MD.C.8 totals
+    arrays: 4,   // qarrays: 2.OA.C.4 rectangular arrays (after even/odd)
     // reading
     letters: 1, begsound: 2, rhymes: 2, sight: 2, cvc: 2.5, digraph: 3, sight2: 3, opposites: 2.5, nounverb: 3, longvowel: [3, 4], sight3: [4, 5],
-    homophones: 4.5, affixes: 4.5, comprehension: [3, 3.5],
+    homophones: 4.5, affixes: 4.5, comprehension: [3, 3.5], passages: [3.5, 4],   // qpassages: RL/RI.1–2 F&P ~I–M
     // early concepts
     colors: 1, shapes: [1, 1.5],
     // topic steps (T = 0, P = 1 unless listed; E by content)
@@ -58,7 +61,7 @@
   };
   var SUBJ_OF_KIND = { // Bubble kinds / Stand steps -> the subject whose floor applies
     p_num: 'math', p_bigger: 'math', p_order: 'math', e_numword: 'math', e_add: 'math', e_evenodd: 'math', e_make10: 'math', e_skip: 'math', e_tens: 'math',
-    p_letter: 'reading', p_begin: 'reading', e_sight: 'reading', e_rhyme: 'reading', e_missing: 'reading', e_spell: 'reading', e_sight3: 'reading', e_homo: 'reading', e_prefix: 'reading',
+    p_letter: 'reading', p_begin: 'reading', e_sight: 'reading', e_rhyme: 'reading', e_missing: 'reading', e_spell: 'reading', e_sight3: 'reading', e_homo: 'reading', e_prefix: 'reading', passages: 'reading',
     m_count5: 'math', m_count10: 'math', m_add: 'math', m_enough: 'math', m_three: 'math', m_change: 'math',
     bb_where: 'math', bb_runs: 'math', bb_onbase: 'math', bb_left: 'math', bb_count: 'math', bb_tied: 'math', bb_towin: 'math', bb_totie: 'math'
   };

@@ -123,7 +123,7 @@
         if (pics.length) {
           var P = pick(pics), not = G.LONG_PIC_NOT[P] || [], plike = bank[P].filter(function (w) { return !alike(w, P) && not.indexOf(w) < 0 && !G.LONG_PIC[w]; });
           var ppool = pool.concat(T).filter(function (w, i, a) { return a.indexOf(w) === i && w !== P && !alike(w, P) && not.indexOf(w) < 0 && !G.LONG_PIC[w]; });
-          return { text: '<span class="lvpic">Which word is this? <span class="emo" aria-hidden="true">' + G.LONG_PIC[P] + '</span></span>', plainText: 'Which word is this?', listen: false, pic: true,
+          return { text: '<span class="lvpic">Which word is this? ' + (A.Icons ? A.Icons.html(G.LONG_PIC[P], { size: 64, decorative: true, cls: 'emo pp-pic', context: 'quiz' }) : '<span class="emo" aria-hidden="true">' + G.LONG_PIC[P] + '</span>') + '</span>', plainText: 'Which word is this?', listen: false, pic: true,
             hint: L ? 'Look at the picture. Find the word with two vowels teaming up, like ai, ee, oa or ea.' : 'Look at the picture. Find the word with the magic e.', say: [], target: P,
             good: function () { return wordCell(P, ['w_thats', wl(P)]); }, bad: function () { var w = plike.length && Math.random() < .65 ? pick(plike) : pick(ppool); return wordCell(w, []); } };
         }
@@ -182,11 +182,23 @@
         say: [id], sayAuto: ['rcq_' + L + '_' + i], story: true, kind: r[4], target: T, rc: id, q: r[1],
         good: function () { return wordCell(T, [id]); }, bad: function () { return wordCell(pick(wrong), [id]); } };
     } });
-  SK[SK.length - 1].ask = function (L, n) {
-    var r = SK[SK.length - 1].gen(L), wrong = A.shuffle(G.rcWrong(G.RC[L][+r.rc.split('_')[2]])).slice(0, n - 1), cells = [r.good()].concat(wrong.map(function (w) { return wordCell(w, [r.rc]); }));
-    var arr = A.shuffle(cells.slice());
-    return { text: r.text, say: [r.rc], sayAuto: r.sayAuto, story: true, kind: r.kind, fact: cells[0].fact, answer: arr.indexOf(cells[0]), target: r.target, choices: arr.map(function (c) { return { label: c.label, html: c.html, say: [], k: c.k }; }) };
-  };
+  (function (sk) {
+    sk.ask = function (L, n) {
+      var r = sk.gen(L), wrong = A.shuffle(G.rcWrong(G.RC[L][+r.rc.split('_')[2]])).slice(0, n - 1), cells = [r.good()].concat(wrong.map(function (w) { return wordCell(w, [r.rc]); }));
+      var arr = A.shuffle(cells.slice());
+      return { text: r.text, say: [r.rc], sayAuto: r.sayAuto, story: true, kind: r.kind, fact: cells[0].fact, answer: arr.indexOf(cells[0]), target: r.target,
+        choices: arr.map(function (c) { return { label: c.label, html: c.html, say: [], k: c.k, long: String(c.label || '').length > 3 }; }) };
+    };
+  })(SK[SK.length - 1]);
+
+  /* qpassages: longer E-band passages (Learning Coach reading_passages_e.json), RL/RI.1–2 / F&P ~I–M.
+     Shows the passage, then 2–3 comprehension questions (one per ask), device-voice read-aloud, no emoji. */
+  SK.push({ id: 'passages', name: 'Reading passages', short: 'Read a short passage, then answer who / what / why / main idea', strand: 'Comprehension', std: 'RL/RI.1–2', grade: '1–2', subject: 'reading', sayFact: false, secs: [18, 20], wideCells: true, maxChoices: 3,
+    levels: ['Fiction & nonfiction passages (who, what, why, main idea)'],
+    intro: { line: 'skill_passages', example: '<div class="qp-pass"><div class="qp-title">The Lost Mitten</div></div>' },
+    gen: function () { return A.Passages.gen(A.Store && A.Store.active && A.Store.active()); },
+    ask: function () { return A.Passages.ask(A.Store && A.Store.active && A.Store.active()); }
+  });
 
   SK.forEach(function (s) { C.register(s); });
   A.Grade1Skills = { ids: SK.map(function (s) { return s.id; }) };
@@ -202,7 +214,7 @@
   var GRADES = [['pk', 'Pre-K'], ['k', 'K'], ['1', '1st'], ['2', '2nd'], ['3', '3rd'], ['4', '4th'], ['5', '5th']];
   // the first skill for each grade (missing grade = above the content: top rung). An entry is a skill id or { id, level } (level 0-based).
   // A grown-up's explicit grade uses this table; 'auto' (by age) uses AGE_START below.
-  var START = { math: { pk: 'count10', k: 'compare', 1: 'add10', 2: 'evenodd' },
+  var START = { math: { pk: 'count10', k: 'compare', 1: 'add10', 2: 'add20' },
     reading: { pk: 'letters', k: 'begsound', 1: 'cvc', 2: 'longvowel', 3: 'homophones' },
     concepts: { pk: 'colors', k: 'shapes' } };
   /* 'Auto (by age)': about one level above grade expectations (Learning Coach, age-start-and-pacing-2026-10-21 §2).
@@ -219,7 +231,7 @@
   AGE_START.none = AGE_START.k;
   // short text for the new-player screen / grown-up area: what each age starts at
   var AGE_TEXT = { 2: 'Tiny Picnic: numbers 1–5, big letters, colors', 3: 'numbers to 10, big & little letters, colors', 4: 'bigger & smaller, beginning sounds, shapes',
-    5: 'adding to 10, first sight words', 6: 'adding to 20, short-vowel words', 7: 'story problems, homophones', 8: 'even & odd to 20, prefixes & suffixes' };
+    5: 'adding to 10, first sight words', 6: 'adding to 20, short-vowel words', 7: 'story problems, homophones', 8: 'adding to 20, then even & odd after pairing practice, prefixes & suffixes' };
   AGE_TEXT.skip = AGE_TEXT[5];
   function byAge(p, subj) { return 'age:' + A.Age.band(p); }   // a pseudo-grade: startFor() looks it up in AGE_START
   function grade(p, subj) { var v = p.levels && p.levels[subj]; return !v || v === 'auto' ? byAge(p, subj) : v; }

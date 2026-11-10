@@ -24,7 +24,7 @@
     return '<svg viewBox="0 0 100 100" aria-hidden="true"><g fill="' + f + '" stroke="#ffffff" stroke-width="5">' + d + '</g></svg>'; }
   function inner(c) {
     if (c.cls === 'shape') return shapeSvg(c.shape, c.col);
-    if (c.cls === 'animal') return '<span class="emo">' + c.e + '</span>';
+    if (c.cls === 'animal') return '<span class="emo">' + (A.Icons ? A.Icons.html(c.e, { size: 64, decorative: true, cls: 'pp-pic' }) : c.e) + '</span>';
     if (c.cls === 'peek') return '<span class="emo q">🫧</span>';
     if (c.cls === 'sound') return '<span class="snd">' + A.esc(c.t) + '</span>';
     if (c.cls === 'color') return '';
@@ -37,7 +37,7 @@
     if (s.col && !s.e) h += '<span class="sw" style="background:' + B.COLORS[s.col] + '"></span>';
     if (s.shape) h += '<span class="shp">' + shapeSvg(s.shape, '#ff8ab3') + '</span>';
     if (s.size) h += '<span class="sz ' + s.size + '"></span>';
-    if (s.e) h += '<span class="emo' + (s.col ? ' tinted' : '') + '"' + (s.col ? ' style="background:' + B.COLORS[s.col] + '55"' : '') + '>' + s.e + '</span>';
+    if (s.e) h += '<span class="emo' + (s.col ? ' tinted' : '') + '"' + (s.col ? ' style="background:' + B.COLORS[s.col] + '55"' : '') + '>' + (A.Icons ? A.Icons.html(s.e, { size: 64, decorative: true, cls: 'pp-pic' }) : s.e) + '</span>';
     if (s.text) h += '<b class="' + (s.text.length > 6 ? 'long' : '') + '">' + A.esc(s.text) + '</b>';
     if (s.sent) h += '<b class="sent">' + A.esc(s.sent) + '</b>';
     if (t.seq) h += '<span class="seq">' + t.seq.map(function (c, k) { return '<i class="' + (k < t.got ? 'on' : k === t.got ? 'now' : '') + '">' + (k < t.got || !t.word ? A.esc(c.t) : '_') + '</i>'; }).join('') + '</span>';

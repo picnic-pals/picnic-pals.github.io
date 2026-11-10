@@ -16,9 +16,14 @@
   var BN = { T: 0, P: 1, E: 2 }, THEMES = [], RULE = { min: 8, acc: .8, days: 1 };
   function rnd(n) { return Math.floor(Math.random() * n); }
   function esc(s) { return A.esc ? A.esc(s) : String(s); }
+  function pic(e, word) {
+    if (!e) return '';
+    if (A.Icons) return A.Icons.html(e, { word: word || '', size: 64, decorative: true, cls: 'tp-pic', context: 'quiz' });
+    return e;
+  }
   function cellHtml(c, b) {
-    if (b === 'T') return '<span class="tp-emo">' + (c.e || '') + '</span>';
-    if (b === 'P') return c.e ? '<span class="tp-emo">' + c.e + '</span>' + (c.w && c.w !== c.e ? '<span class="tp-w">' + esc(c.w) + '</span>' : '') : '<span class="tp-w only">' + esc(c.w) + '</span>';
+    if (b === 'T') return '<span class="tp-emo">' + pic(c.e, c.w) + '</span>';
+    if (b === 'P') return c.e ? '<span class="tp-emo">' + pic(c.e, c.w) + '</span>' + (c.w && c.w !== c.e ? '<span class="tp-w">' + esc(c.w) + '</span>' : '') : '<span class="tp-w only">' + esc(c.w) + '</span>';
     return '<span class="tp-w only">' + esc(c.w || c.raw) + '</span>';
   }
   function say(c) { return c.say ? [c.say] : c.w ? [c.w] : []; }
@@ -28,12 +33,13 @@
       do { i = rnd(items.length); } while (last.indexOf(i) >= 0 && g++ < 20);
       if (st) { last.push(i); st.tpLast = last.slice(-Math.min(5, items.length - 2)); }
       var it = items[i], b = stepDef.band, map = { a: it.ans }; it.wrong.forEach(function (w, k) { map['w' + k] = w; });
-      var qtxt = esc(it.q) + (it.qe && b !== 'E' ? '<span class="tp-qe">' + it.qe + '</span>' : it.qe ? ' <span class="tp-qe">' + it.qe + '</span>' : '');
+      var qWord = /\brobin\b/i.test(it.q) ? 'robin' : /\bcheetah\b/i.test(it.q) ? 'cheetah' : '';
+      var qtxt = esc(it.q) + (it.qe && b !== 'E' ? '<span class="tp-qe">' + pic(it.qe, qWord) + '</span>' : it.qe ? ' <span class="tp-qe">' + pic(it.qe, qWord) + '</span>' : '');
       return { key: stepDef.id + '#' + i, ans: 'a', wrong: Object.keys(map).filter(function (k) { return k !== 'a'; }), text: '<span class="tp-q">' + qtxt + '</span>', say: [it.say], pictures: b !== 'E',
         cell: function (v) { var c = map[v]; return { label: c.w || c.raw, html: cellHtml(c, b), fact: v === 'a' ? say(c).concat(it.factSay && b !== 'E' ? [it.factSay] : []) : say(c) }; },
         // hints after a miss: 1 = look again (the question's picture, the fact if there is one), 2 = the answer shown
         hint: function (l) { var a = it.ans;
-          return '<div class="st-hint tp-hint">' + (l >= 2 ? '<span class="tp-emo">' + (a.e || '') + '</span><p>It\'s <b>' + esc(a.w || a.raw) + '</b>!' + (it.fact ? ' ' + esc(it.fact) : '') + '</p>' : (it.qe ? '<span class="tp-emo">' + it.qe + '</span>' : '') + '<p>' + (it.fact && b === 'E' ? esc(it.fact) : 'Look again. ' + esc(it.q)) + '</p>') + '</div>'; },
+          return '<div class="st-hint tp-hint">' + (l >= 2 ? '<span class="tp-emo">' + pic(a.e, a.w) + '</span><p>It\'s <b>' + esc(a.w || a.raw) + '</b>!' + (it.fact ? ' ' + esc(it.fact) : '') + '</p>' : (it.qe ? '<span class="tp-emo">' + pic(it.qe, qWord) + '</span>' : '') + '<p>' + (it.fact && b === 'E' ? esc(it.fact) : 'Look again. ' + esc(it.q)) + '</p>') + '</div>'; },
         fact: it.fact };
     };
   }

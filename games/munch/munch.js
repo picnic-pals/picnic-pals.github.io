@@ -173,6 +173,7 @@
     CW = wide ? Math.max(CS, Math.min(Math.floor((W - GAP * (COLS - 1)) / COLS), Math.round(CS * 1.7))) : CS;
     board.style.gridTemplateColumns = 'repeat(' + COLS + ',' + CW + 'px)'; board.style.gridAutoRows = CS + 'px'; board.style.gap = GAP + 'px';
     board.style.setProperty('--cs', CS + 'px');
+    board.style.setProperty('--icon-cs', CS + 'px');  // artswap: icon/emoji size ignores fitCells label shrink
     PL.map(function (p) { return p.el; }).concat([grumEl, starEl]).forEach(function (e) { if (e) { e.style.width = CS + 'px'; e.style.height = CS + 'px'; } });
     place(false); fitCells();
   }
@@ -184,7 +185,7 @@
   function fitCell(d) {
     var l = d.querySelector('.lbl'); if (!l) return;
     l.style.removeProperty('--cs'); d.classList.remove('wrap', 'tight');
-    l.style.maxWidth = Math.floor(d.clientWidth * .92) + 'px'; l.style.maxHeight = Math.floor(d.clientHeight * .92) + 'px';   // whole pixels: no rounding "overflow"
+    l.style.maxWidth = Math.floor(d.clientWidth * .92) + 'px'; l.style.maxHeight = d.clientHeight + 'px';   // full tile height (92% left 3-line phrases short at 1024x640)
     if (!over(l)) return;
     var k = 1, f0 = textPx(l);
     while (over(l) && k > .72 && f0 * k * .92 >= MIN_FONT) { k *= .92; l.style.setProperty('--cs', (CS * k) + 'px'); }
@@ -454,21 +455,21 @@
   function checkStar(pl) { if (B.cell >= 0 && !B.open && pl.pos.r * COLS + pl.pos.c === B.cell) { B.cell = -1; B.used = true; place(true); openBonus(pl); } }
   function openBonus(pl) {
     var q = A.BonusQ.pick(pl.P), order = A.shuffle(q.choices.map(function (c, i) { return i; }));
-    B.open = true; B.q = q; B.order = order; B.sel = 0; B.pl = pl; B.answered = false; B.t0 = Date.now();
+    B.open = true; B.q = q; B.order = order; B.sel = -1; B.pl = pl; B.answered = false; B.t0 = Date.now();
     V.stop(); SFX.bonus(); A.Store.save();
     var keys = TWO ? (pl.i ? '<kbd>A</kbd><kbd>D</kbd> choose · <kbd>F</kbd> pick' : '<kbd>←</kbd><kbd>→</kbd> choose · <kbd class="wide">Space</kbd> pick') : '<kbd>←</kbd><kbd>→</kbd> choose · <kbd class="wide">Space</kbd> pick · <kbd>R</kbd> hear again';
     var ov = A.el('<div class="overlay on bonusq" role="dialog" aria-modal="true"><div class="card">' +
       '<span class="tag">✨ Bonus question' + (TWO ? ' for ' + A.esc(pl.name) : '') + '</span>' +
       (TWO ? '<span class="mini who p' + (pl.i + 1) + '">' + A.Blobs.forProfile(pl.P) + '</span>' : '') +
       '<h2 class="qq">' + A.esc(q.q) + ' <button class="speak sm" data-again aria-label="Hear it again">🔊</button></h2>' +
-      '<div class="choices n' + order.length + '">' + order.map(function (ci, k) { var c = q.choices[ci]; return '<button class="choice" data-k="' + k + '"><span class="em"' + (c.size ? ' style="font-size:' + c.size + 'em"' : '') + '>' + c.emoji + '</span><span class="lb">' + A.esc(c.hideText ? '' : c.text) + '</span></button>'; }).join('') + '</div>' +
+      '<div class="choices n' + order.length + '">' + order.map(function (ci, k) { var c = q.choices[ci]; var em = A.Icons ? A.Icons.html(c.emoji, { size: 64, decorative: true, cls: 'pp-pic', context: 'quiz', word: c.text }) : c.emoji; return '<button class="choice" data-k="' + k + '"><span class="em"' + (c.size ? ' style="font-size:' + c.size + 'em"' : '') + '>' + em + '</span><span class="lb">' + A.esc(c.hideText ? '' : c.text) + '</span></button>'; }).join('') + '</div>' +
       '<div class="res" aria-live="polite"></div><span class="kh">' + (A.isTouchOnly() ? 'Tap your answer' : keys) + '</span><span class="ph">' + A.Pad.g('dpad') + ' choose · ' + A.Pad.g('a') + ' answer</span></div></div>');
     document.body.appendChild(ov); B.el = ov; UI.cardOpen = true;
     A.$$('.choice', ov).forEach(function (b) { b.addEventListener('click', function () { answer(+b.dataset.k); }); b.addEventListener('pointerenter', function () { if (!B.answered) select(+b.dataset.k); }); });
     ov.querySelector('[data-again]').addEventListener('click', function (e) { e.stopPropagation(); readQuestion(true); });
     // batch-1107c: tap outside the card to skip the bonus question (nothing recorded)
     UI.skipOutside(ov, function () { if (!B.open || B.answered) return; B.answered = true; B.readTok++; V.stop(); ov.remove(); B.el = null; B.open = false; UI.cardOpen = !!document.querySelector('.overlay.on'); poke(); });
-    select(0); readQuestion();
+    readQuestion();   // no choice highlighted until a tap / arrow / hover
   }
   function readQuestion(all) {
     var q = B.q, tok = (B.readTok = (B.readTok || 0) + 1);
@@ -519,8 +520,8 @@
     var k = e.key, who = TWO ? B.pl.i : -1;
     var p1 = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }, p2 = { a: -1, A: -1, w: -1, W: -1, d: 1, D: 1, s: 1, S: 1 };
     var mv = (who !== 1 ? p1[k] : undefined) || (who !== 0 ? p2[k] : undefined);
-    if (mv) { select(B.sel + mv); SFX.tap(); }
-    else if ((who !== 1 && (k === ' ' || k === 'Enter')) || (who !== 0 && (k === 'f' || k === 'F'))) { if (!e.repeat) answer(B.sel); }
+    if (mv) { select(B.sel < 0 ? (mv < 0 ? B.order.length - 1 : 0) : B.sel + mv); SFX.tap(); }
+    else if ((who !== 1 && (k === ' ' || k === 'Enter')) || (who !== 0 && (k === 'f' || k === 'F'))) { if (!e.repeat && B.sel >= 0) answer(B.sel); }
     else if (k >= '1' && k <= '4') { if (!e.repeat) answer(Math.min(+k - 1, B.order.length - 1)); }
     else if (k === 'r' || k === 'R') readQuestion();
     else return true;

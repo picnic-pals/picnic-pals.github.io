@@ -1,5 +1,27 @@
 /* Bubble Pop (bubble1): big bubbles (100px+; 124 / 150 for toddlers), calm motion, touch and mouse, original CSS/SVG art */
-body { background: linear-gradient(#a9dcff 0%, #d7f0ff 62%, #bdeaa8 62%, #a3dd8e 100%); }
+/* artswap nature-bg: bubble sky/grass plate (webp + jpg fallback; 1920 default, 2560 large) */
+body {
+  background-color: #a9dcff;
+  background-image: url("../../art/backgrounds/bubble_1920x1080.jpg");
+  background-image: image-set(
+    url("../../art/backgrounds/bubble_1920x1080.webp") type("image/webp"),
+    url("../../art/backgrounds/bubble_1920x1080.jpg") type("image/jpeg")
+  );
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+@media (min-width: 1400px), (min-resolution: 2dppx) and (min-width: 900px) {
+  body {
+    background-image: url("../../art/backgrounds/bubble_2560x1440.jpg");
+    background-image: image-set(
+      url("../../art/backgrounds/bubble_2560x1440.webp") type("image/webp"),
+      url("../../art/backgrounds/bubble_2560x1440.jpg") type("image/jpeg")
+    );
+  }
+}
+/* art already paints sky/clouds — hide old CSS cloud blobs */
+.clouds { display: none !important; }
 #bubble { height: 100vh; height: 100dvh; position: relative; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
 .tbar { position: relative; z-index: 4; display: flex; align-items: center; justify-content: center; padding: 14px 90px 0; min-height: 64px; }
 .homebtn { position: fixed; top: 8px; left: 8px; z-index: 6; width: 52px; height: 52px; border-radius: 50%; border: 0; background: #fff; font-size: 24px; opacity: .85; box-shadow: 0 3px 0 #d6e7f3; touch-action: none; }
@@ -94,4 +116,19 @@ body { background: linear-gradient(#a9dcff 0%, #d7f0ff 62%, #bdeaa8 62%, #a3dd8e
   .bub .emo { font-size: 42px; } .bub .tx { font-size: 36px; } .bub .tx.long { font-size: 22px; } .bub.k-sum .tx { font-size: 26px; } .bub .snd { font-size: 22px; }
   .target { top: 70px; padding: 8px 14px; gap: 8px; } .target b { font-size: 32px; } .target .emo { font-size: 42px; } .target .sw { width: 50px; height: 50px; } .target .shp svg { width: 52px; height: 52px; }
   .sayagain { width: 56px; height: 56px; font-size: 26px; }
+}
+
+.emo .pp-icon, .emo img.pp-pic { width: 1em; height: 1em; vertical-align: middle; }
+.target .emo .pp-icon { width: 60px; height: 60px; }
+.bub .emo .pp-icon { width: 58px; height: 58px; }
+@media (max-width: 480px) {
+  .bub .emo .pp-icon { width: 42px; height: 42px; }
+  .target .emo .pp-icon { width: 42px; height: 42px; }
+}
+
+.bub .emo .pp-emoji { font-size: 58px; line-height: 1; display: inline-block; width: 1em; height: 1em; }
+.target .emo .pp-emoji { font-size: 60px; line-height: 1; display: inline-block; width: 1em; height: 1em; }
+@media (max-width: 480px), (max-height: 560px) {
+  .bub .emo .pp-emoji { font-size: 42px; }
+  .target .emo .pp-emoji { font-size: 42px; }
 }

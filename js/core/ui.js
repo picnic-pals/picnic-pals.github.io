@@ -75,7 +75,7 @@
      Resolves { score, result: 'skip' | 'higher' | 'normal' }. No hearts, no timer, no "wrong" sound: a missed one just glows the answer. */
   // Shared question overlays get one replay control, outside the prompt's layout.
   function promptReplay(ov, q) {
-    var button = A.el('<button class="pc-replay" aria-label="Hear the prompt again">🔊</button>');
+    var button = A.el('<button class="pc-replay" aria-label="Hear the prompt again">' + (A.Icons ? A.Icons.html('ui.speaker', { size: 32, decorative: true, cls: 'pp-pic' }) : '🔊') + '</button>');
     button.addEventListener('click', function () { if (q.say) A.Voice.say(q.say, { kind: 'tap' }); });
     ov.appendChild(button);
   }
@@ -439,7 +439,7 @@
   function howtoBody(h) {
     if (h.steps && h.steps.length) {
       return '<div class="howto-steps" role="list">' + h.steps.map(function (s, i) {
-        return '<div class="howto-step" role="listitem"><span class="hs-e" aria-hidden="true">' + s.e + '</span><span class="hs-t">' + A.esc(s.t) + '</span>' +
+        return '<div class="howto-step" role="listitem"><span class="hs-e" aria-hidden="true">' + (A.Icons ? A.Icons.html(s.e, { size: 48, decorative: true, cls: 'pp-pic' }) : s.e) + '</span><span class="hs-t">' + A.esc(s.t) + '</span>' +
           (i < h.steps.length - 1 ? '<span class="hs-arrow" aria-hidden="true">→</span>' : '') + '</div>';
       }).join('') + '</div>';
     }
@@ -449,7 +449,7 @@
     show: function (g) {
       var h = HOWTO[g]; if (!h || document.querySelector('.overlay.howto')) return Promise.resolve();
       var P = A.Store && A.Store.active && A.Store.active(), friend = P && A.Blobs && A.Blobs.forProfile ? A.Blobs.forProfile(P, { expr: 'happy' }) : '';
-      var pic = h.steps ? '' : '<div class="howto-art"><span class="he" aria-hidden="true">' + h.e + '</span>' + (friend ? '<span class="hf">' + friend + '</span>' : '') + '</div>';
+      var pic = h.steps ? '' : '<div class="howto-art"><span class="he" aria-hidden="true">' + (A.Icons ? A.Icons.html(h.e, { size: 64, decorative: true, cls: 'pp-pic' }) : h.e) + '</span>' + (friend ? '<span class="hf">' + friend + '</span>' : '') + '</div>';
       return UI.card({ cls: 'howto' + (h.steps ? ' howto-pic' : ''), tag: 'How to play', title: h.title, art: pic,
         html: howtoBody(h), btn: "Let's go!", voice: ['q1_howto_' + g], minMs: 500 });
     },

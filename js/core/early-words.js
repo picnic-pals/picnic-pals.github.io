@@ -34,6 +34,36 @@
     pie: '🥧', tie: '👔', eye: '👁️', train: '🚆', rain: '🌧️', chain: '⛓️', nose: '👃', rose: '🌹', shell: '🐚'
   };
   var PLURAL = { cherries: 1, blueberries: 1, jeans: 1, grapes: 1 };
+  /* qquality1: pictures with ONE everyday name for a young child (muted rhyme / beginning-sound).
+     Ambiguous ones (bunny/rabbit, cup/mug, kitten/cat, rock/stone, couch/sofa, pup/dog, bug/ant, and the list below)
+     stay out of muted picture questions so kids do not guess the wrong label. With sound on we still prefer this list. */
+  var PIC_AMBIG = {
+    chick: 'chick/chicken', bear: 'bear/teddy', chestnut: 'chestnut/acorn',
+    jeans: 'jeans/pants', cherries: 'cherry/cherries', blueberries: 'blueberry/berries',
+    'green apple': 'green apple/apple', 'fire truck': 'fire truck/truck',
+    'water drop': 'water/drop/raindrop', 'cherry blossom': 'blossom/flower',
+    sunflower: 'sunflower/flower', clover: 'clover/leaf/shamrock',
+    cap: 'cap/hat', hat: 'hat/top hat', leaf: 'leaf/maple leaf', rain: 'rain/cloud',
+    rose: 'rose/flower', coat: 'coat/jacket', fire: 'fire/flame',
+    snowflake: 'snowflake/snow', salad: 'salad/bowl', lollipop: 'lollipop/candy',
+    hippo: 'hippo/hippopotamus', ghost: 'ghost/boo', mushroom: 'mushroom/toadstool',
+    // also covers words grade1-words.js later adds into E.PICS
+    cup: 'cup/mug', bug: 'bug/caterpillar', pup: 'pup/dog', ant: 'ant/bug',
+    rock: 'rock/stone', bunny: 'bunny/rabbit', rabbit: 'bunny/rabbit', kitten: 'kitten/cat',
+    couch: 'couch/sofa', sofa: 'couch/sofa', mug: 'cup/mug'
+  };
+  E.PIC_AMBIG = PIC_AMBIG;
+  E.isClearPic = function (w) { return !!PICS[w] && !PIC_AMBIG[w]; };
+  E.clearList = function () { return Object.keys(PICS).filter(function (w) { return E.isClearPic(w); }); };
+  E.PIC_CLEAR = E.clearList();   // snapshot at load; clearList() refreshes after grade1-words adds pics
+  /* quiet/force: only clear pictures. With sound on: prefer clear (fall back to the full list if a pool would empty). */
+  E.clearPool = function (arr, force) {
+    if (!arr || !arr.length) return [];
+    var quiet = force || !!(A.SightWords && A.SightWords.quiet && A.SightWords.quiet());
+    var clear = arr.filter(function (w) { return E.isClearPic(w); });
+    if (quiet) return clear;
+    return clear.length ? clear : arr.slice();
+  };
   // reuse the bonus-question answer clips that are just the bare word ("c_apple" says "Apple."), else a new pw_<word> line
   var ANS = {}; if (A.BonusQ) A.BonusQ.QS.forEach(function (q) { if (q.d > 2) return; q.choices.forEach(function (c) { ANS[c.line] = 1; }); });   // quality1: only the original (recorded) d1/d2 bank; the new d3/d4 answers have no clips yet
   function slug(w) { return String(w).toLowerCase().replace(/[^a-z0-9]+/g, '_'); }

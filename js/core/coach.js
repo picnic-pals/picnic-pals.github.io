@@ -33,9 +33,9 @@
     wordprob: { acc: .85, min: 20, days: 2, label: 'Story problems: 85%+ over 20+ answers on 2 days' }
   };
   var TYPE_OF = { add10: 'facts', sub10: 'facts', make10: 'facts', missing: 'facts', add20: 'facts', sub20: 'facts', wordprob: 'wordprob',
-    count10: 'count', compare: 'count', teen: 'count', evenodd: 'count',
+    count10: 'count', compare: 'count', teen: 'count', evenodd: 'count', time_hour_half: 'count', time_5min: 'count', coin_values: 'count', money_coins: 'count', arrays: 'count',
     letters: 'letters', begsound: 'letters', rhymes: 'phonics', cvc: 'phonics', digraph: 'phonics', longvowel: 'phonics', homophones: 'phonics', affixes: 'phonics',
-    sight: 'sight', sight2: 'sight', sight3: 'sight', comprehension: 'story', opposites: 'vocab', nounverb: 'vocab', colors: 'concepts', shapes: 'concepts' };
+    sight: 'sight', sight2: 'sight', sight3: 'sight', comprehension: 'story', passages: 'story', opposites: 'vocab', nounverb: 'vocab', colors: 'concepts', shapes: 'concepts' };
   function typeOf(sid) { return TYPE_OF[sid] || 'vocab'; }
   function rule(sid) { return TYPES[typeOf(sid)]; }
 

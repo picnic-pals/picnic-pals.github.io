@@ -21,12 +21,12 @@
   box-shadow: 0 calc(var(--cs) * .06) 0 #0000001a; transition: transform .12s, background .3s, opacity .3s; cursor: pointer; overflow: visible; }
 .cell:active { transform: scale(.96); }
 .cell .lbl { display: flex; align-items: center; justify-content: center; transition: transform .2s; white-space: nowrap; pointer-events: none;
-  font-size: calc(var(--cs) * .34); max-width: 92%; max-height: 92%; overflow: hidden; text-align: center; }
+  font-size: calc(var(--cs) * .34); max-width: 92%; max-height: 100% !important; overflow: hidden; text-align: center; }
 .cell.long .lbl { font-size: calc(var(--cs) * .2); }
 /* long answers (phrases): fitCells() in munch.js wraps them at spaces (never inside a word) and shrinks the label (its own --cs) down to a 13px minimum */
 .cell.wrap .lbl { white-space: normal; overflow-wrap: normal; word-break: normal; hyphens: none; flex-wrap: wrap; }
 .cell .lbl, .cell .lbl .ea-word { line-height: 1.22; }   /* line box >= the font's glyph box, so labels never report a 1px overflow */
-.cell.wrap .lbl .ea-word { line-height: 1.12; padding: .05em 0; }
+.cell.wrap .lbl, .cell.wrap .lbl .ea-word { line-height: 1.1; padding: 0; }  /* contain glyphs; 3 lines at the 13px floor still fit a 44px-tall tile */
 .cell .frame { font-size: calc(var(--cs) * .3); }
 .cell .frames2 { font-size: calc(var(--cs) * .44); }
 .cell .frames2 .frame { font-size: inherit; }
@@ -133,6 +133,8 @@ body.notimer .timer { display: none !important; }
   transition: transform .12s, box-shadow .12s, background .2s; }
 .choice .em { font-size: clamp(48px, 11vmin, 92px); line-height: 1.1; font-family: "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif; }
 .choice .lb { font-size: clamp(17px, 3vmin, 24px); font-weight: 700; }
+.choice:focus { outline: none; }
+.choice:focus-visible { outline: 4px solid #7cc4ff; outline-offset: 3px; }
 .choice.sel { transform: translateY(-4px) scale(1.04); box-shadow: 0 8px 0 #b6d8f5, inset 0 0 0 4px #7cc4ff; background: #eef7ff; }
 .choice.reading { animation: cread .5s ease-in-out infinite alternate; }
 @keyframes cread { to { transform: translateY(-6px); } }
@@ -346,7 +348,7 @@ body.challenge .timer .clock::after { content: ' ⭐'; }
 @keyframes unjump { 0% { transform: scale(.8); } 50% { transform: scale(1.18) translateY(-12%); } 100% { transform: scale(1); } }
 .cutscene.unlock .cs-sub { max-width: 80vw; text-align: center; }
 /* reading & early-concepts cells: bigger pictures in the grid */
-.cell .ea-emo { font-size: calc(var(--cs) * .52); }
+.cell .ea-emo, .cell .pp-emoji { font-size: calc(var(--icon-cs, var(--cs)) * .52); }
 .cell .ea-svg { width: calc(var(--cs) * .6); height: calc(var(--cs) * .6); }
 .cell .ea-ltr { font-size: calc(var(--cs) * .5); }
 .cell .ea-word { font-size: calc(var(--cs) * .3); }

@@ -84,8 +84,14 @@
     return 'translate(' + s.x + ' ' + s.y + ') rotate(' + r + ') scale(' + fl + ' 1)';
   }
   function stickerSVG(s) {
-    var w = 100 * s.s, inner = s.f ? '<image href="' + friendImg(s.f) + '" x="' + (-w / 2) + '" y="' + (-w / 2) + '" width="' + w + '" height="' + w + '"/>' :
-      '<text x="0" y="0" font-size="' + (w * .8) + '" text-anchor="middle" dominant-baseline="central">' + s.e + '</text>';
+    var w = 100 * s.s, inner;
+    if (s.f) inner = '<image href="' + friendImg(s.f) + '" x="' + (-w / 2) + '" y="' + (-w / 2) + '" width="' + w + '" height="' + w + '"/>';
+    else {
+      var src = A.Icons && A.Icons.src(s.e, { size: 64 });
+      inner = src
+        ? '<image href="' + src + '" x="' + (-w / 2) + '" y="' + (-w / 2) + '" width="' + w + '" height="' + w + '"/>'
+        : '<text x="0" y="0" font-size="' + (w * .8) + '" text-anchor="middle" dominant-baseline="central">' + s.e + '</text>';
+    }
     return '<g class="cl-stk" transform="' + stkTransform(s) + '">' + inner + '</g>';
   }
   function strokePath(st) { var p = st.p.split(' '); return 'M' + p[0] + (p.length > 1 ? ' L' + p.slice(1).join(' L') : ' l0.1 0'); }
@@ -157,7 +163,7 @@
       '<g class="cl-lines" fill="none" stroke="#3b2d55" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"></g><g class="cl-stks"></g></svg></div>' +
       '<button class="cl-zoomout" data-act="zoomout" aria-label="Zoom out" title="Zoom out">🔎</button></div>' +
       '<div class="cl-swatches"></div>' +
-      '<div class="cl-tray">' + STICKERS.map(function (e) { return '<button class="cl-ts" data-e="' + e + '">' + e + '</button>'; }).join('') + met.map(function (id) { return '<button class="cl-ts cl-tsf" data-f="' + id + '"><img src="' + friendImg(id) + '" alt="" draggable="false"></button>'; }).join('') + '</div></div>';
+      '<div class="cl-tray">' + STICKERS.map(function (e) { return '<button class="cl-ts" data-e="' + e + '">' + (A.Icons ? A.Icons.html(e, { size: 48, decorative: true, cls: 'pp-pic' }) : e) + '</button>'; }).join('') + met.map(function (id) { return '<button class="cl-ts cl-tsf" data-f="' + id + '"><img src="' + friendImg(id) + '" alt="" draggable="false"></button>'; }).join('') + '</div></div>';
     var root = host.querySelector('.cl'), svg = root.querySelector('svg'), stage = root.querySelector('.cl-stage'), inner = root.querySelector('.cl-stage-inner');
     var gF = svg.querySelector('.cl-fills'), gB = svg.querySelector('.cl-brush'), gL = svg.querySelector('.cl-lines'), gS = svg.querySelector('.cl-stks'), swHost = root.querySelector('.cl-swatches');
     function el(n, at) { var e = document.createElementNS(NS, n); for (var a in at) e.setAttribute(a, at[a]); return e; }

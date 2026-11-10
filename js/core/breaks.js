@@ -139,7 +139,7 @@
     c.stage.insertAdjacentHTML('beforeend', '<div class="sk-title">' + sk.title + '</div><div class="sk-prop"></div><div class="sk-hint">👆 Tap!</div>');
     var fs = sk.cast.map(function (id, j) { return c.friend(id, 'sk-f sk-f' + j); }), prop = c.stage.querySelector('.sk-prop'), hint = c.stage.querySelector('.sk-hint');
     function beat() {
-      var bt = sk.beats[i]; if (!bt) return; busy = true; hint.classList.remove('on'); prop.textContent = bt[2];
+      var bt = sk.beats[i]; if (!bt) return; busy = true; hint.classList.remove('on'); if (A.Icons && A.Icons.has(bt[2], { context: 'breaks' })) { prop.innerHTML = A.Icons.html(bt[2], { size: 64, decorative: true, cls: 'pp-pic', context: 'breaks' }); } else { prop.textContent = bt[2]; }
       c.stage.dataset.fx = bt[1]; fs.forEach(function (f) { f.classList.remove('fx'); void f.offsetWidth; f.classList.add('fx'); });
       prop.classList.remove('fx'); void prop.offsetWidth; prop.classList.add('fx');
       (/sneeze|giggle|pop|wave|shake/.test(bt[1]) ? SND.giggle : /hop|jump|bonk/.test(bt[1]) ? SND.boing : /splash|puddle/.test(bt[1]) ? SND.splash : SND.pop)();
@@ -162,7 +162,7 @@
     c.peekTap = function (i) {
       var b = btns[i]; if (b.classList.contains('found')) return;
       if (i === hid) { b.classList.add('found'); c.pose(f, 'cheering'); SND.giggle(); c.say('br_peek_found'); round++; hid = -1; c.later(hide, 2600); }
-      else { b.querySelector('.pk-bug').textContent = ['🐞', '🌼', '🐛', '🍄'][Math.floor(Math.random() * 4)]; b.classList.remove('bug'); void b.offsetWidth; b.classList.add('bug'); SND.boing(); c.say('br_peek_bug'); }
+      else { var bugE = ['🐞', '🌼', '🐛', '🍄'][Math.floor(Math.random() * 4)]; var bugEl = b.querySelector('.pk-bug'); if (A.Icons && A.Icons.has(bugE)) bugEl.innerHTML = A.Icons.html(bugE, { size: 32, decorative: true, cls: 'pp-pic' }); else bugEl.textContent = bugE; b.classList.remove('bug'); void b.offsetWidth; b.classList.add('bug'); SND.boing(); c.say('br_peek_bug'); }
     };
     hide();
   };
@@ -173,7 +173,7 @@
     var used = {}; fs.forEach(function (id, i) { if (used[kindOf[id]]) kindOf[id] = kinds.filter(function (k) { return !used[k]; })[0]; used[kindOf[id]] = 1; });
     c.stage.insertAdjacentHTML('beforeend', '<div class="sm-row"></div><div class="sm-song" aria-label="Your song"></div><button class="sm-play">▶ Play my song</button>');
     var row = c.stage.querySelector('.sm-row'), track = c.stage.querySelector('.sm-song'), playBtn = c.stage.querySelector('.sm-play');
-    var els = fs.map(function (id, i) { var f = el('<button class="bf sm-f" data-f="' + id + '"><img src="' + art(id, 'happy') + '" alt="' + name(id) + '" draggable="false"><span class="sm-k">' + ({ sing: '🎵', sing2: '🎶', boing: '🌀', boing2: '🌀', laugh: '😂', burp: '💨', slide: '🎢', pop: '💥', drum: '🥁' }[kindOf[id]] || '🎵') + '</span></button>'); row.appendChild(f); return f; });
+    var els = fs.map(function (id, i) { var f = el('<button class="bf sm-f" data-f="' + id + '"><img src="' + art(id, 'happy') + '" alt="' + name(id) + '" draggable="false"><span class="sm-k">' + (function (em) { return A.Icons ? A.Icons.html(em, { size: 32, decorative: true, cls: 'pp-pic', context: 'breaks' }) : em; })({ sing: '🎵', sing2: '🎶', boing: '🌀', boing2: '🌀', laugh: '😂', burp: '💨', slide: '🎢', pop: '💥', drum: '🥁' }[kindOf[id]] || '🎵') + '</span></button>'); row.appendChild(f); return f; });
     function play(id, f) { var k = kindOf[id]; (SND[k] || SND.pop)(k === 'sing' ? SCALE[3 + fs.indexOf(id)] : undefined); f.classList.remove('hit'); void f.offsetWidth; f.classList.add('hit'); }
     els.forEach(function (f) { f.addEventListener('click', function (e) { e.stopPropagation(); if (playing) return; var id = f.dataset.f; play(id, f); if (song.length < 8) { song.push(id); track.insertAdjacentHTML('beforeend', '<img src="' + art(id, 'happy') + '" alt="">'); } if (song.length >= 3) playBtn.classList.add('on'); }); });
     playBtn.addEventListener('click', function (e) { e.stopPropagation(); if (playing || !song.length) return; playing = true; c.say('br_playsong'); var imgs = track.querySelectorAll('img');

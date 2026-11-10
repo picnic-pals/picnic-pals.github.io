@@ -176,11 +176,12 @@
   // T band (2-3): count 1-3, then 1-5. Big objects the kid can tap to count (each tap says the number); the choices are plates
   // of dots with the numeral, so no reading is needed. 2 choices, no timer (Gentle Munch at these ages), no fast-skip.
   var BIG = ['🍎', '🍓', '🍌', '🥕', '🐶', '🐱', '🦆', '🚗', '⚽', '🌼'];
+  function bigPic(e) { return A.Icons ? A.Icons.html(e, { size: 64, decorative: true, cls: 'pp-pic' }) : e; }
   function tinyItem(hi) {
     var n = rnd(1, hi), e = pick(BIG), w = within([n - 1, n + 1, n + 2], 1, hi + 1, n);
-    return { key: 'tc' + n, ans: n, wrong: w, text: 'How many?', pic: '<span class="st-objs big tap" data-n="' + n + '">' + Array.apply(null, Array(n)).map(function () { return '<i>' + e + '</i>'; }).join('') + '</span>', say: ['st_how_many'], pictures: true,
+    return { key: 'tc' + n, ans: n, wrong: w, text: 'How many?', pic: '<span class="st-objs big tap" data-n="' + n + '">' + Array.apply(null, Array(n)).map(function () { return '<i>' + bigPic(e) + '</i>'; }).join('') + '</span>', say: ['st_how_many'], pictures: true,
       cell: function (v) { return { label: String(v), html: '<span class="st-numdot big">' + plate(v) + '<b>' + v + '</b></span>', fact: ['w_thats', v] }; },
-      hint: function (l) { return box('<span class="st-objs big">' + Array.apply(null, Array(n)).map(function (_, i) { return '<i>' + e + (l >= 2 ? '<sub>' + (i + 1) + '</sub>' : '') + '</i>'; }).join('') + '</span>', l >= 2 ? 'One, two… <b>' + n + '</b>!' : 'Tap each one and count!'); } };
+      hint: function (l) { return box('<span class="st-objs big">' + Array.apply(null, Array(n)).map(function (_, i) { return '<i>' + bigPic(e) + (l >= 2 ? '<sub>' + (i + 1) + '</sub>' : '') + '</i>'; }).join('') + '</span>', l >= 2 ? 'One, two… <b>' + n + '</b>!' : 'Tap each one and count!'); } };
   }
 
   /* ---------- ladder registry (plug-in point) ---------- */
@@ -206,7 +207,7 @@
   function stOf(s) { try { return ctx.p ? C.state(ctx.p, s.id) : null; } catch (e) { return null; } }
 
   var pvRecent = {}, pvOwner = null;
-  function pvStep(s) { return /^(pv_(tens|compare|ten_more|hto|cmp3)|[as]2_(add|sub|regroup))$/.test(s.id); }
+  function pvStep(s) { return /^(pv_(tens|compare|ten_more|hto|cmp3)|[as]2_(add|sub|regroup)|time_(hour_half|5min)|coin_values|money_coins|arrays)$/.test(s.id); }
   function freshPV(s, channel, make, keyOf) {
     if (pvOwner !== ctx.p) { pvOwner = ctx.p; pvRecent = {}; }
     var key = channel + s.id, seen = pvRecent[key] || (pvRecent[key] = []), x, k, g = 0;
@@ -506,6 +507,439 @@
       { id: 'pv_cmp3', name: 'Compare 3-digit numbers', short: '462 > 426', std: '2.NBT.4', item: cmp3Item },
       { id: 'skip_count', name: 'Skip counting', short: 'By 5s, 10s and 100s', std: '2.NBT.2', item: skipItem }
     ].map(function (s) { if (s.kind) { s.gen = g2Gen(s.kind, s); s.ask = g2Ask(s.kind); s.secs = [18, 20]; } return s; }) });
+  /* qtime (batch 3): telling time. Original items from Learning Coach templates (math_g1_g2 time family), never copied from i-Ready.
+     Grade 1 hour/half (1.MD.B.3) after place value; Grade 2 five-minute + a.m./p.m. (2.MD.C.7) after skip counting by 5s. */
+  function tmFmt(h, m) { return A.Clock.fmt(h, m); }
+  function tmFace(h, m, small) { return A.Clock.face(h, m, { small: !!small }); }
+  function tmUniq(ans, list) { var out = []; list.forEach(function (x) { if (x && x !== ans && out.indexOf(x) < 0) out.push(x); }); return out; }
+  function tmParse(s) { var m = String(s).match(/^(\d{1,2}):(\d{2})$/); return m ? { h: +m[1], m: +m[2] } : null; }
+  function tmDistractors(h, m) {
+    var minNum = m / 5, swapH = minNum === 0 ? 12 : minNum, swapM = Math.round((h % 12) * 5); if (swapM >= 60) swapM = 0;
+    var nextH = h === 12 ? 1 : h + 1, prevH = h === 1 ? 12 : h - 1;
+    return tmUniq(tmFmt(h, m), [
+      tmFmt(nextH, m), tmFmt(prevH, m),
+      tmFmt(swapH, swapM),
+      m > 0 ? tmFmt(h, minNum) : tmFmt(h, 5),           // minute-number-as-minutes (hand on 4 → :04)
+      m === 30 ? tmFmt(nextH, 30) : tmFmt(h, m === 0 ? 30 : 0),
+      tmFmt(h, (m + 5) % 60), tmFmt(h, (m + 55) % 60)
+    ]);
+  }
+  function tmPickH() { return rnd(1, 12); }
+  function tmPickM(kind) { return kind === 'hour_half' ? (Math.random() < .5 ? 0 : 30) : pick([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]); }
+  function tmCellTime(v) { var p = tmParse(v); return { label: String(v), html: p ? tmFace(p.h, p.m, true) : null, fact: ['w_thats', { id: 'tm_say', text: String(v).replace(':', ' ') }], long: true }; }
+  function tmCellDigital(v) { return { label: String(v), fact: ['w_thats', { id: 'tm_say', text: String(v).replace(':', ' ') }] }; }
+  function tmAmPmEvents() {
+    return [
+      { ev: 'eats breakfast', ap: 'a.m.' }, { ev: 'gets ready for school', ap: 'a.m.' }, { ev: 'sees the sunrise', ap: 'a.m.' },
+      { ev: 'eats dinner', ap: 'p.m.' }, { ev: 'goes to bed', ap: 'p.m.' }, { ev: 'sees the sunset', ap: 'p.m.' }
+    ];
+  }
+  function tmHero() { var ids = ['strawberry', 'blueberry', 'lemon', 'grape', 'pretzel', 'muffin']; return pick(ids); }
+  function tmItem(kind) {
+    var h = tmPickH(), m = tmPickM(kind), t = tmFmt(h, m), wrong = tmDistractors(h, m).slice(0, 3), r = Math.random();
+    var hint = function (l) {
+      var face = tmFace(h, m);
+      if (m === 0) return box(face, l >= 2 ? 'The minute hand points at 12, so it is <b>' + t + '</b> on the hour.' : 'When the long hand is on 12, say the hour and “o’clock.”');
+      if (m === 30) return box(face, l >= 2 ? 'The long hand is on 6 (30 minutes). The short hand sits halfway to ' + (h === 12 ? 1 : h + 1) + '. So <b>' + t + '</b>.' : 'Half past: long hand on 6. The short hand is halfway between two hours.');
+      return box(face, l >= 2 ? 'Count by 5s from 12 to the long hand: that is ' + m + ' minutes. Short hand near ' + h + '. So <b>' + t + '</b>.' : 'The long hand shows minutes. Each number is 5 minutes.');
+    };
+    // a.m. / p.m. only on the grade-2 step
+    if (kind === '5min' && r < .22) {
+      var e = pick(tmAmPmEvents()), hh = rnd(1, 11), mm = pick([0, 15, 30]);
+      return { variant: 'amPm', key: 'ampm' + e.ap + e.ev + hh + mm, ans: e.ap, wrong: [e.ap === 'a.m.' ? 'p.m.' : 'a.m.'], text: 'A picnic pal ' + e.ev + ' at ' + em(tmFmt(hh, mm)) + '. Is that a.m. or p.m.?',
+        say: [{ id: 'tm_ampm', text: 'Is ' + tmFmt(hh, mm) + ' in the morning a.m., or after noon p.m.?' }], cell: function (v) { return { label: v, fact: ['w_thats', { id: 'tm_' + v.replace('.', ''), text: v }] }; }, hint: function (l) { return box('', l >= 2 ? '<b>' + e.ap + '</b> — ' + e.ev + ' happens ' + (e.ap === 'a.m.' ? 'in the morning' : 'in the evening') + '.' : 'a.m. is morning. p.m. is afternoon or night.'); } };
+    }
+    // which clock / digital→analog
+    if (r < .55) {
+      return { variant: r < .3 ? 'pickClock' : 'matchDigital', key: 'clk' + t, ans: t, wrong: wrong, text: r < .3 ? 'Which clock shows ' + em(t) + '?' : 'Match the digital time ' + em(t) + ' to the clock.',
+        say: [{ id: 'tm_which', text: 'Which clock shows ' + t.replace(':', ' ') + '?' }], cell: tmCellTime, hint: hint };
+    }
+    // read the analog clock
+    return { variant: 'readClock', key: 'read' + t, ans: t, wrong: wrong, pic: tmFace(h, m), text: 'What time does the clock show?',
+      say: [{ id: 'tm_read', text: 'What time does the clock show?' }], cell: tmCellDigital, hint: hint };
+  }
+  function timeAsk(kind) {
+    return function (L, n) {
+      var it = freshPV({ id: 'time_' + kind }, 'pitch', function () { return tmItem(kind); }, function (x) { return x.key; });
+      n = Math.min(n || 4, it.wrong.length + 1);
+      if (it.variant === 'amPm') n = 2;
+      var vals = choices(it.ans, it.wrong, n);
+      return { variant: it.variant, text: it.text, pic: it.pic || null, say: it.say, fact: it.cell(it.ans).fact || [], answer: vals.indexOf(it.ans), target: it.key,
+        hint: it.hint(1), hint2: it.hint(2),
+        choices: vals.map(function (v) { var c = it.cell(v); return { label: c.label, html: c.html || null, say: [String(v).replace(':', ' ')], value: v, long: !!c.long }; }) };
+    };
+  }
+  function timeGen(kind) {
+    return function () {
+      // Munch boards need several distinct goods: category boards (o'clock vs half past, or a shared minute)
+      if (kind === 'hour_half') {
+        var half = Math.random() < .5, hours = A.shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]), gi = 0, bi = 0;
+        function mk(h, m) { var lab = tmFmt(h, m); return { label: lab, html: tmFace(h, m, true), fact: ['w_thats', { id: 'tm_say', text: lab.replace(':', ' ') }], k: lab, long: true }; }
+        return { text: half ? 'Munch the half-past times' : 'Munch the o’clock times', say: [{ id: half ? 'tm_munch_half' : 'tm_munch_hour', text: half ? 'Munch the half past times' : 'Munch the oclock times' }], target: half ? 'half' : 'hour',
+          stepHint: function (cell, lvl) { var p = tmParse(cell && cell.label); if (!p) return ''; var face = tmFace(p.h, p.m); return box(face, lvl >= 2 ? 'That clock shows <b>' + cell.label + '</b>.' : (half ? 'Half past: long hand on 6.' : 'O’clock: long hand on 12.')); },
+          good: function () { return mk(hours[gi++ % 12], half ? 30 : 0); },
+          bad: function () { return mk(hours[(bi++ + 3) % 12], half ? 0 : 30); } };
+      }
+      var mm = pick([5, 10, 15, 20, 25, 35, 40, 45, 50, 55]), hours = A.shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]), gi = 0, bi = 0;
+      var other = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].filter(function (x) { return x !== mm; });
+      function mk2(h, m) { var lab = tmFmt(h, m); return { label: lab, html: tmFace(h, m, true), fact: ['w_thats', { id: 'tm_say', text: lab.replace(':', ' ') }], k: lab, long: true }; }
+      return { text: 'Munch the clocks that show ' + em(':' + (mm < 10 ? '0' : '') + mm), say: [{ id: 'tm_munch_min', text: 'Munch the clocks that show ' + mm + ' minutes' }], target: mm,
+        stepHint: function (cell, lvl) { var p = tmParse(cell && cell.label); if (!p) return ''; return box(tmFace(p.h, p.m), lvl >= 2 ? 'Count by 5s to the long hand: <b>' + cell.label + '</b>.' : 'Each number the long hand passes is 5 minutes.'); },
+        good: function () { return mk2(hours[gi++ % 12], mm); },
+        bad: function () { return mk2(hours[(bi++ + 4) % 12], pick(other)); } };
+    };
+  }
+  ladder({ id: 'tm1', subject: 'math', band: 'E', grade: '1', strand: 'Measurement', std: '1.MD.B.3', after: 'pv_ten_more', introLine: 'st_new_step', secs: [13, 14],
+    groups: [{ id: 'g_time1', ids: ['time_hour_half'] }],
+    steps: [{ id: 'time_hour_half', name: 'Time to the hour and half hour', short: 'Read and match clocks (o’clock and half past)', std: '1.MD.B.3',
+      gen: timeGen('hour_half'), ask: timeAsk('hour_half'),
+      intro: { line: 'st_new_step', example: '3:00 · 3:30' } }] });
+  ladder({ id: 'tm2', subject: 'math', band: 'E', grade: '2', strand: 'Measurement', std: '2.MD.C.7', after: 'skip_count', introLine: 'st_new_step', secs: [14, 15],
+    groups: [{ id: 'g_time2', ids: ['time_5min'] }],
+    steps: [{ id: 'time_5min', name: 'Time to 5 minutes', short: '5-minute times and a.m. / p.m.', std: '2.MD.C.7',
+      gen: timeGen('5min'), ask: timeAsk('5min'), maxChoices: 4,
+      intro: { line: 'st_new_step', example: '3:20 · a.m. / p.m.' } }] });
+  /* qcoins (batch 3): US coin recognition (G1) then mixed totals to $1 (2.MD.C.8). Original items from Learning Coach money family. Coins are SVG, never emoji. */
+  function cnIds() { return ['penny', 'nickel', 'dime', 'quarter']; }
+  function cnMeta(id) { return A.Coins.META[id]; }
+  function cnFmt(n) { return A.Coins.fmt(n); }
+  function cnOne(id, small) { return A.Coins.one(id, { small: !!small }); }
+  function cnBag(bag, small) { return A.Coins.bag(bag, { small: !!small }); }
+  function cnTotal(bag) { return A.Coins.cents(bag); }
+  function cnCount(bag) { var n = 0, k; for (k in bag) n += bag[k] | 0; return n; }
+  function cnKey(bag) { return A.Coins.ORDER.map(function (id) { return id[0] + (bag[id] | 0); }).join(''); }
+  function cnClone(bag) { var o = {}, k; for (k in bag) o[k] = bag[k] | 0; return o; }
+  function cnRandBag(maxCents) {
+    maxCents = maxCents || 100;
+    var bag, t, g = 0;
+    do {
+      bag = { quarter: Math.random() < .55 ? rnd(0, 3) : 0, dime: rnd(0, 4), nickel: rnd(0, 3), penny: rnd(0, 6) };
+      if (cnCount(bag) < 2) bag.penny = rnd(2, 5);
+      t = cnTotal(bag);
+      // trim oversized bags
+      while (t > maxCents && (bag.quarter || bag.dime || bag.nickel || bag.penny)) {
+        if (bag.quarter && t - 25 >= 10) bag.quarter--;
+        else if (bag.dime && t - 10 >= 5) bag.dime--;
+        else if (bag.nickel && t - 5 >= 1) bag.nickel--;
+        else if (bag.penny) bag.penny--;
+        else break;
+        t = cnTotal(bag);
+      }
+    } while ((t < 8 || t > maxCents || cnCount(bag) < 2) && ++g < 40);
+    return bag;
+  }
+  function cnSwapND(bag) {
+    var o = cnClone(bag), n = o.nickel | 0, d = o.dime | 0;
+    o.nickel = d; o.dime = n; return o;
+  }
+  function cnForgot(bag) {
+    var o = cnClone(bag), order = A.Coins.ORDER.filter(function (id) { return (o[id] | 0) > 0; });
+    if (!order.length) return o;
+    var id = pick(order); o[id]--; if (!o[id]) delete o[id]; return o;
+  }
+  function cnUniqCents(ans, list) {
+    var out = [], seen = {}; seen[ans] = 1;
+    list.forEach(function (x) { x = x | 0; if (x > 0 && x <= 100 && !seen[x]) { seen[x] = 1; out.push(x); } });
+    return out;
+  }
+  function cnDistractors(bag) {
+    var ans = cnTotal(bag), count = cnCount(bag), swapped = cnTotal(cnSwapND(bag)), forgot = cnTotal(cnForgot(bag));
+    return cnUniqCents(ans, [count, swapped, forgot, ans + 5, ans - 5, ans + 10, ans - 1, ans + 1, ans + 25, count * 5, count * 10]);
+  }
+  function cnCellCents(v) { return { label: cnFmt(v), fact: ['w_thats', { id: 'cn_cents', text: (v | 0) + ' cents' }] }; }
+  function cnCellName(id) { var m = cnMeta(id); return { label: m.name, html: cnOne(id, true), fact: ['w_thats', { id: 'cn_' + id, text: 'a ' + m.name }], long: true }; }
+  function cnCellBag(bag) { return { label: cnFmt(cnTotal(bag)), html: cnBag(bag, true), fact: ['w_thats', { id: 'cn_tot', text: cnTotal(bag) + ' cents' }], long: true, bag: cnClone(bag) }; }
+  function cnNameWrong(id) { return cnIds().filter(function (x) { return x !== id; }); }
+  function cnValueWrong(v) { return cnUniqCents(v, [1, 5, 10, 25, v === 10 ? 5 : 10, v === 5 ? 10 : 5, v === 1 ? 5 : 1, v === 25 ? 10 : 25]); }
+
+  function cnRecognizeItem() {
+    var id = pick(cnIds()), m = cnMeta(id), r = Math.random();
+    // how many pennies equal this coin? (nickel/dime/quarter)
+    if (r < .18 && id !== 'penny') {
+      return { variant: 'howMany', key: 'how' + id + m.v, ans: m.v, wrong: cnUniqCents(m.v, [m.v + 1, m.v - 1, m.v === 5 ? 10 : 5, m.v === 10 ? 5 : 10, 25, 1, m.v * 2]).slice(0, 3),
+        pic: cnOne(id), text: 'How many pennies equal one ' + em(m.name) + '?',
+        say: [{ id: 'cn_howmany', text: 'How many pennies equal one ' + m.name + '?' }], cell: function (v) { return { label: String(v), fact: ['w_thats', v] }; },
+        hint: function (l) { return box(cnOne(id), l >= 2 ? 'One ' + m.name + ' is <b>' + m.label + '</b>, so <b>' + m.v + '</b> pennies.' : 'A penny is 1¢. Match the coin\'s value.'); } };
+    }
+    // which is worth the most / least
+    if (r < .36) {
+      var most = Math.random() < .5, ansId = most ? 'quarter' : 'penny';
+      return { variant: 'mostLeast', key: (most ? 'most' : 'least') + rnd(1, 9), ans: ansId, wrong: cnIds().filter(function (x) { return x !== ansId; }),
+        text: most ? 'Which coin is worth the most?' : 'Which coin is worth the least?',
+        say: [{ id: most ? 'cn_most' : 'cn_least', text: most ? 'Which coin is worth the most?' : 'Which coin is worth the least?' }], cell: cnCellName,
+        hint: function (l) { return box(cnIds().map(function (x) { return cnOne(x, true); }).join(''), l >= 2 ? (most ? 'The <b>quarter</b> is 25¢ — the most.' : 'The <b>penny</b> is 1¢ — the least.') : 'Compare the numbers on the coins.'); } };
+    }
+    if (r < .58) {
+      return { variant: 'nameCoin', key: 'name' + id + rnd(1, 6), ans: id, wrong: cnNameWrong(id), pic: cnOne(id), text: 'What coin is this?',
+        say: [{ id: 'cn_name', text: 'What coin is this?' }], cell: cnCellName,
+        hint: function (l) { return box(cnOne(id), l >= 2 ? 'This is a <b>' + m.name + '</b>. It is worth <b>' + m.label + '</b>.' : 'Look at the size and the number on the coin.'); } };
+    }
+    if (r < .79) {
+      return { variant: 'valueCoin', key: 'val' + id + rnd(1, 6), ans: m.v, wrong: cnValueWrong(m.v), pic: cnOne(id), text: 'How much is this coin worth?',
+        say: [{ id: 'cn_val', text: 'How much is this coin worth?' }], cell: cnCellCents,
+        hint: function (l) { return box(cnOne(id), l >= 2 ? 'A <b>' + m.name + '</b> is worth <b>' + m.label + '</b>.' : 'Read the number on the coin.'); } };
+    }
+    return { variant: 'pickCoin', key: 'pick' + id + rnd(1, 6), ans: id, wrong: cnNameWrong(id), text: 'Which coin is worth ' + em(m.label) + '?',
+      say: [{ id: 'cn_pick', text: 'Which coin is worth ' + m.v + ' cents?' }], cell: cnCellName,
+      hint: function (l) { return box(cnOne(id), l >= 2 ? 'The coin with <b>' + m.label + '</b> on it is the <b>' + m.name + '</b>.' : 'Match the value on the coin face.'); } };
+  }
+
+  function cnTotalItem() {
+    var r = Math.random();
+    // which group is worth more
+    if (r < .28) {
+      var a, b, ga = 0;
+      do { a = cnRandBag(90); b = cnRandBag(90); } while ((cnTotal(a) === cnTotal(b) || cnKey(a) === cnKey(b)) && ++ga < 30);
+      if (cnTotal(a) === cnTotal(b)) { b.penny = (b.penny | 0) + 1; }
+      var left = cnTotal(a), right = cnTotal(b), more = left > right ? 'A' : 'B';
+      var pic = '<div class="qcoin-cmp"><div class="qcoin-grp"><span class="qcoin-tag">A</span>' + cnBag(a) + '</div><div class="qcoin-grp"><span class="qcoin-tag">B</span>' + cnBag(b) + '</div></div>';
+      return { variant: 'worthMore', key: 'more' + cnKey(a) + 'x' + cnKey(b), ans: more, wrong: [more === 'A' ? 'B' : 'A'], pic: pic,
+        text: 'Which group is worth more?', say: [{ id: 'cn_more', text: 'Which group is worth more, A or B?' }],
+        cell: function (v) { return { label: 'Group ' + v, fact: ['w_thats', { id: 'cn_grp' + v, text: 'group ' + v }] }; },
+        hint: function (l) { return box(pic, l >= 2 ? 'Group A is <b>' + cnFmt(left) + '</b>. Group B is <b>' + cnFmt(right) + '</b>. So <b>' + more + '</b> is worth more.' : 'Count bigger coins first, then add.'); },
+        bags: { A: a, B: b } };
+    }
+    // which set makes N¢
+    if (r < .55) {
+      var bag = cnRandBag(100), tot = cnTotal(bag), wrongBags = [], seen = {}, seenTot = {}, g = 0;
+      seen[cnKey(bag)] = 1; seenTot[tot] = 1;
+      while (wrongBags.length < 3 && ++g < 60) {
+        var w = g % 3 === 1 ? cnSwapND(bag) : g % 3 === 2 ? cnForgot(bag) : cnRandBag(100);
+        var wt = cnTotal(w);
+        if (wt === tot || seenTot[wt] || seen[cnKey(w)]) {
+          w.penny = (w.penny | 0) + (wrongBags.length + 1 + (g % 4));
+          wt = cnTotal(w);
+        }
+        if (wt === tot || wt < 1 || wt > 100 || seenTot[wt] || seen[cnKey(w)]) continue;
+        seen[cnKey(w)] = 1; seenTot[wt] = 1; wrongBags.push(w);
+      }
+      // last-resort distinct cent values as tiny bags
+      var fallback = [tot + 5, tot - 5, tot + 10, tot - 1, tot + 1, tot + 25, tot - 10].filter(function (x) { return x > 0 && x <= 100 && !seenTot[x]; });
+      while (wrongBags.length < 3 && fallback.length) {
+        var v = fallback.shift(), fb = { penny: v };
+        if (v >= 25) { fb = { quarter: Math.floor(v / 25), penny: v % 25 }; }
+        else if (v >= 10) { fb = { dime: Math.floor(v / 10), penny: v % 10 }; }
+        seenTot[v] = 1; wrongBags.push(fb);
+      }
+      return { variant: 'pickSet', key: 'set' + cnKey(bag), ans: cnKey(bag), wrong: wrongBags.map(cnKey), ansBag: cnClone(bag), wrongBags: wrongBags,
+        text: 'Which set makes ' + em(cnFmt(tot)) + '?', say: [{ id: 'cn_set', text: 'Which set makes ' + tot + ' cents?' }],
+        cell: function (k) {
+          var b0 = k === cnKey(bag) ? bag : (wrongBags.filter(function (w) { return cnKey(w) === k; })[0] || bag);
+          return cnCellBag(b0);
+        },
+        hint: function (l) { return box(cnBag(bag), l >= 2 ? 'Count bigger coins first: <b>' + cnFmt(tot) + '</b>.' : 'Add the values. Quarters, then dimes, nickels, pennies.'); } };
+    }
+    // how much money?
+    var bag2 = cnRandBag(100), tot2 = cnTotal(bag2), wrong2 = cnDistractors(bag2).slice(0, 3);
+    return { variant: 'countCoins', key: 'cnt' + cnKey(bag2), ans: tot2, wrong: wrong2, pic: cnBag(bag2),
+      text: 'How much money?', say: [{ id: 'cn_how', text: 'How much money?' }], cell: cnCellCents,
+      hint: function (l) { return box(cnBag(bag2), l >= 2 ? 'Count bigger coins first. Total: <b>' + cnFmt(tot2) + '</b>.' : 'Quarters (25¢), dimes (10¢), nickels (5¢), pennies (1¢).'); } };
+  }
+
+  function coinAsk(kind) {
+    return function (L, n) {
+      var it = freshPV({ id: kind }, 'pitch', function () { return kind === 'coin_values' ? cnRecognizeItem() : cnTotalItem(); }, function (x) { return x.key; });
+      n = Math.min(n || 4, (it.wrong && it.wrong.length ? it.wrong.length : 3) + 1);
+      if (it.variant === 'worthMore') n = 2;
+      var vals;
+      if (it.variant === 'pickSet') {
+        var bags = [it.ansBag].concat(it.wrongBags.slice(0, n - 1));
+        bags = A.shuffle(bags.slice());
+        return { variant: it.variant, text: it.text, pic: it.pic || null, say: it.say, fact: ['w_thats', { id: 'cn_tot', text: cnTotal(it.ansBag) + ' cents' }],
+          answer: bags.findIndex(function (b) { return cnKey(b) === cnKey(it.ansBag); }), target: it.key,
+          hint: it.hint(1), hint2: it.hint(2),
+          choices: bags.map(function (b) { var c = cnCellBag(b); return { label: c.label, html: c.html, say: [cnTotal(b) + ' cents'], value: cnKey(b), long: true }; }) };
+      }
+      vals = choices(it.ans, it.wrong, n);
+      return { variant: it.variant, text: it.text, pic: it.pic || null, say: it.say, fact: (it.cell(it.ans).fact || []),
+        answer: vals.indexOf(it.ans), target: it.key, hint: it.hint(1), hint2: it.hint(2),
+        choices: vals.map(function (v) { var c = it.cell(v); return { label: c.label, html: c.html || null, say: [String(c.label).replace('¢', ' cents')], value: v, long: !!c.long }; }) };
+    };
+  }
+  function coinGen(kind) {
+    return function () {
+      if (kind === 'coin_values') {
+        // category board: munch one coin type; goods share the type, bads are the other three (cycled)
+        var want = pick(cnIds()), others = cnIds().filter(function (x) { return x !== want; }), bi = 0, gi = 0;
+        return { text: 'Munch the ' + cnMeta(want).names, say: [{ id: 'cn_munch_' + want, text: 'Munch the ' + cnMeta(want).names }], target: want,
+          stepHint: function (cell, lvl) { return box(cell && cell.html || '', lvl >= 2 ? 'That is a <b>' + (cell && cell.label) + '</b>.' : 'Match the coin.'); },
+          good: function () { var c = cnCellName(want); c.k = want + (gi++); return c; },
+          bad: function () { var id = others[bi++ % others.length], c = cnCellName(id); c.k = id + bi; return c; } };
+      }
+      // money_coins: munch groups worth a target amount band, or "more than 50¢"
+      var over = Math.random() < .5, target = over ? 50 : pick([25, 30, 40, 50, 60, 75]);
+      function mk() {
+        var b, g = 0;
+        do { b = cnRandBag(100); } while (++g < 30 && (over ? cnTotal(b) <= target : cnTotal(b) !== target && Math.abs(cnTotal(b) - target) > 15));
+        if (!over) {
+          // force exact-ish by adjusting pennies
+          var need = target - cnTotal(b); b.penny = Math.max(0, (b.penny | 0) + need);
+          if (cnTotal(b) !== target) { b = { quarter: Math.floor(target / 25), dime: 0, nickel: 0, penny: 0 }; var rem = target % 25; b.dime = Math.floor(rem / 10); rem %= 10; b.nickel = Math.floor(rem / 5); b.penny = rem % 5; }
+        }
+        return cnCellBag(b);
+      }
+      function mkBad() {
+        var b, g = 0;
+        do { b = cnRandBag(100); } while (++g < 30 && (over ? cnTotal(b) > target : cnTotal(b) === target));
+        if (!over && cnTotal(b) === target) b = cnForgot(b);
+        if (over && cnTotal(b) > target) { b = cnForgot(b); if (cnTotal(b) > target) b = { penny: rnd(3, 12) }; }
+        return cnCellBag(b);
+      }
+      return { text: over ? 'Munch groups worth more than ' + cnFmt(target) : 'Munch groups worth ' + cnFmt(target),
+        say: [{ id: 'cn_munch_tot', text: over ? 'Munch groups worth more than ' + target + ' cents' : 'Munch groups worth ' + target + ' cents' }], target: (over ? 'gt' : 'eq') + target,
+        stepHint: function (cell, lvl) { return box(cell && cell.html || '', lvl >= 2 ? 'That group is <b>' + (cell && cell.label) + '</b>.' : 'Count bigger coins first.'); },
+        good: mk, bad: mkBad };
+    };
+  }
+
+  /* qarrays: 2.OA.C.4 rectangular arrays up to 5×5; total = repeated addition. After even/odd (i-Ready/Khan OA order). */
+  function arPickRC(allowOne) {
+    var r = rnd(2, 5), c = rnd(2, 5);
+    // occasionally allow a 1-row or 1-col for "how many rows / in each row"
+    if (allowOne && Math.random() < .18) { if (Math.random() < .5) r = 1; else c = 1; }
+    return { r: r, c: c };
+  }
+  function arUniq(ans, pool) {
+    var out = [], seen = {}, i, v; seen[String(ans)] = 1;
+    for (i = 0; i < pool.length; i++) {
+      v = pool[i]; if (v == null || seen[String(v)]) continue;
+      seen[String(v)] = 1; out.push(v);
+    }
+    return out;
+  }
+  function arTotalWrong(r, c) {
+    var tot = r * c, pool = [r + c, c, r, tot + c, tot - c, tot + r, tot - r, (r + 1) * c, Math.max(1, r - 1) * c, r * (c + 1), r * Math.max(1, c - 1), tot + 1, tot - 1];
+    return arUniq(tot, pool);
+  }
+  function arAddWrong(r, c) {
+    var right = A.Arrays.addSentence(r, c), pool = [], i;
+    // wrong repeated addend (rows instead of cols)
+    if (r !== c) pool.push(A.Arrays.addSentence(c, r));
+    // off by one row
+    if (r + 1 <= 5) pool.push(A.Arrays.addSentence(r + 1, c));
+    if (r - 1 >= 1) pool.push(A.Arrays.addSentence(r - 1, c));
+    // wrong addend ±1
+    if (c + 1 <= 5) pool.push(A.Arrays.addSentence(r, c + 1));
+    if (c - 1 >= 1) pool.push(A.Arrays.addSentence(r, c - 1));
+    // r+c style single sum
+    pool.push(r + ' + ' + c);
+    pool.push(String(r * c));
+    // one row only written once
+    pool.push(String(c));
+    return arUniq(right, pool);
+  }
+  function arItem() {
+    var roll = Math.random(), allowOne = roll >= .28 && roll < .72;
+    var rc = arPickRC(allowOne), r = rc.r, c = rc.c, tot = r * c, food = A.Arrays.pickFood(r * 17 + c * 3 + rnd(0, 2));
+    var pic = A.Arrays.face(r, c, { foodObj: food, seed: r * 17 + c });
+    var obj = tot === 1 ? food.one : food.many;
+    // array_add ~28% (need ≥2 rows and ≥2 cols so repeated addition is clear)
+    if (roll < .28 && r >= 2 && c >= 2) {
+      var ans = A.Arrays.addSentence(r, c), wrong = arAddWrong(r, c).slice(0, 3);
+      return { variant: 'array_add', key: 'add' + r + 'x' + c + food.id, ans: ans, wrong: wrong, pic: pic, r: r, c: c,
+        text: 'Which addition sentence matches?',
+        say: [{ id: 'ar_add', text: 'Which addition sentence matches ' + r + ' rows of ' + c + '?' }],
+        cell: function (v) { return { label: String(v), fact: ['w_thats', { id: 'ar_sent', text: String(v) }], long: true }; },
+        hint: function (l) { return box(pic, l >= 2 ? 'There are <b>' + r + '</b> rows of <b>' + c + '</b>, so <b>' + ans + '</b>.' : 'Each row has the same number. Add that number once per row.'); } };
+    }
+    // how many rows ~22%
+    if (roll < .50) {
+      var wr = arUniq(r, [c, r + 1, Math.max(1, r - 1), r + c, tot, c + 1, Math.max(1, c - 1)]).slice(0, 3);
+      return { variant: 'howManyRows', key: 'rows' + r + 'x' + c + food.id, ans: r, wrong: wr, pic: pic, r: r, c: c,
+        text: 'How many rows?',
+        say: [{ id: 'ar_rows', text: 'How many rows?' }],
+        cell: function (v) { return { label: String(v), fact: ['w_thats', v] }; },
+        hint: function (l) { return box(pic, l >= 2 ? 'Count the horizontal lines of ' + obj + ': <b>' + r + '</b> rows.' : 'Rows go across. Count them.'); } };
+    }
+    // how many in each row ~22%
+    if (roll < .72) {
+      var wc = arUniq(c, [r, c + 1, Math.max(1, c - 1), r + c, tot, r + 1, Math.max(1, r - 1)]).slice(0, 3);
+      return { variant: 'howManyInRow', key: 'cols' + r + 'x' + c + food.id, ans: c, wrong: wc, pic: pic, r: r, c: c,
+        text: 'How many in each row?',
+        say: [{ id: 'ar_inrow', text: 'How many in each row?' }],
+        cell: function (v) { return { label: String(v), fact: ['w_thats', v] }; },
+        hint: function (l) { return box(pic, l >= 2 ? 'Each row has <b>' + c + '</b> ' + obj + '.' : 'Pick one row and count across.'); } };
+    }
+    // array_total: how many in all
+    var wt = arTotalWrong(r, c).slice(0, 3);
+    return { variant: 'array_total', key: 'tot' + r + 'x' + c + food.id + rnd(1, 3), ans: tot, wrong: wt, pic: pic, r: r, c: c,
+      text: 'How many in all?',
+      say: [{ id: 'ar_tot', text: 'How many ' + food.many + ' in all?' }],
+      cell: function (v) { return { label: String(v), fact: ['w_thats', v] }; },
+      hint: function (l) { return box(pic, l >= 2 ? '<b>' + r + '</b> rows of <b>' + c + '</b> is <b>' + tot + '</b>.' : 'Add the same number for each row, or count them all.'); } };
+  }
+  function arrayAsk() {
+    return function (L, n) {
+      var it = freshPV({ id: 'arrays' }, 'pitch', arItem, function (x) { return x.key; });
+      n = Math.min(n || 4, (it.wrong && it.wrong.length ? it.wrong.length : 3) + 1);
+      n = Math.max(3, Math.min(4, n));
+      var vals = choices(it.ans, it.wrong, n);
+      return { variant: it.variant, text: it.text, pic: it.pic || null, say: it.say, fact: (it.cell(it.ans).fact || []),
+        answer: vals.indexOf(it.ans), target: it.key, hint: it.hint(1), hint2: it.hint(2),
+        choices: vals.map(function (v) { var c = it.cell(v); return { label: c.label, html: c.html || null, say: [String(c.label)], value: v, long: !!c.long }; }) };
+    };
+  }
+  function arrayGen() {
+    return function () {
+      var mode = Math.random();
+      // munch arrays with total N
+      if (mode < .55) {
+        var want = pick([6, 8, 9, 10, 12, 15, 16, 20, 25]), gi = 0, bi = 0;
+        function mkGood() {
+          var factors = [], rr, cc;
+          for (rr = 1; rr <= 5; rr++) if (want % rr === 0) { cc = want / rr; if (cc >= 1 && cc <= 5) factors.push({ r: rr, c: cc }); }
+          var f = factors.length ? factors[gi++ % factors.length] : { r: Math.min(5, want), c: 1 };
+          var food = A.Arrays.pickFood(want + gi);
+          return { label: String(want), html: A.Arrays.face(f.r, f.c, { foodObj: food, small: true }), fact: ['w_thats', want], k: 'g' + want + f.r + 'x' + f.c + gi };
+        }
+        function mkBad() {
+          var t, g = 0, f;
+          do { t = pick([4, 5, 6, 7, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 24, 25]); } while (t === want && ++g < 20);
+          var factors = [];
+          for (var rr = 1; rr <= 5; rr++) if (t % rr === 0) { var cc = t / rr; if (cc >= 1 && cc <= 5) factors.push({ r: rr, c: cc }); }
+          f = factors.length ? factors[bi++ % factors.length] : { r: 2, c: 2 };
+          var food = A.Arrays.pickFood(t + bi + 3);
+          return { label: String(t), html: A.Arrays.face(f.r, f.c, { foodObj: food, small: true }), fact: ['w_thats', t], k: 'b' + t + f.r + 'x' + f.c + bi };
+        }
+        return { text: 'Munch arrays with ' + want + ' in all', say: [{ id: 'ar_munch_tot', text: 'Munch arrays with ' + want + ' in all' }], target: 'tot' + want,
+          stepHint: function (cell, lvl) { return box(cell && cell.html || '', lvl >= 2 ? 'That array has <b>' + (cell && cell.label) + '</b>.' : 'Count the rows of food.'); },
+          good: mkGood, bad: mkBad };
+      }
+      // munch arrays with R rows
+      var rows = pick([2, 3, 4, 5]), gi2 = 0, bi2 = 0;
+      return { text: 'Munch arrays with ' + rows + ' rows', say: [{ id: 'ar_munch_rows', text: 'Munch arrays with ' + rows + ' rows' }], target: 'rows' + rows,
+        stepHint: function (cell, lvl) { return box(cell && cell.html || '', lvl >= 2 ? 'Count the rows across.' : 'Rows go across.'); },
+        good: function () {
+          var c = rnd(1, 5), food = A.Arrays.pickFood(rows * 9 + c + gi2);
+          return { label: rows + ' rows', html: A.Arrays.face(rows, c, { foodObj: food, small: true }), fact: ['w_thats', rows], k: 'gr' + rows + 'c' + c + (gi2++) };
+        },
+        bad: function () {
+          var rr, c, g = 0;
+          do { rr = rnd(1, 5); c = rnd(1, 5); } while (rr === rows && ++g < 20);
+          if (rr === rows) rr = rows === 5 ? 4 : rows + 1;
+          var food = A.Arrays.pickFood(rr * 5 + c + bi2);
+          return { label: rr + ' rows', html: A.Arrays.face(rr, c, { foodObj: food, small: true }), fact: ['w_thats', rr], k: 'br' + rr + 'c' + c + (bi2++) };
+        } };
+    };
+  }
+  ladder({ id: 'ar', subject: 'math', band: 'E', grade: '2', strand: 'Operations', std: '2.OA.C.4', after: 'evenodd', introLine: 'st_new_step', secs: [14, 16],
+    groups: [{ id: 'g_arrays', ids: ['arrays'] }],
+    steps: [{ id: 'arrays', name: 'Arrays', short: 'Rows and columns up to 5×5', std: '2.OA.C.4',
+      gen: arrayGen(), ask: arrayAsk(), maxChoices: 4,
+      intro: { line: 'st_new_step', example: '3 rows of 4 = 4 + 4 + 4' } }] });
+
+  ladder({ id: 'cn1', subject: 'math', band: 'E', grade: '1', strand: 'Measurement', std: '1.MD (money intro)', after: 'time_hour_half', introLine: 'st_new_step', secs: [13, 14],
+    groups: [{ id: 'g_coin1', ids: ['coin_values'] }],
+    steps: [{ id: 'coin_values', name: 'Coin names and values', short: 'Penny, nickel, dime, quarter — name and cents', std: '1.MD (money intro)',
+      gen: coinGen('coin_values'), ask: coinAsk('coin_values'), maxChoices: 4,
+      intro: { line: 'st_new_step', example: 'dime = 10¢' } }] });
+  ladder({ id: 'cn2', subject: 'math', band: 'E', grade: '2', strand: 'Measurement', std: '2.MD.C.8', after: 'time_5min', introLine: 'st_new_step', secs: [14, 16],
+    groups: [{ id: 'g_coin2', ids: ['money_coins'] }],
+    steps: [{ id: 'money_coins', name: 'Count mixed coins', short: 'Totals to $1 and which group is worth more', std: '2.MD.C.8',
+      gen: coinGen('money_coins'), ask: coinAsk('money_coins'), maxChoices: 4,
+      intro: { line: 'st_new_step', example: '1 quarter + 2 dimes = 45¢' } }] });
+
+
   ['k', 'wp', 'eo'].forEach(function (l) { LADDERS[l].steps.forEach(function (s) { s.ladder = l; s.band = LADDERS[l].band; s.intro = s.intro || { line: 'st_new_step', example: '' }; }); });
   LADDERS.t.steps[2].ladder = 't'; LADDERS.t.steps[2].band = 'T';
   // coach: steps use their own rule (§0.1); the type label shows on the grown-up page
@@ -541,6 +975,25 @@
     var ok = ['pk_count20', 'pk_next20', 'pk_more1', 'pk_less1', 'pk_compare'].every(function (id) { return C.state(p, id).status === 'mastered'; });
     var m = C.state(p, 'pk_make5'), lg = (K.data(p).log.pk_make5 || []).slice(-20), acc = lg.length ? lg.reduce(function (a, x) { return a + (x.c >= 1 ? 1 : x.c > 0 ? .5 : 0); }, 0) / lg.length : 0;
     return ok && (m.status === 'mastered' || acc >= .8);
+  }
+  /* qquality1: even/odd (2.OA.C.3) only after readiness — solid pairing (make 10) or within-20 add success,
+     or Bubble skip-counting by 2s. Already-started evenodd keeps going. Band lock (GL=4) keeps it off younger bands. */
+  function strongSkill(p, id) {
+    var st = C.state(p, id); if (st && st.status === 'mastered') return true;
+    if (A.Coach && A.Coach.ready && A.Coach.ready(p, id).ok) return true;
+    var lg = ((A.Coach && A.Coach.data(p).log) || {})[id] || [];
+    var last = lg.slice(-20); if (last.length < 8) return false;
+    var a = last.reduce(function (s, x) { return s + (x.c >= 1 ? 1 : x.c > 0 ? .5 : 0); }, 0) / last.length;
+    return a >= .8;
+  }
+  function evenOddReady(p) {
+    if (!p) return false;
+    var eo = C.state(p, 'evenodd');
+    if (eo && (eo.status === 'mastered' || (eo.attempts | 0) > 0 || eo.placed)) return true;
+    if (['make10', 'add20', 'a_mix', 'a_mk10', 'a_dbl'].some(function (id) { return strongSkill(p, id); })) return true;
+    var g = p.games && p.games.bubble && p.games.bubble.steps && p.games.bubble.steps.e_skip;
+    if (g && (g.status === 'mastered' || (g.n >= 12 && g.ok / g.n >= .8))) return true;
+    return false;
   }
 
   /* ---------- missed facts + spaced review (§3.3) ---------- */
@@ -605,6 +1058,8 @@
     ctx.p = p; C.ensure(p);
     var Tm = C.track(p, 'math');
     Tm = C.track(p, (opt && opt.subject) || 'math');
+    // qquality1: never open a fresh evenodd round before pairing / within-20 readiness
+    if (Tm.current === 'evenodd' && !evenOddReady(p)) { Tm.current = C.byId.a_mix ? 'a_mix' : (C.byId.add20 ? 'add20' : Tm.current); }
     if (Tm.dropBack && C.byId[Tm.dropBack.to]) { var d = Tm.dropBack; Tm.dropBack = null; return { skill: C.byId[d.to], level: 0, review: false, dropBack: true, from: d.from, nOk: 4 }; }
     var r = basePick(p, opt); if (!r || !r.skill) return r;
     var subj = C.subjectOf(r.skill), T = C.track(p, subj), cur = C.byId[T.current];
@@ -645,6 +1100,7 @@
       var L2 = C.list(s.subject).filter(function (k) { return k.isStep; }).map(function (k) { return k.id; }), top = L2.slice(-4);
       ev.ladderTop = true; if (!s.topic) T.current = top[(top.indexOf(s.id) + 1) % top.length]; return; }
     if (s.ladder === 'pk' && nx.ladder !== 'pk' && !gateOk(p)) { ev.ladderTop = true; return; }
+    if (nx.id === 'evenodd' && !evenOddReady(p)) { ev.ladderTop = true; return; }   // qquality1: wait for pairing / within-20 readiness
     var ns = C.state(p, nx.id); if (ns.status === 'locked') ns.status = 'open';
     T.current = nx.id; ev.nextStep = nx.id;
     if (nx.isStep && nx.stepIx > 0) ns.introduced = true; else if (!ns.introduced) ev.newSkill = nx.id;   // one "New skill!" card per ladder, not per step
@@ -826,7 +1282,7 @@
     return m;
   };
 
-  A.Steps = { STEPS: STEPS, LADDERS: LADDERS, GROUP: GROUP, ladder: ladder, band: band, FAST_MS: FAST_MS, ready: ready, gateOk: gateOk, factHint: factHint, modeOf: modeOf, parseFact: parseFact, F: F, FAM: FAM,
+  A.Steps = { STEPS: STEPS, LADDERS: LADDERS, GROUP: GROUP, ladder: ladder, band: band, FAST_MS: FAST_MS, ready: ready, gateOk: gateOk, evenOddReady: evenOddReady, factHint: factHint, modeOf: modeOf, parseFact: parseFact, F: F, FAM: FAM,
     missedList: missedList, topMissed: topMissed, dueFacts: dueFacts, noteMiss: noteMiss, MBOX: MBOX, dueCheck: dueCheck, worked: worked, migrate: migrate,
     probePlan: probePlan, probeNext: probeNext, probeAnswer: probeAnswer, probeFinish: probeFinish, probeRun: probeRun, ctx: ctx, tf: tf, plate: plate };
 })(window.Arcade);
@@ -841,13 +1297,13 @@
   //   default by age: 2 tiny counting, 3 count to 10, 4 pre-K counting, 5 adding to 10, 6 doubles to 20, 7-8 make ten / story problems
   //   start:          2-3 tiny counting, 4 count to 10, 5 pre-K counting, 6 adding to 10, 7-8 doubles to 20
   // batch1: starts are never under the band (6-7: 1st-2nd grade, 8+: 2nd grade, the top content today); the warm-up climbs
-  var M = { toddler: 't_count3', pre: 't_count3', pk: 'count10', k: 'pk_count10', g1: 'a_dbl', g2: 'a_dbl', g3: 'evenodd' };
+  var M = { toddler: 't_count3', pre: 't_count3', pk: 'count10', k: 'pk_count10', g1: 'a_dbl', g2: 'a_dbl', g3: 'a_mix' };
   Object.keys(M).forEach(function (b) { Lv.AGE_START[b].math = { id: M[b], level: 0 }; });
-  Lv.START.math.pk = 'pk_count10'; Lv.START.math.k = 'pk_compare'; Lv.START.math[1] = 'a_dbl'; Lv.START.math[2] = 'evenodd';
+  Lv.START.math.pk = 'pk_count10'; Lv.START.math.k = 'pk_compare'; Lv.START.math[1] = 'a_dbl'; Lv.START.math[2] = 'a_mix';   // qquality1: evenodd opens only after readiness
   Lv.AGE_TEXT[2] = 'Tiny Picnic: counting to 3 and 5 with big pictures, colors'; Lv.AGE_TEXT[3] = 'counting to 3, 5 and 10, big & little letters, colors';
   Lv.AGE_TEXT[4] = 'counting to 10 and up (a quick warm-up finds the level), letters and beginning sounds (warm-up), shapes';
   Lv.AGE_TEXT[5] = 'counting to 20 and 30 and up (warm-up), first sight words'; Lv.AGE_TEXT[6] = 'doubles and facts to 20 and up (warm-up), sh / ch / th words and up';
-  Lv.AGE_TEXT[7] = 'facts to 20 up to 2-digit adding (warm-up), sh / ch / th words and up (warm-up)'; Lv.AGE_TEXT[8] = 'even & odd, 2-digit adding and place value (warm-up), 3rd-grade sight words and up';
+  Lv.AGE_TEXT[7] = 'facts to 20 up to 2-digit adding (warm-up), sh / ch / th words and up (warm-up)'; Lv.AGE_TEXT[8] = 'facts to 20, then even & odd after pairing practice (warm-up), 3rd-grade sight words and up';
   // batch1: reading starts in band too (6-7 on digraphs, 8 on 3rd-grade sight words); the reading warm-up climbs from there
   Lv.AGE_START.pk.reading = { id: 'letters', level: 1 };   // batch1: 4 starts at pre-K letters (was K beginning sounds); the warm-up climbs
   Lv.AGE_START.g1.reading = { id: 'digraph', level: 0 }; Lv.AGE_START.g2.reading = { id: 'digraph', level: 0 }; Lv.AGE_START.g3.reading = { id: 'sight3', level: 1 };

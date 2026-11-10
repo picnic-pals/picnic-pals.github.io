@@ -8,7 +8,7 @@
   var pose = ['thinking', 'thinking'];
   function img(src, cls) { return '<img class="' + (cls || '') + '" src="' + src + '" alt="" draggable="false">'; }
   function pip(suit) { return img(ART + suit + '-pip.png'); }
-  // Familiar mirrored playing-card positions; the corner suit icons are not counted pips.
+  // Familiar mirrored playing-card positions; corners show numerals only so kids count center pips.
   var layouts = { 1:[[50,50]], 2:[[50,18],[50,82]], 3:[[50,18],[50,50],[50,82]],
     4:[[26,18],[74,18],[26,82],[74,82]], 5:[[26,18],[74,18],[50,50],[26,82],[74,82]],
     6:[[26,18],[74,18],[26,50],[74,50],[26,82],[74,82]],
@@ -20,7 +20,7 @@
     var suit = side ? 'strawberry' : 'lemon', label = c.label || String(c.value), solve = label !== String(c.value);
     var h = '<button class="ff-card ' + (glow ? 'ff-glow ' : '') + (wild ? 'ff-wild ' : '') + '" data-side="' + side + '" aria-label="' + (side ? 'Your' : 'Sunny’s') + ' card: ' + (wild ? 'Picnic Basket wild' : A.esc(label)) + '"' + (example || G.phase !== 'choose' ? ' disabled' : '') + '>';
     if (wild) return h + img(ART + 'wild.png') + '</button>';
-    h += '<span class="ff-corner" aria-hidden="true"><b>' + (solve ? '?' : c.value) + '</b>' + pip(suit) + '</span><span class="ff-corner ff-invert" aria-hidden="true"><b>' + (solve ? '?' : c.value) + '</b>' + pip(suit) + '</span>';
+    h += '<span class="ff-corner" aria-hidden="true"><b>' + (solve ? '?' : c.value) + '</b></span><span class="ff-corner ff-invert" aria-hidden="true"><b>' + (solve ? '?' : c.value) + '</b></span>';
     if (c.value <= 10 && !solve) h += '<span class="ff-pips" aria-hidden="true">' + layouts[c.value].map(function (p) { return '<i style="left:' + p[0] + '%;top:' + p[1] + '%">' + pip(suit) + '</i>'; }).join('') + '</span>';
     else if (solve) h += '<span class="ff-equation">' + A.esc(label) + '<small>Solve first</small></span>';
     else h += '<span class="ff-number">' + c.value + '</span><span class="ff-model" aria-hidden="true">' + A.PV100.blocks3(Math.floor(c.value / 100), Math.floor(c.value % 100 / 10), c.value % 10) + '</span>';

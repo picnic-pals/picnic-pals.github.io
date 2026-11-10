@@ -34,10 +34,18 @@
   var AN = {}; ANIMALS.forEach(function (a) { AN[a.id] = a; });
   var LETTERS = 'ABCDEFGHIJKLMNOPRSTW'.split('');
   var BEGIN = [['b', 'ball', '⚽'], ['c', 'cat', '🐱'], ['d', 'dog', '🐶'], ['f', 'fish', '🐟'], ['h', 'hat', '🎩'], ['m', 'moon', '🌙'], ['p', 'pig', '🐷'], ['s', 'sun', '☀️'], ['t', 'tree', '🌳'], ['k', 'kite', '🪁'], ['l', 'leaf', '🍃'], ['r', 'rain', '🌧️']];
-  // batch-1107c: muted play: only pictures nobody names two ways (ball / soccer, hat / top hat, leaf, rain are left out), and no
-  // "which animal says moo?" (the sound is the clue)
-  var BEGIN_CLEAR = ['cat', 'dog', 'fish', 'pig', 'sun', 'moon', 'tree'];
+  // batch-1107c + qquality1: muted play uses only pictures with one clear name (shared EarlyWords.PIC_CLEAR allowlist).
+  // ball/soccer, hat/top hat, leaf, rain stay out; kite is clear. No "which animal says moo?" when muted.
+  var BEGIN_CLEAR = (A.EarlyWords && A.EarlyWords.isClearPic)
+    ? BEGIN.map(function (x) { return x[1]; }).filter(function (w) { return A.EarlyWords.isClearPic(w); })
+    : ['cat', 'dog', 'fish', 'pig', 'sun', 'moon', 'tree', 'kite'];
   function quietNow() { return !!(A.SightWords && A.SightWords.quiet && A.SightWords.quiet()); }
+  function beginPick() {
+    var clear = BEGIN.filter(function (x) { return BEGIN_CLEAR.indexOf(x[1]) >= 0; });
+    if (quietNow()) return pick(clear.length ? clear : BEGIN);
+    // with sound on still prefer the allowlist
+    return pick(clear.length ? clear : BEGIN);
+  }
   var RHYMES = [['cat', 'hat', 'bat', 'mat', 'rat', 'sat'], ['dog', 'log', 'frog', 'hog', 'fog'], ['sun', 'run', 'fun', 'bun'], ['pig', 'big', 'dig', 'wig'], ['hen', 'ten', 'pen', 'men'], ['top', 'hop', 'mop', 'pop']];
   var CVC = ['cat', 'dog', 'sun', 'pig', 'hen', 'bus', 'cup', 'map', 'bed', 'fox', 'jam', 'net', 'hat', 'top', 'rug', 'lip', 'van', 'web'];
   var SPELL = ['cat', 'dog', 'sun', 'pig', 'hen', 'cup', 'map', 'bed', 'fox', 'frog', 'fish', 'duck', 'milk', 'star', 'jump', 'cake'];
@@ -78,7 +86,7 @@
     { id: 'p_animal', name: 'Animals', band: 'P', gen: function () { var a = pick(ANIMALS), snd = !quietNow() && RNG() < .4 && a.id !== 'fish'; return { say: snd ? ['bp_says', 'bp_snd_' + a.id] : ['bp_pop_the', 'bp_ans_' + a.id], show: snd ? { text: a.snd } : { e: a.e }, need: 2, good: [cAn(a.id)], bad: others(ANIMALS.map(function (x) { return x.id; }), [a.id], 3).map(function (x) { return cAn(x); }) }; } },
     { id: 'p_letter', name: 'Letters', band: 'P', gen: function () { var l = pick(LETTERS); return { say: ['bp_pop_the', tx(l)], show: { text: l }, need: 1, good: [cLet(l)], bad: others(LETTERS, [l], 3).map(cLet) }; } },
     { id: 'p_num', name: 'Numbers', band: 'P', sub: 1, gen: function (cx) { var top = cx.sub ? 30 : 10, v = rnd(cx.sub ? 11 : 1, top), b = []; while (b.length < 3) { var x = rnd(1, top); if (x !== v && b.indexOf(x) < 0 && String(x).split('').reverse().join('') !== String(v)) b.push(x); } return { say: ['bp_pop_the', v], show: { text: String(v) }, need: 1, good: [cNum(v)], bad: b.map(cNum) }; } },
-    { id: 'p_begin', name: 'Beginning sounds', band: 'P', gen: function () { var w = pick(quietNow() ? BEGIN.filter(function (x) { return BEGIN_CLEAR.indexOf(x[1]) >= 0; }) : BEGIN); return { say: ['bp_starts', tx(w[1])], ask: 'Which letter does it start with?', show: { e: w[2] }, need: 1, good: [cLet(w[0].toUpperCase())], bad: others(BEGIN.map(function (x) { return x[0].toUpperCase(); }), [w[0].toUpperCase()], 3).map(cLet) }; } },
+    { id: 'p_begin', name: 'Beginning sounds', band: 'P', gen: function () { var w = beginPick(); return { say: ['bp_starts', tx(w[1])], ask: 'Which letter does it start with?', show: { e: w[2] }, need: 1, good: [cLet(w[0].toUpperCase())], bad: others(BEGIN.map(function (x) { return x[0].toUpperCase(); }), [w[0].toUpperCase()], 3).map(cLet) }; } },
     { id: 'p_bigger', name: 'The bigger number', band: 'P', gen: function () { var a = rnd(1, 9), b = a; while (b === a) b = rnd(1, 10); var hi = Math.max(a, b), lo = Math.min(a, b); return { say: ['bp_bigger', a, 'bp_or', b], show: { text: a + ' or ' + b }, need: 1, good: [cNum(hi)], bad: [cNum(lo)] }; } },
     { id: 'p_order', name: 'Pop 1 to 10 in order', band: 'P', sub: 1, gen: function (cx) { var n = cx.sub ? 10 : 5, seq = []; for (var i = 1; i <= n; i++) seq.push(cNum(i)); return { say: ['bp_order', n], show: { text: '1 → ' + n }, need: n, seq: seq, good: [], bad: [] }; } },
     { id: 'p_combo', name: 'Two-rule bubbles', band: 'P', gen: function () {
@@ -141,7 +149,11 @@
      the child's floor for its subject and not past her ceiling. Kinds below the floor are marked done ('band', no reviews) and
      never come back as filler, review, an easier target or a step-down. Without A.Learn (old Node tests) everything is in band. */
   function LN() { return A.Learn && A.Learn.bubbleSub ? A.Learn : null; }
-  function inBand(p, id) { var Ln = LN(); if (!Ln) return true; var sb = Ln.bubbleSub(p, id); return sb >= 0 && Ln.kindOk(p, id, Math.max(sb, (data(p).steps[id] || {}).sub || 0)); }
+  function inBand(p, id) {
+    // qquality1: even/odd only after pairing / within-20 / skip-by-2s readiness (and only in the 2.OA.3 band via GL tags)
+    if (id === 'e_evenodd' && A.Steps && A.Steps.evenOddReady && !A.Steps.evenOddReady(p)) return false;
+    var Ln = LN(); if (!Ln) return true; var sb = Ln.bubbleSub(p, id); return sb >= 0 && Ln.kindOk(p, id, Math.max(sb, (data(p).steps[id] || {}).sub || 0));
+  }
   function underCeil(p, id) { var Ln = LN(); if (!Ln) return true; var q = data(p).steps[id] || {}; return Ln.gl(id, q.sub || 0) == null || Ln.gl(id, q.sub || 0) <= Ln.ceil(p, Ln.subjOfKind(id)); }
   function bandMark(p, L) {
     var Ln = LN(); if (!Ln) return;
@@ -168,8 +180,8 @@
   }
   function fill(p, T, L) {   // keep K kinds learning: the lowest not-yet-mastered kinds (in band, under the ceiling)
     bandMark(p, L);
-    T.learn = T.learn.filter(function (id) { return sst(p, id).status !== 'mastered'; });
-    for (var i = 0; i < L.length && T.learn.length < K; i++) { var id = L[i].id, s = sst(p, id); if (s.status !== 'mastered' && T.learn.indexOf(id) < 0 && !(s.rest > now()) && underCeil(p, id)) { T.learn.push(id); if (s.status === 'locked') s.status = 'open'; } }
+    T.learn = T.learn.filter(function (id) { return sst(p, id).status !== 'mastered' && inBand(p, id); });
+    for (var i = 0; i < L.length && T.learn.length < K; i++) { var id = L[i].id, s = sst(p, id); if (s.status !== 'mastered' && T.learn.indexOf(id) < 0 && !(s.rest > now()) && underCeil(p, id) && inBand(p, id)) { T.learn.push(id); if (s.status === 'locked') s.status = 'open'; } }
     T.learn.sort(function (a, b) { return STEPS[a].ix - STEPS[b].ix; });
   }
   function reached(p) { var b = bandOf(p), T = track(p); return LAD[b].filter(function (s) { var q = sst(p, s.id); return q.status === 'mastered' || T.learn.indexOf(s.id) >= 0; }).map(function (s) { return s.id; }); }

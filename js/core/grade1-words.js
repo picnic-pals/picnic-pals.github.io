@@ -12,6 +12,7 @@
   var NEW = { van: '🚐', can: '🥫', pen: '🖊️', ten: '🔟', leg: '🦵', pin: '📌', six: '6️⃣', box: '📦', log: '🪵', bug: '🐛', cup: '🥤',
     ship: '🚢', shoe: '👟', sheep: '🐑', shark: '🦈', shirt: '👕', chain: '⛓️', chocolate: '🍫', thumb: '👍', three: '3️⃣', thread: '🧵', thermometer: '🌡️' };
   Object.keys(NEW).forEach(function (w) { if (!E.PICS[w]) E.PICS[w] = NEW[w]; });
+  if (E.clearList) E.PIC_CLEAR = E.clearList();
 
   /* ---------- CVC words (short vowels) ---------- pictured words (word -> picture) + extra real CVC words used as look-alikes */
   G.CVC = { a: words('cat bat hat map van can'), e: words('bed pen ten leg'), i: words('pig pin six'), o: words('dog fox box log'), u: words('sun bus bug cup') };
@@ -162,6 +163,7 @@
   add('skill_homophones', 'Homophones! Words that sound the same but are spelled differently, like to, two and too.');
   add('skill_affixes', 'Word parts! Un means not. Re means again. Ful means full of. Less means without.');
   add('skill_comprehension', 'Reading stories! Read the story, then answer the question.');
+  add('skill_passages', 'Reading passages! Read the passage, then answer the questions.');
   add('rule_find_word', 'Munch the word', '+ word (the choices are never read aloud)');
   add('q_which_word', 'Which word is', '+ word'); add('rule_homophone', 'Munch the word that fits the sentence!'); add('rule_comprehension', 'Read the story. Munch the answer!');
   G.HOMO.forEach(function (h, i) { add('hom_' + i, h[0].replace('___', h[1].charAt(0).toUpperCase() === h[1].charAt(0) ? h[1] : h[1]).replace(/^./, function (c) { return c.toUpperCase(); }), 'homophone sentence (sounds the same whichever word fits)'); });

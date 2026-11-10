@@ -1,3 +1,31 @@
+/* artswap nature-bg: home plate */
+body {
+  background-color: #f3e9ff;
+  background-image: url("../art/backgrounds/home_1920x1080.jpg");
+  background-image: image-set(
+    url("../art/backgrounds/home_1920x1080.webp") type("image/webp"),
+    url("../art/backgrounds/home_1920x1080.jpg") type("image/jpeg")
+  );
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+@media (min-width: 1400px), (min-resolution: 2dppx) and (min-width: 900px) {
+  body {
+    background-image: url("../art/backgrounds/home_2560x1440.jpg");
+    background-image: image-set(
+      url("../art/backgrounds/home_2560x1440.webp") type("image/webp"),
+      url("../art/backgrounds/home_2560x1440.jpg") type("image/jpeg")
+    );
+  }
+}
+/* keep tiles / buttons readable over the soft plate */
+.hub .kid, .hub .tile, .hub .me, .hub .starchip, .hub .backbtn, .hub .actbtn,
+.hub .modebtn, .hub .book, .hub .nkform, .hub .nkprev, .hub .contbtn {
+  /* existing solid fills already provide contrast */
+}
+
 /* Blob Arcade — hub screens */
 .hub { flex-direction: column; align-items: center; padding: max(18px, env(safe-area-inset-top)) 22px 22px; overflow: auto; }
 .logo { margin: 8px 0 0; font-size: clamp(40px, 9vmin, 92px); font-weight: 700; line-height: 1; color: #fff; letter-spacing: 1px; text-align: center;

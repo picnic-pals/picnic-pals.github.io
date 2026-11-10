@@ -120,6 +120,8 @@ body:not(.two) .turn { display: none; }
 .bcard .cv { display: block; }
 .bcard.rich { font-size: clamp(30px, 6.6vh, 56px); }
 .bcard:hover { transform: translateY(-4px); }
+.bcard:focus { outline: none; }
+.bcard:focus-visible { outline: 4px solid #7cc4ff; outline-offset: 3px; }
 .bcard.sel { border-color: var(--pc, #3d8ef0); transform: translateY(-6px) rotate(-1deg); box-shadow: 0 9px 0 #0000002a, 0 0 0 5px #ffffffa0; }
 .bcard.right { border-color: #2fc07e; background: #e6fff2; animation: rpop .5s; }
 .bcard.right .kk::after { content: "✓"; } .bcard.right .kk { background: #2fc07e; color: #fff; font-size: 0; } .bcard.right .kk::after { font-size: 18px; }
@@ -243,3 +245,108 @@ body.bonusing .sign .qpic.on { display: flex; align-items: center; }
 }
 /* quality1 polish: on a tablet the base-running picture is big enough to follow the numbered path at a glance */
 @media (min-width: 601px) { body.bonusing .sign .bbdiamond { width: 140px; height: 140px; } }
+
+/* ---- qpassages layout fix: phrase cards + two-step read/ask ---- */
+.bcard.phrase {
+  font-size: clamp(22px, 4.2vh, 30px);
+  line-height: 1.15;
+  padding: 22px 12px 12px 34px; /* left clears the # badge */
+  overflow: hidden;
+  align-content: center;
+  box-sizing: border-box;
+}
+.bcard.phrase .cv {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
+  line-height: 1.2;
+  overflow: visible;
+}
+.cards.phrases { align-items: stretch; }
+.cards.phrases .bcard { flex: 1 1 0; min-width: 0; }
+.cards.phrases:not(.stack) .bcard.phrase { min-height: clamp(96px, 18vh, 140px); }
+/* phone: stack 3 phrase choices as full-width rows */
+.cards.stack { flex-direction: column; flex-wrap: nowrap; gap: 8px; padding: 6px 12px 8px; min-height: 0; }
+.cards.stack .bcard {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: none;
+  min-height: 56px;
+  font-size: clamp(22px, 5.2vw, 28px);
+  padding: 16px 12px 10px 34px;
+}
+.cards.stack .bcard.phrase .cv { overflow: visible; }
+
+/* Read step: big scrollable passage, field still peeks, no answer cards, no friend bubble */
+body.passage-read #friendBubble { display: none !important; }
+body.passage-read .cards { display: none !important; }
+body.passage-read #keys { display: none !important; }
+body.passage-read #game .top { flex: 1 1 auto; align-items: stretch; max-height: 62vh; }
+body.passage-read .sign {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 58vh;
+  padding: 10px 14px 12px;
+}
+body.passage-read .sign .qrow { flex: 1; min-height: 0; align-items: flex-start; }
+body.passage-read .sign .qtxt {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  font-size: inherit;
+}
+body.passage-read .qp-pass {
+  max-height: none;
+  margin: 0;
+}
+body.passage-read .qp-pass .qp-title { font-size: clamp(18px, 4.2vw, 26px); }
+body.passage-read .qp-pass .qp-body { font-size: clamp(17px, 4vw, 24px); line-height: 1.38; }
+body.passage-read #parkWrap { flex: 0 0 auto; height: min(28vh, 220px); min-height: 100px; }
+body.passage-read .pass-actions { display: flex; justify-content: center; padding: 8px 0 2px; }
+body.passage-read .pass-ready {
+  display: inline-flex; align-items: center; justify-content: center;
+  font: 800 clamp(20px, 4.5vw, 28px)/1.1 system-ui, sans-serif;
+  color: #fff; background: linear-gradient(#6ad39a, #2fc07e);
+  border: 0; border-radius: 999px; padding: .45em 1.4em;
+  box-shadow: 0 6px 0 #1f9a62; cursor: pointer;
+}
+body.passage-read .pass-again { display: none !important; }
+body.passage-read .sign .qpic { display: none !important; }
+
+/* Ask step: compact question, field visible, phrase cards, no friend bubble */
+body.passage-ask #friendBubble { display: none !important; }
+body.passage-ask #game .top { flex: 0 0 auto; max-height: none; }
+body.passage-ask .sign { flex: 0 1 auto; max-height: min(22vh, 160px); padding: 6px 12px 8px; }
+body.passage-ask .sign .qtxt { font-size: clamp(18px, 3.6vh, 28px); overflow: auto; max-height: min(18vh, 130px); }
+body.passage-ask .qp-q { margin: 0; font-size: inherit; }
+body.passage-ask #parkWrap { flex: 1 1 auto; min-height: 120px; }
+body.passage-ask .pass-actions { display: none; } /* inline Read again lives in qtxt */
+body.passage-ask .pass-again-inline {
+  display: inline-flex; align-items: center; gap: 4px; margin-top: 6px;
+  font: 700 14px/1.1 system-ui, sans-serif; color: #3d6eb0;
+  background: #e8f3ff; border: 2px solid #b7d6f5; border-radius: 999px;
+  padding: 5px 12px; cursor: pointer;
+}
+body.passage-ask .cards { min-height: 0; }
+@media (max-width: 420px) {
+  body.passage-read #game .top { max-height: 64vh; }
+  body.passage-read .sign { max-height: 60vh; }
+  body.passage-read #parkWrap { height: min(24vh, 160px); min-height: 90px; }
+  body.passage-ask .sign { max-height: min(20vh, 140px); }
+  body.passage-ask #parkWrap { min-height: 110px; }
+}
+@media (min-width: 700px) {
+  body.passage-read #parkWrap { height: min(32vh, 280px); }
+  body.passage-ask .sign { max-height: min(18vh, 150px); }
+}
+
+.pass-actions[hidden] { display: none !important; }

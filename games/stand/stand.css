@@ -1,5 +1,25 @@
 /* Lemonade Stand (stand1): big tap targets (76px+), calm motion, works with touch and mouse */
-body { background: linear-gradient(#bfe6ff 0%, #e8f6ff 52%, #b9eaa6 52%, #9fdc8a 100%); }
+/* artswap bg2: lemonade stand plate (awning + sky + meadow + shelf painted) */
+body {
+background-color: #bfe6ff;
+  background-image: url("../../art/backgrounds/stand_1920x1080.jpg");
+  background-image: image-set(
+    url("../../art/backgrounds/stand_1920x1080.webp") type("image/webp"),
+    url("../../art/backgrounds/stand_1920x1080.jpg") type("image/jpeg")
+  );
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+@media (min-width: 1400px), (min-resolution: 2dppx) and (min-width: 900px) {
+  body {
+    background-image: url("../../art/backgrounds/stand_2560x1440.jpg");
+    background-image: image-set(
+      url("../../art/backgrounds/stand_2560x1440.webp") type("image/webp"),
+      url("../../art/backgrounds/stand_2560x1440.jpg") type("image/jpeg")
+    );
+  }
+}
 #stand { display: flex; flex-direction: column; height: 100vh; height: 100dvh; padding: 10px 16px 14px; box-sizing: border-box; gap: 6px; position: relative; overflow: hidden; }
 .awning { position: absolute; left: 0; right: 0; top: 0; height: 26px; background: repeating-linear-gradient(90deg, #ffd23c 0 60px, #fff 60px 120px); z-index: 0; pointer-events: none; }
 .awning::after { content: ''; position: absolute; left: 0; right: 0; top: 26px; height: 16px; background: radial-gradient(circle at 30px 0, #ffd23c 15px, transparent 16px) 0 0 / 120px 16px repeat-x, radial-gradient(circle at 90px 0, #fff 15px, transparent 16px) 0 0 / 120px 16px repeat-x; }
@@ -340,3 +360,11 @@ body.tipq .jarchip { display: none !important; }
   .pitcher .psvg, .pitcher.pour .psvg, .pitcher .psvg .jlev { transition: none; }
   .pitcher.pour .psvg { transform: none; }
 }
+
+
+.awning { display: none !important; }
+.counter {
+  background: rgba(255, 232, 190, 0.72) !important;
+  backdrop-filter: blur(2px);
+}
+.sunny { display: none !important; } /* sun is in the painting */

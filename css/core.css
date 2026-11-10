@@ -291,6 +291,21 @@ section.subj h3 small { font-weight: 500; font-size: .7em; }
 .example .ea-pw .ea-cap { font-size: .6em; }
 /* 2nd-3rd grade reading: a short story (comprehension) and the blank in a homophone sentence */
 .ea-story { font-weight: 600; font-style: normal; color: #3d3160; display: block; font-size: .82em; line-height: 1.25; margin-bottom: .15em; }
+/* qpassages: E-band reading passages — large readable text on phone */
+.qp-pass { display: block; background: #fffaf3; border: 3px solid #c9b8e8; border-radius: 14px; padding: 10px 12px; margin: 0 0 8px; max-width: 100%; box-sizing: border-box; }
+.qp-pass .qp-title { font-size: clamp(15px, 3.6vw, 20px); font-weight: 800; color: #5a3d8a; margin: 0 0 6px; }
+.qp-pass .qp-body { font-size: clamp(15px, 3.8vw, 20px); font-weight: 600; line-height: 1.35; color: #3d3160; margin: 0; }
+.qp-q { font-size: clamp(17px, 4.2vw, 24px); font-weight: 800; color: #3d3160; margin: 6px 0 0; }
+.sign .qtxt .qp-pass { font-size: inherit; max-height: min(42vh, 280px); overflow: auto; -webkit-overflow-scrolling: touch; }
+.sign .qtxt .qp-body { font-size: clamp(14px, 2.4vh, 18px); line-height: 1.3; }
+.sign .qtxt .qp-q { font-size: clamp(16px, 2.8vh, 22px); }
+@media (max-width: 420px) {
+  .qp-pass { padding: 8px 10px; }
+  .qp-pass .qp-body { font-size: 15px; line-height: 1.32; }
+  .qp-q { font-size: 17px; }
+  .sign .qtxt .qp-pass { max-height: min(36vh, 220px); }
+}
+
 .ea-blank { display: inline-block; min-width: 2.2em; border-bottom: 3px solid #b39ddb; color: transparent; }
 
 /* ---------- coach v2: placement check, mistake mini-lessons, picnic story problems ---------- */
@@ -534,3 +549,103 @@ body.touchui .keys:not(.touch):not(.padkeys) { display: none !important; }
 .pv100-line { display:block; width:320px; max-width:100%; height:auto; margin:10px auto; }
 
 .pv-flat { display:inline-block; width:130px; min-width:130px; height:130px; flex-shrink:0; border-radius:3px; background-color:#98d7b0; background-image:repeating-linear-gradient(to right,transparent 0 12px,#39795b 12px 13px),repeating-linear-gradient(to bottom,transparent 0 12px,#39795b 12px 13px); box-shadow:inset 0 0 0 1px #39795b; }
+
+/* qtime: analog clock faces — readable at 375px */
+.qclock { display:block; width:min(180px, 72vw); height:auto; margin:8px auto; background:#fffaf3; border-radius:50%; }
+.qclock.sm { width:min(112px, 28vw); }
+.qclock .qc-face { fill:#fffaf3; }
+.qclock .qc-rim { stroke:#6b4f9a; stroke-width:6; }
+.qclock text { font:700 16px system-ui,sans-serif; fill:#3b2a5a; }
+.qclock.sm text { font-size:14px; }
+.qclock .qc-hour { stroke:#e0336f; }
+.qclock .qc-min { stroke:#3b2a5a; }
+.qclock .qc-hub { fill:#3b2a5a; }
+.bcard.rich .qclock, .pc-opt .qclock, .cell .qclock { width:min(100px, 24vw); margin:2px auto; }
+.bcard.rich .qclock.sm, .pc-opt .qclock.sm, .cell .qclock.sm { width:min(92px, 22vw); }
+.st-pic .qclock { width:min(180px, 70vw); }
+/* qcoins: flat SVG coins */
+.qcoin { display: inline-block; vertical-align: middle; margin: 2px; }
+.qcoins { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; align-items: center; max-width: 100%; }
+.qcoins.sm .qcoin { margin: 1px; }
+.qcoin-cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: min(100%, 420px); margin: 6px auto; }
+.qcoin-grp { background: #fffaf3; border: 3px solid #c9b8e8; border-radius: 16px; padding: 8px 6px 6px; text-align: center; }
+.qcoin-tag { display: inline-block; font-weight: 800; font-size: 18px; color: #6b4f9a; background: #efe7ff; border-radius: 999px; padding: 2px 10px; margin-bottom: 4px; }
+.bcard.rich .qcoin, .pc-opt .qcoin, .cell .qcoin { margin: 1px; }
+.st-pic .qcoins { margin: 6px auto; }
+/* qarrays: rectangular arrays of drawn dots */
+.qarray { display: block; margin: 8px auto; max-width: 100%; height: auto; }
+.qarray.sm { margin: 4px auto; }
+.qarray .qa-bg { fill: #fffaf3; stroke: #c9b8e8; stroke-width: 3; }
+.bcard.rich .qarray, .pc-opt .qarray, .cell .qarray { margin: 2px auto; max-width: min(140px, 36vw); }
+.st-pic .qarray { margin: 6px auto; }
+.sign .qpic .qarray { max-height: min(160px, 28vh); width: auto; height: auto; max-width: min(220px, 42vw); }
+@media (max-width: 420px) {
+  .sign .qpic .qarray { max-height: min(140px, 26vh); max-width: min(180px, 48vw); }
+}
+@media (max-width: 420px) {
+  .qarray { max-width: min(100%, 92vw); }
+  .bcard.rich .qarray, .cell .qarray { max-width: min(110px, 40vw); }
+}
+
+@media (max-width: 420px) {
+  .qcoin-cmp { gap: 6px; }
+  .qcoin-grp { padding: 6px 4px; }
+}
+
+@media (max-width: 480px) {
+  .qclock { width:min(160px, 78vw); }
+  .bcard.rich .qclock, .pc-opt .qclock, .cell .qclock { width:min(84px, 26vw); }
+  .qclock text { font-size:15px; }
+}
+
+/* qpassages phrase answers in any game that reuses .long labels */
+.bcard.phrase, .cell.long.wrap .lbl { overflow-wrap: anywhere; }
+
+
+/* Picnic Pals custom icon art (artswap) — scales like emoji it replaces */
+.pp-icon, img.pp-pic {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  object-fit: contain;
+  vertical-align: -0.15em;
+  image-rendering: -webkit-optimize-contrast;
+}
+.tp-emo .pp-icon, .tp-qe .pp-icon, .tp-emo img.pp-pic, .tp-qe img.pp-pic {
+  width: 58px; height: 58px; vertical-align: middle;
+}
+/* --icon-cs is set on the board; fitCells may shrink --cs on .lbl for text, but icons stay full size */
+.cell img.pp-icon, .cell img.pp-pic, img.ea-emo.pp-pic {
+  width: 1em; height: 1em; font-size: inherit;
+}
+.cell img.ea-emo.pp-pic, .cell img.pp-pic, .cell img.pp-icon {
+  width: calc(var(--icon-cs, var(--cs)) * .52); height: calc(var(--icon-cs, var(--cs)) * .52);
+}
+.cell .ea-emo, .cell .pp-emoji, .cell .pp-emoji[data-size] {
+  font-size: calc(var(--icon-cs, var(--cs)) * .52) !important; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1em; height: 1em; vertical-align: -0.15em;
+  font-family: "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+}
+.choice .em .pp-icon, .choice .em img.pp-pic { width: 1.6em; height: 1.6em; }
+.choice .em .ea-emo, .choice .em .pp-emoji { font-size: 1.6em; line-height: 1; width: 1em; height: 1em; display: inline-flex; align-items: center; justify-content: center; }
+.lvpic .pp-icon, .lvpic img.pp-pic { width: 1.4em; height: 1.4em; vertical-align: middle; }
+.lvpic .pp-emoji, .lvpic .ea-emo { font-size: 1.4em; line-height: 1; }
+.st-objs i .pp-icon, .st-objs i img.pp-pic { width: 1em; height: 1em; }
+.st-objs i .pp-emoji { font-size: 1em; }
+.pc-replay .pp-icon { width: 22px; height: 22px; }
+.homebtn .pp-icon, .sayagain .pp-icon, .backbtn .pp-icon,
+.homebtn .pp-emoji, .sayagain .pp-emoji { width: 1.1em; height: 1.1em; font-size: 1em; vertical-align: middle; }
+.cl-ts .pp-icon { width: 36px; height: 36px; }
+.hs-e .pp-icon, .he .pp-icon { width: 1.2em; height: 1.2em; }
+.hs-e .pp-emoji, .he .pp-emoji { font-size: 1.2em; }
+.modebtn .mic .pp-icon, .modebtn .spk .pp-icon { width: 1.2em; height: 1.2em; }
+.pp-emoji { font-family: "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif; line-height: 1; display: inline-block; vertical-align: -0.15em; }
+.pp-emoji[data-size="32"] { font-size: 32px; width: 1em; height: 1em; }
+.pp-emoji[data-size="48"] { font-size: 48px; width: 1em; height: 1em; }
+.pp-emoji[data-size="64"] { font-size: 64px; width: 1em; height: 1em; }
+/* cell / emo contexts override data-size via more specific rules */
+/* Bubble / target: fallback emoji fill the same box as art imgs */
+.emo .pp-emoji { font-size: 1em; line-height: 1; display: inline-block; width: 1em; height: 1em; vertical-align: middle; }
+.bub .emo .pp-emoji, .bub .emo .pp-emoji[data-size] { font-size: 58px !important; width: 1em; height: 1em; }
+.target .emo .pp-emoji, .target .emo .pp-emoji[data-size] { font-size: 60px !important; width: 1em; height: 1em; }

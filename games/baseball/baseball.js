@@ -196,7 +196,7 @@
   var LITTLE = A.Age.little(P1);
   function maxOuts() { return STORYB && SC && SC.outs ? SC.outs : R.outsFor(A.Age.little(bat().P)); }   // after9: a story stop is one big inning with SC.outs (4) outs
   function mercy() { return STORYB ? (SC && SC.mercy ? SC.mercy : 99) : R.mercyFor(A.Age.little(bat().P)); }   // batch1: Story caps an inning at 5 runs too
-  var G = { phase: 'intro', inning: 1, half: 0, outs: 0, strikes: 0, pa: 0, halfRuns: 0, missLast: false, recentAt: [], scoreQ: {}, bonusN: 0, hitN: 0, walkoff: false, bases: [null, null, null], q: null, accept: false, busy: false, sel: 0, qT0: 0, voiceDone: false, over: false, t0: Date.now(), recent: [], pitchN: 0, clockT: null, timer: null };
+  var G = { phase: 'intro', inning: 1, half: 0, outs: 0, strikes: 0, pa: 0, halfRuns: 0, missLast: false, recentAt: [], scoreQ: {}, bonusN: 0, hitN: 0, walkoff: false, bases: [null, null, null], q: null, accept: false, busy: false, sel: -1, qT0: 0, voiceDone: false, over: false, t0: Date.now(), recent: [], pitchN: 0, clockT: null, timer: null };
   function bat() { return PL[G.half]; }
 
   /* ---------- the ballpark (one SVG, 1600 × 900; extends past its box so wide/tall screens show more sky and grass) ---------- */
@@ -420,19 +420,104 @@
   function itemKey(q) { var t = String(q.text || '').replace(/<[^>]*>/g, ' '), m = t.match(/(\d+)\s*([+−-])\s*(\d+)/); return m ? m[1] + ' ' + (m[2] === '-' ? '−' : m[2]) + ' ' + m[3] : (t.replace(/\s+/g, ' ').trim() || q.key); }
   // hint for a step pitch whose generator has none (the old two-level skills): the strategy picture for its fact
   function bbHint(q) { var f = A.Steps.parseFact(itemKey(q)); if (f) { q.hint = A.Steps.factHint(f, 1, q.skill); q.hint2 = A.Steps.factHint(f, 2, q.skill); } }
-  function renderQuestion(q) {
-    $('#qTxt').innerHTML = q.text; var hh = q.retry && q.hintHtml ? '<div class="bb-hint">' + q.hintHtml + '</div>' : ''; $('#qPic').innerHTML = (q.pic || '') + hh; $('#qPic').classList.toggle('on', !!(q.pic || hh));
-    var box = $('#cards'); box.innerHTML = ''; box.classList.toggle('n3', q.choices.length === 3);
+  function isPhraseChoice(c) {
+    if (!c) return false;
+    if (c.long || c.html) return true;
+    var s = String(c.label == null ? '' : c.label).replace(/<[^>]*>/g, '').trim();
+    return s.length > 3 || /\s/.test(s);
+  }
+  function fitCard(b) {
+    var cv = b.querySelector('.cv'); if (!cv || !b.classList.contains('phrase')) return;
+    b.style.fontSize = '30px';
+    var lo = 22, hi = 30, best = lo, padY = 28, padX = 20;
+    for (var px = hi; px >= lo; px--) {
+      b.style.fontSize = px + 'px';
+      // allow wrapping; require the label to fit inside the card box
+      if (cv.scrollHeight <= b.clientHeight - padY && cv.scrollWidth <= b.clientWidth - padX) { best = px; break; }
+    }
+    b.style.fontSize = best + 'px';
+  }
+  function fitCards() { A.$$('#cards .bcard.phrase').forEach(fitCard); }
+  function renderQuestion(q, opt) {
+    opt = opt || {};
+    var txt = opt.text != null ? opt.text : q.text;
+    $('#qTxt').innerHTML = txt; var hh = q.retry && q.hintHtml ? '<div class="bb-hint">' + q.hintHtml + '</div>' : ''; $('#qPic').innerHTML = (q.pic || '') + hh; $('#qPic').classList.toggle('on', !!(q.pic || hh));
+    var box = $('#cards'); box.innerHTML = '';
+    var phrases = !opt.hideCards && q.choices.some(isPhraseChoice);
+    box.classList.toggle('n3', q.choices.length === 3);
+    box.classList.toggle('phrases', !!phrases);
+    box.classList.toggle('stack', !!phrases && q.choices.length === 3 && window.innerWidth <= 500);
+    if (opt.hideCards) { G.sel = -1; return; }
     q.choices.forEach(function (c, i) {
-      var b = A.el('<button class="bcard c' + i + (c.html ? ' rich' : '') + '" data-i="' + i + '" aria-label="Answer ' + (i + 1) + ': ' + A.esc(c.label) + '"><span class="kk">' + (i + 1) + '</span><span class="cv">' + (c.html || A.esc(c.label)) + '</span></button>');
+      var phrase = isPhraseChoice(c);
+      var b = A.el('<button class="bcard c' + i + (c.html ? ' rich' : '') + (phrase ? ' phrase' : '') + '" data-i="' + i + '" aria-label="Answer ' + (i + 1) + ': ' + A.esc(c.label) + '"><span class="kk">' + (i + 1) + '</span><span class="cv">' + (c.html || A.esc(c.label)) + '</span></button>');
       b.addEventListener('click', function () { if (G.accept) { G.sel = i; markSel(); answer(i, 'click'); } });
       box.appendChild(b);
     });
-    G.sel = 0; markSel(false);
+    G.sel = -1; markSel(false);   // no card highlighted until a tap / arrow / number (never looks like a free tip)
+    requestAnimationFrame(function () { fitCards(); requestAnimationFrame(fitCards); });
+  }
+  function ensurePassUI() {
+    var sign = $('#sign'); if (!sign || $('#passActions')) return;
+    var row = A.el('<div class="pass-actions" id="passActions"><button type="button" class="pass-ready" id="passReady">I\'m ready ▶</button><button type="button" class="pass-again" id="passAgain" hidden>Read again</button></div>');
+    sign.appendChild(row);
+    $('#passReady').addEventListener('click', function () { SFX.tap(); if (G.q && G.q.passage) enterPassageAsk(G.q); });
+    $('#passAgain').addEventListener('click', function () { SFX.tap(); if (G.q && G.q.passage) enterPassageRead(G.q, true); });
+  }
+  function hideFriendBubble() {
+    var fb = $('#friendBubble'); if (fb) { fb.classList.remove('on'); fb.style.display = 'none'; }
+  }
+  function clearPassageMode() {
+    document.body.classList.remove('passage-read', 'passage-ask');
+    var fb = $('#friendBubble'); if (fb) fb.style.display = '';
+    var pa = $('#passActions'); if (pa) pa.hidden = true;
+    var pr = $('#passReady'); if (pr) pr.hidden = true;
+    var ag = $('#passAgain'); if (ag) { ag.hidden = true; }
+  }
+  function enterPassageRead(q, fromAsk) {
+    ensurePassUI();
+    G.phase = 'pass-read';
+    G.accept = false; G.busy = false;
+    document.body.classList.add('passage-read');
+    document.body.classList.remove('passage-ask');
+    hideFriendBubble();
+    var html = q.passageHtml || q.text;
+    renderQuestion(q, { text: html, hideCards: true });
+    $('#passActions').hidden = false;
+    $('#passReady').hidden = false;
+    $('#passAgain').hidden = true;
+    $('#sign').classList.remove('done');
+    var say = q.sayPass || q.say;
+    V.stop();
+    Promise.race([V.say(say, { kind: 'tap', bubble: false }), wait(8000)]).then(function () {});
+    if (window.__bbPassRead) window.__bbPassRead(q);
+  }
+  function enterPassageAsk(q) {
+    ensurePassUI();
+    G.phase = 'pitch';
+    document.body.classList.remove('passage-read');
+    document.body.classList.add('passage-ask');
+    hideFriendBubble();
+    var qHtml = (q.questionHtml || '') + '<button type="button" class="pass-again-inline" id="passAgainInline">Read again</button>';
+    renderQuestion(q, { text: qHtml });
+    var inl = $('#passAgainInline');
+    if (inl) inl.addEventListener('click', function (e) { e.stopPropagation(); SFX.tap(); enterPassageRead(q, true); });
+    $('#passActions').hidden = false;
+    $('#passReady').hidden = true;
+    $('#passAgain').hidden = false;
+    G.accept = true; G.busy = false; G.voiceDone = false; G.qT0 = G.qShown = Date.now();
+    var my = G.pitchN;
+    var say = A.ReadAloud ? A.ReadAloud.auto(bat().P, q) : q.sayAuto || q.say;
+    V.stop();
+    Promise.race([V.say(say, { kind: q.listen ? 'listen' : 'prompt', bubble: false }), wait(6000)]).then(function () {
+      if (G.pitchN === my && !G.voiceDone) { G.voiceDone = true; G.qT0 = Date.now(); }
+    });
+    clearInterval(G.timer); G.timer = setInterval(tick, 100); tick();
+    if (window.__bbPassAsk) window.__bbPassAsk(q);
   }
   function markSel(say) {
-    A.$$('#cards .bcard').forEach(function (b, i) { b.classList.toggle('sel', i === G.sel); });
-    if (say && G.q && G.q.choices[G.sel].say) V.say(G.q.choices[G.sel].say, { kind: 'name', bubble: false });
+    A.$$('#cards .bcard').forEach(function (b, i) { b.classList.toggle('sel', G.sel >= 0 && i === G.sel); });
+    if (say && G.sel >= 0 && G.q && G.q.choices[G.sel].say) V.say(G.q.choices[G.sel].say, { kind: 'name', bubble: false });
   }
   function elapsed() { return G.voiceDone ? (Date.now() - G.qT0) / 1000 : 0; }
   function tick() {
@@ -457,13 +542,20 @@
   }
   function startPitch() {
     if (G.over) return;
+    clearPassageMode();
     G.phase = 'pitch';
     var q = G.q = newQuestion(); G.pitchN++;
     if (!G.keepTag) { $('#swingTag').innerHTML = q.stretch ? '<small>🔥 Tricky pitch!</small>' : ''; $('#swingTag').className = 'swingtag' + (q.stretch ? ' on tricky' : ''); }
-    renderQuestion(q); renderBoard(); if (batEl) setBat(-118);
+    renderBoard(); if (batEl) setBat(-118);
     $('#sign').classList.remove('done'); B.anim($('#sign'), 'signpop', 400);
-    // the pitcher gets set; the voice reads the question; the clock starts when it has been read
     $('#pitcherG').classList.add('set');
+    // qpassages: two-step read → question (full passage first, then choices)
+    if (q.passage) {
+      G.accept = false; G.busy = false; G.voiceDone = false; G.qT0 = G.qShown = Date.now();
+      $('#shot').textContent = '';
+      return enterPassageRead(q);
+    }
+    renderQuestion(q);
     G.accept = true; G.busy = false; G.voiceDone = false; G.qT0 = G.qShown = Date.now(); $('#shot').textContent = S.bbClock > 0 ? '⏱ ' + S.bbClock : '';
     var my = G.pitchN;
     Promise.race([V.say(A.ReadAloud ? A.ReadAloud.auto(bat().P, q) : q.say, { kind: q.listen ? 'listen' : 'prompt' }), wait(6000)]).then(function () { if (G.pitchN === my && !G.voiceDone) { G.voiceDone = true; G.qT0 = Date.now(); } });
@@ -846,18 +938,18 @@
     if (UI.cardOpen || A.Parent.isOpen() || A.$('#gate') || A.$('.overlay.on')) return;
     var k = e.key;
     if (k === 'm' || k === 'M') { M.toggle(); musicBtn(); return; }
-    if (k === 'r' || k === 'R') { if (G.q) V.say(G.q.say, { kind: 'tap' }); return; }
+    if (k === 'r' || k === 'R') { if (G.q) { var parts = G.phase === 'pass-read' ? (G.q.sayPass || G.q.say) : (G.q.sayAuto || G.q.say); V.say(parts, { kind: 'tap', bubble: false }); } return; }
     if (k === 'Escape') { e.preventDefault(); UI.confirm({ title: 'Stop this game?', sub: 'You can play again any time.', yes: 'Stop', no: 'Keep playing' }).then(function (y) { if (y) { V.stop(); M.stop(); location.href = STORYB ? MAPURL : 'index.html'; } }); return; }
     if (!G.q || !G.accept) { if (k === ' ' || k === 'Enter') e.preventDefault(); return; }
     var n = G.q.choices.length;
     if (/^[1-4]$/.test(k) && +k <= n) { e.preventDefault(); G.sel = +k - 1; markSel(); answer(G.sel, 'key'); return; }
-    if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'a' || k === 'A' || k === 'w' || k === 'W') { e.preventDefault(); G.sel = (G.sel + n - 1) % n; markSel(true); SFX.step(); return; }
-    if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'd' || k === 'D' || k === 's' || k === 'S') { e.preventDefault(); G.sel = (G.sel + 1) % n; markSel(true); SFX.step(); return; }
-    if (k === ' ' || k === 'Enter' || k === 'f' || k === 'F') { e.preventDefault(); if (!e.repeat) answer(G.sel, 'key'); }
+    if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'a' || k === 'A' || k === 'w' || k === 'W') { e.preventDefault(); G.sel = G.sel < 0 ? n - 1 : (G.sel + n - 1) % n; markSel(true); SFX.step(); return; }
+    if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'd' || k === 'D' || k === 's' || k === 'S') { e.preventDefault(); G.sel = G.sel < 0 ? 0 : (G.sel + 1) % n; markSel(true); SFX.step(); return; }
+    if (k === ' ' || k === 'Enter' || k === 'f' || k === 'F') { e.preventDefault(); if (!e.repeat && G.sel >= 0) answer(G.sel, 'key'); }
   });
   function musicBtn() { var b = $('#musicBtn'); b.classList.toggle('off', S.music === false); b.setAttribute('aria-label', S.music === false ? 'Music is off (M)' : 'Music is on (M)'); }
   $('#musicBtn').addEventListener('click', function () { M.toggle(); musicBtn(); });
-  $('#speakBtn').addEventListener('click', function () { if (G.q) V.say(G.q.say, { kind: 'tap' }); });
+  $('#speakBtn').addEventListener('click', function () { if (!G.q) return; var parts = G.phase === 'pass-read' ? (G.q.sayPass || G.q.say) : (G.q.sayAuto || G.q.say); V.say(parts, { kind: 'tap', bubble: false }); });
   $('#homeBtn').addEventListener('click', function () { V.stop(); M.stop(); SFX.tap(); A.Store.save(); location.href = STORYB ? MAPURL : A.ROOT + 'index.html#games'; });
   UI.gear({ onClose: function () { musicBtn(); M.apply(); } });
   musicBtn();
@@ -878,6 +970,10 @@
     answer: answer, right: function () { return G.q ? G.q.answer : -1; }, wrongIdx: function () { return G.q ? (G.q.answer + 1) % G.q.choices.length : -1; },
     setElapsed: function (sec) { G.voiceDone = true; G.qT0 = Date.now() - sec * 1000; },
     ready: function () { return !!(G.phase === 'pitch' && G.q && G.accept && !G.busy); },
+    passReading: function () { return G.phase === 'pass-read' && !!(G.q && G.q.passage); },
+    enterPassageAsk: function () { if (G.q && G.q.passage) enterPassageAsk(G.q); },
+    enterPassageRead: function () { if (G.q && G.q.passage) enterPassageRead(G.q, true); },
+    fitCards: fitCards,
     set speed(v) { SPEED = v; }, get speed() { return SPEED; },
     scoreQ: scoreQuestion, sbPic: sbPic, runQ: runQuestion,   // v2p1a test hooks (+ quality1: runQ for the base-running picture)
     total: totalRuns, endGame: endGame, R: R, RIV: RIV, rival: RIVALON, maxOuts: maxOuts, mercy: mercy, isBonus: function () { return !!(G.q && G.q.bonus); }, whereChoices: function (from) { return whereChoices(from).map(function (x) { return x === 4 ? 'Home 🏠' : BASEN[x]; }); }, story: STORYB ? { stop: SI, cfg: SC, end: endStory } : null, bases: function () { return G.bases.map(Boolean); }
@@ -894,6 +990,6 @@
     sub: INNINGS + ' innings · ' + R.outsFor(LITTLE) + ' outs (or ' + R.mercyFor(LITTLE) + ' runs) each inning', btn: 'Play ball! ▶', voice: ['bb_title'], cls: 'bbintro', minMs: 500 }); }).then(startHalf);
   // design1: keep the friend's speech bubble above the answer cards in landscape (baseball.css uses --bbCardsTop)
   (function () { var cs = document.getElementById('cards'); if (!cs) return;
-    function upd() { var t = cs.getBoundingClientRect().top; if (t > 0) document.documentElement.style.setProperty('--bbCardsTop', Math.round(t) + 'px'); }
+    function upd() { var t = cs.getBoundingClientRect().top; if (t > 0) document.documentElement.style.setProperty('--bbCardsTop', Math.round(t) + 'px'); } fitCards();
     upd(); window.addEventListener('resize', upd); if (window.ResizeObserver) new ResizeObserver(upd).observe(cs); setInterval(upd, 1000); })();
 })(window.Arcade);

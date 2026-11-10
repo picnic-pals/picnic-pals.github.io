@@ -108,6 +108,112 @@
     line: function (a, b, op) { var tens = Math.floor(b / 10) * 10, ones = b % 10, mid = op === '+' ? a + tens : a - tens, sign = op === '+' ? '+' : '−';
       return '<svg class="pv100-line" viewBox="0 0 320 100" role="img" aria-label="Start at ' + a + ', jump ' + sign + tens + ', then ' + sign + ones + '. Find the endpoint."><path d="M15 78H305 M25 78Q85 0 155 78 M155 78Q220 20 295 78" fill="none" stroke="#476e9b" stroke-width="3"/><g font-size="17" text-anchor="middle" fill="#263f5e"><text x="25" y="98">' + a + '</text><text x="155" y="98">' + mid + '</text><text x="295" y="98">?</text><text x="85" y="30">' + sign + tens + '</text><text x="225" y="43">' + sign + ones + '</text></g></svg>'; }
   };
+  /* qtime: hand-drawn analog clock faces (SVG). Hour hand moves with minutes (half-hour sits halfway). */
+  A.Clock = {
+    fmt: function (h, m) { return (h || 12) + ':' + (m < 10 ? '0' : '') + m; },
+    face: function (h, m, opt) {
+      opt = opt || {}; h = ((h - 1 + 12) % 12) + 1; m = ((m % 60) + 60) % 60;
+      var ha = (h % 12) * 30 + m * 0.5, ma = m * 6, sz = opt.small ? 120 : 180;
+      var nums = '', i, a, x, y;
+      for (i = 1; i <= 12; i++) {
+        a = (i * 30 - 90) * Math.PI / 180; x = 100 + Math.cos(a) * 72; y = 100 + Math.sin(a) * 72;
+        nums += '<text x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" text-anchor="middle" dominant-baseline="middle">' + i + '</text>';
+      }
+      function hand(deg, len, cls, w) {
+        var rad = (deg - 90) * Math.PI / 180, x2 = 100 + Math.cos(rad) * len, y2 = 100 + Math.sin(rad) * len;
+        return '<line class="' + cls + '" x1="100" y1="100" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke-width="' + w + '" stroke-linecap="round"/>';
+      }
+      // numbers sit at r≈72; minute hand stops just inside them; hour hand is clearly shorter + thicker
+      var label = A.Clock.fmt(h, m);
+      return '<svg class="qclock' + (opt.small ? ' sm' : '') + '" viewBox="0 0 200 200" width="' + sz + '" height="' + sz + '" role="img" aria-label="Clock showing ' + label + '">' +
+        '<circle class="qc-face" cx="100" cy="100" r="92"/><circle class="qc-rim" cx="100" cy="100" r="92" fill="none"/>' +
+        nums + hand(ma, 58, 'qc-min', 3.5) + hand(ha, 34, 'qc-hour', 9) +
+        '<circle class="qc-hub" cx="100" cy="100" r="6"/></svg>';
+    }
+  };
+  /* qcoins: original flat SVG US coins (value on the face; never emoji). Size cue: dime < penny < nickel < quarter. */
+  A.Coins = {
+    META: {
+      penny:   { v: 1,  name: 'penny',   names: 'pennies',   fill: '#d4925a', stroke: '#a86a3a', r: 30, label: '1¢' },
+      nickel:  { v: 5,  name: 'nickel',  names: 'nickels',  fill: '#c5cdd6', stroke: '#7a8490', r: 34, label: '5¢' },
+      dime:    { v: 10, name: 'dime',    names: 'dimes',    fill: '#d5dde6', stroke: '#6e7884', r: 24, label: '10¢' },
+      quarter: { v: 25, name: 'quarter', names: 'quarters', fill: '#cfd7e0', stroke: '#5f6974', r: 42, label: '25¢' }
+    },
+    ORDER: ['quarter', 'dime', 'nickel', 'penny'],
+    cents: function (bag) {
+      var t = 0, k; bag = bag || {};
+      for (k in bag) if (this.META[k]) t += this.META[k].v * (bag[k] | 0);
+      return t;
+    },
+    fmt: function (n) { return (n | 0) + '¢'; },
+    one: function (id, opt) {
+      opt = opt || {}; var m = this.META[id]; if (!m) return '';
+      var r = m.r, pad = 8, s = (r + pad) * 2, cx = r + pad, cy = r + pad;
+      var fs = id === 'dime' ? 11 : id === 'penny' ? 13 : id === 'nickel' ? 14 : 16;
+      return '<svg class="qcoin qcoin-' + id + (opt.small ? ' sm' : '') + '" viewBox="0 0 ' + s + ' ' + s + '" width="' + (opt.small ? Math.round(s * .72) : s) + '" height="' + (opt.small ? Math.round(s * .72) : s) + '" role="img" aria-label="' + m.name + ', ' + m.label + '">' +
+        '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + m.fill + '" stroke="' + m.stroke + '" stroke-width="3"/>' +
+        '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r - 5) + '" fill="none" stroke="' + m.stroke + '" stroke-width="1.5" opacity=".45"/>' +
+        '<text x="' + cx + '" y="' + cy + '" text-anchor="middle" dominant-baseline="middle" font-size="' + fs + '" font-weight="800" fill="#3b2a5a" font-family="system-ui,sans-serif">' + m.label + '</text></svg>';
+    },
+    bag: function (counts, opt) {
+      opt = opt || {}; counts = counts || {};
+      var parts = [], i, n, say = [], total = 0, many = 0;
+      this.ORDER.forEach(function (id) { n = counts[id] | 0; if (n) { many += n; total += A.Coins.META[id].v * n; } });
+      var small = !!opt.small || many > 5;
+      this.ORDER.forEach(function (id) {
+        n = counts[id] | 0; if (!n) return;
+        var m = A.Coins.META[id];
+        say.push(n + ' ' + (n === 1 ? m.name : m.names));
+        for (i = 0; i < n; i++) parts.push(A.Coins.one(id, { small: small }));
+      });
+      return '<span class="qcoins' + (small ? ' sm' : '') + '" role="img" aria-label="' + say.join(', ') + '">' + parts.join('') + '</span>';
+    }
+  };
+
+  /* qarrays: neat rectangular arrays (2.OA.C.4). Kawaii food pics or Picnic Pals dots — never emoji. */
+  A.Arrays = {
+    COLORS: ['#ff7aa6', '#5aa9f0', '#4fc47e', '#ffb347', '#a77bff', '#ff6b8b'],
+    FOODS: [
+      { id: 'berry', file: 'strawberry-pip.png', one: 'strawberry', many: 'strawberries' },
+      { id: 'lemon', file: 'lemon-pip.png', one: 'lemon', many: 'lemons' },
+      { id: 'muffin', file: 'muffin.png', one: 'muffin', many: 'muffins' }
+    ],
+    pickFood: function (seed) {
+      var i = ((seed | 0) % this.FOODS.length + this.FOODS.length) % this.FOODS.length;
+      return this.FOODS[i];
+    },
+    foodSrc: function (food) {
+      return (A.ROOT || '') + 'art/food-fight/' + food.file;
+    },
+    addSentence: function (rows, cols) {
+      var parts = [], i; for (i = 0; i < rows; i++) parts.push(String(cols));
+      return parts.join(' + ');
+    },
+    face: function (rows, cols, opt) {
+      opt = opt || {};
+      rows = Math.max(1, Math.min(5, rows | 0)); cols = Math.max(1, Math.min(5, cols | 0));
+      var useFood = opt.food !== false && opt.dots !== true;
+      var food = opt.foodObj || (useFood ? this.pickFood(opt.seed != null ? opt.seed : rows * 11 + cols) : null);
+      var cell = opt.small ? (useFood ? 26 : 22) : (useFood ? 34 : 28);
+      var gap = opt.small ? 8 : 10, pad = opt.small ? 10 : 14;
+      var w = pad * 2 + cols * cell + (cols - 1) * gap, h = pad * 2 + rows * cell + (rows - 1) * gap;
+      var fill = opt.color || this.COLORS[(rows * 7 + cols) % this.COLORS.length];
+      var cells = '', r, c, cx, cy, x, y, rad = cell * 0.38, src = food ? this.foodSrc(food) : '';
+      var label = rows + ' rows of ' + cols + (food ? ' ' + food.many : '');
+      for (r = 0; r < rows; r++) for (c = 0; c < cols; c++) {
+        cx = pad + c * (cell + gap) + cell / 2; cy = pad + r * (cell + gap) + cell / 2;
+        if (food) {
+          x = (cx - cell * 0.42).toFixed(1); y = (cy - cell * 0.42).toFixed(1);
+          cells += '<image class="qa-food" href="' + src + '" x="' + x + '" y="' + y + '" width="' + (cell * 0.84).toFixed(1) + '" height="' + (cell * 0.84).toFixed(1) + '"/>';
+        } else {
+          cells += '<circle class="qa-dot" cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + rad.toFixed(1) + '" fill="' + fill + '"/>';
+        }
+      }
+      return '<svg class="qarray' + (opt.small ? ' sm' : '') + (food ? ' food' : '') + '" viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '" role="img" aria-label="' + label + '">' +
+        '<rect class="qa-bg" x="0" y="0" width="' + w + '" height="' + h + '" rx="12" ry="12"/>' + cells + '</svg>';
+    }
+  };
+
   A.QVariants = VAR;
 
   Object.keys(ASK).forEach(function (id) { if (C.byId[id] && !C.byId[id].ask) C.byId[id].ask = ASK[id]; });
