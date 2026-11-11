@@ -105,9 +105,14 @@
     return A.shuffle(out.slice());
   }
 
+  function allPass() {
+    var list = PASSAGES.slice();
+    if (A.PassagesE2 && A.PassagesE2.isLive && A.PassagesE2.isLive() && A.PassagesE2.ALL) list = list.concat(A.PassagesE2.ALL);
+    return list;
+  }
   function pickPassage(p) {
-    var st = state(p), recent = st.recent || [], pool = PASSAGES.filter(function (x) { return recent.indexOf(x.id) < 0; });
-    if (!pool.length) { st.recent = []; pool = PASSAGES.slice(); }
+    var st = state(p), recent = st.recent || [], pool = allPass().filter(function (x) { return recent.indexOf(x.id) < 0; });
+    if (!pool.length) { st.recent = []; pool = allPass().slice(); }
     var pass = pool[A.rnd(0, pool.length - 1)];
     st.recent.push(pass.id); if (st.recent.length > RECENT_MAX) st.recent.shift();
     st.cur = { id: pass.id, qs: pickQs(pass).map(function (q) { return pass.questions.indexOf(q); }), i: 0 };
@@ -117,7 +122,7 @@
   function current(p) {
     var st = state(p), pass, qi;
     if (st.cur && st.cur.i < (st.cur.qs || []).length) {
-      pass = PASSAGES.filter(function (x) { return x.id === st.cur.id; })[0];
+      pass = allPass().filter(function (x) { return x.id === st.cur.id; })[0];
       if (pass) { qi = st.cur.qs[st.cur.i]; return { pass: pass, q: pass.questions[qi], qi: qi, n: st.cur.qs.length, step: st.cur.i }; }
     }
     pass = pickPassage(p);
@@ -181,6 +186,11 @@
   A.Passages = {
     ALL: PASSAGES, RECENT_MAX: RECENT_MAX, heroName: heroName, fillHero: fillHero,
     ask: askOne, gen: genBoard, state: state, current: current, renderPass: renderPass,
-    byId: function (id) { return PASSAGES.filter(function (p) { return p.id === id; })[0] || null; }
+    all: allPass,
+    byId: function (id) {
+      var hit = allPass().filter(function (p) { return p.id === id; })[0];
+      if (hit) return hit;
+      return (A.PassagesE2 && A.PassagesE2.byId) ? A.PassagesE2.byId(id) : null;
+    }
   };
 })(window.Arcade);

@@ -31,7 +31,7 @@
   function sound(k) { if (A.Store.settings && A.Store.settings.sfx === false) return; (SOUNDS[k] || SOUNDS.pop)(); A.StoryMap2.lastSound = k; }
 
   function build() {
-    root = A.el('<section class="s2" id="s2map" aria-label="Story map"><div class="s2-top"><button class="s2-back" id="s2Back" aria-label="Back">Back</button>' +
+    root = A.el('<section class="s2" id="s2map" aria-label="Story map"><div class="s2-top"><button class="s2-back" id="s2Back" aria-label="Back">←</button>' +
       '<div class="s2-title" id="s2Title"></div><button class="s2-book" id="s2Book" aria-label="Read the story book">Book</button><button class="q1help" id="s2Help" aria-label="How to play" title="How to play">?</button>' +
       '<button class="s2-hero" id="s2Hero" aria-label="Switch friend"><img alt=""><span class="nm"></span><span class="sw"><i>F</i> <b>Friend</b></span></button></div>' +
       '<div class="s2-stage" id="s2Stage"></div></section>');
@@ -80,7 +80,7 @@
     L.forEach(function (i, j) {
       var boss = S2.isBoss(i), ok = S2.playable(P, i), pass = S2.passed(P, i), r = ST.stopInfo(P, i) || {}, g = ST.gameOf(P, i), gi = ST.GAMES[g] ? ST.GAMES[g].icon : '';
       var b = A.el('<button class="s2-lv' + (boss ? ' boss' : '') + (i === cur ? ' cur' : '') + (pass ? ' pass' : '') + (ok ? '' : ' off') + '" data-i="' + i + '" style="' + LX(xy[j][0]) + ';top:' + xy[j][1] + '%"' + (ok ? '' : ' aria-disabled="true"') + (pass && ok ? ' aria-label="Play again"' : '') + '>' +
-        '<span class="n">' + (boss ? '👑' : (j + 1)) + '</span>' + (ok && !boss ? '<span class="g">' + gi + '</span>' : '') + (pass ? '<span class="st">' + '⭐'.repeat(Math.max(1, Math.min(3, r.stars || 1))) + '</span>' : '') +
+        '<span class="n">' + (boss ? (A.Icons ? A.Icons.html('👑', { size: 32, decorative: true, cls: 'pp-pic', slot: 'story2:boss:' + i }) : '👑') : (j + 1)) + '</span>' + (ok && !boss ? '<span class="g">' + gi + '</span>' : '') + (pass ? '<span class="st">' + '⭐'.repeat(Math.max(1, Math.min(3, r.stars || 1))) + '</span>' : '') +
         (boss ? '<span class="bl">Mini boss</span>' : '') + (pass && ok ? '<span class="rp" aria-hidden="true">↻</span>' : '') + '</button>');
       b.addEventListener('click', function () { if (busy) return; if (!ok) { sound('pop'); b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); return; } choose(i); });
       stg.appendChild(b);

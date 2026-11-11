@@ -9,13 +9,17 @@
   function img(src, cls) { return '<img class="' + (cls || '') + '" src="' + src + '" alt="" draggable="false">'; }
   function pip(suit) { return img(ART + suit + '-pip.png'); }
   // Familiar mirrored playing-card positions; corners show numerals only so kids count center pips.
-  var layouts = { 1:[[50,50]], 2:[[50,18],[50,82]], 3:[[50,18],[50,50],[50,82]],
-    4:[[26,18],[74,18],[26,82],[74,82]], 5:[[26,18],[74,18],[50,50],[26,82],[74,82]],
-    6:[[26,18],[74,18],[26,50],[74,50],[26,82],[74,82]],
-    7:[[26,18],[74,18],[50,34],[26,50],[74,50],[26,82],[74,82]],
-    8:[[26,18],[74,18],[50,34],[26,50],[74,50],[50,66],[26,82],[74,82]],
-    9:[[26,12],[74,12],[26,37],[74,37],[50,50],[26,63],[74,63],[26,88],[74,88]],
-    10:[[26,12],[74,12],[50,25],[26,37],[74,37],[26,63],[74,63],[50,75],[26,88],[74,88]] };
+  /* 1-5: dice / five-frame style. 6-10: one ten-frame (top row of 5, then the rest), never loose scatter. */
+  function pipLayout(n) {
+    var i, r, c, out = [];
+    if (n <= 5) {
+      var dice = { 1:[[50,50]], 2:[[26,18],[74,82]], 3:[[26,18],[50,50],[74,82]], 4:[[26,18],[74,18],[26,82],[74,82]], 5:[[26,18],[74,18],[50,50],[26,82],[74,82]] };
+      return dice[n] || dice[1];
+    }
+    for (i = 0; i < n && i < 10; i++) { r = i < 5 ? 0 : 1; c = i % 5; out.push([18 + c * 16, 28 + r * 40]); }
+    return out;
+  }
+  var layouts = {}; for (var n = 1; n <= 10; n++) layouts[n] = pipLayout(n);
   function card(c, side, glow, wild) {
     var suit = side ? 'strawberry' : 'lemon', label = c.label || String(c.value), solve = label !== String(c.value);
     var h = '<button class="ff-card ' + (glow ? 'ff-glow ' : '') + (wild ? 'ff-wild ' : '') + '" data-side="' + side + '" aria-label="' + (side ? 'Your' : 'Sunny’s') + ' card: ' + (wild ? 'Picnic Basket wild' : A.esc(label)) + '"' + (example || G.phase !== 'choose' ? ' disabled' : '') + '>';
@@ -98,11 +102,34 @@
   function confetti() {
     var el = A.el('<span class="ff-confetti" aria-hidden="true">' + Array.from({ length: 16 }, function (_, i) { return '<i style="left:' + (i * 6) + '%;--r:' + (i % 2 ? 25 : -30) + 'deg;--c:' + ['#e87699','#74b99c','#eac74c'][i % 3] + '"></i>'; }).join('') + '</span>'); $('.ff-table').appendChild(el); setTimeout(function () { el.remove(); }, 1300);
   }
-  function saveMatch() { if (!saved) { stats.matches++; stats.best = Math.max(stats.best, G.score[1]); A.Store.save(); saved = true; } }
+  function saveMatch() {
+    if (saved) return;
+    stats.matches++;
+    stats.best = Math.max(stats.best, G.score[1]);
+    stats.correct = Math.max(stats.correct || 0, G.correctN || 0);
+    var stars = F.matchStars(G);
+    stats.lastStars = stars;
+    if (stars) A.Store.earnStars(P, stars, 'foodfight');
+    A.Store.save();
+    saved = true;
+    return stars;
+  }
   function results() {
-    saveMatch();
+    var stars = saveMatch();
+    if (stars == null) stars = F.matchStars(G);
     A.Audio.sfx('win');
-    $('#ffContent').innerHTML = '<div class="ff-results">' + img(A.ROOT + 'assets/picnic/friends/lemon/cheering_256.webp') + '<h2>What a food fight!</h2><p>Ten flips. A picnic full of splats.</p><div class="ff-result-scores"><span>You<b>' + G.score[1] + '</b>cards won</span><span>Sunny<b>' + G.score[0] + '</b>cards won</span></div><p>Thanks for playing together!</p><button class="ff-action" id="playAgain">Play again</button><button class="ff-secondary" id="resultsHome">Home</button></div>';
+    var judged = G.judged || 0, right = G.correctN || 0;
+    var ruleWord = 'MORE/LESS';
+    var spot = judged ? ('You spotted ' + ruleWord + ' on ' + right + ' of ' + judged + ' flips.') : 'Ten flips. A picnic full of splats.';
+    var starLine = stars > 0
+      ? ('You earned ' + stars + (stars === 1 ? ' star' : ' stars') + '.')
+      : 'Nice picnic. Want to try more and less again?';
+    $('#ffContent').innerHTML = '<div class="ff-results">' + img(A.ROOT + 'assets/picnic/friends/lemon/cheering_256.webp') +
+      '<h2>What a food fight!</h2><p>' + A.esc(spot) + '</p>' +
+      '<div class="ff-result-scores"><span>You spotted<b>' + right + '</b>of ' + judged + '</span>' +
+      '<span>You<b>' + G.score[1] + '</b>cards won</span><span>Sunny<b>' + G.score[0] + '</b>cards won</span></div>' +
+      '<p>' + A.esc(starLine) + ' Thanks for playing together!</p>' +
+      '<button class="ff-action" id="playAgain">Play again</button><button class="ff-secondary" id="resultsHome">Home</button></div>';
     $('#playAgain').onclick = function () { G = F.newMatch(P); window.__foodfight.G = G; saved = false; firstSpoken = false; next(); }; $('#resultsHome').onclick = home;
   }
   function home() { A.Voice.stop(); A.Store.save(); location.href = A.ROOT + 'index.html?from=game#games'; }

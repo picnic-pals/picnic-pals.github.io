@@ -1,0 +1,1093 @@
+/* Snack Racers: portrait race, solid cream question cards, food-built cars. */
+body {
+  color: #3a2714;
+  background-color: #e8f4c8;
+  background-image: url("../../art/backgrounds/home_1920x1080.jpg");
+  background-image: image-set(
+    url("../../art/backgrounds/home_1920x1080.webp") type("image/webp"),
+    url("../../art/backgrounds/home_1920x1080.jpg") type("image/jpeg")
+  );
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+@media (min-width: 700px), (min-resolution: 2dppx) and (min-width: 400px) {
+  body {
+    background-image: url("../../art/backgrounds/home_2560x1440.jpg");
+    background-image: image-set(
+      url("../../art/backgrounds/home_2560x1440.webp") type("image/webp"),
+      url("../../art/backgrounds/home_2560x1440.jpg") type("image/jpeg")
+    );
+  }
+}
+body.track-candy {
+  background-color: #f8d5e6;
+  background-image: linear-gradient(180deg, #fde8f1 0%, #f8d0e2 48%, #f4c8d6 100%);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+body.track-pizza {
+  background-color: #f3d2a8;
+  background-image: linear-gradient(180deg, #f8e4b8 0%, #f0cc8c 55%, #e8b878 100%);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+body::before, body::after { display: none !important; content: none !important; }
+
+#racers {
+  width: min(100%, 680px);
+  height: 100vh; height: 100dvh;
+  max-height: 1100px;
+  margin: auto;
+  padding: 8px 12px 12px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
+.sr-header {
+  display: flex; align-items: center; gap: 8px; min-height: 48px; flex-shrink: 0;
+}
+.sr-header h1 {
+  font-size: clamp(20px, 4.4vw, 28px); margin: 0; flex: 1; text-align: center;
+  color: #3a2714;
+  background: #fff6dc;
+  border: 2px solid #e4d2a4;
+  border-radius: 14px;
+  padding: 4px 8px;
+  line-height: 1.15;
+}
+.sr-header button, .sr-coins {
+  min-width: 60px; min-height: 60px; border-radius: 15px;
+  background: #fff6dc; border: 2px solid #e4d2a4; font-size: 16px; font-weight: 700; color: #3a2714;
+  display: flex; align-items: center; justify-content: center; padding: 0 8px; flex-shrink: 0;
+}
+.sr-header button .pp-icon, .sr-header button .pp-emoji { width: 28px; height: 28px; }
+.sr-coins { gap: 4px; font-size: 18px; padding: 0 10px; }
+.sr-coins .pp-icon { width: 22px; height: 22px; }
+
+#srContent { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+
+.sr-menu, .sr-garage, .sr-podium {
+  flex: 1; min-height: 0; overflow: auto;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.sr-card, .sr-panel {
+  background: #fff6dc;
+  color: #2a1b0c;
+  border: 3px solid #5a3d1c;
+  border-radius: 18px;
+  padding: 12px;
+  box-shadow: 0 3px 0 #c9b17a, 0 8px 16px #0002;
+}
+.sr-lead { margin: 0; font-size: 22px; font-weight: 700; line-height: 1.3; color: #2a1b0c; }
+.sr-sub { margin: 4px 0 0; font-size: 16px; font-weight: 600; color: #5a3d1c; }
+
+.sr-actions { display: flex; flex-direction: column; gap: 8px; }
+.sr-btn, .sr-action, .sr-secondary {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  border-radius: 17px; padding: 10px 18px; min-height: 48px;
+  font-size: 22px; font-weight: 700; width: 100%;
+  background: #b9ded1; color: #244038; border: 2px solid #87b9a6; box-shadow: 0 3px #87b9a6;
+  cursor: pointer;
+}
+.sr-secondary { background: #fff1cd; border-color: #dfc68f; box-shadow: 0 3px #dfc68f; color: #3a2714; }
+.sr-btn.lock, .sr-btn:disabled { opacity: 0.7; cursor: default; }
+.sr-btn .pp-icon { width: 32px; height: 32px; flex-shrink: 0; }
+
+.sr-preview {
+  display: flex; align-items: flex-end; justify-content: center;
+  min-height: 200px; padding: 8px 8px 0;
+  overflow: visible;
+  background-color: #c8b089;
+  background-image: url("../../art/racers/env/bg_garage_v1.png");
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+.sr-garage .sr-preview, .sr-menu .sr-preview { min-height: 220px; padding-top: 12px; }
+.sr-preview .sr-kart { margin-bottom: calc(var(--sz) * -0.14); }
+
+/* Layered 512-canvas kart. Anchors are percentages of the 512 canvas. */
+.sr-kart {
+  --sz: 240px;
+  --mx: 113;
+  --my: 195;
+  --fx: 108;
+  --fy: 198;
+  --sx: 300;
+  --sy: 220;
+  position: relative;
+  width: var(--sz);
+  height: var(--sz);
+  flex-shrink: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 6px rgba(40, 24, 8, 0.32));
+}
+.sr-preview .sr-kart { --sz: 280px; width: var(--sz); height: var(--sz); }
+.sr-kart.sm { --sz: 200px; width: var(--sz); height: var(--sz); }
+.sr-kart.pod { width: 100%; height: auto; aspect-ratio: 1; --sz: 100%; }
+
+.sr-k-wheel {
+  position: absolute;
+  width: 30%;
+  height: 30%;
+  z-index: 1;
+}
+.sr-k-wheel.back {
+  left: calc(152 / 512 * 100% - 15%);
+  top: calc(348 / 512 * 100% - 15%);
+}
+.sr-k-wheel.front {
+  left: calc(372 / 512 * 100% - 15%);
+  top: calc(348 / 512 * 100% - 15%);
+  z-index: 2;
+}
+.sr-k-wheel img {
+  width: 100%; height: 100%;
+  display: block;
+  transform-origin: 50% 50%;
+  object-fit: fill;
+}
+.sr-k-body, .sr-k-front, .sr-k-spoiler {
+  position: absolute; left: 0; top: 0;
+  width: 100%; height: 100%;
+  object-fit: fill;
+  display: block;
+  pointer-events: none;
+}
+.sr-k-body { z-index: 3; }
+.sr-k-driver {
+  position: absolute;
+  left: calc(var(--sx) / 512 * 100%);
+  top: calc(var(--sy) / 512 * 100%);
+  width: 30%;
+  height: 30%;
+  transform: translate(-50%, -82%);
+  z-index: 4;
+}
+.sr-k-driver img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.sr-k-front { z-index: 5; }
+.sr-k-sticker {
+  position: absolute;
+  left: 28%; top: 38%;
+  width: 16%; height: 16%;
+  z-index: 5;
+}
+.sr-k-sticker .pp-icon, .sr-k-sticker .pp-emoji { width: 100%; height: 100%; object-fit: contain; }
+.sr-k-spoiler {
+  z-index: 6;
+  left: calc((var(--mx) - var(--fx)) / 512 * 100%);
+  top: calc((var(--my) - var(--fy)) / 512 * 100%);
+}
+@keyframes sr-wheel-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.sr-kart.rolling .sr-k-wheel img { animation: sr-wheel-spin 0.7s linear infinite; }
+.sr-kart.boosting .sr-k-wheel img { animation: sr-wheel-spin 0.28s linear infinite; }
+
+.sr-kart.trail-crumbs::after, .sr-kart.trail-sparkle::after {
+  content: ""; position: absolute; right: 100%; top: 62%; width: 40px; height: 12px;
+  background: radial-gradient(circle, #c48a38 2px, transparent 3px);
+  background-size: 8px 8px; opacity: 0.8;
+  z-index: 0;
+}
+.sr-kart.trail-sparkle::after {
+  background: radial-gradient(circle, #ffe144 2px, transparent 3px);
+}
+
+.sr-thumb {
+  width: 64px; height: 64px;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+.sr-thumb-wheels { width: 52px; height: 52px; }
+
+.sr-shop { display: flex; flex-direction: column; gap: 10px; }
+.sr-sec h2 {
+  margin: 0 0 6px; font-size: 18px; font-weight: 800; color: #5a3d1c;
+}
+.sr-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.sr-part {
+  width: auto; min-width: 0; min-height: 88px;
+  border: 2px solid #c9a24a; border-radius: 16px; background: #fff;
+  padding: 6px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  box-shadow: 0 3px 0 #e4d2a4;
+  color: #2a1b0c; font-size: 13px; font-weight: 700; text-align: center;
+}
+.sr-part .pp-icon, .sr-part .pp-emoji { width: 48px; height: 48px; object-fit: contain; }
+.sr-part.on { box-shadow: 0 0 0 3px #6dae58, 0 3px 0 #e4d2a4; border-color: #6dae58; }
+.sr-part.lock { opacity: 0.95; }
+.sr-part .sr-cost { font-size: 13px; color: #5a3d1c; }
+.sr-part:focus-visible { outline: 3px solid #328497; outline-offset: 2px; }
+
+/* Race layout */
+.sr-race { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+.sr-pips {
+  display: flex; gap: 4px; justify-content: center; flex-shrink: 0;
+}
+.sr-pips i {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #ead9b0; border: 2px solid #c9a24a;
+}
+.sr-pips i.on { background: #7cbc62; border-color: #5a9a44; }
+.sr-pips i.ok { background: #7cbc62; border-color: #5a9a44; }
+.sr-pips i.no { background: #e0c48a; border-color: #c9a24a; }
+
+/* Progress toward the finish */
+.sr-progress {
+  flex-shrink: 0;
+  background: #fff6dc;
+  border: 2px solid #e4d2a4;
+  border-radius: 12px;
+  padding: 4px 8px 5px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.sr-prog-row {
+  display: flex; align-items: center; gap: 6px;
+}
+.sr-prog-row img, .sr-prog-row .sr-sil {
+  width: 22px; height: 22px; object-fit: contain; flex-shrink: 0;
+}
+.sr-prog-track {
+  position: relative; flex: 1; height: 10px;
+  background: #e8d5a8;
+  border: 2px solid #c9a24a;
+  border-radius: 999px;
+  overflow: visible;
+}
+.sr-prog-track i {
+  position: absolute; top: 50%; width: 14px; height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: #3a2714;
+  border: 2px solid #fff6dc;
+  box-shadow: 0 1px 2px #0004;
+}
+.sr-prog-row.me .sr-prog-track i { background: #2f7d46; }
+.sr-prog-row.opp .sr-prog-track i { background: #c45a3a; }
+.sr-prog-flag { width: 20px; height: 20px; flex-shrink: 0; }
+.sr-prog-flag .pp-icon, .sr-prog-flag .pp-emoji { width: 20px; height: 20px; }
+
+/* Locked track art, cropped into a shorter race panel. */
+.sr-track {
+  position: relative;
+  --ts: 1;
+  --crop: 232;
+  flex: 0 0 280px;
+  height: 280px;
+  min-height: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 3px solid #5a3d1c;
+  background: #cfe8ff;
+}
+.sr-track.candy { background: #f8d5e6; }
+.sr-track.pizza { background: #f3c56a; }
+.sr-stage {
+  position: absolute;
+  left: 0;
+  top: calc(-1 * var(--crop) * var(--ts) * 1px);
+  width: 100%;
+  height: calc(512 * var(--ts) * 1px);
+  pointer-events: none;
+  isolation: isolate;
+}
+.sr-par {
+  position: absolute;
+  left: 0; top: 0;
+  width: 250%;
+  height: 100%;
+  pointer-events: none;
+  will-change: transform;
+  transition: transform 0.55s ease-out;
+}
+.sr-par-sky { z-index: 0; }
+.sr-par-far { z-index: 1; }
+.sr-par-mid { z-index: 2; }
+.sr-par-road { z-index: 3; pointer-events: none; }
+.sr-par-near { z-index: 6; }
+.sr-par-art {
+  position: absolute;
+  left: 0; top: 0;
+  height: 100%;
+  width: calc(3640 * var(--ts) * 2 * 1px);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+.sr-par-art img {
+  width: calc(3640 * var(--ts) * 1px);
+  height: 100%;
+  display: block;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.sr-par-actors { z-index: 7; overflow: visible; }
+.sr-world {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 250%;
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+  transition: transform 0.55s ease-out;
+  z-index: 3;
+}
+.sr-far, .sr-mid {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 250%;
+  pointer-events: none;
+  will-change: transform;
+  transition: transform 0.55s ease-out;
+}
+.sr-far { z-index: 0; }
+.sr-mid { z-index: 1; }
+.sr-world { z-index: 2; }
+.sr-world .sr-scenery-strip { width: 100%; }
+.sr-horizon-spacer {
+  flex: 0 0 30%;
+  min-height: 56px;
+  pointer-events: none;
+}
+
+/* Soft sky, distant hills, slow clouds — calm so karts stay the focus */
+.sr-sky-wash {
+  position: absolute; left: 0; right: 0; top: 0; height: 42%;
+  background: linear-gradient(#b8dff6 0%, #d4eefc 38%, #eaf6d0 72%, #d4e89a 100%);
+}
+.sr-track.candy .sr-sky-wash {
+  background: linear-gradient(#f8d5e6 0%, #fde6f0 40%, #f7d5e2 72%, #f0c0d4 100%);
+}
+.sr-track.pizza .sr-sky-wash {
+  background: linear-gradient(#f8e3c0 0%, #f8e8d0 40%, #f0d4a8 72%, #e8c48a 100%);
+}
+.sr-sun {
+  position: absolute; left: 30%; top: 4%;
+  width: 72px; height: 72px;
+  opacity: 0.9;
+  z-index: 1;
+}
+.sr-sun .pp-icon, .sr-sun .pp-emoji { width: 72px; height: 72px; object-fit: contain; }
+.sr-clouds { position: absolute; inset: 0 0 58% 0; z-index: 2; overflow: visible; }
+.sr-cloud {
+  position: absolute;
+  opacity: 0.8;
+  animation: sr-drift 48s ease-in-out infinite alternate;
+}
+.sr-cloud.c2 { opacity: 0.65; animation-duration: 62s; animation-delay: -18s; }
+.sr-cloud.c3 { opacity: 0.75; animation-duration: 54s; animation-delay: -30s; }
+.sr-cloud .pp-icon, .sr-cloud .pp-emoji { width: 100%; height: auto; object-fit: contain; display: block; }
+@keyframes sr-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(18px); }
+}
+.sr-hills {
+  position: absolute;
+  left: -4%; right: -4%;
+  top: 18%;
+  height: 24%;
+  z-index: 3;
+  overflow: visible;
+}
+.sr-hill {
+  position: absolute;
+  bottom: 0;
+  border-radius: 50% 50% 0 0;
+}
+.sr-hill.a { left: 0; width: 28%; height: 62%; background: #a8d08c; }
+.sr-hill.b { left: 16%; width: 30%; height: 88%; background: #93c27a; }
+.sr-hill.c { left: 34%; width: 26%; height: 70%; background: #87b86e; }
+.sr-hill.d { left: 48%; width: 32%; height: 92%; background: #8fbe74; }
+.sr-hill.e { left: 64%; width: 24%; height: 66%; background: #9ccb80; }
+.sr-hill.f { left: 76%; width: 28%; height: 84%; background: #85b56a; }
+.sr-hill.g { left: 88%; width: 22%; height: 60%; background: #98c67e; }
+.sr-hill.h { left: 8%; width: 20%; height: 50%; background: #b3d89a; }
+.sr-track.candy .sr-hill { filter: hue-rotate(300deg) saturate(0.55) brightness(1.08); }
+.sr-track.pizza .sr-hill { filter: hue-rotate(20deg) saturate(0.7) brightness(1.05); }
+.sr-far-trees {
+  position: absolute;
+  left: 0; right: 0;
+  top: 12%;
+  height: 18%;
+  z-index: 4;
+  pointer-events: none;
+}
+.sr-far-tree {
+  position: absolute;
+  bottom: 10%;
+  width: 34px;
+  height: 46px;
+  opacity: 0.58;
+}
+.sr-far-tree.t1 { width: 28px; height: 40px; opacity: 0.48; bottom: 22%; }
+.sr-far-tree.t2 { width: 38px; height: 52px; opacity: 0.62; bottom: 2%; }
+.sr-far-tree.t3 { width: 26px; height: 36px; opacity: 0.46; bottom: 28%; }
+.sr-far-tree .pp-icon, .sr-far-tree .pp-emoji { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+.sr-mid .sr-festoon {
+  position: absolute;
+  left: 0; right: 0; top: 2%;
+  width: 100%;
+  height: 48px;
+  z-index: 5;
+}
+.sr-mid .sr-festoon .pp-icon,
+.sr-mid .sr-festoon .pp-emoji { width: 13%; height: 48px; object-fit: contain; object-position: center; }
+.sr-start, .sr-finish {
+  position: absolute;
+  top: calc(348 / 512 * 100%);
+  height: calc(80 / 512 * 100%);
+  z-index: 3;
+  pointer-events: none;
+}
+.sr-start {
+  left: 3.2%;
+  width: 10px;
+  background: repeating-linear-gradient(#f6f6f6 0 8px, #1a1a1a 8px 16px);
+  box-shadow: 2px 0 0 #fff, -2px 0 0 #1a1a1a;
+}
+.sr-finish {
+  left: 92%;
+  width: 20px;
+  background: repeating-conic-gradient(#1a1a1a 0% 25%, #f6f6f6 0% 50%) 0 0 / 11px 11px;
+  border-left: 2px solid #fff;
+  box-shadow: -2px 0 0 #1a1a1a;
+}
+
+/* Race-track karts only: about half the garage/podium size so the road reads longer. */
+.sr-track .sr-kart { --sz: 90px; width: var(--sz); height: var(--sz); }
+.sr-track .sr-kart.sm { --sz: 64px; width: var(--sz); height: var(--sz); }
+.sr-track .sr-obstacle { width: 44px; height: 44px; }
+.sr-track .sr-obstacle .pp-icon,
+.sr-track .sr-obstacle .pp-emoji { width: 44px; height: 44px; }
+.sr-sky { display: none; }
+
+.sr-festoon {
+  position: absolute; left: -2%; right: -2%; top: 0;
+  height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+  pointer-events: none; z-index: 5;
+}
+.sr-festoon .pp-icon, .sr-festoon .pp-emoji {
+  width: 42%; height: 52px; object-fit: contain; object-position: center;
+}
+.sr-sky-props {
+  position: absolute; inset: 0;
+  display: flex; align-items: flex-end; justify-content: space-around;
+  padding: 0 8px 2px;
+  z-index: 1;
+}
+.sr-sky-props .sr-prop { width: 18%; height: 70%; }
+.sr-sky-props .pp-icon { width: 100%; height: 100%; object-fit: contain; }
+
+.sr-verge {
+  position: relative;
+  flex: 0 0 12%;
+  min-height: 28px;
+  overflow: visible;
+}
+.sr-track.picnic .sr-verge { background: linear-gradient(#b7dd7a, #7eae58); }
+.sr-track.candy .sr-verge { background: linear-gradient(#f7b3cc, #e989b0); }
+.sr-track.pizza .sr-verge { background: linear-gradient(#e8a878, #c45a3a); }
+
+.sr-scenery-strip {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  display: flex; align-items: flex-end; gap: 18px;
+  padding: 0 10px 0;
+  width: 200%;
+  will-change: transform;
+}
+.sr-track.boosting .sr-whoosh { display: block; }
+@keyframes sr-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-18%); }
+}
+.sr-prop { display: flex; align-items: flex-end; flex-shrink: 0; height: 100%; }
+.sr-prop .pp-icon, .sr-prop .pp-emoji { object-fit: contain; display: block; }
+.sr-prop.tree { width: 64px; }
+.sr-prop.tree .pp-icon { width: 64px; height: 100%; }
+.sr-prop.flower { width: 32px; align-self: flex-end; height: 70%; }
+.sr-prop.flower .pp-icon { width: 32px; height: 100%; }
+.sr-prop.ball { width: 28px; height: 80%; }
+.sr-prop.ball .pp-icon { width: 28px; height: 100%; }
+.sr-picnic {
+  position: relative;
+  width: 72px; height: 90%;
+  flex-shrink: 0;
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.sr-blanket {
+  position: absolute; left: 4px; right: 4px; bottom: 0; height: 42%;
+  background: repeating-conic-gradient(#f4b8c8 0% 25%, #fff 0% 50%) 0 0 / 10px 10px;
+  border-radius: 6px;
+  box-shadow: 0 2px 0 #0002;
+  transform: skewX(-12deg);
+}
+.sr-picnic .pp-icon { position: relative; z-index: 1; width: 36px; height: 36px; margin-bottom: 6px; }
+
+/* Lanes sit inside the locked road band (y=348–428, ground y=408). */
+.sr-lane {
+  position: absolute;
+  left: 0; right: 0;
+  top: 0; bottom: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+.sr-lane.opp { --gy: 365; }
+.sr-lane.me { --gy: 408; z-index: 5; }
+/* Front-lane ground sits on the visual road surface, not the lower curb/crust. */
+.sr-track.picnic .sr-lane.me { --gy: 410; }
+.sr-track.candy .sr-lane.me { --gy: 406; }
+.sr-track.pizza .sr-lane.me { --gy: 410; }
+.sr-lane > div {
+  position: absolute;
+  top: calc(var(--gy) / 512 * 100%);
+  transition: left 0.55s ease-out;
+}
+.sr-lane .sr-kart {
+  position: relative;
+  /* Ground of the 512 canvas is y=408, 79.6875% down the box. */
+  transform: translateY(-79.6875%);
+  bottom: auto;
+  transition: none;
+}
+
+/* Boss stands on the grass just above the road; obstacle sits on the player lane. */
+.sr-boss {
+  position: absolute;
+  z-index: 5;
+  top: calc(348 / 512 * 100%);
+  transform: translate(-50%, -92%);
+  display: flex; flex-direction: column; align-items: center;
+  width: 88px;
+  filter: drop-shadow(0 3px 3px rgba(40,24,8,0.35));
+  pointer-events: none;
+}
+.sr-boss img { width: 84px; height: 84px; object-fit: contain; }
+.sr-boss span {
+  font-size: 12px; font-weight: 800; color: #3a2714;
+  background: #fff6dc; border: 2px solid #5a3d1c; border-radius: 999px;
+  padding: 0 7px; line-height: 1.3; margin-top: -6px;
+}
+.sr-obstacle {
+  position: absolute;
+  top: calc(var(--gy, 408) / 512 * 100%);
+  transform: translateY(-100%);
+  width: 88px; height: 88px; z-index: 5;
+  filter: drop-shadow(0 4px 4px rgba(40,24,8,0.4));
+}
+.sr-obstacle .pp-icon, .sr-obstacle .pp-emoji,
+.sr-obstacle .sr-obs-anim { width: 88px; height: 88px; object-fit: contain; display: block; }
+.sr-obstacle .pp-icon, .sr-obstacle .pp-emoji, .sr-obstacle .sr-obs-anim {
+  animation: sr-toss 0.45s ease-out;
+}
+.sr-obstacle.pop .pp-icon, .sr-obstacle.pop .pp-emoji, .sr-obstacle.pop .sr-obs-anim {
+  animation: sr-pop 0.4s ease-out forwards;
+}
+@keyframes sr-toss {
+  0% { transform: translateY(-50px) scale(0.5); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes sr-pop {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+.sr-whoosh {
+  display: none;
+  position: absolute; inset: 18% 0 10% 0;
+  pointer-events: none; z-index: 5;
+  overflow: hidden;
+}
+.sr-track.boosting .sr-whoosh { display: block; }
+.sr-whoosh i {
+  position: absolute; height: 4px; border-radius: 4px;
+  background: linear-gradient(90deg, transparent, #fffce8cc);
+  animation: sr-whoosh 0.55s linear infinite;
+}
+@keyframes sr-whoosh {
+  from { transform: translateX(40%); opacity: 0; }
+  20% { opacity: 1; }
+  to { transform: translateX(-120%); opacity: 0; }
+}
+
+.sr-status { margin: 0; text-align: center; font-size: 16px; font-weight: 700; color: #3a2714;
+  background: #fff6dc; border: 2px solid #e4d2a4; border-radius: 12px; padding: 4px 8px;
+}
+.sr-status:empty { display: none; }
+
+/* High-contrast question card — larger type, easy-to-tap answers */
+.sr-qcard {
+  flex: 1 1 auto;
+  min-height: 0;
+  align-content: center;
+  background: #fff6dc;
+  color: #2a1b0c;
+  border: 3px solid #5a3d1c;
+  border-radius: 18px;
+  padding: 10px 12px 12px;
+  box-shadow: 0 3px 0 #c9b17a, 0 8px 16px #0002;
+  display: grid;
+  grid-template-columns: 1fr 48px;
+  grid-template-rows: auto auto auto;
+  gap: 6px 8px;
+  align-items: start;
+}
+.sr-qcard.boss { border-color: #8a5a12; background: #fff4c8; }
+.sr-qwho {
+  grid-column: 1; grid-row: 1;
+  font-size: 16px; font-weight: 700; color: #5a3d1c; line-height: 1.2;
+}
+.sr-qcard #srCardSpeak {
+  grid-column: 2; grid-row: 1 / span 2;
+  align-self: center; justify-self: end;
+  min-width: 48px; min-height: 48px; border-radius: 14px;
+  background: #ffe9a8; border: 2px solid #c9a24a;
+  display: flex; align-items: center; justify-content: center;
+}
+.sr-qcard #srCardSpeak .pp-icon { width: 32px; height: 32px; }
+.sr-ask {
+  grid-column: 1; grid-row: 2;
+  margin: 0;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #2a1b0c;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.sr-pics {
+  grid-column: 1 / -1;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  margin-top: 2px;
+}
+.sr-pics .pp-icon, .sr-pics .pp-emoji { width: 48px; height: 48px; object-fit: contain; }
+.sr-choices {
+  grid-column: 1 / -1;
+  display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+  margin-top: 4px;
+}
+.sr-choice {
+  min-width: 100px; min-height: 84px;
+  border: 2px solid #c9a24a; border-radius: 18px; background: #fff;
+  padding: 8px 12px; cursor: pointer;
+  font-size: 36px; font-weight: 800; color: #2a1b0c;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  box-shadow: 0 3px 0 #e4d2a4;
+}
+.sr-choice .pp-icon, .sr-choice .pp-emoji { width: 64px; height: 64px; object-fit: contain; }
+.sr-choice:focus-visible { outline: 3px solid #328497; outline-offset: 2px; }
+.sr-choice.ok { box-shadow: 0 0 0 3px #6dae58, 0 3px 0 #e4d2a4; }
+.sr-choice.no { opacity: 0.55; }
+
+/* Podium */
+.sr-podium {
+  text-align: center; align-items: center;
+  justify-content: space-between;
+}
+.sr-podium h2 { margin: 0; font-size: clamp(28px, 7vw, 40px); line-height: 1.15; color: #2a1b0c; }
+.sr-podium > p { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.3; max-width: 28em; color: #2a1b0c; }
+
+.sr-podium-art {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding-top: 20%;
+  flex: 1 1 auto;
+}
+.sr-podium-stage { position: relative; width: 100%; }
+.sr-podium-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+}
+.sr-onstep {
+  position: absolute;
+  width: 34%;
+  transform: translate(-50%, -79.7%);
+  z-index: 2;
+}
+.sr-onstep.first { left: 47.2%; top: 14.2%; width: 40%; z-index: 3; }
+.sr-onstep.second { left: 18.0%; top: 32.6%; width: 34%; }
+.sr-onstep.third { left: 79.1%; top: 44.9%; width: 30%; }
+.sr-podium-art.two {
+  padding-top: 22%;
+  width: min(100%, 500px);
+  max-height: 48vh;
+  flex: 0 1 auto;
+}
+.sr-podium-art.two .sr-podium-img { max-height: 34vh; width: auto; max-width: 100%; margin: 0 auto; }
+.sr-podium-art.two .sr-onstep.first { left: 71.6%; }
+.sr-podium-art.two .sr-onstep.second { left: 27.3%; }
+.sr-podium h2 { position: relative; z-index: 4; margin: 0 0 2px; }
+.sr-podium .sr-actions { flex-shrink: 0; }
+
+.sr-onstep .sr-kart { filter: drop-shadow(0 4px 4px rgba(40,24,8,0.35)); width: 100%; height: auto; aspect-ratio: 1; }
+.sr-stands {
+  display: flex; align-items: flex-end; justify-content: center; gap: 10px;
+  min-height: 280px; width: 100%;
+  flex: 1;
+}
+.sr-stand { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.sr-stand img { object-fit: contain; display: block; }
+.sr-stand.first img { width: 168px; height: 168px; }
+.sr-stand.second img { width: 124px; height: 124px; }
+.sr-stand.third img { width: 100px; height: 100px; }
+.sr-stand .sr-step {
+  width: 118px; border-radius: 10px 10px 0 0;
+  background: #e4d2a4; border: 3px solid #5a3d1c; border-bottom: 0;
+  font-size: 32px; font-weight: 800; color: #5a3d1c;
+  display: flex; align-items: flex-start; justify-content: center; padding-top: 8px;
+}
+.sr-stand.first .sr-step { height: 130px; width: 136px; background: #ffe9a8; }
+.sr-stand.second .sr-step { height: 88px; }
+.sr-stand.third .sr-step { height: 58px; width: 100px; background: #d8c49a; }
+.sr-sil {
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: #5a5a68;
+  box-shadow: inset 0 -10px 0 #0004;
+}
+.sr-stand.second .sr-sil { width: 124px; height: 124px; }
+.sr-stand.first .sr-sil { width: 168px; height: 168px; }
+.sr-sil::before, .sr-sil::after {
+  content: ""; display: block; margin: 0 auto;
+  background: #3d3d48;
+  border-radius: 50%;
+}
+.sr-sil::before { width: 28%; height: 28%; margin-top: 22%; }
+.sr-sil::after {
+  width: 54%; height: 28%;
+  margin-top: 8%;
+  border-radius: 20px 20px 12px 12px;
+}
+.sr-coins-won {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  margin: 4px 0;
+}
+.sr-coins-won .pp-icon, .sr-coins-won .pp-emoji { width: 88px; height: 88px; object-fit: contain; }
+.sr-coins-won b {
+  font-size: 36px; font-weight: 800; color: #2a1b0c; line-height: 1;
+}
+.sr-coins-won span { font-size: 16px; font-weight: 700; color: #5a3d1c; }
+.sr-confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 2; }
+.sr-confetti i {
+  position: absolute; top: -8px; width: 8px; height: 12px; border-radius: 2px;
+  animation: sr-fall 1.6s linear forwards;
+}
+@keyframes sr-fall {
+  to { transform: translateY(110vh) rotate(240deg); opacity: 0.9; }
+}
+
+@media (min-width: 700px) and (min-height: 900px) {
+  .sr-row { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .sr-part { width: auto; min-height: 110px; }
+  .sr-part .pp-icon, .sr-part .pp-emoji { width: 64px; height: 64px; }
+  .sr-qcard { padding: 18px 18px 22px; gap: 10px 8px; }
+  .sr-choice { min-width: 136px; min-height: 132px; font-size: 42px; }
+  .sr-choice .pp-icon, .sr-choice .pp-emoji { width: 80px; height: 80px; }
+  .sr-pics .pp-icon, .sr-pics .pp-emoji { width: 56px; height: 56px; }
+  .sr-kart { --sz: 300px; width: var(--sz); height: var(--sz); }
+  .sr-kart.sm { --sz: 250px; width: var(--sz); height: var(--sz); }
+  .sr-preview .sr-kart { --sz: 340px; width: var(--sz); height: var(--sz); }
+  .sr-track .sr-kart { --sz: 112px; width: var(--sz); height: var(--sz); }
+  .sr-track .sr-kart.sm { --sz: 80px; width: var(--sz); height: var(--sz); }
+  .sr-track .sr-obstacle { width: 60px; height: 60px; }
+  .sr-track .sr-obstacle .pp-icon, .sr-track .sr-obstacle .pp-emoji { width: 60px; height: 60px; }
+  .sr-track {
+    --ts: 1.5;
+    --crop: 178.67;
+    flex: 0 0 500px;
+    height: 500px;
+  }
+  .sr-lane.opp { --gy: 365; }
+  .sr-preview { min-height: 280px; }
+  .sr-garage .sr-preview { min-height: 300px; }
+  .sr-thumb { width: 80px; height: 80px; }
+  .sr-obstacle { width: 120px; height: 120px; }
+  .sr-obstacle .pp-icon, .sr-obstacle .pp-emoji { width: 120px; height: 120px; }
+  .sr-boss { width: 120px; }
+  .sr-boss img { width: 116px; height: 116px; }
+  
+.sr-podium-art {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding-top: 20%;
+  flex: 1 1 auto;
+}
+.sr-podium-stage { position: relative; width: 100%; }
+.sr-podium-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+}
+.sr-onstep {
+  position: absolute;
+  width: 34%;
+  transform: translate(-50%, -79.7%);
+  z-index: 2;
+}
+.sr-onstep.first { left: 47.2%; top: 14.2%; width: 40%; z-index: 3; }
+.sr-onstep.second { left: 18.0%; top: 32.6%; width: 34%; }
+.sr-onstep.third { left: 79.1%; top: 44.9%; width: 30%; }
+.sr-onstep .sr-kart { filter: drop-shadow(0 4px 4px rgba(40,24,8,0.35)); width: 100%; height: auto; aspect-ratio: 1; }
+.sr-stands { min-height: 340px; }
+  .sr-stand.first img { width: 200px; height: 200px; }
+  .sr-stand.second img { width: 150px; height: 150px; }
+  .sr-stand.third img { width: 120px; height: 120px; }
+  .sr-stand.first .sr-sil { width: 200px; height: 200px; }
+  .sr-stand.second .sr-sil { width: 150px; height: 150px; }
+  .sr-coins-won .pp-icon, .sr-coins-won .pp-emoji { width: 110px; height: 110px; }
+  .sr-ask { font-size: 32px; }
+  .sr-prop.tree { width: 80px; }
+  .sr-prop.tree .pp-icon { width: 80px; }
+}
+@media (max-width: 400px) {
+  #racers { padding: 6px 8px 8px; gap: 6px; }
+  .sr-header { min-height: 44px; gap: 5px; }
+  .sr-ask { font-size: 28px; }
+  .sr-lead, .sr-btn, .sr-action, .sr-podium > p { font-size: 22px; }
+  .sr-pics .pp-icon, .sr-pics .pp-emoji { width: 40px; height: 40px; }
+  .sr-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .sr-part { width: auto; min-height: 80px; font-size: 12px; }
+  .sr-kart { --sz: 148px; width: var(--sz); height: var(--sz); }
+  .sr-kart.sm { --sz: 126px; width: var(--sz); height: var(--sz); }
+  .sr-preview .sr-kart { --sz: 200px; width: var(--sz); height: var(--sz); }
+  .sr-track .sr-kart { --sz: 62px; width: var(--sz); height: var(--sz); }
+  .sr-track .sr-kart.sm { --sz: 44px; width: var(--sz); height: var(--sz); }
+  .sr-track .sr-obstacle { width: 40px; height: 40px; }
+  .sr-track .sr-obstacle .pp-icon, .sr-track .sr-obstacle .pp-emoji { width: 40px; height: 40px; }
+  .sr-obstacle { width: 72px; height: 72px; }
+  .sr-obstacle .pp-icon, .sr-obstacle .pp-emoji { width: 72px; height: 72px; }
+  .sr-preview { min-height: 150px; }
+  .sr-track {
+    --ts: 0.88;
+    --crop: 284.7;
+    flex: 0 0 200px;
+    height: 200px;
+  }
+  .sr-lane.opp { --gy: 365; }
+  .sr-qcard { padding: 10px 10px 12px; }
+  .sr-choice { min-width: 92px; min-height: 80px; font-size: 32px; }
+  .sr-choice .pp-icon, .sr-choice .pp-emoji { width: 56px; height: 56px; }
+  .sr-boss { width: 64px; }
+  .sr-boss img { width: 60px; height: 60px; }
+  .sr-podium { gap: 6px; }
+  .sr-podium h2 { font-size: 26px; }
+  
+.sr-podium-art {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding-top: 20%;
+  flex: 1 1 auto;
+}
+.sr-podium-stage { position: relative; width: 100%; }
+.sr-podium-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+}
+.sr-onstep {
+  position: absolute;
+  width: 34%;
+  transform: translate(-50%, -79.7%);
+  z-index: 2;
+}
+.sr-onstep.first { left: 47.2%; top: 14.2%; width: 40%; z-index: 3; }
+.sr-onstep.second { left: 18.0%; top: 32.6%; width: 34%; }
+.sr-onstep.third { left: 79.1%; top: 44.9%; width: 30%; }
+.sr-onstep .sr-kart { filter: drop-shadow(0 4px 4px rgba(40,24,8,0.35)); width: 100%; height: auto; aspect-ratio: 1; }
+.sr-stands { min-height: 168px; }
+  .sr-stand.first img { width: 100px; height: 100px; }
+  .sr-stand.second img { width: 78px; height: 78px; }
+  .sr-stand.third img { width: 64px; height: 64px; }
+  .sr-stand.first .sr-step { height: 72px; width: 96px; font-size: 24px; }
+  .sr-stand.second .sr-step { height: 52px; width: 84px; font-size: 24px; }
+  .sr-stand.third .sr-step { height: 36px; width: 70px; font-size: 22px; }
+  .sr-stand.first .sr-sil { width: 100px; height: 100px; }
+  .sr-stand.second .sr-sil { width: 78px; height: 78px; }
+  .sr-coins-won .pp-icon, .sr-coins-won .pp-emoji { width: 56px; height: 56px; }
+  .sr-coins-won b { font-size: 28px; }
+  .sr-podium .sr-actions { gap: 6px; }
+  .sr-podium .sr-action, .sr-podium .sr-secondary { min-height: 44px; padding: 8px 16px; }
+  .sr-podium-art { padding-top: 24%; }
+  .sr-onstep.first { width: 38%; }
+  .sr-onstep.second { width: 32%; }
+  .sr-onstep.third { width: 28%; }
+  .sr-garage .sr-preview { min-height: 180px; }
+  .sr-thumb { width: 56px; height: 56px; }
+  .sr-prop.tree { width: 52px; }
+  .sr-prop.tree .pp-icon { width: 52px; }
+  .sr-picnic { width: 58px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sr-lane .sr-kart { transition: none; }
+  .sr-world, .sr-far, .sr-mid, .sr-par { transition: none; }
+  .sr-cloud { animation: none !important; }
+  .sr-obstacle, .sr-obstacle.pop, .sr-confetti i,
+  .sr-track.boosting .sr-scenery-strip,
+  .sr-track.boosting .sr-lane-line,
+  .sr-whoosh i,
+  .sr-kart.rolling .sr-k-wheel img,
+  .sr-kart.boosting .sr-k-wheel img { animation: none !important; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+.sr-visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); border: 0;
+}
+.sr-swatch {
+  width: 36px; height: 36px; border-radius: 10px; border: 2px solid #5a3d1c;
+  background: #e8c078;
+}
+.sr-swatch.paint-natural { background: #e8c078; }
+.sr-swatch.paint-berry { background: #e88aa8; }
+.sr-swatch.paint-leaf { background: #7cbc62; }
+.sr-swatch.paint-sunset { background: #f0a04a; }
+
+
+/* ---- playtester round 3: short-height landscape, 60px header, compact podium ---- */
+@media (orientation: landscape) and (max-height: 820px) {
+  #racers { width: min(100%, 1100px); padding: 4px 8px 6px; gap: 4px; }
+  .sr-header { min-height: 60px; gap: 6px; }
+  .sr-header button, .sr-coins { min-width: 60px; min-height: 60px; }
+  .sr-header h1 { font-size: 20px; padding: 2px 6px; }
+  .sr-track {
+    --box: 230;
+    height: calc(var(--box) * 1px);
+    flex: 0 0 calc(var(--box) * 1px);
+    --ts: calc(var(--box) / 280);
+    --crop: 232;
+  }
+  .sr-track .sr-kart { --sz: 78px; width: var(--sz); height: var(--sz); }
+  .sr-track .sr-kart.sm { --sz: 56px; width: var(--sz); height: var(--sz); }
+  .sr-qcard { padding: 8px 10px 10px; gap: 6px; min-height: 0; overflow: auto; }
+  .sr-ask { font-size: 22px; }
+  .sr-choice { min-width: 100px; min-height: 64px; font-size: 28px; }
+  .sr-choice .pp-icon, .sr-choice .pp-emoji { width: 48px; height: 48px; }
+  .sr-pics .pp-icon, .sr-pics .pp-emoji { width: 36px; height: 36px; }
+  .sr-podium { gap: 6px; }
+  .sr-podium-art { flex: 0 1 auto; max-height: min(38vh, 240px); padding-top: 0; width: min(100%, 420px); }
+  .sr-podium h2 { font-size: 24px; }
+  .sr-podium > p { font-size: 16px; }
+  .sr-coins-won .pp-icon, .sr-coins-won .pp-emoji { width: 48px; height: 48px; }
+  .sr-podium .sr-actions { flex: 0 0 auto; margin-top: auto; }
+  .sr-podium .sr-action, .sr-podium .sr-secondary { min-height: 48px; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  #racers { padding: 2px 6px 8px; gap: 2px; }
+  #srContent { gap: 4px; min-height: 0; }
+  .sr-progress { display: none; }
+  .sr-track {
+    --box: 124;
+    height: calc(var(--box) * 1px);
+    flex: 0 0 calc(var(--box) * 1px);
+    max-height: 124px;
+  }
+  .sr-track .sr-kart { --sz: 52px; }
+  .sr-track .sr-kart.sm { --sz: 38px; }
+  .sr-qcard {
+    flex: 1 1 auto; min-height: 0;
+    padding: 4px 8px 8px; gap: 2px 6px;
+    overflow: hidden;
+    align-content: start;
+  }
+  .sr-qwho { font-size: 13px; }
+  .sr-ask { font-size: 18px; line-height: 1.15; }
+  .sr-pics { margin-top: 0; gap: 2px; }
+  .sr-pics .pp-icon, .sr-pics .pp-emoji { width: 26px; height: 26px; }
+  .sr-choices { flex-wrap: nowrap; margin: 6px 0 8px; gap: 8px; }
+  .sr-choice { min-height: 60px; min-width: 0; flex: 1; font-size: 22px; padding: 4px 6px; }
+  .sr-choice .pp-icon, .sr-choice .pp-emoji { width: 36px; height: 36px; }
+  .sr-podium {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 1.1fr);
+    grid-template-rows: auto auto 1fr auto;
+    align-items: center;
+    column-gap: 12px;
+    height: 100%;
+    min-height: 0;
+  }
+  .sr-podium.celebrate::before { grid-column: 2; height: 32px; margin: 0 auto 0; }
+  .sr-podium h2 { grid-column: 2; font-size: 20px; margin: 0; }
+  .sr-podium .sr-coins-won, .sr-podium > p { grid-column: 2; }
+  .sr-podium-art {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    flex: none;
+    width: 100%;
+    max-width: none;
+    max-height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    padding-top: 18%;
+    align-self: stretch;
+  }
+  .sr-podium .sr-actions { grid-column: 2; flex: 0 0 auto; width: 100%; }
+  .sr-podium .sr-action, .sr-podium .sr-secondary { min-height: 40px; }
+}
+
+
+.sr-podium.celebrate.sr-panel,
+.sr-podium.celebrate {
+  background-color: #e8d6f3;
+  background-image: url("../../assets/picnic/title/title_b_win_landscape.png");
+  background-image: image-set(url("../../assets/picnic/title/title_b_win_landscape.webp") type("image/webp"), url("../../assets/picnic/title/title_b_win_landscape.png") type("image/png"));
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+@media (orientation: portrait) {
+  .sr-podium.celebrate {
+    background-image: url("../../assets/picnic/title/title_b_win_portrait.png");
+    background-image: image-set(url("../../assets/picnic/title/title_b_win_portrait.webp") type("image/webp"), url("../../assets/picnic/title/title_b_win_portrait.png") type("image/png"));
+  }
+}
+.sr-podium.celebrate::before {
+  content: "";
+  display: block;
+  width: min(200px, 50%);
+  height: 48px;
+  margin: 0 auto 4px;
+  background: url("../../assets/picnic/logo/logo_b_wordmark_500.png") center / contain no-repeat;
+  background-image: image-set(url("../../assets/picnic/logo/logo_b_wordmark_500.webp") type("image/webp"), url("../../assets/picnic/logo/logo_b_wordmark_500.png") type("image/png"));
+  flex: none;
+}
+
+
+/* pt4: keep the two-step podium title clear of the kart and all three actions on screen */
+@media (orientation: portrait) {
+  .sr-podium-art.two {
+    width: min(100%, 440px);
+    max-width: 440px;
+    padding-top: 20%;
+    max-height: 40vh;
+    flex: 0 0 auto;
+  }
+  .sr-podium-art.two .sr-podium-img { max-height: 28vh; width: auto; max-width: 100%; margin: 0 auto; display: block; }
+  .sr-podium .sr-coins-won .pp-icon, .sr-podium .sr-coins-won .pp-emoji { width: 64px; height: 64px; }
+}

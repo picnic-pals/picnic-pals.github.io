@@ -378,3 +378,374 @@ body {
 
 /* Food Fight: picnic cards, original pip artwork. */
 .tile.foodfight .scene { background:linear-gradient(155deg,#fff0bd,#ffd4df); }
+
+.tile.packer .scene { background: linear-gradient(#fff6d4, #d9f3c9); }
+.tile.packer .packsc { position: absolute; inset: 8% 8% 28% 8%; display: flex; align-items: flex-end; justify-content: center; gap: 6%; }
+.tile.packer .packsc .pp-icon { width: 34%; height: auto; object-fit: contain; }
+.tile.packer .packsc .pp-icon.pk-hub-bask { width: 48%; }
+.tile.packer .who2 { width: 42%; left: 28%; bottom: 2%; }
+
+.tile.racers .scene { background: linear-gradient(#d7eef9, #cfe889); }
+.tile.racers .racesc { position: absolute; inset: 8% 8% 28% 8%; display: flex; align-items: flex-end; justify-content: center; gap: 2%; }
+.tile.racers .racesc .pp-icon { width: 28%; height: auto; object-fit: contain; }
+.tile.racers .racesc .pp-icon.sr-hub-body { width: 46%; }
+.tile.racers .who2 { width: 42%; left: 28%; bottom: 2%; }
+.tile.bakeshop .scene { background: linear-gradient(#ffe9c8, #f4c7a0); }
+.tile.bakeshop .bakesc { position: absolute; inset: 10% 18% 30% 18%; display: flex; align-items: center; justify-content: center; }
+.tile.bakeshop .bakesc svg { width: 80%; height: auto; }
+.tile.bakeshop .who2 { width: 42%; left: 28%; bottom: 2%; }
+
+
+
+/* first-paint title layer (outside .screen; visible before hub.js) */
+#boot {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at 78% 18%, #ffe9c8 0 12%, transparent 46%),
+    linear-gradient(180deg, #fabedc 0%, #ffdfd8 18%, #f8cce5 42%, #cadffe 68%, #bfe3a8 100%);
+  transition: opacity .45s ease;
+}
+#boot.gone { opacity: 0; pointer-events: none; }
+#boot .boot-sun {
+  position: absolute;
+  right: 12vw;
+  top: 8vh;
+  width: 16vmin;
+  height: 16vmin;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #fff8dc, #ffe58a 55%, #ffd06a 100%);
+  box-shadow: 0 0 60px 16px #ffe9c880;
+}
+#boot .boot-hill {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: -22%;
+  height: 52%;
+  background:
+    radial-gradient(ellipse at 30% 0%, #d8f0a8 0 26%, transparent 27%),
+    linear-gradient(180deg, #b8e07a 0%, #8fc47d 42%, #7ab35e 100%);
+  border-radius: 50% 50% 0 0 / 70% 70% 0 0;
+  box-shadow: inset 0 18px 0 #c8ec9880;
+}
+#boot .boot-stage {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4vh 4vw 8vh;
+  gap: 4vh;
+}
+#boot .boot-wordmark {
+  width: min(820px, 86vw);
+  filter: drop-shadow(0 10px 0 #3b2d5518);
+}
+#boot .boot-wordmark svg { width: 100%; height: auto; display: block; }
+#boot .boot-play {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  font-size: clamp(28px, 5vmin, 44px);
+  color: #fff;
+  letter-spacing: .02em;
+  padding: .28em 1.5em .38em;
+  border-radius: 999px;
+  background: linear-gradient(#f4a090, #e8665a 55%, #d85b50);
+  box-shadow: inset 0 3px 0 #ffd4c8, 0 7px 0 #c94f45, 0 14px 24px #c94f4533;
+  text-shadow: 0 2px 0 #c94f4580;
+}
+#boot .boot-play:active {
+  transform: translateY(3px);
+  box-shadow: inset 0 3px 0 #ffd4c8, 0 4px 0 #c94f45, 0 8px 16px #c94f4533;
+}
+#boot.painted {
+  background: var(--boot-title) center / cover no-repeat, #f3e9ff;
+}
+#boot.painted .boot-sun,
+#boot.painted .boot-hill,
+#boot.painted .boot-wordmark { opacity: 0; pointer-events: none; }
+#boot.painted .boot-play {
+  /* the painted title already has a Play button; this is the hit target */
+  position: absolute;
+  bottom: 7%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(420px, 72vw);
+  height: clamp(56px, 11vh, 96px);
+  padding: 0;
+  opacity: 0;
+  background: transparent;
+  box-shadow: none;
+  text-shadow: none;
+  color: transparent;
+}
+#boot.painted .boot-play:focus-visible {
+  opacity: 1;
+  color: #fff;
+  background: linear-gradient(#f4a090, #e8665a 55%, #d85b50);
+  box-shadow: inset 0 3px 0 #ffd4c8, 0 7px 0 #c94f45;
+}
+@media (orientation: portrait) {
+  #boot .boot-stage { padding-top: 8vh; }
+  #boot .boot-wordmark { width: min(920px, 92vw); }
+  #boot .boot-hill { height: 48%; bottom: -18%; }
+  #boot.painted .boot-play { bottom: 6%; height: clamp(64px, 12vh, 110px); }
+}
+
+
+/* ---- playtester round 3: boot dwell, title Play, hub overflow ---- */
+html.boot-up .screen,
+html.boot-up .friend-bubble,
+html.boot-up .tip-bubble,
+html.boot-up #hubMusic {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+html.boot-up #boot { visibility: visible !important; pointer-events: auto !important; }
+
+/* Keep the painted Play hit target on short landscape phones (cover was cropping it). */
+@media (orientation: landscape) and (max-height: 500px) {
+  #boot.painted {
+    background-size: cover !important;
+    background-position: center bottom !important;
+  }
+  #boot.painted .boot-play {
+    bottom: max(8px, env(safe-area-inset-bottom, 0px));
+    height: 64px;
+    width: min(300px, 70vw);
+  }
+}
+
+/* Games picker: scroll the tile grid and leave a peek of the next row. */
+#games.screen {
+  overflow: hidden;
+}
+#games .tiles {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: 8px;
+  margin-bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 24px;
+  align-content: start;
+  -webkit-overflow-scrolling: touch;
+}
+#games .actions {
+  flex: 0 0 auto;
+  margin-bottom: 0;
+  padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+}
+/* "Free play!" was sitting on tile titles; hide it on the games screen. */
+body:has(#games.on) .friend-bubble { display: none !important; }
+
+@media (orientation: portrait) and (max-width: 500px) {
+  .tiles:not(.toddler) { gap: 10px; }
+  .tile { padding: 8px 8px 10px; }
+  .tile .scene { aspect-ratio: 16 / 10; }
+  .tile .tn { font-size: 18px; margin-top: 6px; }
+  .tile .tsub { font-size: 13px; }
+}
+
+@media (orientation: landscape) and (max-height: 820px) {
+  .tiles:not(.toddler) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: 1100px;
+    gap: 8px;
+    margin: 8px auto;
+  }
+  .tile { padding: 6px 6px 8px; border-radius: 20px; }
+  .tile .scene { aspect-ratio: 16 / 9; border-radius: 14px; }
+  .tile .tn { font-size: 16px; margin-top: 4px; }
+  .tile .tsub { font-size: 12px; line-height: 1.2; }
+  .tile .play { font-size: 12px; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  .tiles:not(.toddler) { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  #games .topbar { padding-right: 120px; }
+  .me small { display: none; }
+}
+
+#nkGrownup { align-self: flex-start; margin-top: 8px; }
+#nkGrownupPanel { display: flex; flex-direction: column; gap: 6px; }
+#nkGrownupPanel[hidden] { display: none !important; }
+@media (orientation: landscape) and (max-height: 820px) {
+  #newkid { padding: 8px 14px; }
+  #newkid .nk { margin-top: 4px; gap: 12px; }
+  #newkid #nkGo { margin-top: 8px; }
+}
+
+
+/* ---- playtester round 3b: readable tile names, first-run CTA on screen ---- */
+#games .tile {
+  min-height: min-content;
+  height: auto;
+  align-self: start;
+}
+.tile .scene { flex: 0 0 auto; min-height: 64px; }
+.tile .tn, .tile .tsub {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  text-align: center;
+  overflow: visible;
+  white-space: normal;
+  padding: 0 4px;
+  box-sizing: border-box;
+}
+body:has(#newkid.on) .friend-bubble,
+body:has(#newkid.on) .tip-bubble { display: none !important; }
+
+#newkid.on { display: flex; flex-direction: column; }
+#newkid { overflow: hidden; height: 100%; height: 100dvh; box-sizing: border-box; }
+#newkid .nk { flex: 1 1 auto; min-height: 0; overflow: hidden; }
+#newkid .nkform { min-height: 0; max-height: 100%; overflow-y: auto; }
+#newkid #nkGo {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+@media (orientation: portrait) and (max-width: 500px) {
+  .tile .play { top: 8px; right: 8px; font-size: 13px; padding: 3px 10px; }
+  .tile .tn { font-size: 16px; line-height: 1.15; margin-top: 6px; }
+  .tile .tsub { font-size: 12px; line-height: 1.2; }
+  #newkid .opt .oa { width: 56px; height: 56px; }
+  #newkid .opts { gap: 6px; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  .tile .scene { min-height: 52px; }
+  .tile .play { top: 6px; right: 6px; font-size: 11px; padding: 2px 8px; }
+  .tile .tn { font-size: 13px; line-height: 1.15; margin-top: 2px; }
+  .tile .tsub { font-size: 11px; line-height: 1.15; }
+  #newkid .opt .oa { width: 52px; height: 52px; }
+  #newkid .opts { gap: 6px; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); }
+}
+/* pin Make my player under the preview, not over the colors */
+@media (orientation: landscape) and (max-height: 500px) {
+  #newkid #nkGo {
+    position: fixed;
+    left: 16px;
+    bottom: max(10px, env(safe-area-inset-bottom, 0px));
+    width: min(26vw, 200px);
+    z-index: 20;
+    margin-top: 0;
+  }
+}
+
+
+
+/* ---- playtester round 4: phone tiles must not overlap; second row not under the actions ---- */
+/* Do not set display here: #games.screen is more specific than .screen { display:none }, which
+   left the games picker clickable over player select and + New player. */
+#games.screen {
+  flex-direction: column;
+  min-height: 0;
+}
+#games .tiles {
+  grid-auto-rows: min-content;
+  align-content: start;
+}
+#games .tile {
+  min-height: auto;
+  height: auto;
+  overflow: visible;
+  align-self: stretch;
+}
+#games .tile .scene { overflow: hidden; }
+
+@media (orientation: portrait) and (max-width: 500px) {
+  #games .tiles { gap: 12px; padding-bottom: 16px; }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  #games .tiles {
+    grid-auto-rows: min-content;
+    padding-bottom: 8px;
+    gap: 6px;
+  }
+  #games .tile { padding: 3px 4px 4px; }
+  #games .tile .scene { aspect-ratio: 2.2 / 1; min-height: 32px; }
+  #games .tile .tn { font-size: 12px; margin-top: 1px; line-height: 1.1; }
+  #games .tile .tsub { display: none; }
+  #games .actions { gap: 8px; }
+  #games .actbtn { padding: 4px 12px 4px 6px; font-size: 16px; }
+  #games .actbtn .ic { width: 40px; height: 40px; }
+  #games .actbtn .ic svg { width: 34px; height: 34px; }
+}
+
+
+/* ---- PT6: phone portrait hub shows all 10 tiles; Sticker / Dress Up / Friends stay one row ---- */
+@media (orientation: portrait) and (max-width: 500px) {
+  #games.screen { padding-left: 10px; padding-right: 10px; padding-bottom: 6px; }
+  /* PT6 leftover padding-right:8px let tiles/fade cover Back and Hi; keep room for music+gear and paint above the fade. */
+  #games > .topbar { position: relative; z-index: 55; padding-right: 128px; row-gap: 4px; gap: 8px; flex-wrap: nowrap; }
+  #games > .topbar .goal, #games > .topbar .nextgoal { display: none; }
+  .me { padding: 4px 14px 4px 4px; }
+  .me .av { width: 44px; height: 44px; }
+  .me .hi { font-size: 18px; }
+  .me small { display: none; }
+  .starchip { padding: 4px 12px 4px 6px; font-size: 18px; }
+  .starchip svg { width: 22px; height: 22px; }
+  #games .tiles {
+    gap: 8px;
+    margin-top: 6px;
+    padding-bottom: 6px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #games .tiles.toddler { grid-template-columns: repeat(6, 1fr); }
+  #games .tile { padding: 4px 6px 6px; border-radius: 16px; }
+  #games .tile .scene { aspect-ratio: 2 / 1; min-height: 48px; border-radius: 12px; }
+  #games .tile .tn { font-size: 13px; margin-top: 2px; line-height: 1.1; }
+  #games .tile .tsub { display: none; }
+  #games .tile .play { top: 4px; right: 4px; font-size: 11px; padding: 2px 8px; }
+  #games .tile.tiny.big, #games .tile.story.big { min-height: 0; }
+  #games .tiles.toddler .tile.big .tn { font-size: 16px; }
+  #games .actions {
+    flex-wrap: nowrap;
+    gap: 6px;
+    width: 100%;
+    justify-content: center;
+    padding: 4px 4px max(6px, env(safe-area-inset-bottom, 0px));
+  }
+  #games .actbtn {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 4px 6px 4px 4px;
+    gap: 6px;
+    font-size: 13px;
+    border-radius: 16px;
+    box-shadow: 0 4px 0 var(--line);
+  }
+  #games .actbtn .ic { width: 32px; height: 32px; border-radius: 10px; }
+  #games .actbtn .ic svg { width: 28px; height: 28px; }
+}
+
+/* ---- PT6: toddler landscape — shrink featured tiles so row 2 peeks ---- */
+@media (orientation: landscape) and (max-height: 500px) {
+  .tile.tiny.big, .tile.story.big {
+    min-height: 0;
+    max-height: 42vh;
+  }
+  .tiles.toddler .tile.big .tn { font-size: 16px; margin-top: 2px; }
+  .tiles.toddler .tile.big .scene { min-height: 64px; aspect-ratio: 2.4 / 1; }
+  .tiles.toddler .tile.big .tsub { display: none; }
+}
+
+.tile.pancake .pancsc { position: absolute; inset: 0; display: flex; align-items: stretch; justify-content: stretch; overflow: hidden; border-radius: inherit; }
+.tile.pancake .pancsc img { width: 100%; height: 100%; object-fit: cover; object-position: center 42%; pointer-events: none; }

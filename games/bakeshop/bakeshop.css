@@ -1,0 +1,330 @@
+/* Bake Shop Clock layout. High-contrast question cards. 60px+ targets. Portrait + short landscape. */
+html, body { margin: 0; height: 100%; background: #f6e3c4; color: #3a2714; font: 700 18px/1.25 system-ui, sans-serif; }
+#bakeshop {
+  box-sizing: border-box;
+  height: 100%; height: 100dvh;
+  max-width: 1100px; margin: 0 auto;
+  display: flex; flex-direction: column;
+  padding: 6px 10px 8px;
+  gap: 6px;
+  min-height: 0;
+}
+.bs-header {
+  display: flex; align-items: center; gap: 8px;
+  min-height: 60px; flex: none;
+}
+.bs-header h1 {
+  flex: 1; margin: 0; text-align: center;
+  font-size: clamp(18px, 4.4vw, 28px); color: #6b3a22;
+  text-shadow: 0 2px 0 #f3d7a0;
+}
+.bs-header button {
+  min-width: 60px; min-height: 60px;
+  border: 3px solid #5a3d1c; border-radius: 16px;
+  background: #fffdf6; color: #3a2714;
+  font: 800 16px/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+.bs-header button:focus-visible { outline: 3px solid #2a7a4a; outline-offset: 2px; }
+
+.bs-play {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column; gap: 8px;
+  position: relative;
+}
+#bsCardHost {
+  flex: 0 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.bs-shop {
+  flex: 1 1 38%;
+  min-height: 0;
+  position: relative;
+  background-color: #f3d7b0;
+  background-image: url("../../art/bakeshop/shop_bg_landscape.webp");
+  background-size: cover;
+  background-position: center 62%;
+  background-repeat: no-repeat;
+  border: 3px solid #5a3d1c;
+  border-radius: 22px;
+  overflow: hidden;
+}
+@media (orientation: portrait) {
+  .bs-shop {
+    background-image: url("../../art/bakeshop/shop_bg_portrait.webp");
+    background-position: center 58%;
+  }
+}
+.bs-shop-window { display: none; }
+.bs-oven { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); width: min(54%, 280px); }
+/* Locked oven: clock sits in the door cutout (cx 510.5, cy 536.5, scale 0.4253) behind the oven. */
+.bs-oven:has(.bs-oven-art) {
+  --bs-clock-scale: 0.4253;
+  width: max(541px, min(92%, 68vh, 720px));
+  height: auto;
+  aspect-ratio: 1 / 1;
+  bottom: auto;
+  top: 50%;
+  transform: translate(-50%, -52.4%);
+}
+.bs-oven-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  z-index: 3;
+  pointer-events: none;
+  display: block;
+}
+.bs-oven:has(.bs-oven-art) .bs-oven-clock {
+  position: absolute;
+  left: 49.853515625%; /* 510.5 / 1024 */
+  top: 52.392578125%;  /* 536.5 / 1024 */
+  width: calc(var(--bs-clock-scale) * 100%);
+  height: calc(var(--bs-clock-scale) * 100%);
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  padding: 0;
+}
+.bs-oven-body {
+  background: #7a4550;
+  border: 3px solid #3a2714;
+  border-radius: 16px 16px 10px 10px;
+  padding: 8px 10px 10px;
+  box-shadow: 0 6px 0 #5a2a32;
+}
+.bs-oven-top { height: 10px; background: #5a2a32; border-radius: 8px 8px 0 0; margin: -8px -10px 8px; }
+.bs-oven-door {
+  background: #3a2714;
+  border-radius: 50%;
+  padding: 6%;
+  display: flex; align-items: center; justify-content: center;
+}
+.bs-oven-clock { width: 100%; }
+.bs-oven-clock .bs-clock { width: 100%; height: auto; display: block; }
+.bs-clock.interactive, #bsOvenClock, .bs-oven-clock .bs-clock.interactive {
+  touch-action: none;
+  cursor: grab;
+}
+.bs-clock.interactive:active { cursor: grabbing; }
+.bs-oven-knobs { display: flex; justify-content: center; gap: 10px; margin-top: 8px; }
+.bs-oven-knobs span { width: 14px; height: 14px; border-radius: 50%; background: #c9a36a; border: 2px solid #3a2714; }
+
+.bs-deco { position: absolute; pointer-events: none; z-index: 5; }
+.bs-deco.pop { animation: bsPop .45s ease-out; }
+@keyframes bsPop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.bs-deco[data-id="string_lights"] { left: 6%; right: 6%; top: 2%; width: auto; }
+.bs-deco[data-id="bunting"] { left: 8%; right: 8%; top: 1%; width: auto; z-index: 2; }
+.bs-deco[data-id="chalkboard"] { left: 4%; top: 40%; width: 18%; }
+.bs-deco[data-id="window_pie"] { right: 10%; top: 8%; width: 16%; }
+@media (orientation: landscape) {
+  .bs-deco[data-id="window_pie"] { left: 6%; right: auto; top: 10%; width: 14%; }
+}
+.bs-deco[data-id="plant"] { left: 3%; bottom: 22%; width: 14%; }
+.bs-deco[data-id="cake_stand"] { right: 10%; bottom: 6%; width: 18%; }
+.bs-deco[data-id="cookie_jar"] { left: 22%; bottom: 6%; width: 14%; }
+.bs-deco[data-id="flower_pot"] { right: 26%; bottom: 6%; width: 14%; }
+.bs-deco[data-id="shelf_clock"] { right: 4%; top: 38%; width: 16%; }
+.bs-deco[data-id="mixing_bowl"] { left: 36%; bottom: 3%; width: 14%; }
+.bs-deco .bs-art { width: 100%; height: auto; display: block; }
+
+.bs-friend {
+  position: absolute; left: 4%; bottom: 6%; width: 22%; max-width: 120px;
+  z-index: 6;
+}
+.bs-friend img { width: 100%; height: auto; display: block; filter: drop-shadow(0 4px 0 #0002); }
+.bs-friend.boss .bs-hat {
+  position: absolute; left: 4%; top: -36%; width: 92%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bs-card {
+  flex: 0 1 auto;
+  background: #fffef8;
+  border: 3px solid #3a2714;
+  border-radius: 22px;
+  padding: 10px 14px 12px;
+  box-shadow: 0 5px 0 #c9a36a;
+  color: #2a1b0c;
+  min-height: 0;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.bs-card.boss { border-color: #8a2a3a; box-shadow: 0 5px 0 #e8a0a8; }
+.bs-ask {
+  margin: 0;
+  font-size: clamp(20px, 4.6vw, 30px);
+  line-height: 1.25;
+  text-align: center;
+}
+.bs-card.picture .bs-ask { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+.bs-tag {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: #fff3c8; border: 2px dashed #8a5a22; border-radius: 16px;
+  padding: 6px 10px;
+}
+.bs-tag.has-art {
+  background: transparent; border: 0; padding: 0; gap: 8px;
+  position: relative;
+}
+.bs-tag-board {
+  position: relative;
+  width: min(190px, 46vw);
+  flex: none;
+}
+.bs-tag-bg { width: 100%; height: auto; display: block; pointer-events: none; }
+.bs-tag-face {
+  position: absolute;
+  left: 20.65%;
+  top: 28.17%;
+  width: 58.59%;
+  height: 58.59%;
+  display: flex; align-items: center; justify-content: center;
+}
+.bs-tag-face .bs-clock { width: 100%; height: 100%; display: block; }
+.bs-tag.has-art .bs-time-prompt { transform: scale(.92); }
+.bs-tag.has-art .bs-time-num { font-size: clamp(28px, 7vw, 44px); }
+.bs-tag.has-art .bs-time-words { font-size: clamp(14px, 3.6vw, 20px); }
+.bs-tag-treat { width: 64px; height: auto; flex: none; }
+.bs-tag-treat .bs-art { width: 64px; height: auto; display: block; }
+.bs-time-prompt {
+  display: flex; align-items: baseline; justify-content: center; gap: 8px;
+  line-height: 1;
+}
+.bs-time-num {
+  font-size: clamp(44px, 12vw, 72px);
+  font-weight: 800;
+  color: #3a2714;
+}
+.bs-time-words {
+  font-size: clamp(22px, 6vw, 32px);
+  font-weight: 800;
+  color: #3a2714;
+}
+.bs-choices {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+}
+.bs-choice {
+  min-width: 108px; min-height: 108px;
+  background: #fff; border: 3px solid #5a3d1c; border-radius: 18px;
+  padding: 6px; cursor: pointer;
+}
+.bs-choice.sel { box-shadow: 0 0 0 4px #2a7a4a; border-color: #2a7a4a; }
+.bs-choice.wrong { animation: bsShake .4s; }
+@keyframes bsShake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.bs-choice .bs-clock { width: 88px; height: 88px; pointer-events: none; }
+
+.bs-set {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.bs-set .bs-clock.interactive { width: min(52vw, 260px); height: auto; touch-action: none; cursor: grab; }
+.bs-set .bs-clock.interactive:active { cursor: grabbing; }
+.bs-ready {
+  min-width: 160px; min-height: 60px;
+  border: 0; border-radius: 999px;
+  background: linear-gradient(#6ad39a, #2fc07e);
+  color: #fff; font: 800 clamp(18px, 4vw, 24px)/1 system-ui, sans-serif;
+  box-shadow: 0 5px 0 #1f9a62; cursor: pointer;
+  padding: 0 22px;
+}
+.bs-ready:disabled { opacity: .5; cursor: default; box-shadow: none; }
+.bs-ready:focus-visible { outline: 3px solid #2a1b0c; outline-offset: 2px; }
+
+.bs-win-card {
+  position: relative;
+  z-index: 4;
+  flex: 0 0 auto;
+  max-height: none;
+  overflow: visible;
+  box-sizing: border-box;
+  animation: none;
+  width: auto;
+  max-width: none;
+  background: #fffef8;
+  color: #2a1b0c;
+  border: 3px solid #5a3d1c; border-radius: 20px;
+  padding: 10px 12px 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  text-align: center;
+}
+.bs-win-card::before {
+  content: ""; display: block;
+  width: min(200px, 56%); height: 48px;
+  background: url("../../assets/picnic/logo/logo_b_wordmark_500.png") center / contain no-repeat;
+  background-image: image-set(url("../../assets/picnic/logo/logo_b_wordmark_500.webp") type("image/webp"), url("../../assets/picnic/logo/logo_b_wordmark_500.png") type("image/png"));
+  flex: none;
+}
+.bs-win-card h2 { margin: 0; font-size: clamp(20px, 4.4vw, 28px); color: #2a1b0c; }
+.bs-win-card p { margin: 0; font-size: 18px; font-weight: 700; color: #2a1b0c; }
+.bs-winart { width: min(28%, 96px); height: auto; flex: none; }
+.bs-winbtns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; flex: none; }
+.bs-winbtns button {
+  box-sizing: border-box;
+  flex: none;
+  min-height: 60px; min-width: 120px;
+  padding: 0 16px;
+  border-radius: 16px; border: 3px solid #5a3d1c;
+  font: 800 18px/1 system-ui, sans-serif; cursor: pointer;
+  background: #2fc07e; color: #08301a;
+}
+.bs-winbtns .bs-secondary { background: #3a2714; color: #fffef8; }
+
+body.bs-won #bakeshop { background: #e8d6f3; }
+body.bs-won .bs-shop { flex: 1 1 55%; min-height: 42%; }
+body.bs-won #bsCardHost { flex: 0 0 auto; }
+
+@media (orientation: landscape) {
+  .bs-oven { width: min(60%, 300px); }
+  .bs-oven-clock, .bs-oven-clock .bs-clock { min-width: 230px; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  #bakeshop { padding: 4px 8px; gap: 4px; }
+  .bs-header { min-height: 60px; }
+  .bs-play { flex-direction: row; align-items: stretch; }
+  .bs-shop { flex: 1 1 48%; min-width: 280px; }
+  #bsCardHost { flex: 1 1 40%; min-width: 0; max-height: 100%; overflow: auto; }
+  .bs-card { flex: 1 1 auto; min-width: 0; max-height: 100%; overflow: auto; }
+  .bs-set { flex-direction: row; justify-content: center; }
+  .bs-set .bs-clock.interactive { width: min(36vh, 200px); }
+  .bs-choice { min-width: 72px; min-height: 72px; }
+  .bs-choice .bs-clock { width: 60px; height: 60px; }
+  .bs-ask { font-size: clamp(18px, 4.2vh, 24px); }
+  .bs-oven { width: min(70%, 280px); min-width: 250px; }
+  .bs-oven-body { padding: 4px 6px 6px; }
+  .bs-oven-top { height: 6px; margin: -4px -6px 4px; }
+  .bs-oven-door { padding: 4%; }
+  .bs-oven-knobs { margin-top: 4px; }
+  .bs-oven-clock, .bs-oven-clock .bs-clock { min-width: 230px; }
+  .bs-win-card {
+    max-height: none;
+    overflow: visible;
+    padding: 6px 10px 8px;
+    gap: 4px;
+  }
+  .bs-win-card::before { display: none; }
+  .bs-winart { width: 44px; max-height: 44px; }
+  .bs-win-card h2 { font-size: 20px; }
+  .bs-win-card p { display: none; }
+  .bs-winbtns { flex-wrap: nowrap; gap: 8px; }
+  body.bs-won .bs-shop { flex: 1 1 48%; min-width: 280px; }
+  body.bs-won #bsCardHost { flex: 1 1 40%; overflow: visible; }
+  .bs-tag-board { width: min(112px, 26vw); }
+  .bs-tag-treat { width: 40px; }
+  .bs-tag-treat .bs-art { width: 40px; }
+  .bs-tag.has-art .bs-time-num { font-size: 26px; }
+  .bs-tag.has-art .bs-time-words { font-size: 14px; }
+}
+@media (min-width: 700px) and (min-height: 700px) {
+  .bs-set .bs-clock.interactive { width: min(48vw, 320px); }
+  .bs-choice .bs-clock { width: 96px; height: 96px; }
+  .bs-choice { min-width: 110px; min-height: 110px; }
+}
+@media (max-width: 420px) {
+  .bs-ask { font-size: clamp(18px, 5.2vw, 24px); }
+  .bs-friend { width: 26%; }
+}

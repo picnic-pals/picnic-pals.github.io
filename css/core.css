@@ -112,7 +112,7 @@ kbd.hit { transform: translateY(.14em); box-shadow: 0 .04em 0 #cbbfe0, inset 0 0
 .card .art > div:not(.rays) { width: 100%; height: 100%; }
 
 /* ---------- gear (press & hold) + grown-up check ---------- */
-.gear { position: fixed; top: max(12px, env(safe-area-inset-top)); right: 12px; width: 52px; height: 52px; border-radius: 50%; background: #ffffffb0; display: grid; place-items: center; z-index: 60; box-shadow: 0 3px 0 #0001; }
+.gear { position: fixed; top: max(12px, env(safe-area-inset-top)); right: 12px; width: 60px; height: 60px; min-width: 60px; min-height: 60px; border-radius: 50%; background: #ffffffb0; display: grid; place-items: center; z-index: 60; box-shadow: 0 3px 0 #0001; }
 .gear svg { width: 28px; height: 28px; fill: var(--ink3); }
 .gear .ring { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(var(--pink) calc(var(--p, 0) * 1%), transparent 0);
   -webkit-mask: radial-gradient(circle, transparent 58%, #000 60%); mask: radial-gradient(circle, transparent 58%, #000 60%); }
@@ -388,11 +388,11 @@ section.subj h3 small { font-weight: 500; font-size: .7em; }
 .bigbtn.pace-wait, .bigbtn.pace-ready, .kh.pace-wait, .kh.pace-ready, .pace-next { position: relative; }
 .kh.pace-wait, .kh.pace-ready { display: inline-block; border-radius: 999px; padding: 2px 10px; }
 .pace-wait { filter: saturate(.55) brightness(1.02); opacity: .8; cursor: default; }
-/* the fill: a clear light wash with a solid white bar along the bottom and a bright leading edge, so it reads on green / blue / pink buttons */
-.pace-wait::after { content: ''; position: absolute; left: 0; bottom: 0; height: 100%; width: 0; pointer-events: none;
-  background: linear-gradient(to top, rgba(255,255,255,.95) 0, rgba(255,255,255,.95) 7px, rgba(255,255,255,.5) 7px);
-  box-shadow: inset -4px 0 0 #fff; animation: paceFill var(--pace-ms, 1500ms) linear forwards; }
-.bigbtn.plain.pace-wait::after, .kh.pace-wait::after { background: linear-gradient(to top, rgba(122,98,180,.6) 0, rgba(122,98,180,.6) 5px, rgba(122,98,180,.16) 5px); box-shadow: inset -3px 0 0 rgba(122,98,180,.6); }
+/* auto-continue fill: a soft rounded wash inside the pill, not a hard white block */
+.pace-wait::after { content: ''; position: absolute; left: 4px; top: 4px; bottom: 4px; width: 0; pointer-events: none;
+  border-radius: inherit; background: rgba(255,255,255,.28);
+  box-shadow: none; animation: paceFill var(--pace-ms, 1500ms) linear forwards; }
+.bigbtn.plain.pace-wait::after, .kh.pace-wait::after { background: rgba(122,98,180,.22); box-shadow: none; }
 .pace-ready { animation: paceReady 1.6s ease-in-out .05s 3; }
 @keyframes paceFill { from { width: 0; } to { width: 100%; } }
 @keyframes paceReady { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
@@ -465,7 +465,7 @@ body.touchui .keys:not(.touch):not(.padkeys) { display: none !important; }
 /* C2: the sight-word fill-in sentence (sound off) */
 .cloze { font-weight: 700; } .cloze .blank { display: inline-block; min-width: 3em; border-bottom: 3px solid currentColor; margin: 0 .15em; }
 /* quality1 (C3): the "?" how-to button and card */
-.q1help { flex: 0 0 auto; width: 56px; height: 56px; border-radius: 50%; border: 0; font-family: inherit; font-weight: 800; font-size: 32px; line-height: 1; color: #fff; background: linear-gradient(#ffd86b, #ffb000); box-shadow: 0 5px 0 #d99000; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.q1help { flex: 0 0 auto; width: 60px; height: 60px; min-width: 60px; min-height: 60px; border-radius: 50%; border: 0; font-family: inherit; font-weight: 800; font-size: 32px; line-height: 1; color: #fff; background: linear-gradient(#ffd86b, #ffb000); box-shadow: 0 5px 0 #d99000; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
 .q1help:active { transform: translateY(3px); box-shadow: 0 2px 0 #d99000; }
 .overlay.howto .howto-art { display: flex; align-items: center; justify-content: center; gap: 10px; }
 .overlay.howto .howto-art .he { font-size: 72px; line-height: 1; }
@@ -478,7 +478,7 @@ body.touchui .keys:not(.touch):not(.padkeys) { display: none !important; }
 .overlay.howto .howto-step .hs-t { font-size: 18px; font-weight: 800; line-height: 1.15; color: var(--ink); }
 .overlay.howto .howto-step .hs-arrow { position: absolute; right: -14px; top: 50%; transform: translateY(-50%); font-size: 22px; color: var(--ink2); z-index: 1; }
 @media (max-width: 500px) {
-  .q1help { width: 46px; height: 46px; font-size: 26px; }
+  .q1help { width: 60px; height: 60px; min-width: 60px; min-height: 60px; font-size: 26px; }
   .overlay.howto .howto-lines { font-size: 19px; }
   .overlay.howto.howto-pic .card { padding: 14px 10px 12px; }
   .overlay.howto.howto-pic h2 { font-size: 28px; margin: 4px 0 6px; }
@@ -649,3 +649,97 @@ body.touchui .keys:not(.touch):not(.padkeys) { display: none !important; }
 .emo .pp-emoji { font-size: 1em; line-height: 1; display: inline-block; width: 1em; height: 1em; vertical-align: middle; }
 .bub .emo .pp-emoji, .bub .emo .pp-emoji[data-size] { font-size: 58px !important; width: 1em; height: 1em; }
 .target .emo .pp-emoji, .target .emo .pp-emoji[data-size] { font-size: 60px !important; width: 1em; height: 1em; }
+
+.toast .pp-icon, .toast img.pp-pic { width: 1.25em; height: 1.25em; vertical-align: -0.2em; }
+#timer .clock .pp-icon, .timer .clock .pp-icon, #shot .pp-icon, #rushBar .pp-icon,
+.mtile .big .pp-icon, .s2-lv .n .pp-icon, .gt2 .pp-icon, .subj h3 .pp-icon {
+  width: 1.15em; height: 1.15em; vertical-align: -0.18em;
+}
+
+
+/* celebration / win screens: Title B picnic scene (no wordmark) + small Logo B on the card */
+.overlay.celebrate {
+  background-color: #e8d6f3;
+  background-image: url("../assets/picnic/title/title_b_win_landscape.png");
+  background-image: image-set(url("../assets/picnic/title/title_b_win_landscape.webp") type("image/webp"), url("../assets/picnic/title/title_b_win_landscape.png") type("image/png"));
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+@media (orientation: portrait) {
+  .overlay.celebrate {
+    background-image: url("../assets/picnic/title/title_b_win_portrait.png");
+    background-image: image-set(url("../assets/picnic/title/title_b_win_portrait.webp") type("image/webp"), url("../assets/picnic/title/title_b_win_portrait.png") type("image/png"));
+  }
+}
+.overlay.celebrate .card {
+  background: #fffefbf5;
+}
+.overlay.celebrate .card::before {
+  content: "";
+  display: block;
+  width: min(220px, 58%);
+  height: 58px;
+  margin: 0 auto 6px;
+  background: url("../assets/picnic/logo/logo_b_wordmark_500.png") center / contain no-repeat;
+  background-image: image-set(url("../assets/picnic/logo/logo_b_wordmark_500.webp") type("image/webp"), url("../assets/picnic/logo/logo_b_wordmark_500.png") type("image/png"));
+}
+
+
+/* ---- PT6: 60px floor on shared Home / How-to / gear ---- */
+.gear, .iconbtn, .q1help, #howtoBtn, #homeBtn, .homebtn {
+  min-width: 60px;
+  min-height: 60px;
+}
+#howtoBtn.q1help, #s2Help.q1help, .q1help { width: 60px; height: 60px; }
+.iconbtn, #homeBtn.iconbtn { width: 60px; height: 60px; }
+
+/* v0.4 visual counting: dots stay large (12% of a frame's inner width), more frames not smaller dots. */
+.cv-set {
+  --cv-d: clamp(22px, 4.4vw, 36px);
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: calc(var(--cv-d) * 0.5);
+  align-items: flex-start;
+  justify-content: center;
+  max-width: 100%;
+}
+.cv-frame, .cv-dice {
+  box-sizing: border-box;
+  display: grid;
+  gap: calc(var(--cv-d) * 0.35);
+  padding: calc(var(--cv-d) * 0.25);
+  background: #fff8f0;
+  border: 2px solid #5a3d8a;
+  border-radius: 8px;
+}
+.cv-frame { grid-template-columns: repeat(5, var(--cv-d)); grid-auto-rows: var(--cv-d); }
+.cv-frame.cv-five { grid-template-rows: var(--cv-d); }
+.cv-dice { grid-template-columns: repeat(3, var(--cv-d)); grid-template-rows: repeat(3, var(--cv-d)); border-radius: 12px; }
+.cv-scatter { display: inline-flex; flex-wrap: wrap; gap: calc(var(--cv-d) * 0.35); padding: calc(var(--cv-d) * 0.25); max-width: calc(var(--cv-d) * 4.2); }
+.cv-dot {
+  width: var(--cv-d);
+  height: var(--cv-d);
+  border-radius: 50%;
+  box-sizing: border-box;
+  background: #fff;
+  box-shadow: inset 0 0 0 2px #c5b8dc;
+}
+.cv-dot.on { background: #b71c1c; box-shadow: inset 0 0 0 2px #7f1010; }
+.cv-dot.on.ones { background: #0d47a1; box-shadow: inset 0 0 0 2px #072a61; }
+.cv-ql { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.cv-ql.is-hidden .cv-ql-pic { visibility: hidden; }
+.cv-showagain {
+  min-height: 44px; min-width: 120px; padding: 8px 16px; border: 0; border-radius: 16px;
+  background: #fff; color: #3b2d55; font: 700 16px inherit; box-shadow: 0 3px 0 rgba(59,45,85,.15); cursor: pointer;
+}
+/* Do not shrink counted dots on a Munch tile: give the set more of the card instead. */
+.cell .cv-set { --cv-d: clamp(22px, 9cqw, 32px); }
+.st-pic .cv-set, .pb-qpic .cv-set, .pbpic .cv-set { --cv-d: clamp(22px, 3.6vw, 32px); }
+
+.g2-clock { display: inline-block; width: 140px; height: 140px; vertical-align: middle; }
+.g2-clock svg { width: 100%; height: 100%; }
+.g2-array { display: inline-grid; gap: 4px; padding: 8px; background: #fff8f0; border: 2px solid #5a3d8a; border-radius: 8px; vertical-align: middle; }
+.g2-array i { width: 14px; height: 14px; border-radius: 50%; background: #b71c1c; }
+.g2-coins { display: inline-block; padding: 8px 12px; background: #fff8f0; border: 2px solid #5a3d8a; border-radius: 12px; font-weight: 700; color: #3b2d55; }
+.cv-arrive { display: inline-block; margin-left: 8px; padding: 6px 10px; border-radius: 12px; background: #e3f2fd; color: #0d47a1; font-weight: 700; }

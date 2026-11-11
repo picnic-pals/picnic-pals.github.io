@@ -30,6 +30,7 @@
   var GL = {
     // math (steps; wrapped old skills keep one tag)
     t_count3: 0, t_count5: 0, count10: 1, pk_count10: 1, pk_compare: 1, pk_more1: 1, pk_less1: 1, pk_make5: 1,
+    counting_visual_p: 1, g2_bb: 4, g2_mu: 4,
     pk_count20: 2, pk_numid20: 2, pk_next20: 2, pk_before20: 2, pk_count30: 2, pk_next30: 2, pk_more1_30: 2,
     add10: 2.5, sub10: 2.5, make10: 2, teen: 2, missing: 3, wordprob: 3, evenodd: 4, compare: 2, add20: 3, sub20: 3,
     a_dbl: 3, a_ndbl: 3, a_ten: 3, s_teen1: 3, s_teen10: 3, s_10: 3, a_9: 3, a_8: 3, s_noX: 3, a_mk10: 3, s_split: 3, s_think: 3, a_mix: 3, s_mix: 3,
@@ -328,7 +329,11 @@
   S.bandTop = function (p) { var b = S.band(p); if (b === 'T') return 'pk_count20'; if (b === 'P' && !pTopOpen(p)) return 'teen'; return null; };
   function pBand(p) { return !!p && (S.band(p) === 'P' || S.band(p) === 'T'); }
   var tf = S.tf;
-  function dotsFor(n) { n = Math.max(0, Math.min(40, n | 0)); var h = '<span class="pb-frames">', full = Math.floor(n / 10), rest = n % 10; for (var i = 0; i < full; i++) h += tf({ on: 10 }); if (rest || !full) h += tf({ on: rest }); return h + '</span>'; }
+  function dotsFor(n) {
+    n = Math.max(0, Math.min(40, n | 0));
+    if (A.CountVisual && n <= 30) return A.CountVisual.html(n);
+    var h = '<span class="pb-frames">', full = Math.floor(n / 10), rest = n % 10; for (var i = 0; i < full; i++) h += tf({ on: 10 }); if (rest || !full) h += tf({ on: rest }); return h + '</span>';
+  }
   function eqPic(label) {
     var m = String(label).match(/^\s*(\d+)\s*([+−-])\s*(\d+)\s*$/); if (!m) return null; var a = +m[1], b = +m[3];
     if (m[2] === '+') return '<span class="pbpic"><b>' + a + ' + ' + b + '</b><span class="pb-row">' + (a <= 10 ? tf({ on: a }) : dotsFor(a)) + '<i class="pb-op">+</i>' + (b <= 10 ? tf({ on: b, b: 0 }).replace(/class="on"/g, 'class="on b"') : dotsFor(b)) + '</span></span>';

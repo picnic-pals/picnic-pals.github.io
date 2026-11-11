@@ -25,7 +25,7 @@
   function inner(c) {
     if (c.cls === 'shape') return shapeSvg(c.shape, c.col);
     if (c.cls === 'animal') return '<span class="emo">' + (A.Icons ? A.Icons.html(c.e, { size: 64, decorative: true, cls: 'pp-pic' }) : c.e) + '</span>';
-    if (c.cls === 'peek') return '<span class="emo q">🫧</span>';
+    if (c.cls === 'peek') return '<span class="emo q">' + (A.Icons ? A.Icons.html('🫧', { size: 48, decorative: true, cls: 'pp-pic', slot: 'bubble:peek' }) : '🫧') + '</span>';
     if (c.cls === 'sound') return '<span class="snd">' + A.esc(c.t) + '</span>';
     if (c.cls === 'color') return '';
     return '<span class="tx' + (String(c.t).length > 3 ? ' long' : '') + '">' + A.esc(c.t) + '</span>';
@@ -183,8 +183,8 @@
     for (var s1 = 0; s1 < stars; s1++) setTimeout(function () { A.Audio.sfx('star'); }, 400 + s1 * 300);
     G.result = { stars: stars, res: G.res, out: out };
     return wait(400).then(function () {
-      return UI.card({ tag: STORY ? (ST.STOPS[SI].area.emoji + ' Stop ' + ST.STOPS[SI].n + ' · ' + ST.STOPS[SI].area.name) : '🫧 Bubble Pop', title: 'Pop-tastic!', cls: 'celebrate bubbledone', html: html,
-        art: '<div class="dance"><img class="hero" src="' + img(P.blob, 'cheering') + '" alt="" draggable="false"></div>', btn: STORY ? 'Map ▶' : '🏠 Back home', voice: ['bp_round_done', 'fb_you_got', stars, stars === 1 ? 'fb_star' : 'fb_stars'], sfx: 'win', confetti: true, minMs: 1000 });
+      return UI.card({ tag: STORY ? (ST.STOPS[SI].area.emoji + ' Stop ' + ST.STOPS[SI].n + ' · ' + ST.STOPS[SI].area.name) : '🫧 Bubble Pop', title: stars > 0 ? 'Pop-tastic!' : 'Nice popping!', cls: 'celebrate bubbledone', html: html,
+        art: '<div class="dance"><img class="hero" src="' + img(P.blob, 'cheering') + '" alt="" draggable="false"></div>', btn: STORY ? 'Map ▶' : '🏠 Back home', voice: stars > 0 ? ['bp_round_done', 'fb_you_got', stars, stars === 1 ? 'fb_star' : 'fb_stars'] : ['bp_round_done'], sfx: 'win', confetti: stars > 0, minMs: 1000 });
     }).then(function () { return A.Rewards.celebrate(P, rewards); })
       .then(function () { return A.PlayTime ? A.PlayTime.checkpoint().then(function (ok) { if (!ok) return new Promise(function () {}); }) : null; })
       .then(function () { if (window.__noNav) return; if (STORY) { var next = out && out.runAdded ? Math.min(SI + 1, ST.mainCount() - 1) : SI; location.href = MAPURL + '&from=' + SI + '&to=' + next; } else goHome(); });

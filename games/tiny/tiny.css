@@ -4,7 +4,7 @@ body { background: linear-gradient(#fff6e8, #ffe9f1); }
 .tbar { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .tbar::before { content: ''; width: 84px; }   /* keeps the dots centred now that Home sits in the corner */
 /* design2: a small corner Home button with press-and-hold (tiny.js HOLD_MS); a ring fills while holding */
-.homebtn { position: fixed; top: 8px; left: 8px; z-index: 5; width: 48px !important; height: 48px !important; font-size: 22px !important; opacity: .7; box-shadow: 0 3px 0 #f0d9e4 !important; touch-action: none; -webkit-user-select: none; user-select: none; }
+.homebtn { position: fixed; top: 8px; left: 8px; z-index: 5; width: 60px !important; height: 60px !important; min-width: 60px; min-height: 60px; font-size: 22px !important; opacity: .7; box-shadow: 0 3px 0 #f0d9e4 !important; touch-action: none; -webkit-user-select: none; user-select: none; }
 .homebtn::after { content: ''; position: absolute; inset: -5px; border-radius: 50%; background: conic-gradient(#ff8ab3 var(--hp, 0%), transparent 0); -webkit-mask: radial-gradient(circle, transparent 27px, #000 28px); mask: radial-gradient(circle, transparent 27px, #000 28px); pointer-events: none; }
 .homebtn.holding { opacity: 1; animation: homehold .8s linear forwards; }
 @property --hp { syntax: '<percentage>'; inherits: true; initial-value: 0%; }

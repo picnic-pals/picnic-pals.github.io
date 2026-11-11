@@ -33,7 +33,10 @@
     }
   };
   UI.toast = function (msg, ms) {
-    var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; fxAdd(t, ms || 2600);
+    var t = document.createElement('div'); t.className = 'toast';
+    if (A.Icons && A.Icons.embed) t.innerHTML = A.Icons.embed(String(msg || ''), { size: 28, decorative: true, cls: 'pp-pic toast-ico', slot: 'toast' });
+    else t.textContent = msg;
+    fxAdd(t, ms || 2600);
   };
 
   /* ---------- modal cards (celebrations, intros) ---------- */

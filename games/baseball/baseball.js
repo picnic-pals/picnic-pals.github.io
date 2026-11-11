@@ -192,7 +192,10 @@
   function mkPlayer(P, i) { return { i: i, P: P, name: P.name, col: COLORS[i], runsBy: [], hits: 0, homers: 0, right: 0, wrong: 0, pitches: 0, outs: 0, round: null, hr: 0, hw: 0, sw: {}, tricky: 0, log: [], t0: 0, cap: capFor(P), times: [] }; }
   var PL = [mkPlayer(P1, 0)]; if (TWO) PL.push(mkPlayer(P2, 1));
   // the friendly rival team (solo free play only; story stops and 2-player games have no rival)
-  var RIVALON = !TWO && !STORYB, RIV = { name: R.RIVAL.name, icon: R.RIVAL.icon, runsBy: [], hits: 0, col: { c: '#4caf50', d: '#2e7d32' } };
+  function rivalIcon() {
+    return (A.Icons && A.Icons.html) ? A.Icons.html('🥦', { size: 28, decorative: true, cls: 'pp-pic', slot: 'bb:sprout' }) : (R.RIVAL.icon || '');
+  }
+  var RIVALON = !TWO && !STORYB, RIV = { name: R.RIVAL.name, icon: rivalIcon(), runsBy: [], hits: 0, col: { c: '#4caf50', d: '#2e7d32' } };
   var LITTLE = A.Age.little(P1);
   function maxOuts() { return STORYB && SC && SC.outs ? SC.outs : R.outsFor(A.Age.little(bat().P)); }   // after9: a story stop is one big inning with SC.outs (4) outs
   function mercy() { return STORYB ? (SC && SC.mercy ? SC.mercy : 99) : R.mercyFor(A.Age.little(bat().P)); }   // batch1: Story caps an inning at 5 runs too
@@ -446,7 +449,7 @@
     var phrases = !opt.hideCards && q.choices.some(isPhraseChoice);
     box.classList.toggle('n3', q.choices.length === 3);
     box.classList.toggle('phrases', !!phrases);
-    box.classList.toggle('stack', !!phrases && q.choices.length === 3 && window.innerWidth <= 500);
+    box.classList.toggle('stack', !!phrases && q.choices.length >= 3 && q.choices.length <= 4 && window.innerWidth <= 500);
     if (opt.hideCards) { G.sel = -1; return; }
     q.choices.forEach(function (c, i) {
       var phrase = isPhraseChoice(c);
@@ -526,7 +529,7 @@
     G.lastTick = Date.now();
     var e = elapsed();
     if (S.bbClock > 0 && G.voiceDone) {
-      var left = Math.max(0, Math.ceil(S.bbClock - e)); $('#shot').textContent = '⏱ ' + left; $('#shot').classList.toggle('low', left <= 5);
+      var left = Math.max(0, Math.ceil(S.bbClock - e)); $('#shot').innerHTML = (A.Icons ? A.Icons.html('⏱', { size: 28, decorative: true, cls: 'pp-pic', slot: 'bb:shot' }) : '⏱') + ' ' + left; $('#shot').classList.toggle('low', left <= 5);
       if (e >= S.bbClock) timeout();
     }
   }
@@ -556,7 +559,7 @@
       return enterPassageRead(q);
     }
     renderQuestion(q);
-    G.accept = true; G.busy = false; G.voiceDone = false; G.qT0 = G.qShown = Date.now(); $('#shot').textContent = S.bbClock > 0 ? '⏱ ' + S.bbClock : '';
+    G.accept = true; G.busy = false; G.voiceDone = false; G.qT0 = G.qShown = Date.now(); $('#shot').innerHTML = S.bbClock > 0 ? ((A.Icons ? A.Icons.html('⏱', { size: 28, decorative: true, cls: 'pp-pic', slot: 'bb:shot' }) : '⏱') + ' ' + S.bbClock) : '';
     var my = G.pitchN;
     Promise.race([V.say(A.ReadAloud ? A.ReadAloud.auto(bat().P, q) : q.say, { kind: q.listen ? 'listen' : 'prompt' }), wait(6000)]).then(function () { if (G.pitchN === my && !G.voiceDone) { G.voiceDone = true; G.qT0 = Date.now(); } });
     clearInterval(G.timer); G.timer = setInterval(tick, 100); tick();
@@ -691,7 +694,7 @@
   var FIELD = ['left field', 'center field', 'right field'];
   function doHit(z, q, o) {
     var pl = bat(); pl.hits++; if (z.k === 'hr') pl.homers++; G.hitN++;
-    var why = o ? [speedOf(o.sec, o.quick) >= 1 ? '⚡ Fast!' : '', o.diff >= .7 ? '🔥 Tricky!' : ''].filter(Boolean).join(' ') : '';
+    var why = o ? [speedOf(o.sec, o.quick) >= 1 ? (A.Icons ? A.Icons.html('⚡', { size: 28, decorative: true, cls: 'pp-pic', slot: 'bb:fast' }) + ' Fast!' : '⚡ Fast!') : '', o.diff >= .7 ? '🔥 Tricky!' : ''].filter(Boolean).join(' ') : '';
     $('#swingTag').innerHTML = z.icon + ' ' + z.name + ' = ' + z.bases + (z.bases === 1 ? ' base' : ' bases') + '!' + (why ? ' <small>' + why + '</small>' : ''); $('#swingTag').className = 'swingtag on ' + z.k;
     var loaded = G.bases.every(Boolean), anyOn = G.bases.some(Boolean);
     // about 1 in 4 hits gets a base-running question ("where" needs a runner on base and no home run)

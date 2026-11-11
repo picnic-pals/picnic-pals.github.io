@@ -438,7 +438,17 @@
   // wrong answer), so it counts as right.
   // stand-r1: the 3rd star needs every served order right the first time (no 3 stars after a retry); a friend who walked off
   // is not counted against her (no penalty beyond the lost tip)
-  function dayStars(r) { var s = 1, f = r.served ? r.firstOk / r.served : 0; if (f >= .7) s++; if (r.served && r.firstOk >= r.served && (r.tipFirst || r.rushWon || r.tod)) s++; return Math.min(3, s); }
+  function dayStars(r) {
+    var served = r.served || 0, first = r.firstOk || 0, walked = r.walked || 0;
+    var f = served ? first / served : 0;
+    var s = 1;
+    if (f >= .7) s++;
+    if (served && first >= served && (r.tipFirst || r.rushWon || r.tod)) s++;
+    /* Kind, no-guilt: a really rough day (lots of misses, or several friends walking off) earns no star. Toddlers stay at least 1. */
+    if (!r.tod && served >= 4 && f < 0.35) return 0;
+    if (!r.tod && walked >= 3) return 0;
+    return Math.min(3, s);
+  }
   function finishDay(p, r) { var g = data(p); g.days++; g.customers += r.served || 0; g.tips += r.tips || 0; g.best = Math.max(g.best || 0, r.tips || 0); g.lastDay = today(); g.cups = (g.cups || 0) + (r.served || 0); r.newFlavor = notePlayDay(p); if (r.rushTried) g.rush.tries++; if (r.rushWon) g.rush.wins++; return dayStars(r); }
   function summary(p) { var g = data(p); return ORDER.map(function (lad) { var L = LADDERS[lad], T = g.tracks[lad]; return { ladder: lad, open: !!L.gate(p), cur: T ? T.cur : null, steps: L.ids.map(function (id) { var s = g.steps[id] || {}; return { id: id, name: STEPS[id].name, status: s.status || 'locked', placed: !!s.placed, n: s.n || 0, acc: s.n ? Math.round(100 * s.ok / s.n) : null }; }) }; }); }
 

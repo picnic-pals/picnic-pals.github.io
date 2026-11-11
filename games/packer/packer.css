@@ -1,0 +1,589 @@
+/* Picnic Packer: portrait picnic packing. Order text lives only on the cream card. */
+/* artswap: painted home meadow as the picnic scene */
+body {
+  color: #3a2714;
+  background-color: #e8f4c8;
+  background-image: url("../../art/backgrounds/home_1920x1080.jpg");
+  background-image: image-set(
+    url("../../art/backgrounds/home_1920x1080.webp") type("image/webp"),
+    url("../../art/backgrounds/home_1920x1080.jpg") type("image/jpeg")
+  );
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+@media (min-width: 700px), (min-resolution: 2dppx) and (min-width: 400px) {
+  body {
+    background-image: url("../../art/backgrounds/home_2560x1440.jpg");
+    background-image: image-set(
+      url("../../art/backgrounds/home_2560x1440.webp") type("image/webp"),
+      url("../../art/backgrounds/home_2560x1440.jpg") type("image/jpeg")
+    );
+  }
+}
+body::before, body::after { display: none !important; content: none !important; }
+
+#packer {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 680px);
+  height: 100vh; height: 100dvh;
+  max-height: 1100px;
+  margin: auto;
+  padding: 8px 12px 12px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pk-header {
+  display: flex; align-items: center; gap: 8px; min-height: 48px; flex-shrink: 0;
+}
+.pk-header h1 {
+  font-size: clamp(20px, 4.4vw, 28px); margin: 0; flex: 1; text-align: center;
+  color: #3a2714;
+  background: #fff6dc;
+  border: 2px solid #e4d2a4;
+  border-radius: 14px;
+  padding: 4px 8px;
+  line-height: 1.15;
+}
+.pk-header button {
+  min-width: 60px; min-height: 60px; border-radius: 15px;
+  background: #fff6dc; border: 2px solid #e4d2a4; font-size: 16px; font-weight: 600; color: #3a2714;
+  display: flex; align-items: center; justify-content: center; padding: 0 8px; flex-shrink: 0;
+}
+.pk-header button .pp-icon, .pk-header button .pp-emoji { width: 28px; height: 28px; }
+.pk-header #pkTimer.on { background: #d7f3c8; border-color: #8fbe74; }
+.pk-header #pkTimer .pk-off-mark { position: absolute; width: 2px; height: 22px; background: #a33; transform: rotate(35deg); border-radius: 2px; pointer-events: none; }
+.pk-header #pkTimer { position: relative; }
+
+#pkContent { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+
+/* High-contrast order card: dark text on solid cream. Never over the meadow. */
+.pk-card {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 5;
+  background: #fff6dc;
+  color: #2a1b0c;
+  border: 3px solid #5a3d1c;
+  border-radius: 18px;
+  padding: 10px 12px 12px 12px;
+  box-shadow: 0 3px 0 #c9b17a, 0 8px 16px #0002;
+  display: grid;
+  grid-template-columns: 1fr 48px;
+  grid-template-rows: auto auto;
+  gap: 6px 8px;
+  align-items: start;
+}
+.pk-card.boss { border-color: #8a5a12; background: #fff4c8; }
+.pk-who {
+  grid-column: 1; grid-row: 1;
+  font-size: 16px; font-weight: 700; color: #5a3d1c; line-height: 1.2;
+  min-width: 0;
+}
+.pk-card #pkCardSpeak, .pk-cardspeak {
+  grid-column: 2; grid-row: 1 / span 2;
+  align-self: center; justify-self: end;
+  min-width: 48px; min-height: 48px; border-radius: 14px;
+  background: #ffe9a8; border: 2px solid #c9a24a;
+  display: flex; align-items: center; justify-content: center;
+}
+.pk-cardspeak .pp-icon, .pk-cardspeak .pp-emoji { width: 32px; height: 32px; }
+.pk-ask {
+  grid-column: 1; grid-row: 2;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #2a1b0c;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.pk-pics {
+  grid-column: 1 / -1;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
+  margin-top: 4px;
+}
+.pk-group {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  background: #fff; border: 2px solid #e4d2a4; border-radius: 14px; padding: 6px 10px;
+}
+.pk-num {
+  font-size: 40px; font-weight: 800; line-height: 1; color: #2a1b0c; min-width: 0.6em; text-align: center;
+}
+.pk-pics .pp-icon, .pk-pics .pp-emoji {
+  width: 56px; height: 56px; object-fit: contain;
+  display: inline-block;
+}
+.pk-repeat { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+
+.pk-play {
+  flex: 1; min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(var(--pk-shelf-min, 200px), 1fr);
+  gap: 10px;
+}
+.pk-row {
+  display: grid;
+  grid-template-columns: minmax(92px, 30%) minmax(0, 1fr);
+  gap: 8px;
+  align-items: end;
+  min-height: 0;
+}
+.pk-friend {
+  background: #fff6dc; border: 2px solid #e4d2a4; border-radius: 18px;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  padding: 6px 6px 8px; position: relative;
+  height: 168px; max-height: 168px; align-self: end;
+}
+.pk-friend img, .pk-friend .blob { width: auto; height: auto; max-width: 100%; max-height: calc(100% - 22px); object-fit: contain; }
+.pk-friend .pk-crown { position: absolute; top: -6px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; }
+.pk-friend .pk-crown .pp-icon { width: 36px; height: 36px; }
+.pk-fname {
+  font-size: 13px; font-weight: 700; color: #5a3d1c; background: #fff; border-radius: 999px;
+  padding: 2px 8px; margin-top: 2px; max-width: 100%; overflow: visible; text-overflow: clip; white-space: normal;
+  line-height: 1.15; text-align: center;
+}
+
+/* Picnic basket: locked body + front-rim art. Layers share one 4:3 canvas
+   so items sit between them and tuck behind the rim. Class has-art hides
+   the CSS handle (the body image already includes one). */
+.pk-basket {
+  --pk-basket-back: image-set(
+    url("../../art/packer/basket_body_512.png") 1x,
+    url("../../art/packer/basket_body.png") 2x
+  );
+  --pk-basket-front: image-set(
+    url("../../art/packer/basket_front_512.png") 1x,
+    url("../../art/packer/basket_front.png") 2x
+  );
+  --pk-basket-weave:
+    repeating-linear-gradient(90deg,
+      #e8c078 0 3px, #c48a38 3px 13px, #8f5a22 13px 15px,
+      #d4a04e 15px 17px, #c48a38 17px 27px, #6f4218 27px 29px),
+    repeating-linear-gradient(0deg,
+      transparent 0 9px, rgba(80, 40, 8, 0.38) 9px 12px,
+      transparent 12px 21px, rgba(255, 220, 140, 0.22) 21px 24px);
+  --pk-basket-weave-front:
+    repeating-linear-gradient(90deg,
+      #d4a04e 0 3px, #b87a30 3px 13px, #6f4218 13px 15px,
+      #c48a38 15px 17px, #b87a30 17px 27px, #5a3210 27px 29px),
+    repeating-linear-gradient(0deg,
+      transparent 0 9px, rgba(50, 24, 4, 0.45) 9px 12px,
+      transparent 12px 21px, rgba(255, 210, 120, 0.18) 21px 24px);
+  position: relative;
+  width: min(100%, 250px);
+  height: 168px;
+  justify-self: center;
+  align-self: end;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+.pk-basket-art { position: relative; width: 100%; height: 100%; }
+.pk-basket.has-art .pk-basket-art {
+  position: absolute;
+  width: calc(var(--pk-art-w) / var(--pk-crop-w) * 100%);
+  height: calc(var(--pk-art-h) / var(--pk-crop-h) * 100%);
+  left: calc(var(--pk-crop-x) / var(--pk-crop-w) * -100%);
+  top: calc(var(--pk-crop-y) / var(--pk-crop-h) * -100%);
+}
+.pk-basket-handle {
+  position: absolute; left: 20%; right: 20%; top: 2px; height: 46px;
+  border: 7px solid #7a4a1c;
+  border-bottom: none;
+  border-radius: 60% 60% 0 0 / 115% 115% 0 0;
+  box-shadow: inset 0 2px 0 #e0b15c, 0 1px 0 #5a3210;
+  background: transparent;
+  pointer-events: none;
+  z-index: 1;
+}
+.pk-basket.has-art .pk-basket-handle { display: none; }
+.pk-basket-back,
+.pk-basket-front {
+  background-color: #c48a38;
+  background-repeat: no-repeat, repeat;
+  background-size: 100% 100%, auto;
+  pointer-events: none;
+}
+.pk-basket-back {
+  position: absolute; left: 0; right: 0; top: 40px; bottom: 0;
+  z-index: 1;
+  border-radius: 10px 10px 28px 28px;
+  clip-path: polygon(6% 0, 94% 0, 100% 100%, 0 100%);
+  background-image: var(--pk-basket-back), var(--pk-basket-weave);
+  box-shadow: inset 0 8px 0 #6f4518, inset 0 -10px 12px rgba(60, 30, 8, 0.28), 0 5px 0 #7a4a18, 0 10px 14px rgba(0, 0, 0, 0.22);
+}
+.pk-basket-front {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 28%;
+  z-index: 3;
+  border-radius: 0 0 28px 28px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  background-image: var(--pk-basket-front), var(--pk-basket-weave-front);
+  box-shadow: inset 0 5px 0 #5a3210, inset 0 10px 8px rgba(0, 0, 0, 0.15);
+}
+.pk-items {
+  position: absolute;
+  left: 9%; right: 9%;
+  top: 52px; bottom: 14%;
+  z-index: 2;
+  display: flex; flex-wrap: wrap;
+  align-content: flex-end;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 1px 2px;
+  overflow: auto;
+  padding: 0 2px 2px;
+}
+.pk-item {
+  width: 44px; height: 44px; border: 0; background: transparent; border-radius: 10px;
+  box-shadow: none; padding: 1px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.pk-item.pre { background: rgba(255, 255, 255, 0.72); box-shadow: inset 0 0 0 2px #5f9a4a; }
+.pk-item .pp-icon, .pk-item .pp-emoji { width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 1px 1px rgba(60, 30, 8, 0.35)); }
+.pk-item:focus-visible { outline: 3px solid #328497; outline-offset: 2px; }
+
+.pk-shelf {
+  min-height: 0;
+  display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start;
+  gap: 10px 12px;
+  background: #fff6dc; border: 2px solid #e4d2a4; border-radius: 18px;
+  /* Extra top padding keeps the first row of bins fully inside the panel,
+     including their borders (overflow + centered content was clipping them). */
+  padding: 16px 14px 14px;
+  box-sizing: border-box;
+  overflow: auto;
+}
+.pk-bin {
+  width: clamp(88px, 20vw, 128px);
+  height: clamp(88px, 20vw, 128px);
+  min-width: 80px; min-height: 80px;
+  border: 2px solid #c9a24a; border-radius: 20px; background: #fff;
+  padding: 6px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  touch-action: none;
+  box-shadow: 0 3px 0 #e4d2a4;
+}
+.pk-bin .pp-icon, .pk-bin .pp-emoji { width: 78%; height: 78%; object-fit: contain; pointer-events: none; }
+.pk-bin:focus-visible { outline: 3px solid #328497; outline-offset: 2px; }
+.pk-bin.hint { box-shadow: 0 0 0 3px #ffe144, 0 0 14px 4px #ffe85f; }
+
+.pk-nudge {
+  flex-shrink: 0;
+  min-height: 28px;
+  margin: 0;
+  font-size: 16px; font-weight: 600; color: #3a2714;
+  background: #fff6dc; border: 2px solid #e4d2a4; border-radius: 12px;
+  padding: 4px 10px; text-align: center;
+}
+.pk-nudge:empty { display: none; }
+
+.pk-timerbar {
+  height: 8px; border-radius: 99px; background: #ead9b0; overflow: hidden; flex-shrink: 0;
+}
+.pk-timerbar > i { display: block; height: 100%; width: 100%; background: #7cbc62; transform-origin: left center; transition: transform .2s linear; }
+.pk-timerbar.low > i { background: #e0a04a; }
+
+/* Meadow decorations sit behind the play UI and never catch taps. */
+.pk-festoon {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.pk-festoon .pk-deco {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 2px 3px rgba(40, 24, 8, 0.28));
+}
+.pk-festoon .pk-deco .pp-icon,
+.pk-festoon .pk-deco .pp-emoji {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.pk-festoon .pk-deco[data-id="bunting"] {
+  width: min(72vw, 520px);
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+.pk-festoon .pk-deco[data-id="rainbow"] {
+  width: min(38vw, 220px);
+  height: auto;
+  aspect-ratio: 1 / 1;
+}
+.pk-festoon .pk-deco.pop {
+  animation: pk-deco-pop 0.45s ease-out;
+}
+@keyframes pk-deco-pop {
+  0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+  70% { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* Slots: bunting along the top of the sky, lanterns at the edges, flowers in the grass. */
+.pk-festoon .slot-bunting-top { left: 42%; top: 25%; }
+.pk-festoon .slot-bunting-top-2 { left: 64%; top: 29%; }
+.pk-festoon .slot-rainbow-top { left: 50%; top: 20%; }
+.pk-festoon .slot-lantern-left { left: 5%; top: 38%; }
+.pk-festoon .slot-lantern-right { left: 95%; top: 42%; }
+.pk-festoon .slot-balloon-left { left: 7%; top: 24%; }
+.pk-festoon .slot-balloon-right { left: 93%; top: 24%; }
+.pk-festoon .slot-kite-right { left: 91%; top: 36%; }
+.pk-festoon .slot-flower-left { left: 10%; top: 91%; }
+.pk-festoon .slot-flower-right { left: 88%; top: 91%; }
+.pk-festoon .slot-flower-left-2 { left: 20%; top: 93%; }
+.pk-festoon .slot-flower-right-2 { left: 78%; top: 93%; }
+.pk-festoon .slot-ground-left { left: 8%; top: 88%; }
+.pk-festoon .slot-ground-right { left: 92%; top: 88%; }
+.pk-festoon .slot-ground-left-2 { left: 16%; top: 90%; }
+
+.pk-action, .pk-secondary {
+  display: block; border-radius: 17px; padding: 9px 22px; min-height: 44px;
+  font-size: 22px; font-weight: 700;
+  background: #b9ded1; color: #244038; border: 2px solid #87b9a6; box-shadow: 0 3px #87b9a6;
+}
+.pk-secondary { background: #fff1cd; border-color: #dfc68f; box-shadow: 0 3px #dfc68f; color: #3a2714; }
+
+.pk-win {
+  flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; gap: 12px;
+  background: #fff6dc; border: 3px solid #5a3d1c; border-radius: 20px; padding: 16px;
+  color: #2a1b0c;
+}
+.pk-win h2 { margin: 0; font-size: clamp(24px, 6vw, 36px); line-height: 1.2; }
+.pk-win p { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.3; max-width: 28em; }
+.pk-win .pk-winart { width: min(46%, 200px); height: auto; }
+.pk-winbtns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+
+.pk-ghost-drag {
+  position: fixed; width: 56px; height: 56px; pointer-events: none; z-index: 40;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 4px 8px #0004);
+}
+.pk-ghost-drag .pp-icon, .pk-ghost-drag .pp-emoji { width: 56px; height: 56px; }
+.pk-basket.drop .pk-basket-back { filter: brightness(1.1); box-shadow: inset 0 8px 0 #6f4518, inset 0 -10px 12px rgba(60, 30, 8, 0.28), 0 5px 0 #7a4a18, 0 0 0 4px #6dae58, 0 10px 14px rgba(0, 0, 0, 0.22); }
+/* Locked art: full 4:3 canvas. Food sits in the open mouth, bottoms below the front rim. */
+.pk-basket.has-art {
+  /* Crop the 512x384 art to the basket itself so the mouth is large enough
+     for countable food. Crop is (78,16) 356x352 in art pixels. */
+  --pk-art-w: 512;
+  --pk-art-h: 384;
+  --pk-crop-x: 78;
+  --pk-crop-y: 16;
+  --pk-crop-w: 356;
+  --pk-crop-h: 352;
+  width: min(100%, 520px);
+  height: auto;
+  aspect-ratio: 356 / 352;
+  overflow: hidden;
+}
+.pk-basket.has-art .pk-basket-back,
+.pk-basket.has-art .pk-basket-front {
+  inset: 0;
+  top: 0;
+  bottom: 0;
+  height: auto;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border-radius: 0;
+  clip-path: none;
+  box-shadow: none;
+}
+.pk-basket.has-art .pk-basket-back {
+  background-image: var(--pk-basket-back);
+}
+.pk-basket.has-art .pk-basket-front {
+  background-image: var(--pk-basket-front);
+}
+.pk-basket.has-art .pk-items {
+  /* Full 512x384 art box; JS lays items in a staggered pile in the mouth. */
+  inset: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  height: auto;
+  overflow: visible;
+  padding: 0;
+  gap: 0;
+}
+.pk-basket.has-art .pk-item {
+  position: absolute;
+  width: var(--pk-item, 72px);
+  height: var(--pk-item, 72px);
+  padding: 0;
+  border-radius: 50%;
+  transform: translate(-50%, -100%);
+}
+.pk-basket.has-art .pk-item .pp-icon,
+.pk-basket.has-art .pk-item .pp-emoji {
+  width: 100%;
+  height: 100%;
+}
+.pk-basket.has-art .pk-item.pre {
+  background: transparent;
+  box-shadow: inset 0 0 0 3px #5f9a4a;
+}
+.pk-basket.has-art.drop .pk-basket-back {
+  filter: brightness(1.08) drop-shadow(0 0 8px #6dae58);
+  box-shadow: none;
+}
+
+
+@media (min-width: 700px) {
+  .pk-friend { height: 220px; max-height: 220px; }
+  .pk-basket { width: min(100%, 280px); height: 200px; }
+  .pk-basket.has-art { width: min(100%, 520px); height: auto; }
+  .pk-basket-handle { height: 54px; top: 2px; }
+  .pk-basket-back { top: 48px; }
+  .pk-basket.has-art .pk-basket-back { top: 0; }
+  .pk-items { top: 60px; }
+  .pk-basket.has-art .pk-item { --pk-item: 76px; }
+  .pk-item { width: 44px; height: 44px; }
+  .pk-item .pp-icon, .pk-item .pp-emoji { width: 40px; height: 40px; }
+  .pk-bin { width: 128px; height: 128px; min-width: 120px; min-height: 120px; border-radius: 24px; }
+  .pk-shelf { --pk-shelf-min: 300px; padding: 16px 16px 16px; gap: 12px 14px; }
+  .pk-basket.has-art { width: min(100%, 520px, calc(418px * 356 / 352)); max-height: 418px; }
+}
+
+@media (max-width: 400px) {
+  #packer { padding: 6px 8px 8px; gap: 6px; }
+  .pk-header { min-height: 60px; gap: 5px; }
+  .pk-ask { font-size: 22px; }
+  .pk-num { font-size: 36px; }
+  .pk-pics .pp-icon, .pk-pics .pp-emoji { width: 48px; height: 48px; }
+  .pk-row { grid-template-columns: 76px minmax(0, 1fr); }
+  .pk-friend { height: 148px; max-height: 148px; }
+  .pk-basket { width: min(100%, 210px); height: 148px; }
+  .pk-basket.has-art { width: 100%; height: auto; max-width: 100%; }
+  .pk-basket-handle { height: 40px; border-width: 6px; }
+  .pk-basket-back { top: 34px; }
+  .pk-basket.has-art .pk-basket-back { top: 0; }
+  .pk-items { top: 44px; }
+  .pk-basket.has-art .pk-item { --pk-item: 50px; }
+  .pk-bin { width: 84px; height: 84px; min-width: 76px; min-height: 76px; }
+  .pk-shelf { padding: 14px 12px 12px; }
+  .pk-item { width: 28px; height: 28px; }
+  .pk-item .pp-icon, .pk-item .pp-emoji { width: 26px; height: 26px; }
+  .pk-win p { font-size: 22px; }
+}
+@media (max-height: 700px) {
+  .pk-pics .pp-icon, .pk-pics .pp-emoji { width: 48px; height: 48px; }
+  .pk-friend .pk-fname { font-size: 13px; }
+}
+@media (max-width: 400px) {
+  .pk-festoon .slot-bunting-top { top: 28%; left: 40%; }
+  .pk-festoon .slot-bunting-top-2 { top: 32%; left: 66%; }
+  .pk-festoon .slot-balloon-left { left: 9%; top: 34%; }
+  .pk-festoon .slot-balloon-right { left: 91%; top: 22%; }
+  .pk-festoon .slot-lantern-left { left: 6%; top: 36%; }
+  .pk-festoon .slot-lantern-right { left: 94%; top: 40%; }
+  .pk-festoon .pk-deco { width: 64px; height: 64px; }
+  .pk-festoon .pk-deco[data-id="bunting"] { width: min(86vw, 340px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pk-festoon .pk-deco.pop { animation: none; }
+
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+
+/* ---- playtester round 3: short-height landscape, lingering win, 60px targets ---- */
+.pk-item {
+  position: relative;
+}
+.pk-item::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+body.pk-won .pk-festoon { z-index: 2; }
+body.pk-won #packer { background: transparent; }
+body.pk-won #pkContent {
+  position: relative;
+  background: transparent;
+}
+.pk-win-card {
+  position: absolute;
+  left: 8px; right: 8px; bottom: 8px;
+  z-index: 3;
+  max-height: 42%;
+  overflow: auto;
+  flex: none;
+  background: #fffefbf5;
+  border: 3px solid #5a3d1c;
+  border-radius: 20px;
+  padding: 10px 12px 12px;
+  box-shadow: 0 6px 18px #0003;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+.pk-win-card::before {
+  content: "";
+  display: block;
+  width: min(200px, 56%);
+  height: 48px;
+  background: url("../../assets/picnic/logo/logo_b_wordmark_500.png") center / contain no-repeat;
+  background-image: image-set(url("../../assets/picnic/logo/logo_b_wordmark_500.webp") type("image/webp"), url("../../assets/picnic/logo/logo_b_wordmark_500.png") type("image/png"));
+  flex: none;
+}
+.pk-win-card .pk-winart { width: min(28%, 110px); }
+
+@media (orientation: landscape) and (max-height: 820px) {
+  #packer { width: min(100%, 1100px); padding: 4px 8px 6px; gap: 4px; }
+  .pk-header { min-height: 60px; }
+  .pk-header button { min-width: 60px; min-height: 60px; }
+  .pk-card { padding: 6px 10px; }
+  .pk-ask { font-size: 20px; }
+  .pk-num { font-size: 28px; }
+  .pk-pics .pp-icon, .pk-pics .pp-emoji { width: 40px; height: 40px; }
+  .pk-play {
+    grid-template-columns: minmax(0, 1fr) minmax(210px, 46%);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .pk-play .pk-row { min-height: 0; align-items: end; }
+  .pk-play .pk-shelf {
+    --pk-shelf-min: 0;
+    min-height: 0;
+    max-height: 100%;
+    overflow: auto;
+    align-content: flex-start;
+    padding: 10px;
+  }
+  .pk-basket.has-art {
+    width: min(100%, 280px, calc(200px * 356 / 352));
+    max-height: 200px;
+    height: auto;
+  }
+  .pk-friend { height: 132px; max-height: 132px; }
+  .pk-bin { width: 88px; height: 88px; min-width: 72px; min-height: 72px; }
+  .pk-win-card { max-height: 48%; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  .pk-basket.has-art {
+    width: min(100%, 210px, calc(150px * 356 / 352));
+    max-height: 150px;
+  }
+  .pk-friend { height: 108px; max-height: 108px; }
+  .pk-bin { width: 72px; height: 72px; min-width: 64px; min-height: 64px; }
+  .pk-ask { font-size: 16px; }
+  .pk-who { font-size: 14px; }
+}

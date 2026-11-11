@@ -286,7 +286,7 @@
     G.rush.asked = true; clear(); bubble(''); $('#friend').innerHTML = '';
     say(['ls_rush_ask']);
     return UI.confirm({ title: 'Rush hour!', sub: 'Three friends are in a hurry. Want to try a speedy round? No stress: there is a bonus if you beat the clock.', yes: "Let's rush! ⏱️", no: 'No thanks', cls: 'rushask',
-      art: '<div class="rushart">⏱️🍋</div>' }).then(function (yes) {
+      art: '<div class="rushart">' + (A.Icons ? A.Icons.html('⏱️', { size: 48, decorative: true, cls: 'pp-pic', slot: 'stand:rushart' }) : '⏱️') + '🍋</div>' }).then(function (yes) {
       if (yes) { G.rush.on = true; G.rush.left = 3; G.rush.ok = 0; G.res.rushTried = true; document.body.classList.add('rush'); say(['ls_rush_go']); }
       nextCustomer();
     });
@@ -338,8 +338,8 @@
     for (var s1 = 0; s1 < stars; s1++) setTimeout(function () { A.Audio.sfx('star'); }, 400 + s1 * 300);
     G.result = { stars: stars, res: G.res, out: out };
     return wait(600).then(function () {
-      return UI.card({ tag: STORY ? (ST.STOPS[SI].area.emoji + ' Stop ' + ST.STOPS[SI].n + ' · ' + ST.STOPS[SI].area.name) : '🍋 Lemonade Stand', title: 'What a great day!', cls: 'celebrate standdone', html: html,
-        art: '<div class="dance"><img class="hero" src="' + img(P.blob, 'cheering') + '" alt="" draggable="false"></div>', btn: STORY ? 'Map ▶' : '🏠 Back home', voice: ['ls_day_done', 'fb_you_got', stars, stars === 1 ? 'fb_star' : 'fb_stars'], sfx: 'win', confetti: true, minMs: 1000 });
+      return UI.card({ tag: STORY ? (ST.STOPS[SI].area.emoji + ' Stop ' + ST.STOPS[SI].n + ' · ' + ST.STOPS[SI].area.name) : '🍋 Lemonade Stand', title: stars > 0 ? 'What a great day!' : 'What a busy stand!', cls: 'celebrate standdone', html: html,
+        art: '<div class="dance"><img class="hero" src="' + img(P.blob, 'cheering') + '" alt="" draggable="false"></div>', btn: STORY ? 'Map ▶' : '🏠 Back home', voice: stars > 0 ? ['ls_day_done', 'fb_you_got', stars, stars === 1 ? 'fb_star' : 'fb_stars'] : ['ls_day_done'], sfx: 'win', confetti: stars > 0, minMs: 1000 });
     }).then(function () { var nf = G.res.newFlavor && S.FL[G.res.newFlavor]; if (!nf) return null; A.Store.save();
       return UI.card({ tag: '🍋 Lemonade Stand', title: 'New flavor!', cls: 'celebrate newflavor', html: '<p class="nfl">' + flIcon(nf.id) + ' <b>' + A.esc(cap(nf.name)) + '</b> is on the menu!</p>',
         art: '<div class="nfart" style="--juice:' + nf.juice + '">' + pitcherSvg(.85, nf.juice) + '</div>', btn: 'Yay! ▶', voice: [{ id: 'sr1_newfl_' + nf.id, text: 'A new flavor! ' + cap(nf.name) + ' is on the menu!' }], sfx: 'win', confetti: true, minMs: 900 });

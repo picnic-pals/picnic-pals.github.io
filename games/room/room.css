@@ -258,3 +258,22 @@ body.touchui #room .keys { display: none !important; }
 #shopBtn.hasnew::after { content: '✨'; position: absolute; right: -6px; top: -10px; font-size: 26px; animation: newpulse 1.4s ease-in-out infinite; }
 @keyframes newpulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.12); } }
 #shopBtn.hasnew::after { animation-name: newpulse2; } @keyframes newpulse2 { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(1.2) rotate(12deg); } }
+
+
+/* ---- PT6: friend hit targets at least 60px; Got it! stays on screen in short landscape ---- */
+.friend { min-width: 60px; min-height: 60px; }
+@media (orientation: landscape) and (max-height: 500px) {
+  .rdemo .card, .overlay.roomintro .card {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100dvh - 12px);
+    overflow: hidden;
+    padding: 8px 16px 10px;
+    box-sizing: border-box;
+  }
+  .rdemo h2 { font-size: 20px; margin: 0 0 4px; }
+  .dstage { max-height: 28vh; aspect-ratio: auto; height: min(28vh, 130px); margin: 0 auto 4px; flex: 0 1 auto; }
+  .rdemo .dsay, .roomintro .dsay { font-size: 16px; margin: 4px 0; }
+  .rdemo .row2, .overlay.roomintro .row2 { flex: none; margin-top: auto; }
+  .rdemo .bigbtn, .overlay.roomintro .bigbtn { min-height: 60px; min-width: 140px; font-size: 22px; padding: 0 1.2em; }
+}

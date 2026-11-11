@@ -1,0 +1,326 @@
+{
+  "locked": {
+    "bodies": [
+      "body_banana_v1",
+      "body_banana_v2",
+      "body_bread_v1",
+      "body_bread_v2",
+      "body_sandwich_v1",
+      "body_sandwich_v2",
+      "body_taco_v1",
+      "body_taco_v2",
+      "body_hotdog_v2",
+      "body_watermelon_v1",
+      "body_cupcake_v1",
+      "body_muffin_v2",
+      "body_pickle_v1"
+    ],
+    "body_fronts": [
+      "body_banana_v1_front",
+      "body_banana_v2_front",
+      "body_bread_v1_front",
+      "body_bread_v2_front",
+      "body_sandwich_v1_front",
+      "body_sandwich_v2_front",
+      "body_taco_v1_front",
+      "body_taco_v2_front",
+      "body_hotdog_v2_front",
+      "body_watermelon_v1_front",
+      "body_cupcake_v1_front",
+      "body_muffin_v2_front",
+      "body_pickle_v1_front"
+    ],
+    "wheels": [
+      "wheel_donut_v1",
+      "wheel_donut_v2",
+      "wheel_cookie_v1",
+      "wheel_cookie_v2",
+      "wheel_orange_v1",
+      "wheel_orange_v2",
+      "wheel_waffle_v1",
+      "wheel_waffle_v2",
+      "wheel_pizza_v1",
+      "wheel_pizza_v2",
+      "wheel_cucumber_v1",
+      "wheel_cucumber_v2"
+    ],
+    "spoilers": [
+      "spoiler_pretzel_v1",
+      "spoiler_carrot_v2",
+      "spoiler_broccoli_v1",
+      "spoiler_lettuce_v1",
+      "spoiler_candycane_v1"
+    ],
+    "env": [
+      "podium_v1",
+      "bg_garage_v1"
+    ],
+    "note": "Round-1 and round-2 bodies are both locked so the game can offer them as choices. Cupcake v1 and muffin v2 are both locked (the sweet-bun pair). Tracks are not locked."
+  },
+  "canvas": {
+    "w": 512,
+    "h": 512,
+    "unit": "px",
+    "origin": "top-left"
+  },
+  "facing": "right",
+  "ground_y": 408,
+  "wheels": {
+    "diameter": 120,
+    "center_y": 348,
+    "back": [
+      152,
+      348
+    ],
+    "front": [
+      372,
+      348
+    ],
+    "wheelbase": 220,
+    "asset": {
+      "canvas": 512,
+      "center": [
+        256,
+        256
+      ],
+      "diameter": 400,
+      "note": "One square image, wheel perfectly centered so it can rotate around (256,256). Scale by 120/400 = 0.3 when placing on the vehicle canvas."
+    }
+  },
+  "wheel_wells": {
+    "centers": {
+      "back": [
+        152,
+        348
+      ],
+      "front": [
+        372,
+        348
+      ]
+    },
+    "radius": 66,
+    "wheel_radius": 60,
+    "underside_y": 326,
+    "note": "Every body shares these well positions. Circular arches of radius 66 are cut at the wheel centers. The chassis underside between the wheels sits at y=326 so about a third of each wheel tucks into the arch."
+  },
+  "spoiler_mount": {
+    "baked_foot": [
+      108,
+      198
+    ],
+    "placement": "Translate the spoiler PNG by (mount.x - 108, mount.y - 198) so the baked foot sits on this body's rear-deck mount.",
+    "per_body": {
+      "body_banana_v1": {
+        "x": 113,
+        "y": 195,
+        "deck_y": 192,
+        "deck_x": 113
+      },
+      "body_banana_v2": {
+        "x": 113,
+        "y": 194,
+        "deck_y": 191,
+        "deck_x": 113
+      },
+      "body_bread_v1": {
+        "x": 128,
+        "y": 184,
+        "deck_y": 181,
+        "deck_x": 128
+      },
+      "body_bread_v2": {
+        "x": 128,
+        "y": 205,
+        "deck_y": 202,
+        "deck_x": 128
+      },
+      "body_sandwich_v1": {
+        "x": 112,
+        "y": 133,
+        "deck_y": 130,
+        "deck_x": 112
+      },
+      "body_sandwich_v2": {
+        "x": 128,
+        "y": 194,
+        "deck_y": 191,
+        "deck_x": 128
+      },
+      "body_taco_v1": {
+        "x": 128,
+        "y": 216,
+        "deck_y": 213,
+        "deck_x": 128
+      },
+      "body_taco_v2": {
+        "x": 128,
+        "y": 216,
+        "deck_y": 213,
+        "deck_x": 128
+      },
+      "body_hotdog_v2": {
+        "x": 127,
+        "y": 203,
+        "deck_y": 200,
+        "deck_x": 127
+      },
+      "body_watermelon_v1": {
+        "x": 113,
+        "y": 177,
+        "deck_y": 174,
+        "deck_x": 113
+      },
+      "body_cupcake_v1": {
+        "x": 127,
+        "y": 158,
+        "deck_y": 56,
+        "deck_x": 127,
+        "note": "Rear-shoulder mount so a shared-size spoiler stays on the 512 canvas of this tall body."
+      },
+      "body_muffin_v2": {
+        "x": 128,
+        "y": 158,
+        "deck_y": 77,
+        "deck_x": 128,
+        "note": "Rear-shoulder mount so a shared-size spoiler stays on the 512 canvas of this tall body."
+      },
+      "body_pickle_v1": {
+        "x": 127,
+        "y": 211,
+        "deck_y": 208,
+        "deck_x": 127
+      }
+    },
+    "locked_spoilers": [
+      "spoiler_pretzel_v1",
+      "spoiler_carrot_v2",
+      "spoiler_broccoli_v1",
+      "spoiler_lettuce_v1",
+      "spoiler_candycane_v1"
+    ],
+    "tall_body_note": "Cupcake v1 and muffin v2 are tall. Their spoiler mount is on the rear shoulder (y = 158), not the frosting peak, so a shared-size spoiler stays on the 512 canvas. Other bodies use a rear-deck mount 3px into the measured deck top."
+  },
+  "seat_anchor": {
+    "xy": [
+      300,
+      220
+    ],
+    "meaning": "Driver sit point: the hip / bottom-center of the pal. Body art leaves an empty cockpit around this point. Do not draw a driver on the body layer.",
+    "cockpit_front": "Paste bodies/<body>_front.png at (0, 0) after the driver so the cockpit lip overlaps the pal's lower half."
+  },
+  "cockpits": {
+    "body_banana_v1": {
+      "cx": 270,
+      "cy": 226,
+      "sill": 213,
+      "well_floor": 237
+    },
+    "body_banana_v2": {
+      "cx": 278,
+      "cy": 225,
+      "sill": 213,
+      "well_floor": 237
+    },
+    "body_bread_v1": {
+      "cx": 296,
+      "cy": 232,
+      "sill": 207,
+      "well_floor": 246
+    },
+    "body_bread_v2": {
+      "cx": 304,
+      "cy": 224,
+      "sill": 209,
+      "well_floor": 233
+    },
+    "body_sandwich_v1": {
+      "cx": 276,
+      "cy": 188,
+      "sill": 168,
+      "well_floor": 199
+    },
+    "body_sandwich_v2": {
+      "cx": 295,
+      "cy": 208,
+      "sill": 198,
+      "well_floor": 222
+    },
+    "body_taco_v1": {
+      "cx": 276,
+      "cy": 237,
+      "sill": 220,
+      "well_floor": 247
+    },
+    "body_taco_v2": {
+      "cx": 278,
+      "cy": 237,
+      "sill": 220,
+      "well_floor": 247
+    },
+    "body_hotdog_v2": {
+      "cx": 283,
+      "cy": 222,
+      "sill": 207,
+      "well_floor": 231
+    },
+    "body_watermelon_v1": {
+      "cx": 279,
+      "cy": 232,
+      "sill": 214,
+      "well_floor": 242
+    },
+    "body_cupcake_v1": {
+      "cx": 271,
+      "cy": 111,
+      "sill": 93,
+      "well_floor": 122
+    },
+    "body_muffin_v2": {
+      "cx": 271,
+      "cy": 100,
+      "sill": 85,
+      "well_floor": 109
+    },
+    "body_pickle_v1": {
+      "cx": 273,
+      "cy": 238,
+      "sill": 227,
+      "well_floor": 251
+    }
+  },
+  "body_envelope": {
+    "x0": 80,
+    "x1": 448,
+    "y0": 150,
+    "y1": 318,
+    "note": "Suggested body bounds. Underside should sit just above the wheels (~y 300\u2013318) so both wheels stay fully visible. Front (right) can taper toward a nose; rear (left) should offer a solid mount at spoiler_mount."
+  },
+  "layer_order": [
+    "back_wheel",
+    "front_wheel",
+    "body",
+    "driver",
+    "body_front",
+    "spoiler"
+  ],
+  "layer_order_note": "Both wheels are drawn behind the body and show through the shared wells. Do not draw the front wheel in front of the body. Wheels rotate around the center of their 512 asset, (256, 256). Scale wheels by 120/400 = 0.3 when placing on the vehicle canvas.",
+  "env": {
+    "podium_v1": {
+      "file": "env/podium_v1.png",
+      "size": [
+        1112,
+        506
+      ],
+      "transparent": true
+    },
+    "bg_garage_v1": {
+      "file": "env/bg_garage_v1.png",
+      "size": [
+        910,
+        512
+      ],
+      "transparent": false,
+      "tileable": false
+    }
+  }
+}

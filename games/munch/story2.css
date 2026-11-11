@@ -1,11 +1,11 @@
 /* story2: world map + place maps */
-.s2 { position: fixed; inset: 0; z-index: 40; display: none; flex-direction: column; font-family: inherit;
+section.s2 { position: fixed; inset: 0; z-index: 40; display: none; flex-direction: column; font-family: inherit;
   background: linear-gradient(180deg, var(--s2b, #cfeeff) 0%, var(--s2a, #bff0c8) 100%); }
-.s2.on { display: flex; }
-.s2[data-view="world"] { background: radial-gradient(ellipse at 50% 120%, #9fe0a0 0 45%, transparent 46%), linear-gradient(180deg, #bfe6ff, #e9f7ff 55%, #c9f0b8); }
+section.s2.on { display: flex; }
+section.s2[data-view="world"] { background: radial-gradient(ellipse at 50% 120%, #9fe0a0 0 45%, transparent 46%), linear-gradient(180deg, #bfe6ff, #e9f7ff 55%, #c9f0b8); }
 .s2-top { display: flex; align-items: center; gap: 10px; padding: 10px 76px 10px 14px; }   /* room for the gear (top right) */
-.s2-back, .s2-book { width: 56px; height: 56px; border-radius: 50%; border: 0; background: #fff; font-size: 26px; box-shadow: 0 3px 0 rgba(59,45,85,.15); cursor: pointer; }
-.s2-title { flex: 1; font-size: 30px; font-weight: 700; color: #3b2d55; text-shadow: 0 2px 0 #fff; }
+.s2-back, .s2-book { width: 60px; height: 60px; min-width: 60px; min-height: 60px; border-radius: 50%; border: 0; background: #fff; font-size: 16px; font-weight: 800; box-shadow: 0 3px 0 rgba(59,45,85,.15); cursor: pointer; overflow: hidden; display: grid; place-items: center; flex: none; }
+.s2-title { flex: 1; min-width: 0; font-size: 30px; font-weight: 700; color: #3b2d55; text-shadow: 0 2px 0 #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .s2-hero { display: flex; align-items: center; gap: 8px; border: 0; border-radius: 40px; background: #fff; padding: 4px 16px 4px 4px; box-shadow: 0 3px 0 rgba(59,45,85,.15); cursor: pointer; font: inherit; color: #3b2d55; }
 .s2-hero img { width: 56px; height: 56px; border-radius: 50%; background: #fff4f7; }
 .s2-hero .nm { font-weight: 700; font-size: 20px; }
@@ -33,13 +33,13 @@
 .s2-guide { position: absolute; font-size: 54px; transform: translate(-50%, -50%); animation: s2hop 1.2s ease-in-out infinite; z-index: 3; pointer-events: none; }
 .s2-deco { position: absolute; border: 0; background: none; font-size: 46px; cursor: pointer; animation: s2float 5s ease-in-out infinite alternate; transform: translate(-50%, -50%); padding: 6px; }
 .s2-deco.wig { animation: s2wig .6s; }
-.s2[data-place="lagoon"] .s2-stage { background: radial-gradient(ellipse at 50% 80%, #7fd3e8 0 40%, transparent 41%); }
-.s2[data-place="woods"] .s2-stage { background: linear-gradient(180deg, #6fae7a, #b7e0a6); } .s2[data-place="woods"] .s2-lv:not(.off) { box-shadow: 0 0 18px #fff79a; }
-.s2[data-place="caves"] .s2-stage { background: radial-gradient(ellipse at 50% 30%, #fff3fb, #cdbfe6); }
-.s2[data-place="bay"] .s2-stage { background: linear-gradient(180deg, #b8e2ff 0 45%, #7cc8f0 45% 60%, #ffe8b0 60%); }
-.s2[data-place="peaks"] .s2-stage { background: linear-gradient(180deg, #e8e0ff, #fff0d8); }
-.s2[data-place="hills"] .s2-stage { background: radial-gradient(ellipse at 30% 110%, #b6e39a 0 50%, transparent 51%), linear-gradient(180deg, #fff1dc, #ffe2c0); }
-.s2[data-place="meadow"] .s2-stage { background: radial-gradient(ellipse at 60% 115%, #a8e08f 0 55%, transparent 56%), linear-gradient(180deg, #e2f6ff, #fff9d8); }
+section.s2[data-place="lagoon"] .s2-stage { background: radial-gradient(ellipse at 50% 80%, #7fd3e8 0 40%, transparent 41%); }
+section.s2[data-place="woods"] .s2-stage { background: linear-gradient(180deg, #6fae7a, #b7e0a6); } section.s2[data-place="woods"] .s2-lv:not(.off) { box-shadow: 0 0 18px #fff79a; }
+section.s2[data-place="caves"] .s2-stage { background: radial-gradient(ellipse at 50% 30%, #fff3fb, #cdbfe6); }
+section.s2[data-place="bay"] .s2-stage { background: linear-gradient(180deg, #b8e2ff 0 45%, #7cc8f0 45% 60%, #ffe8b0 60%); }
+section.s2[data-place="peaks"] .s2-stage { background: linear-gradient(180deg, #e8e0ff, #fff0d8); }
+section.s2[data-place="hills"] .s2-stage { background: radial-gradient(ellipse at 30% 110%, #b6e39a 0 50%, transparent 51%), linear-gradient(180deg, #fff1dc, #ffe2c0); }
+section.s2[data-place="meadow"] .s2-stage { background: radial-gradient(ellipse at 60% 115%, #a8e08f 0 55%, transparent 56%), linear-gradient(180deg, #e2f6ff, #fff9d8); }
 .s2-friends .s2-fl { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin: 12px 0 18px; }
 .s2-fr { width: 130px; border: 4px solid #fff; border-radius: 24px; background: #fff6fa; padding: 8px; cursor: pointer; font: inherit; color: #3b2d55; box-shadow: 0 4px 0 rgba(59,45,85,.12); display: flex; flex-direction: column; align-items: center; }
 .s2-fr img { width: 96px; height: 96px; } .s2-fr span { font-weight: 700; font-size: 18px; } .s2-fr i { font-style: normal; font-size: 13px; color: #c2477a; }
@@ -56,18 +56,18 @@
 .s2-note { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); background: rgba(255,255,255,.92); border-radius: 22px; padding: 10px 20px; font-size: 20px; color: #3b2d55; box-shadow: 0 3px 0 rgba(59,45,85,.12); white-space: nowrap; }
 
 /* toddler mode: bigger level buttons and labels */
-.s2.s2-tod .s2-lv { width: 136px; height: 136px; } .s2.s2-tod .s2-lv .n { font-size: 52px; } .s2.s2-tod .s2-lv .g { font-size: 26px; }
-.s2.s2-tod .s2-lv.boss { width: 170px; height: 170px; } .s2.s2-tod .s2-back { width: 70px; height: 70px; font-size: 32px; }
+section.s2.s2-tod .s2-lv { width: 136px; height: 136px; } section.s2.s2-tod .s2-lv .n { font-size: 52px; } section.s2.s2-tod .s2-lv .g { font-size: 26px; }
+section.s2.s2-tod .s2-lv.boss { width: 170px; height: 170px; } section.s2.s2-tod .s2-back { width: 70px; height: 70px; font-size: 32px; }
 
 /* quality1 (C3): the story map "?" how-to button */
-.s2-top .q1help { width: 44px; height: 44px; font-size: 24px; flex: none; }
+.s2-top .q1help { width: 60px; height: 60px; min-width: 60px; min-height: 60px; font-size: 26px; flex: none; }
 /* quality1 polish: phone top bar. The friend button ran under the gear (and off the screen). On a narrow screen the buttons
    are a little smaller and the friend button is just the friend's face with a small "switch" badge. */
 @media (max-width: 600px) {
-  .s2-top { gap: 6px; padding: 8px 70px 8px 8px; }
-  .s2-back, .s2-book { width: 46px; height: 46px; font-size: 22px; flex: none; }
-  .s2-top .q1help { width: 40px; height: 40px; font-size: 22px; }
-  .s2-title { font-size: 18px; min-width: 0; line-height: 1.15; }
+  .s2-top { gap: 8px; padding: 8px 76px 8px 8px; align-items: center; }
+  .s2-back, .s2-book { width: 60px; height: 60px; min-width: 60px; min-height: 60px; font-size: 14px; flex: none; overflow: hidden; }
+  .s2-top .q1help { width: 60px; height: 60px; min-width: 60px; min-height: 60px; font-size: 26px; }
+  .s2-title { font-size: 16px; min-width: 0; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .s2-hero { position: relative; padding: 3px; flex: none; }
   .s2-hero img { width: 44px; height: 44px; }
   .s2-hero .nm { display: none; }
@@ -76,9 +76,9 @@
 }
 /* quality1 polish: half-widths (+ border/shadow) used by LX() in story2-map.js to keep nodes inside the map */
 .s2-place { --hw: 92px; } .s2-lv { --hw: 54px; } .s2-lv.boss { --hw: 72px; }
-.s2.s2-tod .s2-lv { --hw: 74px; } .s2.s2-tod .s2-lv.boss { --hw: 91px; }
+section.s2.s2-tod .s2-lv { --hw: 74px; } section.s2.s2-tod .s2-lv.boss { --hw: 91px; }
 @media (max-width: 800px) { .s2-place { --hw: 78px; } .s2-lv { --hw: 44px; } .s2-lv.boss { --hw: 58px; } }
-@media (max-width: 600px) { .s2.s2-tod .s2-lv { width: 116px; height: 116px; --hw: 64px; } .s2.s2-tod .s2-lv.boss { width: 140px; height: 140px; --hw: 76px; } .s2.s2-tod .s2-lv .n { font-size: 44px; } }
+@media (max-width: 600px) { section.s2.s2-tod .s2-lv { width: 116px; height: 116px; --hw: 64px; } section.s2.s2-tod .s2-lv.boss { width: 140px; height: 140px; --hw: 76px; } section.s2.s2-tod .s2-lv .n { font-size: 44px; } }
 
 /* replay: a beaten level shows a small play-again badge (tap to replay; no repeat prizes) */
 .s2-lv .rp { position: absolute; top: -10px; right: -10px; width: 34px; height: 34px; border-radius: 50%; background: #ff8fb3; color: #fff; border: 3px solid #fff; font-size: 20px; font-weight: 700; line-height: 28px; text-align: center; box-shadow: 0 2px 0 rgba(0,0,0,.15); }
@@ -87,9 +87,9 @@
 .s2-art-stage { overflow: auto; overscroll-behavior: contain; background: #fff4df !important; touch-action: pan-x pan-y; }
 .s2-art-board { position: relative; width: max(100%, 900px); aspect-ratio: 8 / 5; min-height: 562.5px; }
 .s2-map-paint { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.s2 .s2-art-lv, .s2.s2-tod .s2-art-lv { width: 52px; height: 52px; border-width: 3px; --hw: 0px; animation: none; background: #fff6df; box-shadow: 0 3px 0 #806351; }
-.s2 .s2-art-lv .n, .s2.s2-tod .s2-art-lv .n { font-size: 25px; }
-.s2 .s2-art-lv.boss, .s2.s2-tod .s2-art-lv.boss { width: 68px; height: 68px; background: #fff1cb; }
+section.s2 .s2-art-lv, section.s2.s2-tod .s2-art-lv { width: 52px; height: 52px; border-width: 3px; --hw: 0px; animation: none; background: #fff6df; box-shadow: 0 3px 0 #806351; }
+section.s2 .s2-art-lv .n, section.s2.s2-tod .s2-art-lv .n { font-size: 25px; }
+section.s2 .s2-art-lv.boss, section.s2.s2-tod .s2-art-lv.boss { width: 68px; height: 68px; background: #fff1cb; }
 .s2-art-lv.off { border-style: dashed; opacity: .92; }
 .s2-art-lv.pass { background: #d5efc9; }
 .s2-art-lv.cur { border-color: #b24e70; }

@@ -30,7 +30,11 @@
     }
     return h + '</span>';
   }
-  function tens(n, o) { o = o || {}; var h = '<span class="st-tens">', full = Math.floor(n / 10), rest = n % 10; for (var i = 0; i < full; i++) h += tf({ on: 10, x: o.xTen && i === full - 1 ? 10 : 0 }); if (rest || !full) h += tf({ on: rest, x: o.xOnes || 0, g: o.g || 0 }); return h + '</span>'; }
+  function tens(n, o) {
+    o = o || {};
+    if (A.CountVisual && n <= 30 && !o.xTen && !o.xOnes && !o.g) return A.CountVisual.html(n);
+    var h = '<span class="st-tens">', full = Math.floor(n / 10), rest = n % 10; for (var i = 0; i < full; i++) h += tf({ on: 10, x: o.xTen && i === full - 1 ? 10 : 0 }); if (rest || !full) h += tf({ on: rest, x: o.xOnes || 0, g: o.g || 0 }); return h + '</span>';
+  }
   var FOODS = ['🍎', '🍓', '🫐', '🥕', '🍪', '🧁', '🍌', '🍇'];
   function objs(n, e) { var h = '<span class="st-objs">'; for (var i = 0; i < n; i++) h += (i && i % 5 === 0 ? '<br>' : '') + '<i>' + e + '</i>'; return h + '</span>'; }
   function plate(m) { var h = '<span class="st-plate" aria-hidden="true">'; for (var i = 0; i < m; i++) h += '<i></i>'; return h + '</span>'; }
@@ -109,10 +113,12 @@
   function within(vals, lo, hi, ans) { return uniq(vals.filter(function (v) { return v >= lo && v <= hi && v !== ans; })); }
   function numCell(v, o) { o = o || {}; return { label: String(v), html: o.dots && v <= 10 && Math.random() < .4 ? '<span class="st-numdot">' + v + tf({ on: v }, v > 5 ? 10 : 5) + '</span>' : null, fact: ['w_thats', v] }; }
   function cntItem(lo, hi, how) {
-    var n = rnd(lo, hi), e = pick(FOODS), pic = how === 'tens' ? tens(n) : objs(n, e);
+    var n = rnd(lo, hi), pic;
+    if (A.CountVisual) pic = A.CountVisual.html(n, { pattern: n <= 5 && how !== 'tens' && Math.random() < .5 ? 'dice' : (n <= 5 ? 'five_frame' : null) });
+    else pic = how === 'tens' ? tens(n) : objs(n, pick(FOODS));
     return { key: 'cnt' + n, ans: n, wrong: within([n - 1, n + 1, n - 2, n + 2, n > 20 ? n - 10 : n + 10].concat(n > 10 ? [n - 10] : []), Math.max(1, lo - 2), hi + 2, n).slice(0, 5),
       text: 'How many?', pic: pic, say: ['st_how_many'], cell: function (v) { return numCell(v, { dots: how !== 'tens' }); },
-      hint: function (l) { return how === 'tens' ? box(tens(n), l >= 2 ? Math.floor(n / 10) * 10 + ' and ' + (n % 10) + ' more is <b>' + n + '</b>.' : 'Count the full tens: 10, 20… then the rest.') : box(n > 10 ? tens(n) : tf({ on: n }), l >= 2 ? 'Count them: … <b>' + n + '</b>!' : 'Touch each one and count.'); } };
+      hint: function (l) { return how === 'tens' || n > 5 ? box(tens(n), l >= 2 ? Math.floor(n / 10) * 10 + ' and ' + (n % 10) + ' more is <b>' + n + '</b>.' : 'Count the full tens, then the rest.') : box(A.CountVisual ? A.CountVisual.html(n) : tf({ on: n }), l >= 2 ? 'Count them: … <b>' + n + '</b>!' : 'Touch each one and count.'); } };
   }
   var LOOK = { 12: [21], 21: [12], 13: [31], 6: [9], 9: [6], 16: [19, 61], 19: [16], 17: [71], 15: [51], 14: [41], 18: [81], 11: [17], 10: [1] };
   function findItem(lo, hi) {
@@ -150,7 +156,7 @@
     if (nums) { a = rnd(1, 20); do { b = rnd(1, 20); } while (b === a); }
     else { a = rnd(1, 10); b = same ? a : rnd(1, 10); if (!same && a === b) b = a < 10 ? a + 1 : a - 1; }
     var e = pick(FOODS), ans = a === b ? 'same' : a > b ? 'L' : 'R';
-    function cell(k) { if (k === 'same') return { label: 'the same', html: '<span class="st-same">= same</span>', fact: ['st_same'] }; var v = k === 'L' ? a : b; return nums ? { label: String(v), fact: ['w_thats', v] } : { label: v + ' ' + (k === 'L' ? 'left' : 'right'), html: objs(v, e), fact: ['w_thats', v] }; }
+    function cell(k) { if (k === 'same') return { label: 'the same', html: '<span class="st-same">= same</span>', fact: ['st_same'] }; var v = k === 'L' ? a : b; return nums ? { label: String(v), fact: ['w_thats', v] } : { label: v + ' ' + (k === 'L' ? 'left' : 'right'), html: (A.CountVisual && v > 5) ? A.CountVisual.html(v) : (v <= 5 && A.CountVisual ? A.CountVisual.html(v, { pattern: 'dice' }) : objs(v, e)), fact: ['w_thats', v] }; }
     return { key: (nums ? 'big' : 'more') + Math.min(a, b) + 'v' + Math.max(a, b), ans: ans, wrong: ans === 'same' ? ['L', 'R'] : [ans === 'L' ? 'R' : 'L'].concat(nums ? [] : ['same']),
       text: nums ? 'Which number is bigger?' : 'Which has more?', say: [nums ? 'st_bigger' : 'st_which_more'], cell: cell, two: true,
       hint: function (l) { return nums ? box(nline(Math.max(0, Math.min(a, b) - 1), Math.max(a, b) + 1, { mark: [a, b], ans: Math.max(a, b), end: l >= 2 }), l >= 2 ? '<b>' + Math.max(a, b) + '</b> is further along the line.' : 'The bigger number is further along the number line.')

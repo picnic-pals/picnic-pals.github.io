@@ -830,7 +830,7 @@
       art: '<div class="jump">' + (got ? A.Blobs.svg({ blob: c.blob, expr: 'happy' }) : A.Blobs.forProfile(P1, { expr: 'happy' })) + '</div>',
       html: '<p class="chgoal">Munch all <b>' + cc.nOk + '</b> in under <b>' + cc.target + ' seconds</b><br>with at most 1 oops</p>',
       btn: 'Go! ▶', voice: got ? ['ch_again'] : ['ch_title'], minMs: 600 })
-      .then(function () { return cutscene({ title: 'Challenge!', sub: '⏱ ' + cc.target + ' seconds · ' + c.a.name, voice: ['lvl_ready'], heroes: [P1], friends: met([c.blob === 'mochi' ? 'strawberry' : 'mochi', 'strawberry', 'carrot', 'grapes'].filter(function (b) { return b !== c.blob; })), ms: 2600 }); })
+      .then(function () { return cutscene({ title: 'Challenge!', sub: (A.Icons ? A.Icons.html('⏱', { size: 28, decorative: true, cls: 'pp-pic', slot: 'munch:challenge' }) : '⏱') + ' ' + cc.target + ' seconds · ' + c.a.name, voice: ['lvl_ready'], heroes: [P1], friends: met([c.blob === 'mochi' ? 'strawberry' : 'mochi', 'strawberry', 'carrot', 'grapes'].filter(function (b) { return b !== c.blob; })), ms: 2600 }); })
       .then(function () { M.play('game'); startLevel(); });
   }
   function endChallenge(gaveUp) {
@@ -899,7 +899,7 @@
       });
     }
     var R = ST.run(P), pts = out.pts, stop = ST.STOPS[SR.i];
-    var rows = [['🍪 Snacks', pts.snacks], ['🎯 Accuracy', pts.accuracy], ['⏱ Time bonus', pts.time], ['✨ Perfect', pts.perfect]].filter(function (r) { return r[1] > 0 || r[0].indexOf('Snacks') >= 0; });
+    var rows = [['🍪 Snacks', pts.snacks], ['🎯 Accuracy', pts.accuracy], [(A.Icons ? A.Icons.html('⏱', { size: 24, decorative: true, cls: 'pp-pic', slot: 'munch:timebonus' }) + ' Time bonus' : '⏱ Time bonus'), pts.time], ['✨ Perfect', pts.perfect]].filter(function (r) { return r[1] > 0 || r[0].indexOf('Snacks') >= 0; });
     var html = (gaveUp ? '' : '<div class="stars">' + [0, 1, 2].map(function (i) { return '<span>' + UI.STAR.replace('<svg', '<svg class="' + (i < stars ? 'got' : '') + '" style="animation-delay:' + (.3 + i * .3).toFixed(2) + 's"') + '</span>'; }).join('') + '</div>') +
       '<div class="score"><table>' + rows.map(function (r) { return '<tr><td>' + r[0] + '</td><td class="v" data-v="' + r[1] + '">0</td></tr>'; }).join('') +
       '<tr class="tot"><td>Stop score</td><td class="v" data-v="' + pts.total + '">0</td></tr></table>' +

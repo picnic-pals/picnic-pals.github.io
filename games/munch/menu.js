@@ -51,7 +51,7 @@
       box.innerHTML = h + '<button class="mtile backt" data-nav data-id="back"><span class="mt">◀ Back</span></button>'; fns.back = back; wire(fns);
     } else {
       q.textContent = P.name + ' & ' + partner.p.name + ': team or race?';
-      box.innerHTML = tile('team', 'Team', 'Munch together, share the stars', '<span class="big">🤝</span>', 'team') + tile('versus', 'Race', 'Who finishes first? (friendly!)', '<span class="big">🏁</span>', 'race') +
+      box.innerHTML = tile('team', 'Team', 'Munch together, share the stars', '<span class="big">🤝</span>', 'team') + tile('versus', 'Race', 'Who finishes first? (friendly!)', '<span class="big">' + (A.Icons ? A.Icons.html('🏁', { size: 48, decorative: true, cls: 'pp-pic', slot: 'munch:race' }) : '🏁') + '</span>', 'race') +
         '<button class="mtile backt" data-nav data-id="back"><span class="mt">◀ Back</span></button>';
       wire({ team: function () { go('mode=team&p2=' + encodeURIComponent(partner.id)); }, versus: function () { go('mode=versus&p2=' + encodeURIComponent(partner.id)); }, back: back });
     }

@@ -12,7 +12,7 @@
   }
   function num(g, lo, hi) { return lo + Math.floor(g.rng() * (hi - lo + 1)); }
   function newMatch(p, rng) {
-    var g = { band: bandFor(p), rng: rng || Math.random, flips: 0, score: [0, 0], streak: 0, wildUsed: 0, wild: false, phase: 'ready', cards: [], rule: 'more', pot: 2, recent: [] };
+    var g = { band: bandFor(p), rng: rng || Math.random, flips: 0, score: [0, 0], judged: 0, correctN: 0, streak: 0, wildUsed: 0, wild: false, phase: 'ready', cards: [], rule: 'more', pot: 2, recent: [] };
     g.wildAt = g.rng() < .25 ? num(g, 3, 8) : -1; return g;
   }
   function card(v, suit, label) { return { value: v, suit: suit, label: label || String(v) }; }
@@ -69,10 +69,19 @@
     if (g.phase !== 'choose' || (side !== 0 && side !== 1)) return null;
     var w = winner(g), ok = g.band.toddler || side === w;
     if (w < 0) { g.phase = 'tie'; return null; }
-    if (ok) { g.score[w] += g.pot; g.streak++; } else g.streak = 0;
+    g.judged = (g.judged || 0) + 1;
+    if (ok) { g.score[w] += g.pot; g.streak++; g.correctN = (g.correctN || 0) + 1; } else g.streak = 0;
     var a = g.cards[w].value, b = g.cards[1 - w].value;
     g.result = { correct: ok, winner: w, pot: ok ? g.pot : 0, message: g.band.toddler ? 'Splat! What a picnic!' : a + ' is ' + g.rule + ' than ' + b + (ok ? '!' : '. Take a look!') };
     g.phase = g.flips === 10 ? 'done' : 'feedback'; return g.result;
   }
-  A.FoodFight = { bandFor: bandFor, newMatch: newMatch, deal: deal, winner: winner, choose: choose, splatOff: splatOff, wildOptions: wildOptions, wildPick: wildPick };
+  function matchStars(g) {
+    var n = g.correctN || 0;
+    if (g.band && g.band.toddler) return 1;
+    if (n >= 9) return 3;
+    if (n >= 7) return 2;
+    if (n >= 4) return 1;
+    return 0;
+  }
+  A.FoodFight = { bandFor: bandFor, newMatch: newMatch, deal: deal, winner: winner, choose: choose, splatOff: splatOff, wildOptions: wildOptions, wildPick: wildPick, matchStars: matchStars };
 })(window.Arcade);

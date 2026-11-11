@@ -9,8 +9,103 @@
   var rnd = A.rnd, pick = A.pick;
   function em(n) { return '<b class="hl">' + n + '</b>'; }
   var BOX = '<span class="box">?</span>';
-  function frame(v) { var n = v > 5 ? 10 : 5, h = '<span class="frame">'; for (var i = 0; i < n; i++) h += '<i class="' + (i < v ? 'on' : '') + '"></i>'; return h + '</span>'; }
-  function frames2(v) { return '<span class="frames2">' + frame(10) + frame(v - 10) + '</span>'; }
+
+  /* v0.4 visual counting (visual_counting_spec.md): one shared renderer for counted sets. */
+  var CV_DICE = { 1: [[1, 1]], 2: [[0, 0], [2, 2]], 3: [[0, 0], [1, 1], [2, 2]], 4: [[0, 0], [0, 2], [2, 0], [2, 2]], 5: [[0, 0], [0, 2], [1, 1], [2, 0], [2, 2]] };
+  function cvLayout(n, opt) {
+    opt = opt || {}; n = Math.max(0, Math.min(30, n | 0));
+    var L = { n: n, scattered: false, audio_required: false, second_color_use: 'none',
+      dot_diameter_min_frac_of_frame_inner_width: 0.12, dot_gap_min_frac_of_diameter: 0.35, frame_padding_min_frac_of_diameter: 0.25,
+      contrast: 'dark dots on light background' };
+    if (opt.scattered && (n <= 5 || (n === 6 && opt.subitize))) {
+      L.scattered = true; L.pattern = 'scattered'; if (n === 6) L.subitize = true; return L;
+    }
+    if (n <= 5) {
+      var pat = opt.pattern || (opt.five_frame ? 'five_frame' : 'dice');
+      if (pat === 'five_frame') { L.pattern = 'five_frame'; L.frames = [{ cells: 5, filled: n, color: 'primary' }]; L.structure = 'five_' + n; }
+      else { L.pattern = 'dice'; L.dice_pips = n; L.frames = []; L.structure = 'dice_' + n; }
+    } else if (n <= 10) {
+      L.pattern = 'ten_frame'; L.frames = [{ cells: 10, filled: n, color: 'primary', fill_order: 'top_row_5_then_bottom' }];
+      L.structure = n === 10 ? '5+5' : ('5+' + (n - 5));
+      if (opt.quick_look) { L.quick_look = true; L.show_again = true; }
+    } else if (n <= 20) {
+      L.pattern = 'ten_frames'; L.frames = [{ cells: 10, filled: 10, color: 'primary' }, { cells: 10, filled: n - 10, color: 'ones' }];
+      L.structure = '10+' + (n - 10); L.second_color_use = 'ones_only';
+    } else {
+      L.pattern = 'ten_frames'; L.frames = [{ cells: 10, filled: 10, color: 'primary' }, { cells: 10, filled: 10, color: 'primary' }, { cells: 10, filled: n - 20, color: 'ones' }];
+      L.structure = '10+10+' + (n - 20); L.second_color_use = 'ones_only';
+    }
+    return L;
+  }
+  function cvDot(on, ones) { return '<i class="' + (on ? (ones ? 'cv-dot on ones' : 'cv-dot on') : 'cv-dot') + '"></i>'; }
+  function cvFrame(fr) {
+    var cells = fr.cells || 10, filled = fr.filled || 0, ones = fr.color === 'ones', h = '<span class="cv-frame' + (cells === 5 ? ' cv-five' : '') + '" aria-hidden="true">', i;
+    for (i = 0; i < cells; i++) h += cvDot(i < filled, ones);
+    return h + '</span>';
+  }
+  function cvDice(n) {
+    var spots = CV_DICE[n] || CV_DICE[1], grid = {}; spots.forEach(function (p) { grid[p[0] + ',' + p[1]] = 1; });
+    var h = '<span class="cv-dice" aria-hidden="true">', r, c;
+    for (r = 0; r < 3; r++) for (c = 0; c < 3; c++) h += cvDot(!!grid[c + ',' + r], false);
+    return h + '</span>';
+  }
+  function cvScatter(n) {
+    var h = '<span class="cv-scatter" aria-hidden="true">', i;
+    for (i = 0; i < n; i++) h += cvDot(true, false);
+    return h + '</span>';
+  }
+  function cvHtml(nOrL, opt) {
+    opt = opt || {};
+    var L = (nOrL && typeof nOrL === 'object' && nOrL.n != null) ? nOrL : cvLayout(nOrL, opt);
+    var inner = '', label = 'A picture of ' + L.n;
+    if (L.scattered) inner = cvScatter(L.n);
+    else if (L.pattern === 'dice') inner = cvDice(L.n);
+    else if (L.frames && L.frames.length) inner = L.frames.map(cvFrame).join('');
+    var html = '<span class="cv-set" data-n="' + L.n + '" data-structure="' + (L.structure || '') + '" role="img" aria-label="' + label + '">' + inner + '</span>';
+    if (L.quick_look) {
+      html = '<div class="cv-ql" data-ql="1"><div class="cv-ql-pic">' + html + '</div><button type="button" class="cv-showagain">Show again</button></div>';
+    }
+    return html;
+  }
+  function cvBindQuickLook(root) {
+    root = root || document;
+    if (!root || !root.querySelectorAll) return;
+    [].forEach.call(root.querySelectorAll('.cv-ql'), function (box) {
+      if (box._cvBound) return; box._cvBound = true;
+      var pic = box.querySelector('.cv-ql-pic'), btn = box.querySelector('.cv-showagain'), hideT;
+      function flash() {
+        box.classList.remove('is-hidden');
+        clearTimeout(hideT);
+        hideT = setTimeout(function () { box.classList.add('is-hidden'); }, 1400);
+      }
+      if (btn) btn.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); flash(); });
+      flash();
+    });
+  }
+  if (typeof document !== 'undefined' && document.addEventListener) {
+    document.addEventListener('click', function (e) {
+      var btn = e.target && e.target.closest && e.target.closest('.cv-showagain');
+      if (!btn) return;
+      var box = btn.closest('.cv-ql'); if (!box) return;
+      e.preventDefault(); box.classList.remove('is-hidden');
+      clearTimeout(box._cvHide);
+      box._cvHide = setTimeout(function () { box.classList.add('is-hidden'); }, 1400);
+    });
+  }
+  if (typeof document !== 'undefined' && window.MutationObserver) {
+    function cvWatch() {
+      if (!document.body) return;
+      var cvObs = new MutationObserver(function () { cvBindQuickLook(document); });
+      cvObs.observe(document.body, { childList: true, subtree: true });
+      cvBindQuickLook(document);
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', cvWatch);
+    else cvWatch();
+  }
+  A.CountVisual = { layout: cvLayout, html: cvHtml, bindQuickLook: cvBindQuickLook, DICE: CV_DICE };
+  function frame(v) { return cvHtml(v, { pattern: v <= 5 ? 'five_frame' : 'ten_frame' }); }
+  function frames2(v) { return cvHtml(v); }
+
   function near(T, lo, hi, offs) { var s, g = 0; do { s = T + pick(offs); g++; } while ((s < lo || s > hi || s === T) && g < 200); if (s < lo || s > hi || s === T) s = (T + 1 <= hi) ? T + 1 : T - 1; return s; }
   function plus(a, b) { return { label: a + ' + ' + b, fact: [a, 'w_plus', b, 'w_is', a + b] }; }
   function minus(a, b) { return { label: a + ' − ' + b, fact: [a, 'w_minus', b, 'w_is', a - b] }; }
@@ -42,7 +137,9 @@
       say = ['wp_there_were', a, 'wp_f_' + food, 'wp_on_blanket', P.part, 'wp_took', b, 'wp_away', 'wp_how_many_left']; }
     var wrongOp = op === '+' ? Math.abs(a - b) : a + b;
     function mk(v) { return { label: String(v), fact: v === ans ? ['w_thats', v] : ['w_thats', v, 'w_not', ans] }; }
-    var pic = '<span class="wp-pic" aria-hidden="true"><span class="pet">' + P.em + '</span>' + (op === '+' ? Array(Math.min(a, 20) + 1).join(f.em) + ' + ' + Array(Math.min(b, 20) + 1).join(f.em) : Array(Math.min(a, 20) + 1).join(f.em)) + '</span>';
+    var pic = '<span class="wp-pic" aria-hidden="true"><span class="pet">' + P.em + '</span>' +
+      (A.CountVisual ? (op === '+' ? A.CountVisual.html(a) + '<i class="pb-op">+</i>' + A.CountVisual.html(b) : A.CountVisual.html(a))
+        : (op === '+' ? Array(Math.min(a, 20) + 1).join(f.em) + ' + ' + Array(Math.min(b, 20) + 1).join(f.em) : Array(Math.min(a, 20) + 1).join(f.em))) + '</span>';
     return { text: '<span class="wp-text">' + A.esc(text) + '</span>', plain: text, pic: pic, hint: 'Draw the story: make a dot for each one, then ' + (op === '+' ? 'put them together.' : 'cross out the ones that go away.'), say: say, story: true,
       wp: { a: a, b: b, op: op, ans: ans, food: f.id, em: f.em, text: text, pet: P.name },
       good: function () { return mk(ans); },

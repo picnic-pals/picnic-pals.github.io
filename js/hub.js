@@ -14,6 +14,10 @@
     { id: 'baseball', name: A.TITLES.baseball, sub: 'Math at the ballpark', cls: 'base', href: 'games/baseball/index.html', ready: true, voice: ['bb_play_ball'], say: ['bb_title'], tip: 'Beat the Sprout Squad! Right answers are hits, misses are outs. Score more runs to win.' },
     { id: 'stand', name: A.TITLES.stand, sub: 'Serve your friends', cls: 'stand', href: 'games/stand/index.html', ready: true, all: true, voice: ['ls_title'], say: ['ls_title'], tip: 'Run a lemonade stand! Fill each friend\'s order and count the tips.' },
     { id: 'foodfight', name: A.TITLES.foodfight, sub: 'Flip, compare & splat', cls: 'foodfight', href: 'games/foodfight/index.html', ready: true, all: true, voice: [{ text: 'Food Fight' }], say: [{ text: 'Food Fight' }], tip: 'Play picnic cards with Sunny. Tap who has more, or less. Ten flips, lots of splats!' },
+    { id: 'packer', name: A.TITLES.packer, sub: 'Pack the picnic basket', cls: 'packer', href: 'games/packer/index.html', ready: true, all: true, voice: [{ text: 'Picnic Packer' }], say: [{ text: 'Picnic Packer' }], tip: 'A friend asks you to pack a basket. Tap or drag food in. When it matches, you place a decoration in the picnic!' },
+    { id: 'racers', name: A.TITLES.racers, sub: 'Race your food car', cls: 'racers', href: 'games/racers/index.html', ready: true, all: true, voice: [{ text: 'Snack Racers' }], say: [{ text: 'Snack Racers' }], tip: 'Your food car drives itself. Answer questions to boost. Race a friend, a boss, or your best time!' },
+    { id: 'bakeshop', name: A.TITLES.bakeshop, sub: 'Set the oven clock', cls: 'bakeshop', href: 'games/bakeshop/index.html', ready: true, all: true, voice: [{ text: 'Bake Shop Clock' }], say: [{ text: 'Bake Shop Clock' }], tip: 'Friends want a treat ready on time. Match or set the oven clock so it comes out just right!' },
+    { id: 'pancake', name: A.TITLES.pancake, sub: 'Stack and race a friend', cls: 'pancake', href: 'games/pancake/index.html', ready: true, all: true, voice: [{ text: 'Pancake Stack Race' }], say: [{ text: 'Pancake Stack Race' }], tip: 'Race a friend to finish breakfast orders. Stack pancakes to make the number, then serve!' },
     { id: 'bubble', name: A.TITLES.bubble, sub: 'Pop the right bubbles', cls: 'bubble', href: 'games/bubble/index.html', ready: true, all: true, voice: ['bp_title'], say: ['bp_title'], tip: 'Pop the bubbles your friend asks for: colors, animals, letters, numbers, words.' },
     // p4: Coloring (all ages; toddlers get Fill + Stickers). No stars, no right or wrong; pictures go to the kid's Gallery.
     { id: 'color', name: A.TITLES.color, sub: 'Color, stickers & gallery', cls: 'color', href: 'games/color/index.html', ready: true, all: true, voice: ['cl_title'], say: ['cl_title'], tip: 'Color pictures of your friends and places. Tap to fill, draw with a brush, add stickers, and save to your gallery.' },
@@ -34,6 +38,30 @@
     }
     if (g.id === 'foodfight') {
       return '<svg class="sc" viewBox="0 0 100 75" aria-hidden="true"><g transform="translate(16 8) rotate(-10 20 28)"><image href="art/food-fight/back.png" width="35" height="51"/></g><g transform="translate(52 14) rotate(10 18 26)"><rect width="35" height="51" rx="5" fill="#fff8e7" stroke="#ad7954"/><text x="4" y="13" font-size="12" font-weight="700" fill="#b63442">5</text><image href="art/food-fight/strawberry-pip.png" x="10" y="16" width="18" height="24"/></g></svg>';
+    }
+    if (g.id === 'packer') {
+      return '<div class="packsc" aria-hidden="true">' +
+        (A.Icons ? A.Icons.html('object.basket', { size: 64, decorative: true, cls: 'pp-pic pk-hub-bask' }) : '') +
+        (A.Icons ? A.Icons.html('🍓', { size: 48, decorative: true, cls: 'pp-pic' }) : '') +
+        (A.Icons ? A.Icons.html('🍋', { size: 48, decorative: true, cls: 'pp-pic' }) : '') +
+        '</div>' +
+        '<div class="who2">' + B.forProfile(p, { expr: 'happy' }) + '</div>';
+    }
+    if (g.id === 'racers') {
+      return '<div class="racesc" aria-hidden="true">' +
+        (A.Icons ? A.Icons.html('🍌', { size: 64, decorative: true, cls: 'pp-pic sr-hub-body' }) : '') +
+        (A.Icons ? A.Icons.html('🍩', { size: 48, decorative: true, cls: 'pp-pic' }) : '') +
+        (A.Icons ? A.Icons.html('🍩', { size: 48, decorative: true, cls: 'pp-pic' }) : '') +
+        '</div>' +
+        '<div class="who2">' + B.forProfile(p, { expr: 'happy' }) + '</div>';
+    }
+    if (g.id === 'pancake') {
+      return '<div class="pancsc" aria-hidden="true"><img src="art/pancake/stand_bg_portrait.webp" alt=""></div>' +
+        '<div class="who2">' + B.forProfile(p, { expr: 'happy' }) + '</div>';
+    }
+    if (g.id === 'bakeshop') {
+      return '<div class="bakesc" aria-hidden="true"><svg viewBox="0 0 80 80"><rect x="8" y="10" width="64" height="62" rx="8" fill="#6b3a4a" stroke="#3a2714" stroke-width="3"/><circle cx="40" cy="40" r="22" fill="#fff8e7" stroke="#c9a36a" stroke-width="3"/><line x1="40" y1="40" x2="40" y2="24" stroke="#b63442" stroke-width="3" stroke-linecap="round"/><line x1="40" y1="40" x2="52" y2="40" stroke="#3a2714" stroke-width="2" stroke-linecap="round"/><circle cx="40" cy="40" r="3" fill="#3a2714"/><circle cx="26" cy="64" r="3" fill="#e8d4a8"/><circle cx="40" cy="64" r="3" fill="#e8d4a8"/><circle cx="54" cy="64" r="3" fill="#e8d4a8"/></svg></div>' +
+        '<div class="who2">' + B.forProfile(p, { expr: 'happy' }) + '</div>';
     }
     if (g.id === 'tiny') {   // big, simple: three food friends on the picnic blanket
       var R0 = A.ROOT + 'assets/picnic/friends/';
@@ -109,7 +137,7 @@
       var b = A.el('<button class="kid save" data-nav data-id="' + p.id + '"><span class="av bd" style="' + B.backdrop(p.color) + '">' + B.forProfile(p) + '</span><span class="nm">' + A.esc(p.name) + '</span><span class="st">⭐ ' + p.stars + '</span>' +
         '<span class="sv"><span class="svl" data-k="math">🔢 ' + A.esc(sv.math) + '</span><span class="svl" data-k="reading">📖 ' + A.esc(sv.reading) + '</span>' +
         '<span class="svl" data-k="story">🗺️ ' + A.esc(sv.story) + '</span><span class="svl" data-k="friends">💛 ' + sv.friends + ' friend' + (sv.friends === 1 ? '' : 's') + '</span>' +
-        (sv.goal ? '<span class="svg2" data-k="goal"><span class="gt2">' + sv.goal.icon + ' ' + A.esc(sv.goal.name) + ' ' + sv.goal.have + '/' + sv.goal.need + '</span><span class="gb"><i style="width:' + sv.goal.pct + '%"></i></span></span>' : '') + '</span>' +
+        (sv.goal ? '<span class="svg2" data-k="goal"><span class="gt2">' + (A.Icons ? A.Icons.html(sv.goal.icon, { size: 28, decorative: true, cls: 'pp-pic', slot: 'goal:' + sv.goal.id }) : sv.goal.icon) + ' ' + A.esc(sv.goal.name) + ' ' + sv.goal.have + '/' + sv.goal.need + '</span><span class="gb"><i style="width:' + sv.goal.pct + '%"></i></span></span>' : '') + '</span>' +
         '<span class="del" aria-hidden="true">✏️ Edit</span></button>');
       b.setAttribute('aria-label', editing ? 'Edit ' + p.name : p.name + ', ' + p.stars + ' stars. ' + sv.say);
       b.addEventListener('click', function () {
@@ -448,6 +476,22 @@
   else if (!A.Store.profiles().length) { go('players'); openNew(); } // first visit: no players yet -> make one
   else go('players');
   window.__hub = { go: go, goHome: goHome, openNew: openNew, saveInfo: saveInfo };
+
+  var nkGrown = document.getElementById('nkGrownup');
+  if (nkGrown) {
+    nkGrown.addEventListener('click', function () {
+      A.Audio.sfx('tap');
+      A.UI.gate().then(function (ok) {
+        if (!ok) return;
+        var pan = document.getElementById('nkGrownupPanel');
+        if (pan) pan.hidden = false;
+        nkGrown.hidden = true;
+      });
+    });
+  }
+
+  if (window.__brandBoot && __brandBoot.ready) __brandBoot.ready();
+
   backFromGame();
   A.Music.play('hub');
   $('#hubMusic').addEventListener('click', function () { A.Music.toggle(); hubMusic(); });

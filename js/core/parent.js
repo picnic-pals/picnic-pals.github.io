@@ -77,7 +77,7 @@
       tog('grumbly', 'Grumbly in ' + A.TITLES.munch, 'A slow, gentle cloud that wanders and bumps the player back to the corner. Extra challenge.', p.games.munch.grumbly) + '</div>';
     SUBJ.forEach(function (x) {
       var T = C().track(p, x.id), cur = C().byId[T.current], cs = p.skills[T.current];
-      h += '<section class="subj" data-subj="' + x.id + '"><h3>' + x.emoji + ' ' + x.name + (W[x.id] ? ' <small class="muted">' + Math.round(W[x.id] * 100) + '% of rounds</small>' : ' <small class="muted">off in the mix</small>') + '</h3>' +
+      h += '<section class="subj" data-subj="' + x.id + '"><h3>' + (A.Icons ? A.Icons.html(x.emoji, { size: 28, decorative: true, cls: 'pp-pic', slot: 'subj:' + x.id }) : x.emoji) + ' ' + x.name + (W[x.id] ? ' <small class="muted">' + Math.round(W[x.id] * 100) + '% of rounds</small>' : ' <small class="muted">off in the mix</small>') + '</h3>' +
         (x.id === 'math' ? '<p class="muted"><label>Now practicing: <select data-step="math">' + C().SKILLS.filter(function (s) { return C().subjectOf(s) === 'math' && s.status === 'active'; }).map(function (s) { return '<option value="' + s.id + '"' + (s.id === T.current ? ' selected' : '') + '>' + A.esc(s.name) + '</option>'; }).join('') + '</select></label> <small>pick the step to work on</small>'   // v2p2b: math is steps; a grown-up picks the step, not a level
         : '<p class="muted">Now practicing: <b>' + A.esc(cur.name) + '</b> — level ' + (cs.level + 1) + ' of ' + cur.levels.length + ' (' + A.esc(cur.levels[cs.level]) + ')') +
         (T.returnTo ? ' · short review detour, then back to <b>' + A.esc(C().byId[T.returnTo].name) + '</b>' : '') + '</p>';

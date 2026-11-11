@@ -90,12 +90,20 @@
     setTimeout(function () { el.classList.remove('tap'); }, 700);
     return speakWord(el.textContent);
   }
+  var swallowEscUntil = 0;
   function onKey(e) {
-    if (!isOpen()) return;
-    var k = e.key, used = true;
+    var k = e.key;
+    // A held or second Escape after Skip must not fall through to the map's Back.
+    if (!isOpen()) {
+      if ((k === 'Escape' || k === 'Backspace') && Date.now() < swallowEscUntil) {
+        e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      }
+      return;
+    }
+    var used = true;
     if (k === 'ArrowRight' || k === 'd' || k === 'D' || k === ' ' || k === 'Enter' || k === 'f' || k === 'F') { if (!e.repeat) next(); else turnDropped++; }
     else if (k === 'ArrowLeft' || k === 'a' || k === 'A') go(page - 1);
-    else if (k === 'Escape' || k === 'Backspace') { if (!e.repeat) close('skip'); }   // Skip book stays, but a held key never skips
+    else if (k === 'Escape' || k === 'Backspace') { if (!e.repeat) { close('skip'); swallowEscUntil = Date.now() + 500; } }   // Skip book stays, but a held key never skips
     else if (k === 'ArrowUp' || k === 'ArrowDown' || k === 'h' || k === 'H' || k === 'm' || k === 'M' || k === 'w' || k === 'W' || k === 's' || k === 'S') { /* swallow so the map underneath does not move */ }
     else used = false;
     if (used) { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); }

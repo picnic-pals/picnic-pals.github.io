@@ -75,7 +75,7 @@
     { id: 't_color', name: 'Pop a color', band: 'T', gen: function () { var c = pick(['red', 'blue', 'yellow', 'green']); return { say: ['bp_pop_the', 'bp_c_' + c, 'bp_ones'], show: { col: c }, need: 3, good: [cCol(c)], bad: others(CN, [c], 2).map(cCol) }; } },
     { id: 't_peek', name: 'Peekaboo bubbles', band: 'T', gen: function (cx) { var f = cx.friends; return { say: ['bp_peek'], show: { e: '🙈' }, need: 3, good: f.map(function (id) { return { key: 'f' + id, cls: 'peek', friend: id, v: id, say: ['bp_boo'] }; }), bad: [], any: true }; } },
     { id: 't_shape', name: 'Pop a shape', band: 'T', gen: function () { var s = pick(['circle', 'star', 'heart']); return { say: ['bp_pop_the', 'bp_shs_' + s], show: { shape: s }, need: 3, good: [cShape(s)], bad: others(['circle', 'star', 'heart', 'square'], [s], 2).map(function (x) { return cShape(x); }) }; } },
-    { id: 't_animal', name: 'Animal sounds', band: 'T', gen: function () { var a = pick(['cow', 'duck', 'pig', 'dog', 'cat', 'sheep']); return { say: ['bp_pop_the', 'bp_snd_' + a, 'bp_bubble'], show: { text: AN[a].snd }, need: 2, good: [{ key: 'snd' + a, cls: 'sound', t: AN[a].snd, v: a, e: AN[a].e, say: ['bp_snd_' + a, 'bp_its_a', 'bp_an_' + a] }], bad: [], any: true }; } },
+    { id: 't_animal', name: 'Animal sounds', band: 'T', gen: function () { var a = pick(['cow', 'duck', 'pig', 'dog', 'cat', 'sheep']); var mute = quietNow(); return { say: mute ? ['bp_pop_the', 'bp_ans_' + a] : ['bp_pop_the', 'bp_snd_' + a, 'bp_bubble'], show: mute ? { e: AN[a].e } : { text: AN[a].snd }, need: 2, good: [{ key: 'snd' + a, cls: 'sound', t: mute ? AN[a].e : AN[a].snd, v: a, e: AN[a].e, say: ['bp_snd_' + a, 'bp_its_a', 'bp_an_' + a] }], bad: [], any: true }; } },
     { id: 't_size', name: 'Big and little', band: 'T', gen: function () { var big = RNG() < .5; return { say: [big ? 'bp_big' : 'bp_little'], show: { size: big ? 'big' : 'little' }, need: 3, good: [{ key: big ? 'big' : 'lit', cls: 'color', col: pick(CN), sz: big ? 'big' : 'little', v: big ? 'big' : 'little', say: [big ? 'bp_w_big' : 'bp_w_little'] }], bad: [{ key: big ? 'lit' : 'big', cls: 'color', col: pick(CN), sz: big ? 'little' : 'big', v: big ? 'little' : 'big', say: [big ? 'bp_w_little' : 'bp_w_big'] }] }; } },
     { id: 't_count3', name: 'Count to 3', band: 'T', gen: function () { return { say: ['bp_count', 3, 'bp_bubbles'], show: { text: '1 2 3' }, need: 3, good: CN.map(cCol), bad: [], any: true, countAloud: true }; } },
     { id: 't_count5', name: 'Count to 5', band: 'T', gen: function () { return { say: ['bp_count', 5, 'bp_bubbles'], show: { text: '1 2 3 4 5' }, need: 5, good: CN.map(cCol), bad: [], any: true, countAloud: true }; } }
@@ -100,7 +100,16 @@
     { id: 'e_numword', name: 'Number words', band: 'E', sub: 2, gen: function (cx) { var top = cx.sub ? 20 : 10, v = cx.sub === 2 ? rnd(11, 20) : rnd(1, top), b = others(Array.from({ length: top }, function (_, i) { return i + 1; }), [v], 3); return { say: ['bp_pop_the', tx(NUMW[v])], show: { text: NUMW[v] }, need: 1, good: [cNum(v)], bad: b.map(cNum) }; } },
     { id: 'e_add', name: 'Pop the answer', band: 'E', sub: 2, gen: function (cx) { var a, b; if (cx.sub === 2) { if (RNG() < .5) { a = rnd(11, 18); b = -rnd(2, 9); } else { a = rnd(4, 9); b = rnd(11 - a, 9); } } else if (cx.sub) { a = rnd(4, 9); b = rnd(11 - a, 9); } else { a = rnd(1, 6); b = rnd(1, 10 - a); } var s = a + b, bad = others([s - 2, s - 1, s + 1, s + 2, s + 10].filter(function (x) { return x > 0; }), [s], 3); return { say: b < 0 ? ['bp_answer', a, 'bp_minus', -b] : ['bp_answer', a, 'bp_plus', b], show: { text: b < 0 ? a + ' − ' + -b : a + ' + ' + b }, need: 1, good: [cNum(s)], bad: bad.map(cNum) }; } },
     { id: 'e_evenodd', name: 'Even and odd', band: 'E', sub: 2, gen: function (cx) { var even = RNG() < .5, g = [], b = [], lo = cx.sub === 2 ? 21 : 1, hi = cx.sub ? (cx.sub === 2 ? 60 : 30) : 20; for (var i = lo; i <= hi; i++) ((i % 2 === 0) === even ? g : b).push(i); return { say: ['bp_pop_the', even ? 'bp_even' : 'bp_odd'], show: { text: even ? 'even' : 'odd' }, need: 3, good: shuffle(g).slice(0, 6).map(cNum), bad: shuffle(b).slice(0, 5).map(cNum) }; } },
-    { id: 'e_rhyme', name: 'Rhymes', band: 'E', sub: 2, gen: function (cx) { var f = pick(RHYMES), w = f[0], g = f.slice(1), b = []; RHYMES.forEach(function (o) { if (o !== f) b = b.concat(o.slice(0, 2)); }); return { say: ['bp_rhyme', tx(w)], show: { text: w }, need: cx.sub ? 3 : 2, good: g.map(cWord), bad: shuffle(b).slice(0, cx.sub === 2 ? 7 : 5).map(cWord) }; } },
+    { id: 'e_rhyme', name: 'Rhymes', band: 'E', sub: 2, gen: function (cx) {
+      var mute = quietNow();
+      var families = mute ? RHYMES.filter(function (f) { return PIC[f[0]] && f.slice(1).some(function (w) { return PIC[w]; }); }) : RHYMES;
+      var f = pick(families.length ? families : RHYMES), w = f[0];
+      var g = f.slice(1).filter(function (x) { return !mute || PIC[x]; });
+      var b = []; RHYMES.forEach(function (o) { if (o !== f) b = b.concat(o.slice(0, 2)); });
+      if (mute) b = b.filter(function (x) { return PIC[x]; });
+      function cRh(word) { var c = cWord(word); if (mute && PIC[word]) { c.e = PIC[word]; c.cls = 'word pic'; } return c; }
+      return { say: ['bp_rhyme', tx(w)], show: (mute && PIC[w]) ? { e: PIC[w], text: w } : { text: w }, need: cx.sub ? 3 : 2, good: g.map(cRh), bad: shuffle(b).slice(0, cx.sub === 2 ? 7 : 5).map(cRh) };
+    } },
     { id: 'e_missing', name: 'The missing letter', band: 'E', sub: 2, gen: function (cx) { var w = cx.sub === 2 ? pick(['frog', 'fish', 'duck', 'milk', 'star', 'jump', 'cake', 'bird', 'tree', 'ship']) : pick(CVC), k = cx.sub ? rnd(0, w.length - 1) : 1, l = w[k], gap = w.slice(0, k) + '_' + w.slice(k + 1), pool = ('aeiou'.indexOf(l) >= 0 ? ['a', 'e', 'i', 'o', 'u'] : 'bcdfghjklmnprstw'.split('')).filter(function (x) { return !realWord(gap.replace('_', x)); });   // quality1: a wrong letter never makes another real word (s_n: not "sin")
       return { say: ['bp_missing', tx(w)], ask: 'Which letter is missing? Pop it!', show: { text: gap, e: PIC[w] }, need: 1, good: [cLet(l)], bad: others(pool, [l], 3).map(function (x) { return cLet(x); }), lower: true }; } },
     { id: 'e_make10', name: 'Ways to make 10', band: 'E', sub: 2, gen: function (cx) { var M = cx.sub === 2 ? pick([12, 14, 15]) : cx.sub ? pick([5, 8, 10]) : 10, g = [], b = []; for (var a = 1; a < M; a++) { if (a > 9 || M - a > 9) continue; g.push(cSum(a, M - a)); var d = rnd(1, 9); if (a + d !== M) b.push(cSum(a, d)); } return { say: M === 10 ? ['bp_make10'] : ['bp_make', M], show: { text: '= ' + M }, need: 3, good: shuffle(g).slice(0, 6), bad: shuffle(b).slice(0, 5) }; } },
@@ -269,10 +278,21 @@
   /* end of round: 1-3 stars like one Munch round (1 for the round, +1 for 80%+ right first time, +1 for the golden bubble or a won storm) */
   // batch1 (plan P2: stars follow effort): 1 for the round, +1 at 70%+ right first time, +1 at 90%+ (was +1 for the golden bubble,
   // so about 2 a round whatever she did). The golden bubble and the storm stay as fun, not as stars.
-  function roundStars(res) { var s = 1, f = res.pops ? res.first / res.pops : 0; if (f >= .7) s++; if (f >= .9) s++; return Math.min(3, s); }
+  function roundStars(res) {
+    var pops = res.pops || 0, first = res.first || 0, escapes = res.escapes || res.escaped || 0;
+    var f = pops ? first / pops : 0;
+    /* Toddler free-pop rounds always look "perfect" (any:true). Give 1 star so a long session does not flood 3s. */
+    if (res.tod) return 1;
+    var s = 1;
+    if (f >= .7) s++;
+    if (f >= .9) s++;
+    if (pops >= 8 && f < 0.35) return 0;
+    if (escapes >= 8 && f < 0.5) return 0;
+    return Math.min(3, s);
+  }
   // wrong pops cost a right bubble (it floats away) from age 5; never for toddlers or Gentle play
   function escapeOk(p) { var a = A.Age && A.Age.of ? A.Age.of(p) : p && p.age; return bandOf(p) !== 'T' && a != null && a >= 5; }
-  function finishRound(p, res) { var g = data(p); g.rounds++; if (res.golden) g.golden++; if (res.stormTried) g.storm.tries++; if (res.stormWon) g.storm.wins++; g.lastDay = today(); return roundStars(res); }
+  function finishRound(p, res) { res = res || {}; if (res.tod == null) res.tod = toddler(p); var g = data(p); g.rounds++; if (res.golden) g.golden++; if (res.stormTried) g.storm.tries++; if (res.stormWon) g.storm.wins++; g.lastDay = today(); return roundStars(res); }
   function friends(p) { var met = (A.Friends && A.Friends.of ? A.Friends.of(p) : Object.keys((p.unlocks && p.unlocks.blobs) || {})); if (p.blob && met.indexOf(p.blob) < 0) met = [p.blob].concat(met); return met.length ? met : ['strawberry']; }
   function summary(p) { var b = bandOf(p), T = track(p); return { band: b, learn: T.learn.slice(), steps: LAD[b].map(function (s) { var q = sst(p, s.id); return { id: s.id, name: s.name, status: q.status, placed: !!q.placed, n: q.n, acc: q.n ? Math.round(100 * q.ok / q.n) : null }; }).filter(function (x) { return x.status !== 'locked'; }) }; }
   A.Bubble = { COLORS: COLORS, SHAPES: SHAPES, ANIMALS: ANIMALS, AN: AN, LETTERS: LETTERS, BEGIN: BEGIN, RHYMES: RHYMES, NUMW: NUMW, LAD: LAD, STEPS: STEPS, RULE: RULE, RULE_E: RULE_E,

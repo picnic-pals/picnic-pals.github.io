@@ -24,7 +24,7 @@ background-color: #bfe6ff;
 .awning { position: absolute; left: 0; right: 0; top: 0; height: 26px; background: repeating-linear-gradient(90deg, #ffd23c 0 60px, #fff 60px 120px); z-index: 0; pointer-events: none; }
 .awning::after { content: ''; position: absolute; left: 0; right: 0; top: 26px; height: 16px; background: radial-gradient(circle at 30px 0, #ffd23c 15px, transparent 16px) 0 0 / 120px 16px repeat-x, radial-gradient(circle at 90px 0, #fff 15px, transparent 16px) 0 0 / 120px 16px repeat-x; }
 .tbar { position: relative; z-index: 2; width: 100%; display: flex; align-items: center; justify-content: center; gap: 14px; padding: 18px 84px 0; box-sizing: border-box; min-height: 70px; }
-.homebtn { position: fixed; top: 8px; left: 8px; z-index: 5; width: 52px; height: 52px; border-radius: 50%; border: 0; background: #fff; font-size: 24px; opacity: .8; box-shadow: 0 3px 0 #f0d9e4; touch-action: none; -webkit-user-select: none; user-select: none; cursor: pointer; }
+.homebtn { position: fixed; top: 8px; left: 8px; z-index: 5; width: 60px; height: 60px; min-width: 60px; min-height: 60px; border-radius: 50%; border: 0; background: #fff; font-size: 24px; opacity: .8; box-shadow: 0 3px 0 #f0d9e4; touch-action: none; -webkit-user-select: none; user-select: none; cursor: pointer; }
 .homebtn::after { content: ''; position: absolute; inset: -5px; border-radius: 50%; background: conic-gradient(#ff8ab3 var(--hp, 0%), transparent 0); -webkit-mask: radial-gradient(circle, transparent 29px, #000 30px); mask: radial-gradient(circle, transparent 29px, #000 30px); pointer-events: none; }
 .homebtn.holding { opacity: 1; animation: homehold .8s linear forwards; }
 @property --hp { syntax: '<percentage>'; inherits: true; initial-value: 0%; }
@@ -150,7 +150,7 @@ body.tod .bubble .want .emo { font-size: 84px; } body.tod .bubble .want .drink s
 .cnt.multi .emo { font-size: 26px; } .cnt.multi .drink svg { width: 26px; height: 28px; } .cnt.multi .drink i { display: none; }
 
 /* quality1 (C3): the "?" how-to button sits under the home button */
-#howtoBtn.q1help { position: fixed; top: 72px; left: 11px; z-index: 6; width: 46px; height: 46px; font-size: 26px; }
+#howtoBtn.q1help { position: fixed; top: 76px; left: 8px; z-index: 6; width: 60px; height: 60px; min-width: 60px; min-height: 60px; font-size: 26px; }
 /* quality1 polish: phone layout. The customer's order bubble (and the ticket in it) used to run off the left edge, because the
    bubble + ticket minimum widths and a 22vh friend did not fit 390px side by side. On a narrow screen the friend is smaller,
    the bubble takes the rest of the row and the ticket text is a little smaller. The top bar gets the same fix as Bubble Pop. */
@@ -318,7 +318,7 @@ body.tipq .jarchip { display: none !important; }
 }
 @media (orientation: landscape) and (max-height: 500px) {
   #stand .tbar { min-height: 46px; padding-top: 6px; } #stand .sayagain { width: 48px; height: 48px; font-size: 24px; top: 6px; }
-  #stand .homebtn { width: 44px; height: 44px; } #howtoBtn.q1help { top: 56px; width: 40px; height: 40px; font-size: 22px; }
+  #stand .homebtn { width: 60px; height: 60px; min-width: 60px; min-height: 60px; } #howtoBtn.q1help { top: 76px; width: 60px; height: 60px; min-width: 60px; min-height: 60px; font-size: 22px; }
   .cust .friend { height: 22vh; } .cust .bubble { max-height: 70%; padding: 6px 10px; }
   .want b { font-size: 28px; } .want .emo { font-size: 34px; } .ticket p { font-size: 18px; } .ticket.long p { font-size: 15px; } .bubble .ask { font-size: 14px; } .bubble .line { font-size: 14px; } .rhead { font-size: 13px; }
   .bin { width: 62px; height: 62px; } .bin .emo { font-size: 32px; } .bin small { display: none; }
@@ -329,8 +329,8 @@ body.tipq .jarchip { display: none !important; }
 }
 /* stand-r1: on a phone in portrait the "?" sits in the top bar (it covered the start of the order text) */
 @media (orientation: portrait) and (max-width: 600px) {
-  #howtoBtn.q1help { top: 10px; left: 66px; width: 44px; height: 44px; font-size: 24px; }
-  #stand .tbar { padding-left: 116px; padding-right: 128px; }
+  #howtoBtn.q1help { top: 8px; left: 76px; width: 60px; height: 60px; min-width: 60px; min-height: 60px; font-size: 24px; }
+  #stand .tbar { padding-left: 148px; padding-right: 136px; }
 }
 /* stand-r1: portrait gives the pitcher the whole mat width (the count chip sits in the top corner), so the ingredients are bigger */
 @media (orientation: portrait) {

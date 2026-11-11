@@ -151,7 +151,7 @@
       var j = ITEMS.findIndex(function (it) { return it.t === 'c' && it.k === k; }), open = ST.chOpen(P, k), got = A.Rewards.unlocked(P, 'blob', c.blob), x = ST.data(P).challenges[c.area] || {};
       if (!open) return;   // design1: a challenge appears on the map only once it is open (no hints about what is ahead)
       var b = A.el('<button class="chal' + (open ? ' open' : ' locked') + (got ? ' got' : '') + (j === sel ? ' sel' : '') + '" style="' + pct(chPos(k)) + '" data-c="' + k + '" aria-label="Challenge, ' + A.esc(c.a.name) + (open ? '' : ', locked') + '">' +
-        '<span class="cb' + (got ? '' : ' star') + '">' + (got ? B.svg({ blob: c.blob, expr: 'happy' }) : '⭐') + '</span><span class="cl">' + (got ? (x.best ? '⏱ ' + Math.round(x.best) + 's' : '✓') : open ? '⏱ Challenge' : '🔒') + '</span></button>');
+        '<span class="cb' + (got ? '' : ' star') + '">' + (got ? B.svg({ blob: c.blob, expr: 'happy' }) : '⭐') + '</span><span class="cl">' + (got ? (x.best ? '⏱ ' + Math.round(x.best) + 's' : '✓') : open ? ((A.Icons ? A.Icons.html('⏱', { size: 24, decorative: true, cls: 'pp-pic', slot: 'map:challenge' }) : '⏱') + ' Challenge') : (A.Icons && A.Icons.has('🔒') ? A.Icons.html('🔒', { size: 24, decorative: true, cls: 'pp-pic', slot: 'map:lock' }) : '🔒')) + '</span></button>');
       b.addEventListener('click', function () { if (busy) return; if (!open) { lockedNudge(b, true); return; } if (sel === j) play(j); else { sel = j; render(); SFX.step(); } });
       box.appendChild(b);
     });
@@ -259,7 +259,7 @@
     var all = A.Store.profiles(), rows = ST.board(all), medals = ['🥇', '🥈', '🥉'], s = ST.data(p), R = ST.run(p);
     var fam = rows.map(function (r, i) {
       return '<tr class="' + (r.p.id === p.id ? 'me' : '') + '"><td class="rk">' + (r.score ? medals[i] || i + 1 : '') + '</td><td class="av">' + B.forProfile(r.p) + '</td><td class="nm">' + A.esc(r.p.name) + '</td>' +
-        '<td class="sc">' + (r.score || '—') + '</td><td class="st">' + (r.score ? (r.finished ? '🏁 ' : '') + r.stops + '/' + MAIN + ' ' + ST.PATHS[r.path].emoji : 'not yet') + '</td></tr>';
+        '<td class="sc">' + (r.score || '—') + '</td><td class="st">' + (r.score ? (r.finished ? (A.Icons ? A.Icons.html('🏁', { size: 24, decorative: true, cls: 'pp-pic', slot: 'map:finish' }) + ' ' : '🏁 ') : '') + r.stops + '/' + MAIN + ' ' + ST.PATHS[r.path].emoji : 'not yet') + '</td></tr>';
     }).join('');
     var mine = ST.AREAS.map(function (a, ai) {
       if (a.trail || a.boss) return '';

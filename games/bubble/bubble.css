@@ -24,7 +24,7 @@ body {
 .clouds { display: none !important; }
 #bubble { height: 100vh; height: 100dvh; position: relative; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
 .tbar { position: relative; z-index: 4; display: flex; align-items: center; justify-content: center; padding: 14px 90px 0; min-height: 64px; }
-.homebtn { position: fixed; top: 8px; left: 8px; z-index: 6; width: 52px; height: 52px; border-radius: 50%; border: 0; background: #fff; font-size: 24px; opacity: .85; box-shadow: 0 3px 0 #d6e7f3; touch-action: none; }
+.homebtn { position: fixed; top: 8px; left: 8px; z-index: 6; width: 60px; height: 60px; min-width: 60px; min-height: 60px; border-radius: 50%; border: 0; background: #fff; font-size: 24px; opacity: .85; box-shadow: 0 3px 0 #d6e7f3; touch-action: none; }
 .homebtn::after { content: ''; position: absolute; inset: -5px; border-radius: 50%; background: conic-gradient(#ff8ab3 var(--hp, 0%), transparent 0); -webkit-mask: radial-gradient(circle, transparent 29px, #000 30px); mask: radial-gradient(circle, transparent 29px, #000 30px); pointer-events: none; }
 .homebtn.holding { opacity: 1; animation: homehold .8s linear forwards; }
 @property --hp { syntax: '<percentage>'; inherits: true; initial-value: 0%; }
@@ -96,7 +96,7 @@ body {
 #bubble .target { top: 66px; }
 
 /* quality1 (C3): the "?" how-to button sits under the home button */
-#howtoBtn.q1help { position: fixed; top: 72px; left: 11px; z-index: 6; width: 46px; height: 46px; font-size: 26px; }
+#howtoBtn.q1help { position: fixed; top: 76px; left: 8px; z-index: 6; width: 60px; height: 60px; min-width: 60px; min-height: 60px; font-size: 26px; }
 /* quality1 polish: phone top bar. The big "say it again" button used to sit on top of the progress dots. On a narrow screen it
    is a 56px button beside the gear, and the dots shrink to fit the space between the home button and it (10 dots max). */
 @media (max-width: 600px) {

@@ -2324,6 +2324,34 @@
       }
     },
     {
+      "id": "food.muffin",
+      "emoji": [],
+      "label": "muffin",
+      "file": "food/muffin.png",
+      "set": "food",
+      "sizes": {
+        "256": "food/muffin.png",
+        "64": "food/muffin_64.png",
+        "48": "food/muffin_48.png",
+        "32": "food/muffin_32.png"
+      }
+    },
+    {
+      "id": "food.pretzel",
+      "emoji": [
+        "🥨"
+      ],
+      "label": "pretzel",
+      "file": "food/pretzel.png",
+      "set": "food",
+      "sizes": {
+        "256": "food/pretzel.png",
+        "64": "food/pretzel_64.png",
+        "48": "food/pretzel_48.png",
+        "32": "food/pretzel_32.png"
+      }
+    },
+    {
       "id": "scenery.sun",
       "emoji": [
         "☀️",
@@ -4065,6 +4093,33 @@
       }
     },
     {
+      "id": "object.lantern",
+      "emoji": [
+        "🏮"
+      ],
+      "label": "lantern",
+      "file": "objects/lantern.png",
+      "set": "objects",
+      "sizes": {
+        "256": "objects/lantern.png",
+        "64": "objects/lantern_64.png",
+        "48": "objects/lantern_48.png",
+        "32": "objects/lantern_32.png"
+      }
+    },
+    {
+      "id": "object.bunting",
+      "emoji": [],
+      "label": "bunting",
+      "file": "objects/bunting.png",
+      "set": "objects",
+      "sizes": {
+        "256": "objects/bunting_256.png",
+        "512": "objects/bunting_512.png",
+        "1024": "objects/bunting.png"
+      }
+    },
+    {
       "id": "body.ear",
       "emoji": [
         "👂"
@@ -4273,6 +4328,229 @@
         "48": "gaps/coconut_48.png",
         "32": "gaps/coconut_32.png"
       }
+    },
+    {
+      "id": "gaps.lightning",
+      "emoji": [
+        "⚡"
+      ],
+      "label": "lightning",
+      "file": "gaps/lightning_v1.png",
+      "set": "gaps",
+      "sizes": {
+        "256": "gaps/lightning_v1.png",
+        "64": "gaps/lightning_v1_64.png",
+        "48": "gaps/lightning_v1_48.png",
+        "32": "gaps/lightning_v1_32.png"
+      },
+      "variants": [
+        {
+          "id": "v1",
+          "file": "gaps/lightning_v1.png",
+          "sizes": {
+            "256": "gaps/lightning_v1.png",
+            "64": "gaps/lightning_v1_64.png",
+            "48": "gaps/lightning_v1_48.png",
+            "32": "gaps/lightning_v1_32.png"
+          }
+        },
+        {
+          "id": "v2",
+          "file": "gaps/lightning_v2.png",
+          "sizes": {
+            "256": "gaps/lightning_v2.png",
+            "64": "gaps/lightning_v2_64.png",
+            "48": "gaps/lightning_v2_48.png",
+            "32": "gaps/lightning_v2_32.png"
+          }
+        }
+      ]
+    },
+    {
+      "id": "gaps.crown",
+      "emoji": [
+        "👑"
+      ],
+      "label": "crown",
+      "file": "gaps/crown_v1.png",
+      "set": "gaps",
+      "sizes": {
+        "256": "gaps/crown_v1.png",
+        "64": "gaps/crown_v1_64.png",
+        "48": "gaps/crown_v1_48.png",
+        "32": "gaps/crown_v1_32.png"
+      },
+      "variants": [
+        {
+          "id": "v1",
+          "file": "gaps/crown_v1.png",
+          "sizes": {
+            "256": "gaps/crown_v1.png",
+            "64": "gaps/crown_v1_64.png",
+            "48": "gaps/crown_v1_48.png",
+            "32": "gaps/crown_v1_32.png"
+          }
+        },
+        {
+          "id": "v2",
+          "file": "gaps/crown_v2.png",
+          "sizes": {
+            "256": "gaps/crown_v2.png",
+            "64": "gaps/crown_v2_64.png",
+            "48": "gaps/crown_v2_48.png",
+            "32": "gaps/crown_v2_32.png"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ui.letters",
+      "emoji": [
+        "🔤"
+      ],
+      "label": "letters",
+      "file": "ui/letters_v1.png",
+      "set": "ui",
+      "sizes": {
+        "256": "ui/letters_v1.png",
+        "64": "ui/letters_v1_64.png",
+        "48": "ui/letters_v1_48.png",
+        "32": "ui/letters_v1_32.png"
+      },
+      "variants": [
+        {
+          "id": "v1",
+          "file": "ui/letters_v1.png",
+          "sizes": {
+            "256": "ui/letters_v1.png",
+            "64": "ui/letters_v1_64.png",
+            "48": "ui/letters_v1_48.png",
+            "32": "ui/letters_v1_32.png"
+          }
+        },
+        {
+          "id": "v2",
+          "file": "ui/letters_v2.png",
+          "sizes": {
+            "256": "ui/letters_v2.png",
+            "64": "ui/letters_v2_64.png",
+            "48": "ui/letters_v2_48.png",
+            "32": "ui/letters_v2_32.png"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ui.timer",
+      "emoji": [
+        "⏱",
+        "⏱️"
+      ],
+      "label": "timer",
+      "file": "ui/timer_v1.png",
+      "set": "ui",
+      "sizes": {
+        "256": "ui/timer_v1.png",
+        "64": "ui/timer_v1_64.png",
+        "48": "ui/timer_v1_48.png",
+        "32": "ui/timer_v1_32.png"
+      },
+      "variants": [
+        {
+          "id": "v1",
+          "file": "ui/timer_v1.png",
+          "sizes": {
+            "256": "ui/timer_v1.png",
+            "64": "ui/timer_v1_64.png",
+            "48": "ui/timer_v1_48.png",
+            "32": "ui/timer_v1_32.png"
+          }
+        },
+        {
+          "id": "v2",
+          "file": "ui/timer_v2.png",
+          "sizes": {
+            "256": "ui/timer_v2.png",
+            "64": "ui/timer_v2_64.png",
+            "48": "ui/timer_v2_48.png",
+            "32": "ui/timer_v2_32.png"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ui.bubbles",
+      "emoji": [
+        "🫧"
+      ],
+      "label": "bubbles",
+      "file": "ui/bubbles_v1.png",
+      "set": "ui",
+      "sizes": {
+        "256": "ui/bubbles_v1.png",
+        "64": "ui/bubbles_v1_64.png",
+        "48": "ui/bubbles_v1_48.png",
+        "32": "ui/bubbles_v1_32.png"
+      },
+      "variants": [
+        {
+          "id": "v1",
+          "file": "ui/bubbles_v1.png",
+          "sizes": {
+            "256": "ui/bubbles_v1.png",
+            "64": "ui/bubbles_v1_64.png",
+            "48": "ui/bubbles_v1_48.png",
+            "32": "ui/bubbles_v1_32.png"
+          }
+        },
+        {
+          "id": "v2",
+          "file": "ui/bubbles_v2.png",
+          "sizes": {
+            "256": "ui/bubbles_v2.png",
+            "64": "ui/bubbles_v2_64.png",
+            "48": "ui/bubbles_v2_48.png",
+            "32": "ui/bubbles_v2_32.png"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ui.flag",
+      "emoji": [
+        "🏁"
+      ],
+      "label": "flag",
+      "file": "ui/flag_v1.png",
+      "set": "ui",
+      "sizes": {
+        "256": "ui/flag_v1.png",
+        "64": "ui/flag_v1_64.png",
+        "48": "ui/flag_v1_48.png",
+        "32": "ui/flag_v1_32.png"
+      },
+      "variants": [
+        {
+          "id": "v1",
+          "file": "ui/flag_v1.png",
+          "sizes": {
+            "256": "ui/flag_v1.png",
+            "64": "ui/flag_v1_64.png",
+            "48": "ui/flag_v1_48.png",
+            "32": "ui/flag_v1_32.png"
+          }
+        },
+        {
+          "id": "v2",
+          "file": "ui/flag_v2.png",
+          "sizes": {
+            "256": "ui/flag_v2.png",
+            "64": "ui/flag_v2_64.png",
+            "48": "ui/flag_v2_48.png",
+            "32": "ui/flag_v2_32.png"
+          }
+        }
+      ]
     }
   ],
   "words": {
@@ -4536,17 +4814,30 @@
     "planet": "gaps.planet",
     "paint": "gaps.paint",
     "painting": "gaps.paint",
-    "coconut": "gaps.coconut"
+    "coconut": "gaps.coconut",
+    "lightning": "gaps.lightning",
+    "bolt": "gaps.lightning",
+    "crown": "gaps.crown",
+    "letters": "ui.letters",
+    "timer": "ui.timer",
+    "stopwatch": "ui.timer",
+    "bubbles": "ui.bubbles",
+    "flag": "ui.flag",
+    "muffin": "food.muffin",
+    "pretzel": "food.pretzel",
+    "lantern": "object.lantern",
+    "paper lantern": "object.lantern",
+    "bunting": "object.bunting"
   },
   "counts": {
-    "ui": 34,
+    "ui": 38,
     "animals": 72,
-    "food": 50,
+    "food": 52,
     "scenery": 32,
     "nature": 24,
-    "total": 285,
-    "objects": 59,
+    "total": 295,
+    "objects": 61,
     "body": 7,
-    "gaps": 7
+    "gaps": 9
   }
 }

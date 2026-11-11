@@ -57,6 +57,7 @@
     return {
       schema: SCHEMA, createdAt: Date.now(), activeId: null,
       settings: { sound: true, voice: true, recorded: true, ttsClips: true, mixVoice: false, rate: 0.9, music: true, musicVol: 0.5, timer: true, bbClock: 0, padRumble: true }, // bbClock: Blob Baseball per-pitch shot clock (seconds, 0 = off); padRumble: light controller rumble
+      family: { coins: 0, racers: {} },
       profiles: [], seeded: false
     };
   }
@@ -147,6 +148,7 @@
     load: load, save: save, persistence: persistence, STARTER_BLOBS: STARTER_BLOBS, BLOB_TO_FOOD: BLOB_TO_FOOD, GRANT_ON_MIGRATE: GRANT_ON_MIGRATE, migrateBlobs: migrateBlobs,
     get data() { return D || load(); },
     get settings() { return (D || load()).settings; },
+    family: function () { var d = D || load(); if (!d.family) d.family = { coins: 0, racers: {} }; if (typeof d.family.coins !== 'number') d.family.coins = 0; return d.family; },
     profiles: function () { return (D || load()).profiles; },
     get: function (id) { return (D || load()).profiles.filter(function (p) { return p.id === id; })[0] || null; },
     active: function () { var d = D || load(); return A.Store.get(d.activeId) || null; },

@@ -54,8 +54,8 @@ body:not(.two) .turn { display: none; }
 .sign .speak { width: 50px; height: 50px; flex: none; border-radius: 50%; background: var(--sky2); display: grid; place-items: center; box-shadow: 0 4px 0 #b6d8f5; }
 .sign .speak svg { width: 30px; height: 30px; }
 .sign .shot { font-weight: 700; font-size: 22px; color: var(--ink2); min-width: 0; } .sign .shot.low { color: #e0435f; animation: rpop .5s infinite; }
-.swingtag { position: absolute; left: 50%; bottom: -13px; transform: translateX(-50%); white-space: nowrap; background: #fffdf6; border: 2px solid #f1dfb2; border-radius: 999px; padding: 0 12px; font-weight: 700; font-size: 15px; line-height: 22px; color: var(--ink2); opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 2; }
-.swingtag.on { opacity: 1; }
+.swingtag { position: static; align-self: center; margin: 4px 0 0; box-sizing: border-box; max-width: 100%; white-space: normal; background: #fffdf6; border: 2px solid #f1dfb2; border-radius: 999px; padding: 0 12px; font-weight: 700; font-size: 15px; line-height: 22px; color: var(--ink2); display: none; pointer-events: none; }
+.swingtag.on { display: block; opacity: 1; }
 .swingtag.sg { color: #2c9a5c; } .swingtag.db { color: #2a6cc4; } .swingtag.tr { color: #d9582a; } .swingtag.hr { color: #b07800; text-shadow: 0 0 10px #ffd23c; }
 
 #parkWrap { flex: 1; min-height: 0; position: relative; overflow: hidden; container-type: size; }
@@ -204,7 +204,7 @@ body:not(.two) .turn { display: none; }
 /* slugger2 (2026-10-22): rival row, mercy note, bonus (base-running / scoreboard) questions, out text, dots */
 .sboard tr.riv td.nm { color: #a8f0b0; }
 .sbf .mercy { font-size: .9em; color: #8f9bc4; }
-.swingtag.bonusq, .swingtag.outtag, .swingtag.rival, .swingtag.walk { font-size: 17px; white-space: normal; max-width: min(92vw, 640px); width: max-content; text-align: center; line-height: 1.25; padding: 3px 14px; }
+.swingtag.bonusq, .swingtag.outtag, .swingtag.rival, .swingtag.walk { font-size: 17px; white-space: normal; max-width: min(100%, 640px); width: max-content; text-align: center; line-height: 1.25; padding: 3px 14px; }
 .swingtag.bonusq { color: #6a3fb0; border-color: #d9c8ff; } .swingtag.bonusq.yes { color: #2c9a5c; border-color: #a8e6c2; } .swingtag.bonusq.hint { color: #7a5a00; border-color: #ffe08a; }
 .swingtag.outtag { color: #5a4a7a; } .swingtag.rival { color: #2e7d32; } .swingtag.tricky { color: #d9582a; } .swingtag.walk { color: #2a6cc4; }
 body.bonusing .sign .qtxt { font-size: clamp(16px, 2.6vh, 24px); line-height: 1.25; }
@@ -296,7 +296,8 @@ body.passage-read .sign {
   max-height: 58vh;
   padding: 10px 14px 12px;
 }
-body.passage-read .sign .qrow { flex: 1; min-height: 0; align-items: flex-start; }
+body.passage-read .sign .qrow { flex: 1; min-height: 0; overflow: hidden; align-items: stretch; }
+body.passage-read .sign .speak { align-self: flex-start; }
 body.passage-read .sign .qtxt {
   flex: 1;
   min-height: 0;
@@ -304,9 +305,15 @@ body.passage-read .sign .qtxt {
   -webkit-overflow-scrolling: touch;
   font-size: inherit;
 }
-body.passage-read .qp-pass {
+body.passage-read .qp-pass,
+body.passage-read .sign .qtxt .qp-pass {
+  /* Beat core.css .sign .qtxt .qp-pass (max-height: min(36vh, 220px) on phone). */
   max-height: none;
+  height: auto;
+  flex: 1;
+  min-height: 0;
   margin: 0;
+  overflow: auto;
 }
 body.passage-read .qp-pass .qp-title { font-size: clamp(18px, 4.2vw, 26px); }
 body.passage-read .qp-pass .qp-body { font-size: clamp(17px, 4vw, 24px); line-height: 1.38; }
@@ -316,7 +323,8 @@ body.passage-read .pass-ready {
   display: inline-flex; align-items: center; justify-content: center;
   font: 800 clamp(20px, 4.5vw, 28px)/1.1 system-ui, sans-serif;
   color: #fff; background: linear-gradient(#6ad39a, #2fc07e);
-  border: 0; border-radius: 999px; padding: .45em 1.4em;
+  border: 0; border-radius: 999px; padding: 0 1.4em;
+  min-height: 60px; min-width: 140px;
   box-shadow: 0 6px 0 #1f9a62; cursor: pointer;
 }
 body.passage-read .pass-again { display: none !important; }
@@ -338,9 +346,13 @@ body.passage-ask .pass-again-inline {
 }
 body.passage-ask .cards { min-height: 0; }
 @media (max-width: 420px) {
-  body.passage-read #game .top { max-height: 64vh; }
-  body.passage-read .sign { max-height: 60vh; }
-  body.passage-read #parkWrap { height: min(24vh, 160px); min-height: 90px; }
+  /* Header buttons live in .top with the sign; cap both so the park and I'm ready stay on screen. */
+  body.passage-read #game .top { max-height: calc(100dvh - 118px); overflow: hidden; }
+  body.passage-read .sign { max-height: calc(100dvh - 200px); overflow: hidden; }
+  body.passage-read .sign .qtxt { max-height: calc(100dvh - 270px); overflow: auto; }
+  body.passage-read .sign .qtxt .qp-pass { max-height: calc(100dvh - 290px); height: auto; overflow: auto; }
+  body.passage-read .pass-actions { flex: 0 0 auto; position: relative; z-index: 2; background: #fffdf6; padding-top: 4px; }
+  body.passage-read #parkWrap { height: min(16vh, 110px); min-height: 72px; }
   body.passage-ask .sign { max-height: min(20vh, 140px); }
   body.passage-ask #parkWrap { min-height: 110px; }
 }
@@ -348,5 +360,111 @@ body.passage-ask .cards { min-height: 0; }
   body.passage-read #parkWrap { height: min(32vh, 280px); }
   body.passage-ask .sign { max-height: min(18vh, 150px); }
 }
+@media (orientation: landscape) and (max-height: 500px) {
+  body.passage-read #game .top { max-height: calc(100dvh - 100px); overflow: hidden; }
+  body.passage-read .sign {
+    max-height: calc(100dvh - 148px);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    min-height: 0;
+  }
+  /* stretch qtxt to the row so the passage scrolls above I'm ready, instead of painting over it */
+  body.passage-read .sign .qrow {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    align-items: stretch;
+  }
+  body.passage-read .sign .qtxt {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    align-self: stretch;
+  }
+  body.passage-read .sign .speak { align-self: flex-start; }
+  body.passage-read .sign .qtxt .qp-pass,
+  body.passage-read .qp-pass { max-height: none; height: auto; overflow: auto; flex: 1 1 auto; min-height: 0; }
+  body.passage-read .qp-pass .qp-title { font-size: 18px; }
+  body.passage-read .qp-pass .qp-body { font-size: 16px; line-height: 1.32; }
+  body.passage-read .pass-actions {
+    flex: 0 0 auto; position: relative; z-index: 2;
+    background: #fffdf6; padding: 6px 0 4px; margin-top: 0;
+  }
+  body.passage-read .pass-ready { font-size: 20px; padding: 0 1.2em; min-height: 60px; min-width: 140px; }
+  body.passage-read #parkWrap { height: min(22vh, 96px); min-height: 80px; }
+}
 
 .pass-actions[hidden] { display: none !important; }
+
+
+/* ---- PT6: Batter Up intro fits on 844x390; Play ball stays in the fold at 60px ---- */
+.overlay.bbintro .bigbtn { min-height: 60px; min-width: 160px; }
+@media (orientation: landscape) and (max-height: 500px) {
+  .overlay.bbintro .card {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100dvh - 10px);
+    overflow: hidden;
+    padding: 8px 16px 10px;
+    width: min(96vw, 760px);
+    max-width: min(96vw, 760px);
+    box-sizing: border-box;
+  }
+  .overlay.bbintro h2 { font-size: 22px; margin: 0 0 2px; }
+  .overlay.bbintro .tag { margin-bottom: 2px; }
+  .overlay.bbintro .art {
+    width: auto;
+    height: min(16vh, 72px);
+    min-height: 0;
+    margin: 0 auto 2px;
+  }
+  .overlay.bbintro .art > div,
+  .overlay.bbintro .dance,
+  .overlay.bbintro .dance svg { max-height: 72px; width: auto; height: 100%; }
+  .overlay.bbintro .howto { font-size: 15px; line-height: 1.25; margin: 2px 0; }
+  .overlay.bbintro .card > p { font-size: 14px; margin: 2px 0 6px; }
+  .overlay.bbintro .kh, .overlay.bbintro .ph { display: none; }
+  .overlay.bbintro .bigbtn {
+    min-height: 60px;
+    flex: none;
+    margin-top: auto;
+    font-size: 22px;
+    padding: 0 1.2em;
+  }
+}
+
+/* v0.4: 4 phrase choices (e.g. 602 > 598) wrap 2×2 on a narrow phone so the numbers stay readable */
+@media (max-width: 500px) {
+  .cards.phrases { flex-wrap: wrap; }
+  .cards.phrases .bcard { flex: 1 1 42%; }
+}
+
+/* v0.4: the status pill is a row under the question (never absolutely over the frames). */
+#game .top, .sign, .sign .qpic.on { overflow: visible; }
+.sign:has(.cv-set) .qrow { align-items: center; }
+.sign .qpic .cv-set {
+  --cv-d: clamp(16px, 3.8vmin, 32px);
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  vertical-align: middle;
+}
+.swingtag img.pp-pic {
+  width: 1.15em;
+  height: 1.15em;
+  vertical-align: -0.2em;
+  margin-right: 4px;
+}
+.banner img.pp-pic, .vsline img.pp-pic, .howto img.pp-pic, .card img.pp-pic {
+  width: 1.15em;
+  height: 1.15em;
+  vertical-align: -0.2em;
+}
+@media (max-height: 500px) {
+  .sign .qpic .cv-set { --cv-d: clamp(14px, 4.4vh, 26px); flex-wrap: nowrap; }
+}
+@media (orientation: portrait) {
+  .sign:has(.cv-set) .qrow { align-items: flex-start; }
+  .sign .qpic .cv-set { --cv-d: clamp(16px, 5vw, 30px); }
+}
