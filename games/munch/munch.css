@@ -15,10 +15,29 @@
 .tally svg { width: 30px; height: 30px; fill: #ffc93c; stroke: #e8a400; stroke-width: 1.2; }
 .tally.bump { animation: rpop .5s; }
 
-#boardWrap { flex: 1; min-height: 0; padding: 6px; display: flex; align-items: center; justify-content: center; position: relative; }
+#boardWrap { flex: 1; min-height: 0; padding: 4px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+/* How-many? answer tiles: a big high-contrast numeral only (count picture is on the question card). */
+.cell .st-ansnum {
+  font-weight: 800;
+  /* --icon-cs is the fitted tile size and is not shrunk by fitCells (which sets --cs on .lbl). ~48% leaves room for "10". */
+  font-size: calc(var(--icon-cs, var(--cs)) * 0.48);
+  line-height: 1;
+  color: var(--ink, #4a3b6b);
+  text-shadow: 0 1px 0 #ffffffc0;
+}
+.cell:has(.st-ansnum) .lbl {
+  line-height: 1;
+  max-width: 88%;
+}
+/* Friend is standing on this tile: keep the numeral readable instead of the usual 0.55 shrink. */
+.cell.here .lbl:has(.st-ansnum) {
+  transform: translateY(calc(var(--cs) * -.32)) scale(.78);
+}
+#ruleTxt .st-pic, #ruleTxt .cv-set { flex-shrink: 0; max-width: 100%; vertical-align: middle; }
+.rule .txt { min-width: 0; }
 #board { position: relative; display: grid; --cs: 100px; }
 .cell { position: relative; border-radius: 22%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: calc(var(--cs) * .34);
-  box-shadow: 0 calc(var(--cs) * .06) 0 #0000001a; transition: transform .12s, background .3s, opacity .3s; cursor: pointer; overflow: visible; }
+  box-shadow: 0 calc(var(--cs) * .06) 0 #0000001a; transition: transform .12s, background .3s, opacity .3s; cursor: pointer; overflow: visible; min-width: 0; min-height: 0; }
 .cell:active { transform: scale(.96); }
 .cell .lbl { display: flex; align-items: center; justify-content: center; transition: transform .2s; white-space: nowrap; pointer-events: none;
   font-size: calc(var(--cs) * .34); max-width: 92%; max-height: 100% !important; overflow: hidden; text-align: center; }
@@ -412,6 +431,30 @@ body.challenge .timer .clock::after { content: ' ⭐'; }
   #map .mwrap { overflow-x: auto; overflow-y: hidden; justify-content: flex-start; overscroll-behavior-x: contain; scrollbar-width: thin; }
   #map .mbox { flex: none; height: 100%; width: auto; max-width: none; max-height: none; }
   #map .stop { min-width: 42px; min-height: 42px; }
+}
+
+/* Short landscape: put the board beside the rule so tiles can grow and nothing covers the count picture. */
+@media (orientation: landscape) and (max-height: 500px) {
+  #game.screen.on {
+    display: grid;
+    grid-template-columns: minmax(240px, 40%) minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto auto;
+    align-items: stretch;
+    gap: 4px 10px;
+  }
+  #game .top {
+    grid-column: 1;
+    grid-row: 1;
+    flex-wrap: wrap;
+    padding-right: 8px;
+    min-height: 0;
+    align-self: start;
+  }
+  #game .top .rule { flex: 1 1 100%; order: 5; margin-right: 0; min-height: 0; }
+  #game .timer { grid-column: 1; grid-row: 2; align-self: start; margin: 0; }
+  #game #boardWrap { grid-column: 2; grid-row: 1 / 3; min-width: 0; min-height: 0; }
+  #game .bottom { grid-column: 1 / -1; grid-row: 3; min-height: 0; }
+  #game .keys, #game #touchHint { grid-column: 1 / -1; grid-row: auto; }
 }
 
 /* design1 (2026-10-22): a calmer story map. Side trips behind one signpost, High scores / New journey in a small ⋯ menu,

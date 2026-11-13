@@ -5,6 +5,52 @@
   var COLORS = ['#ff8fb1', '#ffd23c', '#8fe3c0', '#9fd2ff', '#c9b2ff', '#ffb36b'];
   var GEAR = '<svg viewBox="0 0 24 24"><path d="M19.4 13a7.7 7.7 0 0 0 0-2l2.1-1.6-2-3.4-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3.3h-4l-.3 2.7a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.4L6.6 11a7.7 7.7 0 0 0 0 2l-2.1 1.6 2 3.4 2.5-1a7.4 7.4 0 0 0 1.7 1l.3 2.7h4l.3-2.7a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.4zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>';
   var UI = A.UI = { STAR: STAR, GEAR: GEAR, COLORS: COLORS };
+  UI.MIN_TAP = 48;
+  /* Immediate tap for touch and mouse. pointerup fires the action once; the following
+     click is ignored so we do not double-fire. Keyboard still uses click (detail 0). */
+  UI.onTap = function (el, fn) {
+    if (!el || typeof fn !== 'function') return el;
+    if (el.getAttribute('data-ontap') === '1') return el;
+    el.setAttribute('data-ontap', '1');
+    var armed = null, last = 0, lock = 0;
+    function blocked() { return !!(el.disabled || el.getAttribute('aria-disabled') === 'true'); }
+    function go(e) {
+      if (blocked()) return;
+      var now = Date.now();
+      if (now - last < ((A.Pace && A.Pace.CFG && A.Pace.CFG.TAP_DEBOUNCE) || 180)) return;
+      last = now; lock = now + 500; fn.call(el, e);
+    }
+    el.addEventListener('pointerdown', function (e) {
+      if (e.isPrimary === false) return;
+      if (e.button != null && e.button !== 0) return;
+      armed = { id: e.pointerId, x: e.clientX, y: e.clientY };
+    });
+    el.addEventListener('pointerup', function (e) {
+      if (!armed || armed.id !== e.pointerId) return;
+      var moved = Math.abs(e.clientX - armed.x) + Math.abs(e.clientY - armed.y) > 16;
+      armed = null;
+      if (moved) return;
+      e.preventDefault();
+      go(e);
+    });
+    el.addEventListener('pointercancel', function () { armed = null; });
+    el.addEventListener('click', function (e) {
+      if (Date.now() < lock) { e.preventDefault(); e.stopPropagation(); return; }
+      go(e);
+    });
+    try { if (!el.style.touchAction) el.style.touchAction = 'manipulation'; } catch (err) {}
+    return el;
+  };
+  UI.bindHome = function (el, go) {
+    if (!el || typeof go !== 'function') return el;
+    el.setAttribute('aria-label', 'Home');
+    el.removeAttribute('title');
+    var tip = el.querySelector && el.querySelector('.holdtip'); if (tip) tip.remove();
+    el.classList.remove('holding', 'hint');
+    try { el.style.touchAction = 'manipulation'; } catch (err) {}
+    return UI.onTap(el, function () { if (A.Audio && A.Audio.sfx) A.Audio.sfx('tap'); go(); });
+  };
+
 
   /* ---------- effects ---------- */
   function fxAdd(el, ms) { document.body.appendChild(el); setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, ms); }
@@ -419,8 +465,16 @@
   function lpEnd() { if (!lp) return; clearTimeout(lp.t); if (lp.fired) { var el = lp.el; UI.swallowClickUntil = Date.now() + 700; UI.swallowFor = el; setTimeout(function () { UI.pressTip = false; }, 2600); } lp = null; }
   document.addEventListener('pointerup', lpEnd, true); document.addEventListener('pointercancel', function () { if (lp) { clearTimeout(lp.t); if (lp.fired) setTimeout(function () { UI.pressTip = false; }, 2600); lp = null; } }, true);
   // the click (and Enter-free) activation after a long-press is swallowed in the capture phase, before any tile handler runs
+  function tipIsControl(el) {
+    if (!el || !el.closest) return false;
+    return !!(el.closest('button, a, [data-nav], [data-game], .tile, .opt, .kid, .homebtn, #homeBtn, [role="button"]'));
+  }
   document.addEventListener('click', function (e) {
-    if (UI.swallowClickUntil && Date.now() < UI.swallowClickUntil && UI.swallowFor && UI.swallowFor.contains(e.target)) { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); UI.swallowClickUntil = 0; UI.swallowFor = null; }
+    /* Long-press tips must not cancel the tap on real buttons (game tiles, Home, cards). Kids often press a little longer than a mouse click. */
+    if (UI.swallowClickUntil && Date.now() < UI.swallowClickUntil && UI.swallowFor && UI.swallowFor.contains(e.target)) {
+      if (tipIsControl(e.target) || tipIsControl(UI.swallowFor)) { UI.swallowClickUntil = 0; UI.swallowFor = null; return; }
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); UI.swallowClickUntil = 0; UI.swallowFor = null;
+    }
   }, true);
 
   /* ---------- quality1 (C3): how-to-play card for Munch, Bubble Pop, Lemonade Stand, Tiny Picnic and Story ----------

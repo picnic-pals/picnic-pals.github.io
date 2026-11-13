@@ -112,12 +112,19 @@
   /* ---------- items (P band): one question, one answer value ---------- */
   function within(vals, lo, hi, ans) { return uniq(vals.filter(function (v) { return v >= lo && v <= hi && v !== ans; })); }
   function numCell(v, o) { o = o || {}; return { label: String(v), html: o.dots && v <= 10 && Math.random() < .4 ? '<span class="st-numdot">' + v + tf({ on: v }, v > 5 ? 10 : 5) + '</span>' : null, fact: ['w_thats', v] }; }
+  function cntWrong(n, lo, hi) {
+    var w = within([n - 1, n + 1, n - 2, n + 2, n - 3, n + 3, n - 4, n + 4, n > 10 ? n - 10 : n + 5], lo, hi, n), k;
+    for (k = lo; k <= hi && w.length < Math.min(5, hi - lo); k++) if (k !== n && w.indexOf(k) < 0) w.push(k);
+    return w.slice(0, 5);
+  }
   function cntItem(lo, hi, how) {
     var n = rnd(lo, hi), pic;
     if (A.CountVisual) pic = A.CountVisual.html(n, { pattern: n <= 5 && how !== 'tens' && Math.random() < .5 ? 'dice' : (n <= 5 ? 'five_frame' : null) });
     else pic = how === 'tens' ? tens(n) : objs(n, pick(FOODS));
-    return { key: 'cnt' + n, ans: n, wrong: within([n - 1, n + 1, n - 2, n + 2, n > 20 ? n - 10 : n + 10].concat(n > 10 ? [n - 10] : []), Math.max(1, lo - 2), hi + 2, n).slice(0, 5),
-      text: 'How many?', pic: pic, say: ['st_how_many'], cell: function (v) { return numCell(v, { dots: how !== 'tens' }); },
+    return { key: 'cnt' + n, ans: n, wrong: cntWrong(n, lo, hi),
+      text: 'How many?', pic: pic, say: ['st_how_many'],
+      // Numeral only: the count picture lives on the question card. html is set so A7 picturizeCell will not add tile dots.
+      cell: function (v) { return { label: String(v), html: '<span class="st-ansnum">' + (A.esc ? A.esc(String(v)) : String(v)) + '</span>', fact: ['w_thats', v] }; },
       hint: function (l) { return how === 'tens' || n > 5 ? box(tens(n), l >= 2 ? Math.floor(n / 10) * 10 + ' and ' + (n % 10) + ' more is <b>' + n + '</b>.' : 'Count the full tens, then the rest.') : box(A.CountVisual ? A.CountVisual.html(n) : tf({ on: n }), l >= 2 ? 'Count them: … <b>' + n + '</b>!' : 'Touch each one and count.'); } };
   }
   var LOOK = { 12: [21], 21: [12], 13: [31], 6: [9], 9: [6], 16: [19, 61], 19: [16], 17: [71], 15: [51], 14: [41], 18: [81], 11: [17], 10: [1] };

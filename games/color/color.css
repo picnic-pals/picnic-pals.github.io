@@ -2,7 +2,7 @@
 body { background: linear-gradient(#fff8ef, #ffeaf3); margin: 0; overflow: hidden; }
 #color { display: flex; flex-direction: column; height: 100vh; height: 100dvh; padding: 6px 10px max(10px, env(safe-area-inset-bottom, 0px)); box-sizing: border-box; gap: 4px; overflow: hidden; }
 .tbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 52px; padding-left: 56px; padding-right: 72px; flex-shrink: 0; } /* 72px clears fixed .gear */
-.homebtn { position: fixed; top: 6px; left: 6px; z-index: 5; width: 60px; height: 60px; min-width: 60px; min-height: 60px; border-radius: 50%; border: 0; background: #fff; font-size: 22px; opacity: .8; box-shadow: 0 3px 0 #f0d9e4; touch-action: none; -webkit-user-select: none; user-select: none; cursor: pointer; }
+.homebtn { position: fixed; top: 6px; left: 6px; z-index: 5; width: 60px; height: 60px; min-width: 60px; min-height: 60px; border-radius: 50%; border: 0; background: #fff; font-size: 22px; opacity: .8; box-shadow: 0 3px 0 #f0d9e4; touch-action: manipulation; -webkit-user-select: none; user-select: none; cursor: pointer; }
 .homebtn::after { content: ''; position: absolute; inset: -5px; border-radius: 50%; background: conic-gradient(#ff8ab3 var(--hp, 0%), transparent 0); -webkit-mask: radial-gradient(circle, transparent 26px, #000 27px); mask: radial-gradient(circle, transparent 26px, #000 27px); pointer-events: none; }
 .homebtn.holding { opacity: 1; animation: homehold .8s linear forwards; }
 @property --hp { syntax: '<percentage>'; inherits: true; initial-value: 0%; }

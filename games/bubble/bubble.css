@@ -22,9 +22,9 @@ body {
 }
 /* art already paints sky/clouds — hide old CSS cloud blobs */
 .clouds { display: none !important; }
-#bubble { height: 100vh; height: 100dvh; position: relative; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+#bubble { height: 100vh; height: 100dvh; position: relative; overflow: hidden; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
 .tbar { position: relative; z-index: 4; display: flex; align-items: center; justify-content: center; padding: 14px 90px 0; min-height: 64px; }
-.homebtn { position: fixed; top: 8px; left: 8px; z-index: 6; width: 60px; height: 60px; min-width: 60px; min-height: 60px; border-radius: 50%; border: 0; background: #fff; font-size: 24px; opacity: .85; box-shadow: 0 3px 0 #d6e7f3; touch-action: none; }
+.homebtn { position: fixed; top: 8px; left: 8px; z-index: 6; width: 60px; height: 60px; min-width: 60px; min-height: 60px; border-radius: 50%; border: 0; background: #fff; font-size: 24px; opacity: .85; box-shadow: 0 3px 0 #d6e7f3; touch-action: manipulation; }
 .homebtn::after { content: ''; position: absolute; inset: -5px; border-radius: 50%; background: conic-gradient(#ff8ab3 var(--hp, 0%), transparent 0); -webkit-mask: radial-gradient(circle, transparent 29px, #000 30px); mask: radial-gradient(circle, transparent 29px, #000 30px); pointer-events: none; }
 .homebtn.holding { opacity: 1; animation: homehold .8s linear forwards; }
 @property --hp { syntax: '<percentage>'; inherits: true; initial-value: 0%; }
@@ -55,7 +55,7 @@ body {
 .stormbar b { position: relative; display: block; text-align: center; line-height: 30px; font-size: 18px; color: #4a3b6b; }
 /* the field and its bubbles */
 .field { position: absolute; inset: 0; z-index: 3; }
-.bub { position: absolute; left: 0; top: 0; border: 0; padding: 0; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; will-change: transform; touch-action: none;
+.bub { position: absolute; left: 0; top: 0; border: 0; padding: 0; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; will-change: transform; touch-action: manipulation;
   background: radial-gradient(circle at 35% 25%, #fff 0%, color-mix(in srgb, var(--tint, #ed5d91) 55%, #fff) 18%, var(--tint, #ed5d91) 65%, color-mix(in srgb, var(--tint, #ed5d91) 85%, #49345f) 100%);
   box-shadow: inset -8px -10px 18px #ffffff66, inset 6px 8px 14px #ffffff55, 0 6px 14px #3a86c022; }
 .bub .shine { position: absolute; left: 20%; top: 14%; width: 26%; height: 18%; border-radius: 50%; background: #ffffffd9; transform: rotate(-30deg); pointer-events: none; }

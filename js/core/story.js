@@ -266,6 +266,47 @@
   // v2p1a (2026-10-25): every journey starts at stop 1 (nothing is pre-passed). Placement moved into config(): each stop
   // plays at the kid's own level (fitStop). Kept as a no-op so old callers (munch.js) still work.
   function placeAtLevel(p) { data(p); return 0; }
+  /* The world-map place name (Berry Meadow, etc.) when Story v2 is on; otherwise the old area name. */
+  function placeName(stopOrIndex) {
+    var stop = typeof stopOrIndex === 'number' ? STOPS[stopOrIndex] : stopOrIndex;
+    if (!stop) return '';
+    var ix = stop.i != null ? stop.i : STOPS.indexOf(stop);
+    try {
+      if (A.Story && A.Story.ON2 && A.Story2 && A.Story2.placeOfStop) {
+        var k = A.Story2.placeOfStop(ix);
+        if (k >= 0 && A.Story2.PLACES[k]) return A.Story2.PLACES[k].name;
+      }
+    } catch (e) {}
+    return (stop.area && stop.area.name) || '';
+  }
+  function placeIx(stopOrIndex) {
+    var stop = typeof stopOrIndex === 'number' ? STOPS[stopOrIndex] : stopOrIndex;
+    if (!stop) return -1;
+    return stop.i != null ? stop.i : STOPS.indexOf(stop);
+  }
+  /* 1-based level inside the current Story2 place (Berry Meadow Level 1, not island Stop 5). 0 if unknown. */
+  function placeLevel(stopOrIndex) {
+    var ix = placeIx(stopOrIndex);
+    if (ix < 0) return 0;
+    try {
+      if (A.Story && A.Story.ON2 && A.Story2 && A.Story2.placeOfStop) {
+        var k = A.Story2.placeOfStop(ix), lv = k >= 0 && A.Story2.LEVELS[k];
+        if (lv) { var pos = lv.indexOf(ix); if (pos >= 0) return pos + 1; }
+      }
+    } catch (e) {}
+    var stop = typeof stopOrIndex === 'number' ? STOPS[stopOrIndex] : stopOrIndex;
+    return (stop && stop.n) || 0;
+  }
+  function placeLevelLabel(stopOrIndex) {
+    var ix = placeIx(stopOrIndex);
+    try {
+      if (A.Story && A.Story.ON2 && A.Story2 && A.Story2.isBoss && ix >= 0 && A.Story2.isBoss(ix)) return 'Mini boss';
+    } catch (e) {}
+    var n = placeLevel(stopOrIndex);
+    if (A.Story && A.Story.ON2 && n) return 'Level ' + n;
+    var stop = typeof stopOrIndex === 'number' ? STOPS[stopOrIndex] : stopOrIndex;
+    return stop && stop.n ? ('Stop ' + stop.n) : '';
+  }
   // family board: each player's best journey (all profiles on this device)
   function board(profiles) {
     return profiles.map(function (p) { var s = data(p); return { p: p, score: s.bestRun || 0, stops: s.bestRunStops || 0, path: s.bestRunPath || path(p), finished: s.finished || 0 }; })
@@ -274,5 +315,5 @@
   A.Story = { placeAtLevel: placeAtLevel, fitStop: fitStop, PLACE_MAX_AREAS: PLACE_MAX_AREAS, skillFor: skillFor, WORLD: WORLD, FESTIVAL: FESTIVAL, addArea: addArea, mainCount: mainCount, isSide: isSide, playable: playable, AREAS: AREAS, STOPS: STOPS, PATHS: PATHS, PROLOGUE: PROLOGUE, FINALE: FINALE, data: data, path: path, defaultPath: defaultPath, setPath: setPath,
     CH: CH, chFor: chFor, chConfig: chConfig, chOpen: chOpen, chHint: chHint, chRecord: chRecord, unlockAll: unlockAll,
     GAMES: GAMES, SLUG_P: SLUG_P, STAND_P: STAND_P, BUBBLE_P: BUBBLE_P, gameMix: gameMix, gameOf: gameOf, sluggerConfig: sluggerConfig, seed01: seed01,
-    stopInfo: stopInfo, unlockedTo: unlockedTo, run: run, newRun: newRun, config: config, scoreFor: scoreFor, record: record, board: board };
+    stopInfo: stopInfo, unlockedTo: unlockedTo, run: run, newRun: newRun, config: config, scoreFor: scoreFor, record: record, board: board, placeName: placeName, placeLevel: placeLevel, placeLevelLabel: placeLevelLabel };
 })(window.Arcade);

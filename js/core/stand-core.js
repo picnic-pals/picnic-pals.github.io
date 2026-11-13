@@ -68,7 +68,7 @@
   // each friend has a fixed favorite flavor; until it unlocks they order another unlocked one (the favorite is never shown early)
   function favOf(p, fid) { var all = FLAVORS[Math.floor(seed01('fav|' + fid) * FLAVORS.length)], got = flavors(p);
     if (hasFlavor(p, all.id)) return { id: all.id, fav: true }; return { id: got[Math.floor(seed01('alt|' + fid + '|' + got.length) * got.length)].id, fav: false }; }
-  var BILLS = [1, 5, 10];                     // whole dollars only (v1). A $20 bill is never needed (totals stay <= $20).
+  var BILLS = [1, 5, 10, 20];                 // whole dollars only. Pay UI shows one of each denom, tapped repeatedly.
   var UPGRADES = [];
   function upgrade(def) { UPGRADES.push(def); return def; }
   function owned(p, id) { var g = data(p); return !!(g.up && g.up[id]); }
@@ -203,6 +203,13 @@
   }
   function bigReader(p) { return band(p) === 'E' && readerOk(p); }
   /* ---------- the MONEY ladder (whole dollars, cartoon bills) ---------- */
+  /* Bills the kid can tap when counting out a price. One of each, used many times. Younger bands see $5 and $1 only. */
+  function payDenoms(p, m) {
+    if (m && m.kind === 'enough') return null;
+    var a = age(p), step = m && m.step;
+    if (step === 'm_count5' || (a != null && a <= 5)) return [5, 1];
+    return [20, 10, 5, 1];
+  }
   function wallet(total, extra, big) { // bills the customer holds: enough to pay `total` exactly, plus a few extra $1s
     var w = [], left = total;
     if (big) { while (left >= 10) { w.push(10); left -= 10; } while (left >= 5) { w.push(5); left -= 5; } }
@@ -453,7 +460,7 @@
   function summary(p) { var g = data(p); return ORDER.map(function (lad) { var L = LADDERS[lad], T = g.tracks[lad]; return { ladder: lad, open: !!L.gate(p), cur: T ? T.cur : null, steps: L.ids.map(function (id) { var s = g.steps[id] || {}; return { id: id, name: STEPS[id].name, status: s.status || 'locked', placed: !!s.placed, n: s.n || 0, acc: s.n ? Math.round(100 * s.ok / s.n) : null }; }) }; }); }
 
   A.Stand = { ITEMS: ITEMS, BY: BY, COLORS: COLORS, FLAVORS: FLAVORS, FL: FL, FLAVOR_DAYS: FLAVOR_DAYS, flavors: flavors, hasFlavor: hasFlavor, notePlayDay: notePlayDay, favOf: favOf, ingr: ingr, tipFor: tipFor, patienceMs: patienceMs, BILLS: BILLS, UPGRADES: UPGRADES, upgrade: upgrade, owned: owned, LADDERS: LADDERS, STEPS: STEPS, ORDER: ORDER, ladder: ladder,
-    band: band, toddler: toddler, moneyOpen: moneyOpen, mathCount10: mathCount10, mathMastered: mathMastered, readerOk: readerOk, stepOk: stepOk, data: data, state: sst, track: track, nextStep: nextStep, makeOrder: makeOrder, checkOrder: checkOrder, checkPay: checkPay,
+    band: band, toddler: toddler, moneyOpen: moneyOpen, mathCount10: mathCount10, mathMastered: mathMastered, readerOk: readerOk, stepOk: stepOk, data: data, state: sst, track: track, nextStep: nextStep, makeOrder: makeOrder, checkOrder: checkOrder, checkPay: checkPay, payDenoms: payDenoms,
     record: record, ready: ready, RULE: RULE, STEADY: STEADY, fastMs: fastMs, sunny: sunny, rushOk: rushOk, customers: customers, planDay: planDay, sillyOrder: sillyOrder, dayStars: dayStars, finishDay: finishDay,
     summary: summary, bandTop: bandTop, inBand: inBand, bigReader: bigReader, count: count, seed01: seed01,
     setClock: function (f) { NOWF = f; }, setRng: function (f) { RNG = f || Math.random; }, today: today };

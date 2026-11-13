@@ -190,12 +190,9 @@
       .then(function () { if (window.__noNav) return; if (STORY) { var next = out && out.runAdded ? Math.min(SI + 1, ST.mainCount() - 1) : SI; location.href = MAPURL + '&from=' + SI + '&to=' + next; } else goHome(); });
   }
   function goHome() { V.stop(); A.Store.save(); location.href = STORY ? MAPURL : A.ROOT + 'index.html?from=game#games'; }
-  var HOLD_MS = 800, hb = $('#homeBtn'), holdT = null, hintT = null;
-  function holdStart(e) { if (e.button > 0) return; e.preventDefault(); clearTimeout(holdT); hb.classList.remove('hint'); hb.classList.add('holding'); holdT = setTimeout(function () { holdT = null; hb.classList.remove('holding'); A.Audio.sfx('tap'); goHome(); }, HOLD_MS); }
-  function holdEnd() { if (!holdT) return; clearTimeout(holdT); holdT = null; hb.classList.remove('holding'); hb.classList.add('hint'); clearTimeout(hintT); hintT = setTimeout(function () { hb.classList.remove('hint'); }, 1800); }
-  hb.addEventListener('pointerdown', holdStart); hb.addEventListener('pointerup', holdEnd); hb.addEventListener('pointerleave', holdEnd); hb.addEventListener('pointercancel', holdEnd);
-  hb.addEventListener('contextmenu', function (e) { e.preventDefault(); });
-  hb.addEventListener('click', function (e) { if (e.detail === 0) { A.Audio.sfx('tap'); goHome(); } });
+  var hb = $('#homeBtn');
+  if (A.UI && A.UI.bindHome) A.UI.bindHome(hb, goHome);
+  else hb.addEventListener('click', function () { A.Audio.sfx('tap'); goHome(); });
   function sayAgain() { if (G.t && G.phase === 'play') say(G.t.say, 'tap'); }
   $('#sayBtn').addEventListener('click', sayAgain); $('#target').addEventListener('click', sayAgain);
   document.addEventListener('keydown', function (e) {

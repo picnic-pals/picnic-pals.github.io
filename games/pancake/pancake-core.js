@@ -140,6 +140,21 @@
     return [];
   }
 
+  function targetOf(order) {
+    if (!order) return 0;
+    return order.target != null ? order.target : (order.n || 0);
+  }
+  /* How far over the target the plate is. Shift-10 hides the end number, so it never reports overage. */
+  function overBy(order, plate) {
+    if (!order || order.kind === 'shift10') return 0;
+    return valueOf(plate) - targetOf(order);
+  }
+  function wobbleLevel(over) {
+    if (over <= 0) return 0;
+    if (over <= 2) return 1;
+    if (over <= 5) return 2;
+    return 3;
+  }
   function checkPlate(order, plate) {
     if (!order) return false;
     plate = plate || [];
@@ -151,8 +166,11 @@
       if (plate.length !== order.n) return false;
       return plate.every(function (c) { return c.kind === 'one'; });
     }
+    /* Two-way prompt still says "with K tens", but a plate with the right amount
+       (canonical tens+ones, or the requested tens, or any equivalent) is correct.
+       Marking a correct total wrong was the age 6-7 "right amount" miss. */
     if (order.kind === 'twoway') {
-      return valueOf(plate) === order.target && countKind(plate, 'ten') === order.needTens;
+      return valueOf(plate) === order.target;
     }
     return valueOf(plate) === order.target;
   }
@@ -390,6 +408,7 @@
     bandFor: bandFor, ready20: ready20, raceParams: raceParams, winsRace: winsRace, friendGain: friendGain, raceVisual: raceVisual,
     makeOrder: makeOrder, checkPlate: checkPlate, startPlate: startPlate,
     addCake: addCake, takeCake: takeCake, valueOf: valueOf, countKind: countKind, cakesForValue: cakesForValue,
+    targetOf: targetOf, overBy: overBy, wobbleLevel: wobbleLevel,
     leaksAnswer: leaksAnswer, scrub: scrub,
     newSession: newSession, nextOrder: nextOrder, complete: complete,
     failNudge: failNudge, autoPlace: autoPlace, nextDeco: nextDeco, saveState: saveState,

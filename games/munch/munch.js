@@ -146,7 +146,7 @@
       // strategy hint only after a mistake (never up front)
       $('#ruleTxt').innerHTML = pl.rule.text + (pl.rule.stepHint && pl.wrong > 0 ? '<span class="hint st">' + pl.rule.stepHint(pl.lastMiss, pl.wrong >= 2 ? 2 : 1) + '</span>' : pl.rule.hint && pl.wrong > 0 ? '<span class="hint">' + pl.rule.hint + '</span>' : '');   // v2p2a: a step shows a picture hint (ten-frame / number line) after a miss, to the answer after 2
       var chip = $('#levelChip'), s = pl.round.skill;
-      chip.textContent = pl.round.story ? pl.round.stop.area.emoji + ' Stop ' + pl.round.stop.n + ' · ' + pl.round.stop.area.name : pl.round.review ? 'Review: ' + s.name : pl.round.testOut ? 'Test-out: ' + s.name + ' · 5 to skip ahead' : s.name + (s.isStep ? '' : ' · Level ' + (pl.round.level + 1)) + (pl.round.boards > 1 ? ' · Board ' + pl.round.board + ' of ' + pl.round.boards : '');
+      chip.textContent = pl.round.story ? ((ST.placeName && ST.placeName(pl.round.stop)) || pl.round.stop.area.name) + ' · Stop ' + pl.round.stop.n : pl.round.review ? 'Review: ' + s.name : pl.round.testOut ? 'Test-out: ' + s.name + ' · 5 to skip ahead' : s.name + (s.isStep ? '' : ' · Level ' + (pl.round.level + 1)) + (pl.round.boards > 1 ? ' · Board ' + pl.round.board + ' of ' + pl.round.boards : '');
       if (pl.round.story && SR && SR.cfg && SR.cfg.boss && A.Story2.PLACES[A.Story2.placeOfStop(SR.i)].art) chip.textContent = 'Mini boss: ' + SR.cfg.bossName;
       chip.classList.toggle('review', !!pl.round.review);
       return;
@@ -164,10 +164,35 @@
     else h.innerHTML = PL.map(function (pl) { return '<span class="sc p' + (pl.i + 1) + '">' + A.esc(pl.name) + ' <b>' + pl.correct + '</b></span>'; }).join('');
   }
   function layout() {
-    var W = wrap.clientWidth - 12, H = wrap.clientHeight - 12; if (!W || !H) return;
-    GAP = Math.max(6, Math.round(Math.min(W, H) * .018));
-    CS = Math.floor(Math.min((W - GAP * (COLS - 1)) / COLS, (H - GAP * (ROWS - 1)) / ROWS, 190));
-    CS = Math.max(44, CS);
+    var W = wrap.clientWidth - 8, H = wrap.clientHeight - 8; if (!W || !H) return;
+    GAP = Math.max(6, Math.round(Math.min(W, H) * .016));
+    // Solo 20-cell boards: pick 5×4 or 4×5, whichever yields larger square tiles that still fit with no scroll.
+    if (!TWO) {
+      function tileSize(cols, rows, gap) {
+        return Math.floor(Math.min((W - gap * (cols - 1)) / cols, (H - gap * (rows - 1)) / rows, 260));
+      }
+      var s54 = tileSize(5, 4, GAP), s45 = tileSize(4, 5, GAP), nextCols = s45 > s54 ? 4 : 5, nextRows = s45 > s54 ? 5 : 4, nextCS = Math.max(s45, s54);
+      if (nextCols !== COLS) {
+        var oldCols = COLS;
+        COLS = nextCols; ROWS = nextRows;
+        if (window.__munch) window.__munch.COLS = COLS;
+        PL.forEach(function (pl) {
+          if (!pl.pos) return;
+          var idx = pl.pos.r * oldCols + pl.pos.c;
+          pl.pos = { r: Math.floor(idx / COLS), c: idx % COLS };
+        });
+        if (G.grum) {
+          var gi = G.grum.r * oldCols + G.grum.c;
+          G.grum = { r: Math.floor(gi / COLS), c: gi % COLS };
+        }
+      }
+      CS = nextCS;
+    } else {
+      CS = Math.floor(Math.min((W - GAP * (COLS - 1)) / COLS, (H - GAP * (ROWS - 1)) / ROWS, 260));
+    }
+    // Never grow past the wrap (the old 44px floor overflowed short landscape screens and covered the question card).
+    var fitCS = Math.floor(Math.min((W - GAP * (COLS - 1)) / COLS, (H - GAP * (ROWS - 1)) / ROWS));
+    CS = Math.max(20, Math.min(CS, fitCS));
     // skills with phrase answers (stories) get wider tiles when there is room (same rows, so the walk/munch grid is unchanged)
     var wide = PL.some(function (pl) { return pl.round && pl.round.skill && pl.round.skill.wideCells; });
     CW = wide ? Math.max(CS, Math.min(Math.floor((W - GAP * (COLS - 1)) / COLS), Math.round(CS * 1.7))) : CS;
@@ -186,6 +211,11 @@
     var l = d.querySelector('.lbl'); if (!l) return;
     l.style.removeProperty('--cs'); d.classList.remove('wrap', 'tight');
     l.style.maxWidth = Math.floor(d.clientWidth * .92) + 'px'; l.style.maxHeight = d.clientHeight + 'px';   // full tile height (92% left 3-line phrases short at 1024x640)
+    if (l.querySelector('.st-ansnum')) {
+      l.style.maxWidth = Math.floor(d.clientWidth * .88) + 'px';
+      return;   // How-many numerals are sized from --icon-cs (~48% of the tile); do not shrink them
+    }
+    if (A.CountVisual && A.CountVisual.fit && l.querySelector('.cv-set')) A.CountVisual.fit(d);
     if (!over(l)) return;
     var k = 1, f0 = textPx(l);
     while (over(l) && k > .72 && f0 * k * .92 >= MIN_FONT) { k *= .92; l.style.setProperty('--cs', (CS * k) + 'px'); }
@@ -809,9 +839,10 @@
       return chain.then(function () {
         if (artBoss) return;
         var parts = stop.side ? ['area_' + stop.area.id].concat(cfg.helper ? ['story_helper'] : []) : ['story_stop', stop.n].concat(cfg.helper ? ['story_helper'] : practice ? ['story_practice'] : []);
-        if (stop.side && cfg.boss) return cutscene({ title: 'Mini boss!', sub: stop.area.emoji + ' ' + cfg.bossName + ' · ' + C.byId[cfg.skill].name, voice: ['s2_boss'], heroes: [P1], friends: met(A.Story2 ? [A.Story2.hero(P1)] : ['strawberry']) });
-        if (stop.side) return cutscene({ title: C.byId[cfg.skill].name + '!', sub: stop.area.emoji + ' ' + stop.area.name + (cfg.helper ? ' · a little easier' : ''), voice: parts, heroes: [P1], friends: met([stop.area.friend, 'mochi', 'strawberry', 'carrot', 'grapes']) });
-        return cutscene({ title: 'Stop ' + stop.n + '!', sub: (slug ? '⚾ ' + A.TITLES.baseball + ' · ' : stand ? '🍋 ' + A.TITLES.stand + ' · ' : '') + stop.area.emoji + ' ' + stop.area.name + (cfg.helper ? ' · a little easier' : practice ? ' · practice' : ''), voice: parts, heroes: [P1], friends: met([stop.area.friend, 'mochi', 'strawberry', 'carrot', 'grapes']) });
+        var where = (ST.placeName && ST.placeName(stop)) || stop.area.name;
+        if (stop.side && cfg.boss) return cutscene({ title: where + '!', sub: 'Mini boss' + (C.byId[cfg.skill] ? ' · ' + C.byId[cfg.skill].name : ''), voice: ['s2_boss'], heroes: [P1], friends: met(A.Story2 ? [A.Story2.hero(P1)] : ['strawberry']) });
+        if (stop.side) return cutscene({ title: where + '!', sub: (C.byId[cfg.skill] ? C.byId[cfg.skill].name : 'Next stop') + (cfg.helper ? ' · a little easier' : ''), voice: parts, heroes: [P1], friends: met([stop.area.friend, 'mochi', 'strawberry', 'carrot', 'grapes']) });
+        return cutscene({ title: where + '!', sub: (slug ? A.TITLES.baseball + ' · ' : stand ? A.TITLES.stand + ' · ' : bub ? A.TITLES.bubble + ' · ' : '') + ((ST.placeLevelLabel && ST.placeLevelLabel(stop)) || ('Stop ' + stop.n)) + (cfg.helper ? ' · a little easier' : practice ? ' · practice' : ''), voice: parts, heroes: [P1], friends: met([stop.area.friend, 'mochi', 'strawberry', 'carrot', 'grapes']) });
       }).then(function () { if (bub) return goBubble(i); if (stand) return goStand(i); if (slug) return goSlugger(i); M.play('game'); startLevel(); });
     }
   }
@@ -909,7 +940,7 @@
     var title = soft ? 'Nice try!' : fin ? 'Stop cleared!' : out.passed ? 'You made it!' : gaveUp ? 'Snack break!' : "Time's up!";
     var voice = soft ? [{ id: 'munch_nice_try_stop', text: "Nice try! Let's play this stop again." }] : fin ? ['fb_hooray', 'fb_you_got', stars, stars === 1 ? 'fb_star' : 'fb_stars'] : out.passed ? ['munch_times_up', 'story_next'] : ['story_try_again'];
     if (out.newBestRun || out.newBestStop) voice.push('story_new_best'); else if (out.passed && pts.total >= 900) voice.push('story_great_score');
-    var card = UI.card({ tag: stop.area.emoji + (stop.side ? ' ' + C.byId[SR.cfg.skill].name : ' Stop ' + stop.n) + ' · ' + stop.area.name, title: title, html: html, art: '<div class="' + (out.passed ? 'dance' : '') + '">' + A.Blobs.forProfile(P, { expr: out.passed || soft ? 'happy' : 'idle' }) + '</div>',
+    var card = UI.card({ tag: ((ST.placeName && ST.placeName(stop)) || stop.area.name) + (stop.side ? ' · ' + C.byId[SR.cfg.skill].name : ' · Stop ' + stop.n), title: title, html: html, art: '<div class="' + (out.passed ? 'dance' : '') + '">' + A.Blobs.forProfile(P, { expr: out.passed || soft ? 'happy' : 'idle' }) + '</div>',
       btn: out.passed ? 'Map ▶' : 'Try again ▶', sfx: out.passed ? 'win' : 'soft', confetti: out.passed, voice: voice, cls: 'celebrate storyres' + (out.passed ? '' : ' tryagain'), minMs: 900 });
     countUp(document.querySelector('.overlay.storyres'));
     card.then(function () { return A.Rewards.celebrate(P, rewards); }).then(function () {
@@ -981,8 +1012,15 @@
   function toggleMusic() { var on = M.toggle(); renderMusicBtn(); bubble(on ? 'Music on 🎵' : 'Music off'); }
   function renderMusicBtn() { var b = $('#musicBtn'); b.classList.toggle('off', S.music === false); b.setAttribute('aria-label', S.music === false ? 'Music is off (M)' : 'Music is on (M)'); }
   $('#musicBtn').addEventListener('click', function (e) { e.stopPropagation(); toggleMusic(); });
-  $('#homeBtn').addEventListener('click', function () { V.stop(); M.stop(); SFX.tap(); A.Store.save(); if (STORY && SR && $('#game').classList.contains('on')) { location.href = 'index.html?mode=story&from=' + SR.i + '&to=' + SR.i; return; }   // quality1 (C4): Back from a story level goes to its place map
-    location.href = A.ROOT + 'index.html' + (STORY && !(A.toddler && A.toddler(P1)) ? '#mode' : '#games'); });
+  (function () {
+    function goMunchHome() {
+      V.stop(); M.stop(); A.Store.save();
+      if (STORY && SR && $('#game').classList.contains('on')) { location.href = 'index.html?mode=story&from=' + SR.i + '&to=' + SR.i; return; }
+      location.href = A.ROOT + 'index.html' + (STORY && !(A.toddler && A.toddler(P1)) ? '#mode' : '#games');
+    }
+    if (A.UI && A.UI.bindHome) A.UI.bindHome($('#homeBtn'), goMunchHome);
+    else $('#homeBtn').addEventListener('click', function () { SFX.tap(); goMunchHome(); });
+  })();
   A.on('voice:start', function () { $('#speakBtn').classList.add('talking'); });
   A.on('voice:end', function () { $('#speakBtn').classList.remove('talking'); });
   window.addEventListener('resize', layout);
@@ -1042,5 +1080,5 @@
 
   window.__munch = { cutscene: cutscene, gentleStars: gentleStars, withBonus: withBonus, timerFor: timerFor, G: G, PL: PL, T: T, B: B, openBonus: openBonus, gentle: GENTLE, retryRound: retryRound, P: function () { return P1; }, two: TWO, mode: MODE, munch: munch, moveBy: function (a, b, c) { if (c === undefined) return moveBy(0, a, b); return moveBy(a, b, c); },
     onCellTap: onCellTap, nextRound: nextRound, unlockScene: unlockScene, story: STORY, SR: function () { return SR; }, cutscene: cutscene, endRound: endRound, showStar: showStar, fitCells: fitCells, workedExample: workedExample, coachAfter: coachAfter, celebrateStreak: celebrateStreak, renderBoard: renderBoard, setTimeLeft: function (s) { T.left = s; renderTimer(); }, COLS: COLS,
-    goTo: function (i, cell) { if (cell === undefined) { cell = i; i = 0; } var pl = PL[i]; pl.target = null; clearTimeout(pl.walkT); pl.walkT = null; pl.pos = { r: Math.floor(cell / COLS), c: cell % COLS }; place(true); checkStar(pl); } };
+    goTo: function (i, cell) { if (cell === undefined) { cell = i; i = 0; } var pl = PL[i]; pl.target = null; clearTimeout(pl.walkT); pl.walkT = null; pl.pos = { r: Math.floor(cell / COLS), c: cell % COLS }; place(true); checkStar(pl); }, playStop: playStop };
 })(window.Arcade);

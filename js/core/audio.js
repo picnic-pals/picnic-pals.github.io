@@ -171,7 +171,7 @@
       var done = false; function fin() { if (!done) { done = true; res(); } }
       try {
         var u = new SpeechSynthesisUtterance(text.replace(/−/g, ' minus ').replace(/\+/g, ' plus '));
-        u.rate = S().rate || .9; u.pitch = 1.15; u.volume = lvl('voiceVol'); if (VOICE) { u.voice = VOICE; u.lang = VOICE.lang; } else u.lang = 'en-US';
+        u.rate = S().rate || .9; u.pitch = 1.15; u.volume = S().muteAll ? 0 : 1; if (VOICE) { u.voice = VOICE; u.lang = VOICE.lang; } else u.lang = 'en-US';
         u.onend = u.onerror = fin;
         speechSynthesis.speak(u);
         setTimeout(fin, 1500 + text.length * 95); // safety: some browsers never fire onend

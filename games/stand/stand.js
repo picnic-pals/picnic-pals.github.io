@@ -50,11 +50,46 @@
       '<g clip-path="url(#jbody)"><rect x="0" y="' + y.toFixed(1) + '" width="100" height="110" fill="#9fe3a8"/></g>' +
       '<rect x="14" y="22" width="72" height="84" rx="20" fill="none" stroke="#8fcfe8" stroke-width="4"/><path d="M26 34 L26 88" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".85"/>' +
       '<text x="50" y="76" text-anchor="middle" font-size="26" font-weight="800" fill="#2f7a3b" font-family="sans-serif">TIPS</text></svg>'; }
-  var BILLC = { 1: ['#c9f5d3', '#5fc77e'], 5: ['#cfe6ff', '#5f9fe0'], 10: ['#e8dcff', '#9a7be0'], 20: ['#ffd9e6', '#e06f9a'] };
-  function billSvg(v) { var c = BILLC[v] || BILLC[1];
-    return '<svg class="bill" viewBox="0 0 132 70" aria-hidden="true"><rect x="2" y="2" width="128" height="66" rx="14" fill="' + c[0] + '" stroke="' + c[1] + '" stroke-width="4"/><rect x="10" y="10" width="112" height="50" rx="9" fill="none" stroke="#ffffff" stroke-width="3" stroke-dasharray="6 5"/>' +
-      '<circle cx="92" cy="35" r="17" fill="#ffffff"/><circle cx="86" cy="32" r="2.6" fill="#4a3b6b"/><circle cx="98" cy="32" r="2.6" fill="#4a3b6b"/><path d="M86 40 Q92 45 98 40" stroke="#4a3b6b" stroke-width="2.6" fill="none" stroke-linecap="round"/><ellipse cx="81" cy="39" rx="3" ry="2" fill="#ff9fb8"/><ellipse cx="103" cy="39" rx="3" ry="2" fill="#ff9fb8"/>' +
-      '<text x="42" y="49" text-anchor="middle" font-size="' + (v >= 10 ? 34 : 40) + '" font-weight="800" fill="#4a3b6b" font-family="sans-serif">$' + v + '</text></svg>'; }
+  var BILLC = {
+    1:  { a: '#d7efd8', b: '#9fd4a6', ink: '#14532d', edge: '#2f7a45', word: 'ONE DOLLAR' },
+    5:  { a: '#c8e6cb', b: '#86c494', ink: '#14532d', edge: '#2a7040', word: 'FIVE DOLLARS' },
+    10: { a: '#b7dcbd', b: '#6fb480', ink: '#134e28', edge: '#256638', word: 'TEN DOLLARS' },
+    20: { a: '#a8d2b0', b: '#5ea572', ink: '#0f3f21', edge: '#1f5c32', word: 'TWENTY DOLLARS' }
+  };
+  function billSeal(c, v) {
+    var i, a, x, y, petals = '';
+    for (i = 0; i < 12; i++) {
+      a = (i * 30 - 90) * Math.PI / 180;
+      x = (148 + Math.cos(a) * 24.5).toFixed(1);
+      y = (50 + Math.sin(a) * 24.5).toFixed(1);
+      petals += '<circle cx="' + x + '" cy="' + y + '" r="4.4" fill="' + c.a + '" stroke="' + c.edge + '" stroke-width="1.15"/>';
+    }
+    return petals +
+      '<circle cx="148" cy="50" r="20.5" fill="#f4fff6" stroke="' + c.edge + '" stroke-width="2.1"/>' +
+      '<circle cx="148" cy="50" r="16.5" fill="none" stroke="' + c.edge + '" stroke-width="1.1"/>' +
+      '<text x="148" y="58" text-anchor="middle" font-size="22" font-weight="800" fill="' + c.ink + '" font-family="system-ui,sans-serif">' + v + '</text>';
+  }
+  var billUid = 0;
+  function billSvg(v) {
+    var c = BILLC[v] || BILLC[1];
+    billUid += 1;
+    var id = 'bf' + billUid, fs = v >= 10 ? 36 : 42;
+    return '<svg class="bill" viewBox="0 0 200 100" aria-hidden="true">' +
+      '<defs><linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0%" stop-color="' + c.a + '"/><stop offset="100%" stop-color="' + c.b + '"/>' +
+      '</linearGradient></defs>' +
+      '<rect x="2" y="2" width="196" height="96" rx="10" fill="url(#' + id + ')" stroke="' + c.edge + '" stroke-width="4"/>' +
+      '<rect x="9" y="9" width="182" height="82" rx="6" fill="none" stroke="' + c.edge + '" stroke-width="1.6" opacity=".7"/>' +
+      '<rect x="13" y="13" width="174" height="74" rx="4" fill="none" stroke="#f3fff5" stroke-width="1.4" opacity=".8"/>' +
+      '<text x="16" y="28" font-size="16" font-weight="800" fill="' + c.ink + '" font-family="system-ui,sans-serif">' + v + '</text>' +
+      '<text x="184" y="28" text-anchor="end" font-size="16" font-weight="800" fill="' + c.ink + '" font-family="system-ui,sans-serif">' + v + '</text>' +
+      '<text x="16" y="90" font-size="16" font-weight="800" fill="' + c.ink + '" font-family="system-ui,sans-serif">' + v + '</text>' +
+      '<text x="184" y="90" text-anchor="end" font-size="16" font-weight="800" fill="' + c.ink + '" font-family="system-ui,sans-serif">' + v + '</text>' +
+      '<text x="62" y="58" text-anchor="middle" font-size="' + fs + '" font-weight="800" fill="' + c.ink + '" font-family="system-ui,sans-serif">$' + v + '</text>' +
+      '<text x="62" y="76" text-anchor="middle" font-size="7.5" font-weight="800" fill="' + c.ink + '" font-family="system-ui,sans-serif" letter-spacing="1.2">' + c.word + '</text>' +
+      billSeal(c, v) +
+      '</svg>';
+  }
   function heart() { return '<span class="emo heart">💛</span>'; }
   function swatch(c) { return '<span class="swatch" style="background:' + S.COLORS[c] + '"></span>'; }
   function wantHtml(w) {
@@ -234,26 +269,85 @@
     G.m = m; G.phase = 'pay'; G.taken = []; G.miss = 0; G.busy = false; clear(); $('#counter').classList.add('paying');
     friend('happy'); renderPay(); say(m.say); G.t0 = Date.now();
   }
+  function takenGroups(taken) {
+    var order = [], counts = {};
+    (taken || []).forEach(function (v) {
+      if (!counts[v]) { order.push(v); counts[v] = 0; }
+      counts[v]++;
+    });
+    return order.map(function (v) { return { v: v, n: counts[v] }; });
+  }
+  function billStackHtml(v, n) {
+    var layers = Math.min(3, Math.max(1, n)), i, h = '<span class="billstack" data-n="' + n + '">';
+    for (i = layers; i >= 1; i--) {
+      h += '<span class="layer l' + i + '">' + billSvg(v) + '</span>';
+    }
+    h += '</span>';
+    if (n > 1) h += '<small class="run">x' + n + '</small>';
+    return h;
+  }
   function renderPay() {
     var m = G.m, hint = G.miss > 0;
     var tags = m.change ? '<span class="tag">Costs $' + m.change.cost + '</span><span class="tag paid">Paid $' + m.change.paid + '</span><span class="q">Change?</span>'
       : m.prices.map(function (v, k) { var c = m.items && m.items[k]; return (k ? '<span class="plus">+</span>' : '') + '<span class="tag">' + (c ? '<span class="cups">' + flIcon(c.fl) + (c.n > 1 ? '<sub>' + c.n + '</sub>' : '') + '</span>' : '') + '$' + v + '</span>'; }).join('');
-    bubble('<div class="prices">' + tags + (m.kind === 'enough' ? '<span class="q">Enough?</span>' : '') + (hint && m.kind !== 'enough' && !m.change && m.prices.length > 1 ? '<span class="eq">= $' + m.total + '</span>' : '') + '</div>', 'pay'); ask(m.say);
+    var parts = [], added = sum(G.taken);
+    G.taken.forEach(function (v) { parts.push('$' + v); });
+    var tally = parts.length ? parts.join(' + ') + ' = $' + added : 'Added: $0';
+    var priceRow = '<div class="prices">' + tags +
+      (m.kind === 'enough' ? '<span class="q">Enough?</span>' : '') +
+      (hint && m.kind !== 'enough' && !m.change && m.prices.length > 1 ? '<span class="eq">= $' + m.total + '</span>' : '') +
+      (m.kind !== 'enough' ? '<span class="pay-tally price-tally" id="payTally">' + A.esc(tally) + '</span>' : '') +
+      '</div>';
+    bubble(priceRow, 'pay'); ask(m.say);
     var bins = $('#bins'); bins.innerHTML = ''; bins.className = 'bins wallet';
-    var left = m.bills.slice(); G.taken.forEach(function (v) { var k = left.indexOf(v); if (k >= 0) left.splice(k, 1); });
-    var run = 0;
-    left.forEach(function (v, k) { run += v; var b = A.el('<button class="billbtn" aria-label="' + v + ' dollar bill">' + billSvg(v) + (m.kind === 'enough' && hint ? '<small class="run">$' + run + '</small>' : '') + '</button>');
-      if (m.kind !== 'enough') b.addEventListener('click', function () { if (G.busy) return; G.taken.push(v); A.Audio.sfx('pop'); renderPay(); if (m.showTotal) V.say([sum(G.taken)], { kind: 'tap' }); });
-      else b.addEventListener('click', function () { V.say([v, v === 1 ? 'ls_dollar' : 'ls_dollars'], { kind: 'tap' }); });
-      bins.appendChild(b); });
     var t = $('#tray');
-    if (m.kind === 'enough') { t.innerHTML = '<div class="cashbox wal"><span class="lbl">' + A.esc(fname(G.c.friend)) + '\'s bills</span></div>'; }
-    else { t.innerHTML = '<div class="cashbox"><span class="lbl">' + (m.change ? 'Change' : 'Cash box') + '</span><div class="pile">' + G.taken.map(function (v, k) { return '<button class="billbtn in" data-k="' + k + '" aria-label="Give back ' + v + ' dollars">' + billSvg(v) + '</button>'; }).join('') + '</div>' +
-      (m.showTotal || hint ? '<span class="cnt">$' + sum(G.taken) + '</span>' : '') + '</div>';
-      A.$$('#tray .billbtn.in').forEach(function (b) { b.addEventListener('click', function () { if (G.busy) return; G.taken.splice(+b.getAttribute('data-k'), 1); A.Audio.sfx('tap'); renderPay(); }); }); }
+    $('#counter').classList.add('paying');
+    $('#counter').classList.toggle('enough', m.kind === 'enough');
+    $('#counter').classList.toggle('take', m.kind !== 'enough');
+    if (m.kind === 'enough') {
+      var left = m.bills.slice(), run = 0;
+      left.forEach(function (v) { run += v; var b = A.el('<button class="billbtn" aria-label="' + v + ' dollar bill">' + billSvg(v) + (hint ? '<small class="run">$' + run + '</small>' : '') + '</button>');
+        b.addEventListener('click', function () { V.say([v, v === 1 ? 'ls_dollar' : 'ls_dollars'], { kind: 'tap' }); });
+        bins.appendChild(b); });
+      t.innerHTML = '<div class="cashbox wal"><span class="lbl">' + A.esc(fname(G.c.friend)) + '\'s bills</span></div>';
+    } else {
+      var denoms = (S.payDenoms && S.payDenoms(P, m)) || [20, 10, 5, 1];
+      denoms.forEach(function (v) {
+        var n = G.taken.filter(function (x) { return x === v; }).length;
+        var b = A.el('<button class="billbtn denom" data-v="' + v + '" aria-label="Add a ' + v + ' dollar bill">' + billSvg(v) + (n ? '<small class="run">x' + n + '</small>' : '') + '</button>');
+        if (A.UI && A.UI.onTap) A.UI.onTap(b, function () { if (G.busy) return; G.taken.push(v); A.Audio.sfx('pop'); renderPay(); V.say([sum(G.taken)], { kind: 'tap' }); });
+        else b.addEventListener('click', function () { if (G.busy) return; G.taken.push(v); A.Audio.sfx('pop'); renderPay(); V.say([sum(G.taken)], { kind: 'tap' }); });
+        bins.appendChild(b);
+      });
+      var groups = takenGroups(G.taken);
+      var pile = groups.length
+        ? groups.map(function (g) {
+            return '<button type="button" class="billbtn in stack" data-v="' + g.v + '" aria-label="Take back a ' + g.v + ' dollar bill">' + billStackHtml(g.v, g.n) + '</button>';
+          }).join('')
+        : '<span class="pile-empty">Tap a bill to pay</span>';
+      var undoBtn = G.taken.length ? '<button type="button" class="sbtn undo" id="payUndo" aria-label="Undo last bill">Undo</button>' : '';
+      t.innerHTML = '<div class="cashbox compact"><span class="lbl">' + (m.change ? 'Change' : 'Cash box') + '</span><div class="pile">' +
+        pile + '</div><span class="pay-tally box-tally">' + A.esc(tally) + '</span>' + undoBtn + '</div>';
+      A.$$('#tray .billbtn.in').forEach(function (b) {
+        var fn = function () {
+          if (G.busy) return;
+          var v = +b.getAttribute('data-v'), i = G.taken.lastIndexOf(v);
+          if (i >= 0) G.taken.splice(i, 1);
+          A.Audio.sfx('tap'); renderPay();
+        };
+        if (A.UI && A.UI.onTap) A.UI.onTap(b, fn); else b.addEventListener('click', fn);
+      });
+      var u = $('#payUndo');
+      if (u) {
+        var undoFn = function () { if (G.busy || !G.taken.length) return; G.taken.pop(); A.Audio.sfx('tap'); renderPay(); };
+        if (A.UI && A.UI.onTap) A.UI.onTap(u, undoFn); else u.addEventListener('click', undoFn);
+      }
+    }
     var acts = $('#acts'); acts.innerHTML = '';
     if (m.kind === 'enough') { acts.appendChild(bigBtn('Yes, enough ✓', 'yes', function () { payAnswer(true); })); acts.appendChild(bigBtn('Not enough', 'no', function () { payAnswer(false); })); }
-    else acts.appendChild(bigBtn('Done ✓', 'serve', function () { payAnswer(G.taken.slice()); }, 'Done paying'));
+    else {
+      acts.appendChild(bigBtn('Done ✓', 'serve', function () { payAnswer(G.taken.slice()); }, 'Done paying'));
+    }
   }
   function sum(a) { return a.reduce(function (x, y) { return x + y; }, 0); }
   function payAnswer(v) {
@@ -348,13 +442,10 @@
       .then(function () { if (window.__noNav) return; if (STORY) { var next = out && out.runAdded ? Math.min(SI + 1, ST.mainCount() - 1) : SI; location.href = MAPURL + '&from=' + SI + '&to=' + next; } else goHome(); });
   }
   function goHome() { V.stop(); A.Store.save(); location.href = STORY ? MAPURL : A.ROOT + 'index.html?from=game#games'; }
-  // the Home button: press-and-hold (like Tiny Picnic), so a stray tap never ends the day
-  var HOLD_MS = 800, hb = $('#homeBtn'), holdT = null, hintT = null;
-  function holdStart(e) { if (e.button > 0) return; e.preventDefault(); clearTimeout(holdT); hb.classList.remove('hint'); hb.classList.add('holding'); holdT = setTimeout(function () { holdT = null; hb.classList.remove('holding'); A.Audio.sfx('tap'); goHome(); }, HOLD_MS); }
-  function holdEnd() { if (!holdT) return; clearTimeout(holdT); holdT = null; hb.classList.remove('holding'); hb.classList.add('hint'); clearTimeout(hintT); hintT = setTimeout(function () { hb.classList.remove('hint'); }, 1800); }
-  hb.addEventListener('pointerdown', holdStart); hb.addEventListener('pointerup', holdEnd); hb.addEventListener('pointerleave', holdEnd); hb.addEventListener('pointercancel', holdEnd);
-  hb.addEventListener('contextmenu', function (e) { e.preventDefault(); });
-  hb.addEventListener('click', function (e) { if (e.detail === 0) { A.Audio.sfx('tap'); goHome(); } });
+  // Home is a single tap.
+  var hb = $('#homeBtn');
+  if (A.UI && A.UI.bindHome) A.UI.bindHome(hb, goHome);
+  else hb.addEventListener('click', function () { A.Audio.sfx('tap'); goHome(); });
   function sayAgain() { if (G.phase === 'order' && G.o) say(G.o.ticket ? G.o.ticketSay : G.o.say, 'tap'); else if (G.phase === 'pay' && G.m) say(G.m.say, 'tap'); else if (G.phase === 'tip') say(['ls_jar_tap'], 'tap'); }
   $('#sayBtn').addEventListener('click', sayAgain);
   $('#bubble').addEventListener('click', function (e) { if (!e.target.closest('.ticket')) sayAgain(); });

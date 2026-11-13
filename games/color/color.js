@@ -65,14 +65,11 @@
   $('#gPages').addEventListener('click', function () { A.Audio.sfx('tap'); pages(); });
   $('#galBtn').addEventListener('click', function () { A.Audio.sfx('tap'); gallery(); });
   (function swipe() { var x0 = null; $('#gFrame').addEventListener('pointerdown', function (e) { x0 = e.clientX; }); $('#gFrame').addEventListener('pointerup', function (e) { if (x0 == null) return; var d = e.clientX - x0; x0 = null; if (Math.abs(d) > 60) { gi += d < 0 ? 1 : -1; A.Audio.sfx('tap'); showG(d < 0 ? 1 : -1); } }); })();
-  /* ---------- home (press and hold, like every game) ---------- */
+  /* ---------- home (single tap) ---------- */
   function goHome() { V.stop(); keep(true); A.Store.save(); location.href = A.ROOT + 'index.html?from=game#games'; }
-  var HOLD_MS = 800, hb = $('#homeBtn'), holdT = null, hintT = null;
-  function holdStart(e) { if (e.button > 0) return; e.preventDefault(); clearTimeout(holdT); hb.classList.remove('hint'); hb.classList.add('holding'); holdT = setTimeout(function () { holdT = null; hb.classList.remove('holding'); A.Audio.sfx('tap'); goHome(); }, HOLD_MS); }
-  function holdEnd() { if (!holdT) return; clearTimeout(holdT); holdT = null; hb.classList.remove('holding'); hb.classList.add('hint'); clearTimeout(hintT); hintT = setTimeout(function () { hb.classList.remove('hint'); }, 1800); }
-  hb.addEventListener('pointerdown', holdStart); hb.addEventListener('pointerup', holdEnd); hb.addEventListener('pointerleave', holdEnd); hb.addEventListener('pointercancel', holdEnd);
-  hb.addEventListener('contextmenu', function (e) { e.preventDefault(); });
-  hb.addEventListener('click', function (e) { if (e.detail === 0) { A.Audio.sfx('tap'); goHome(); } });
+  var hb = $('#homeBtn');
+  if (A.UI && A.UI.bindHome) A.UI.bindHome(hb, goHome);
+  else hb.addEventListener('click', function () { A.Audio.sfx('tap'); goHome(); });
   window.addEventListener('pagehide', function () { keep(true); });
   document.addEventListener('keydown', function (e) { if (UI.cardOpen || A.Parent.isOpen()) return; if (e.key === 'Escape') goHome();
     if (document.body.dataset.view === 'vGal') { if (e.key === 'ArrowLeft') $('#gPrev').click(); if (e.key === 'ArrowRight') $('#gNext').click(); } });

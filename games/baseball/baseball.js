@@ -265,7 +265,20 @@
   var park = $('#park'); park.insertAdjacentHTML('afterbegin', parkSVG());
   var svg = $('#parkSvg'), ball = $('#ball'), shadow = $('#ballShadow');
   var rival = P1.blob === 'corn' || (P2 && P2.blob === 'corn') ? 'carrot' : 'corn';
-  var pitcher = actor($('#pitcherG'), B.svg({ blob: rival, color: 'grape', outfit: 'cap', expr: 'happy' }), 118, { cls: 'pitcher' }); place(pitcher, MOUND.x, MOUND.y - 4);
+  var pitcher = null;
+  function pitcherHtml() {
+    if (TWO) {
+      var other = PL[1 - (G.half || 0)];
+      return blobOf(other, { expr: 'happy', outfit: 'cap' });
+    }
+    return B.svg({ blob: rival, color: 'grape', outfit: 'cap', expr: 'happy' });
+  }
+  function setPitcher() {
+    if (pitcher) pitcher.remove();
+    pitcher = actor($('#pitcherG'), pitcherHtml(), 118, { cls: 'pitcher' });
+    place(pitcher, MOUND.x, MOUND.y - 4);
+  }
+  setPitcher();
   var fielders = FIELDERS.map(function (f, k) { var g = actor($('#fielders'), B.svg({ blob: ['blueberry', 'apple', 'corn'][k], color: 'grape', outfit: 'cap', expr: 'happy' }), 70, { cls: 'fielder' }); place(g, f.x, f.y); return g; });
   var batter = null, batEl = null;
   function newBatter(walkIn) {
@@ -458,7 +471,11 @@
       box.appendChild(b);
     });
     G.sel = -1; markSel(false);   // no card highlighted until a tap / arrow / number (never looks like a free tip)
-    requestAnimationFrame(function () { fitCards(); requestAnimationFrame(fitCards); });
+    requestAnimationFrame(function () {
+      fitCards();
+      if (A.CountVisual && A.CountVisual.fit) A.CountVisual.fit(box);
+      requestAnimationFrame(function () { fitCards(); if (A.CountVisual && A.CountVisual.fit) A.CountVisual.fit(box); });
+    });
   }
   function ensurePassUI() {
     var sign = $('#sign'); if (!sign || $('#passActions')) return;
@@ -768,7 +785,9 @@
   function endPA() {
     G.pa++; renderBoard(); A.Store.save();
     if (G.walkoffOn && totalRuns(PL[0]) > totalRuns(RIV)) { G.walkoff = true; return 'half'; }
-    return G.outs >= maxOuts() || G.halfRuns >= mercy() ? 'half' : 'next';
+    if (G.outs >= maxOuts() || G.halfRuns >= mercy()) return 'half';
+    if (TWO && G.pa >= 3) return 'half';
+    return 'next';
   }
   function afterPitch(what) {
     if (G.over) return;
@@ -817,6 +836,7 @@
       if (pl.runsBy[G.inning - 1] == null) pl.runsBy[G.inning - 1] = 0;
       G.walkoffOn = RIVALON && G.inning === INNINGS && totalRuns(PL[0]) <= totalRuns(RIV);
       renderTurn(); renderBoard();
+      setPitcher();
       clearBases(); hideBall();
       $('#qTxt').innerHTML = ''; $('#qPic').innerHTML = ''; $('#cards').innerHTML = ''; $('#swingTag').innerHTML = ''; $('#swingTag').className = 'swingtag';
       var last = G.inning === INNINGS && (!TWO || G.half === 0);
@@ -833,7 +853,8 @@
     var ms = Date.now() - pl.t0, out = !STORYB && pl.hr + pl.hw ? C.finishRound(pl.P, pl.round, { correct: pl.hr, wrong: pl.hw, ms: ms }) : { say: [], events: {} };
     if (!pl.P.guest) A.Store.addTime(pl.P, 'baseball', ms);
     A.Store.save();
-    banner(G.walkoff ? 'WALK-OFF WIN!' : threeOuts ? (maxOuts() === 3 ? 'THREE OUTS!' : 'FOUR OUTS!') : G.halfRuns >= mercy() ? 'WHAT AN INNING!<small>' + mercy() + ' runs, switch sides</small>' : 'INNING OVER', 'inning', 1700);
+    var switchHit = TWO && G.pa >= 3 && !threeOuts && G.halfRuns < mercy() && !G.walkoff;
+    banner(G.walkoff ? 'WALK-OFF WIN!' : threeOuts ? (maxOuts() === 3 ? 'THREE OUTS!' : 'FOUR OUTS!') : G.halfRuns >= mercy() ? 'WHAT AN INNING!<small>' + mercy() + ' runs, switch sides</small>' : switchHit ? 'SWITCH HITTERS!<small>' + A.esc(pl.name) + ' had 3 pitches</small>' : 'INNING OVER', 'inning', 1700);
     var line = threeOuts ? (TWO ? 'bb_three_outs' : 'bb_three_outs_next') : 'bb_inning_over';
     var lastHalf = G.walkoff || (G.inning === INNINGS && (!TWO || G.half === 1));
     if (lastHalf) line = 'bb_inning_over';
@@ -973,6 +994,7 @@
     answer: answer, right: function () { return G.q ? G.q.answer : -1; }, wrongIdx: function () { return G.q ? (G.q.answer + 1) % G.q.choices.length : -1; },
     setElapsed: function (sec) { G.voiceDone = true; G.qT0 = Date.now() - sec * 1000; },
     ready: function () { return !!(G.phase === 'pitch' && G.q && G.accept && !G.busy); },
+    pitcherBlob: function () { return TWO ? PL[1 - G.half].P.blob : rival; },
     passReading: function () { return G.phase === 'pass-read' && !!(G.q && G.q.passage); },
     enterPassageAsk: function () { if (G.q && G.q.passage) enterPassageAsk(G.q); },
     enterPassageRead: function () { if (G.q && G.q.passage) enterPassageRead(G.q, true); },

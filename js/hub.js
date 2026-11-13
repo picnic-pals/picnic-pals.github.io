@@ -281,7 +281,7 @@
     GAMES.filter(function (gm) { return tod ? gm.toddler || gm.all || gm.id === 'room' : !gm.toddler; }).forEach(function (gm) {
       var t = A.el('<button class="tile ' + gm.cls + (tod && gm.toddler ? ' big' : '') + (gm.ready ? '' : ' soon') + '" data-nav data-game="' + gm.id + '"><div class="scene">' + scene(gm, me) + '</div>' +
         (gm.ready ? '<span class="play">▶ Play</span>' : '<span class="ribbon">COMING SOON</span>') + '<span class="tn">' + gm.name + '</span><span class="tsub">' + gm.sub + '</span></button>');
-      t.addEventListener('click', function () {
+      A.UI.onTap(t, function () {
         if (gm.ready) { A.Audio.sfx('pop'); A.Voice.say(gm.voice); setTimeout(function () { location.href = gm.href; }, 350); }
         else { t.classList.remove('nudge'); void t.offsetWidth; t.classList.add('nudge'); A.Audio.sfx('locked'); A.Voice.say(gm.voice); }
       });

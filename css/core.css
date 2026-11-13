@@ -690,7 +690,12 @@ body.touchui .keys:not(.touch):not(.padkeys) { display: none !important; }
 .gear, .iconbtn, .q1help, #howtoBtn, #homeBtn, .homebtn {
   min-width: 60px;
   min-height: 60px;
+  touch-action: manipulation;
 }
+button, [role="button"], a, .tile, .opt, .kid, [data-nav], [data-game] {
+  touch-action: manipulation;
+}
+
 #howtoBtn.q1help, #s2Help.q1help, .q1help { width: 60px; height: 60px; }
 .iconbtn, #homeBtn.iconbtn { width: 60px; height: 60px; }
 
@@ -733,9 +738,61 @@ body.touchui .keys:not(.touch):not(.padkeys) { display: none !important; }
   min-height: 44px; min-width: 120px; padding: 8px 16px; border: 0; border-radius: 16px;
   background: #fff; color: #3b2d55; font: 700 16px inherit; box-shadow: 0 3px 0 rgba(59,45,85,.15); cursor: pointer;
 }
-/* Do not shrink counted dots on a Munch tile: give the set more of the card instead. */
-.cell .cv-set { --cv-d: clamp(22px, 9cqw, 32px); }
-.st-pic .cv-set, .pb-qpic .cv-set, .pbpic .cv-set { --cv-d: clamp(22px, 3.6vw, 32px); }
+/* Question-card sets keep a readable default size. Tile/choice sets are sized by CountVisual.fit. */
+.st-pic .cv-set, .pb-qpic .cv-set, .sign .qpic .cv-set { --cv-d: clamp(22px, 3.6vw, 32px); }
+
+/* Small hosts (Munch tiles, Baseball choices): compact ten-frames and a lower floor so dots can shrink to fit. */
+.cell .lbl:has(.cv-set),
+.bcard .cv:has(.cv-set),
+.pc-opt:has(.cv-set) {
+  white-space: normal;
+  box-sizing: border-box;
+}
+.cell .lbl:has(.cv-set) {
+  width: 92%;
+  height: 100%;
+  max-width: 92%;
+  max-height: 100%;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+}
+.cell .pbpic.num,
+.bcard .pbpic.num {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  justify-content: center;
+  gap: 2px;
+}
+.cell .pbpic.num > b {
+  font-size: calc(var(--cs) * 0.2);
+  line-height: 1;
+  flex: 0 0 auto;
+}
+.cell .lbl .cv-set,
+.cell .pbpic .cv-set,
+.bcard .cv-set,
+.pc-opt .cv-set {
+  --cv-d: clamp(6px, min(18cqmin, 22cqw), 22px);
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+}
+/* Compact 2×5 ten-frames (left column 1–5, right 6–10) and a 1×5 five-frame when that fits better. */
+.cv-tile.cv-tall .cv-frame {
+  grid-template-columns: repeat(2, var(--cv-d));
+  grid-template-rows: repeat(5, var(--cv-d));
+  grid-auto-flow: column;
+}
+.cv-tile.cv-tall .cv-frame.cv-five {
+  grid-template-columns: var(--cv-d);
+  grid-template-rows: repeat(5, var(--cv-d));
+  grid-auto-flow: row;
+}
 
 .g2-clock { display: inline-block; width: 140px; height: 140px; vertical-align: middle; }
 .g2-clock svg { width: 100%; height: 100%; }

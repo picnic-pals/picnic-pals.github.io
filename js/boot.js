@@ -1,5 +1,6 @@
 /* Picnic Pals first-paint title layer. No Arcade deps: this file loads
-   before hub.js so Play works as soon as the button is in the DOM. */
+   before hub.js so Play works as soon as the button is in the DOM.
+   Only the current painted title is shown — the old wordmark/sky path is gone. */
 (function () {
   var boot = document.getElementById('boot');
   if (!boot) return;
@@ -28,7 +29,7 @@
       ready: function () { hubReady = true; },
       hide: function () {},
       isVisible: function () { return false; },
-      isPainted: function () { return !!boot && boot.classList.contains('painted'); }
+      isPainted: function () { return true; }
     };
     return;
   }
@@ -40,13 +41,13 @@
 
   function applyTitle() {
     var webp = titleUrl('.webp'), png = titleUrl('.png');
+    boot.classList.add('painted');
+    boot.style.setProperty('--boot-title', 'url("' + webp + '"), url("' + png + '")');
     boot.style.backgroundImage = 'image-set(url("' + webp + '") type("image/webp"), url("' + png + '") type("image/png"))';
     boot.style.backgroundSize = 'cover';
     boot.style.backgroundPosition = 'center center';
     boot.style.backgroundRepeat = 'no-repeat';
     boot.style.backgroundColor = '#f3e9ff';
-    boot.classList.add('painted');
-    // Stay up until Play is tapped or the dwell timer fires. Do not hide on paint.
   }
 
   function preload() {
@@ -54,8 +55,7 @@
     img.onload = applyTitle;
     img.onerror = function () {
       if (img.src.indexOf('.webp') >= 0) { img.src = titleUrl('.png'); return; }
-      waited = true;
-      maybeHide();
+      applyTitle();
     };
     img.src = titleUrl('.webp');
   }
@@ -83,16 +83,25 @@
     if (playHit || waited) hide();
   }
 
+  function onPlay() {
+    playHit = true;
+    if (hubReady) hide();
+  }
   if (play) {
-    play.addEventListener('click', function () {
-      playHit = true;
-      if (hubReady) hide();
+    play.addEventListener('pointerup', function (e) {
+      if (e.button != null && e.button !== 0) return;
+      e.preventDefault();
+      onPlay();
+    });
+    play.addEventListener('click', onPlay);
+    play.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPlay(); }
     });
   }
 
   window.addEventListener('resize', function () {
     if (hidden || boot.hidden) return;
-    if (boot.classList.contains('painted')) applyTitle();
+    applyTitle();
   });
 
   setTimeout(function () { waited = true; maybeHide(); }, wantTitle ? 120000 : 2500);
@@ -104,5 +113,7 @@
     isPainted: function () { return !!(boot && boot.classList.contains('painted')); }
   };
 
+  boot.classList.add('painted');
+  applyTitle();
   preload();
 })();

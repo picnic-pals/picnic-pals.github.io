@@ -50,11 +50,16 @@
     var winning = example ? (example === 'less' ? 0 : 1) : G.result ? G.result.winner : -1;
     var war = tie ? '<span class="ff-war" aria-label="Three face-down cards">' + [1,2,3].map(function () { return img(ART + 'back.png', 'ff-back'); }).join('') + '</span>' : '';
     $('#ffContent').innerHTML = '<div class="ff-table ' + (example ? 'ff-example ' : '') + (rule === 'less' ? 'ff-less' : '') + '">' + friend(0) + '<div class="ff-mat ff-yellow">' + war + card(cards[0], 0, winning === 0, false) + '</div><div class="ff-banner" role="status">' + (tie ? 'Splat-Off!' : 'Tap who has <strong>' + rule.toUpperCase() + '</strong>') + '</div><div class="ff-mat ff-pink">' + war + card(cards[1], 1, winning === 1, !example && G.wild && G.phase === 'wild') + '</div>' + friend(1) + footer() + '</div>';
-    A.$$('.ff-card').forEach(function (el) { el.onclick = function () { tap(+el.dataset.side); }; });
-    A.$$('.ff-pick').forEach(function (el) { el.onclick = function () { if (F.wildPick(G, +el.dataset.pick)) { render(); if (G.band.toddler) tap(1); } else { $('#wildHint').textContent = 'Look for ' + G.rule.toUpperCase() + ' than ' + G.cards[0].value + '.'; el.classList.add('ff-try'); var right = F.wildOptions(G).filter(function (n) { return G.rule === 'more' ? n > G.cards[0].value : n < G.cards[0].value; })[0]; $('[data-pick="' + right + '"]').classList.add('ff-glow'); } }; });
-    var start = $('#ruleStart') || $('#lessStart'); if (start) start.onclick = closeExample;
-    if ($('#splatFlip')) $('#splatFlip').onclick = function () { F.splatOff(G); A.Audio.sfx('pop'); render(); reveal(); };
-    if ($('#nextRound')) $('#nextRound').onclick = function () { if (G.phase === 'done') results(); else next(); };
+    function bindTap(el, fn) { if (!el) return; if (A.UI && A.UI.onTap) A.UI.onTap(el, fn); else el.onclick = fn; }
+    A.$$('.ff-mat').forEach(function (mat) {
+      var card = mat.querySelector('.ff-card'); if (!card) return;
+      mat.setAttribute('data-side', card.getAttribute('data-side'));
+      bindTap(mat, function () { tap(+card.dataset.side); });
+    });
+    A.$$('.ff-pick').forEach(function (el) { bindTap(el, function () { if (F.wildPick(G, +el.dataset.pick)) { render(); if (G.band.toddler) tap(1); } else { $('#wildHint').textContent = 'Look for ' + G.rule.toUpperCase() + ' than ' + G.cards[0].value + '.'; el.classList.add('ff-try'); var right = F.wildOptions(G).filter(function (n) { return G.rule === 'more' ? n > G.cards[0].value : n < G.cards[0].value; })[0]; $('[data-pick="' + right + '"]').classList.add('ff-glow'); } }); });
+    var start = $('#ruleStart') || $('#lessStart'); if (start) bindTap(start, closeExample);
+    if ($('#splatFlip')) bindTap($('#splatFlip'), function () { F.splatOff(G); A.Audio.sfx('pop'); render(); reveal(); });
+    if ($('#nextRound')) bindTap($('#nextRound'), function () { if (G.phase === 'done') results(); else next(); });
   }
   function closeExample() {
     if (example === 'more') stats.rules = true; else stats.less = true;
@@ -130,12 +135,12 @@
       '<span>You<b>' + G.score[1] + '</b>cards won</span><span>Sunny<b>' + G.score[0] + '</b>cards won</span></div>' +
       '<p>' + A.esc(starLine) + ' Thanks for playing together!</p>' +
       '<button class="ff-action" id="playAgain">Play again</button><button class="ff-secondary" id="resultsHome">Home</button></div>';
-    $('#playAgain').onclick = function () { G = F.newMatch(P); window.__foodfight.G = G; saved = false; firstSpoken = false; next(); }; $('#resultsHome').onclick = home;
+    if (A.UI && A.UI.onTap) { A.UI.onTap($('#playAgain'), function () { G = F.newMatch(P); window.__foodfight.G = G; saved = false; firstSpoken = false; next(); }); A.UI.onTap($('#resultsHome'), home); } else { $('#playAgain').onclick = function () { G = F.newMatch(P); window.__foodfight.G = G; saved = false; firstSpoken = false; next(); }; $('#resultsHome').onclick = home; }
   }
   function home() { A.Voice.stop(); A.Store.save(); location.href = A.ROOT + 'index.html?from=game#games'; }
-  $('#ffHome').onclick = home;
-  $('#ffSpeak').onclick = function () { say(instruction()); };
-  $('#ffHelp').onclick = function () { if (!G.band.supported) return; returning = G.flips > 0; example = 'more'; render(); };
+  if (A.UI && A.UI.bindHome) A.UI.bindHome($('#ffHome'), home); else $('#ffHome').onclick = home;
+  if (A.UI && A.UI.onTap) { A.UI.onTap($('#ffSpeak'), function () { say(instruction()); }); A.UI.onTap($('#ffHelp'), function () { if (!G.band.supported) return; returning = G.flips > 0; example = 'more'; render(); }); }
+  else { $('#ffSpeak').onclick = function () { say(instruction()); }; $('#ffHelp').onclick = function () { if (!G.band.supported) return; returning = G.flips > 0; example = 'more'; render(); }; }
   window.__foodfight = { G: G, render: render }; // same local inspection pattern as the other arcade games
   if (!stats.rules) { example = 'more'; render(); } else next();
 })(window.Arcade);

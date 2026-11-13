@@ -61,7 +61,8 @@
     if (L.scattered) inner = cvScatter(L.n);
     else if (L.pattern === 'dice') inner = cvDice(L.n);
     else if (L.frames && L.frames.length) inner = L.frames.map(cvFrame).join('');
-    var html = '<span class="cv-set" data-n="' + L.n + '" data-structure="' + (L.structure || '') + '" role="img" aria-label="' + label + '">' + inner + '</span>';
+    var nFrames = (L.frames && L.frames.length) || (L.pattern === 'dice' || L.scattered ? 1 : 0);
+    var html = '<span class="cv-set" data-n="' + L.n + '" data-structure="' + (L.structure || '') + '" data-frames="' + nFrames + '" role="img" aria-label="' + label + '">' + inner + '</span>';
     if (L.quick_look) {
       html = '<div class="cv-ql" data-ql="1"><div class="cv-ql-pic">' + html + '</div><button type="button" class="cv-showagain">Show again</button></div>';
     }
@@ -102,7 +103,109 @@
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', cvWatch);
     else cvWatch();
   }
-  A.CountVisual = { layout: cvLayout, html: cvHtml, bindQuickLook: cvBindQuickLook, DICE: CV_DICE };
+
+  // Scale a counted set so every frame and dot fits in a small host (Munch tile, Baseball choice).
+  // Tight hosts use a compact 2×5 ten-frame when that yields bigger countable dots (e.g. 21 = 2 full frames + 1).
+  function cvFit(root) {
+    if (typeof document === 'undefined') return;
+    root = root && root.querySelectorAll ? root : document;
+    [].forEach.call(root.querySelectorAll ? (root.matches && root.matches('.cv-set') ? [root] : root.querySelectorAll('.cv-set')) : [], cvFitOne);
+  }
+  function cvFitHost(set) {
+    return set.closest('.cell, .bcard, .pc-opt, .pk-frame, .pk-group');
+  }
+  function cvFitOne(set) {
+    if (!set || !set.style) return;
+    set.style.removeProperty('--cv-d');
+    set.style.maxWidth = '100%';
+    set.classList.remove('cv-tile', 'cv-tall', 'cv-wide');
+    var host = cvFitHost(set), tight = !!host;
+    var box = host && host.classList.contains('cell') ? (host.querySelector('.lbl') || host)
+      : host && host.classList.contains('bcard') ? (host.querySelector('.cv') || host)
+      : (set.parentElement || set);
+    if (tight) set.classList.add('cv-tile');
+    void set.offsetWidth;
+    var W = box.clientWidth, H = box.clientHeight;
+    if (W < 8 || H < 8) return;
+    var used = 0, parent = set.parentElement;
+    if (parent) {
+      [].forEach.call(parent.children, function (ch) {
+        if (ch === set) return;
+        var cs = window.getComputedStyle(ch);
+        used += ch.offsetHeight + (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0);
+      });
+      var pcs = window.getComputedStyle(parent);
+      used += parseFloat(pcs.rowGap || pcs.gap) || 0;
+    }
+    var availW = W, availH = Math.max(12, H - used);
+    if (!tight && set.scrollWidth <= availW + 1 && set.scrollHeight <= availH + 1) return;
+
+    var dice = !!set.querySelector('.cv-dice');
+    var scatter = !!set.querySelector('.cv-scatter');
+    var fiveOnly = !!set.querySelector('.cv-five') && !set.querySelector('.cv-frame:not(.cv-five)');
+    var F = set.querySelectorAll('.cv-frame, .cv-dice').length || 1;
+    var orients;
+    if (dice) orients = [{ cols: 3, rows: 3, F: 1, cls: 'cv-wide' }];
+    else if (scatter) orients = [{ cols: 4, rows: 2, F: 1, cls: 'cv-wide', scatter: true }];
+    else if (fiveOnly) orients = tight
+      ? [{ cols: 1, rows: 5, F: 1, cls: 'cv-tall' }, { cols: 5, rows: 1, F: 1, cls: 'cv-wide' }]
+      : [{ cols: 5, rows: 1, F: 1, cls: 'cv-wide' }];
+    else orients = tight
+      ? [{ cols: 2, rows: 5, F: F, cls: 'cv-tall' }, { cols: 5, rows: 2, F: F, cls: 'cv-wide' }]
+      : [{ cols: 5, rows: 2, F: F, cls: 'cv-wide' }];
+
+    function maxD(o, fCols, fRows) {
+      if (o.scatter) return Math.min(availW / 4.2, availH / 2.2);
+      var gap = 0.35, pad = 0.25, setGap = 0.5, border = 4;
+      var cellK = o.cols + (o.cols - 1) * gap + 2 * pad;
+      var rowK = o.rows + (o.rows - 1) * gap + 2 * pad;
+      var kw = fCols * cellK + (fCols - 1) * setGap;
+      var kh = fRows * rowK + (fRows - 1) * setGap;
+      var dw = (availW - fCols * border) / kw, dh = (availH - fRows * border) / kh;
+      if (!(dw > 0) || !(dh > 0)) return 0;
+      return Math.min(dw, dh);
+    }
+    var packs = function (o) {
+      var list = [{ c: o.F, r: 1 }];
+      if (o.F > 1) list.push({ c: 1, r: o.F });
+      if (o.F === 3) list.push({ c: 2, r: 2 });
+      return list;
+    };
+    var best = 0, bestO = orients[0], wrapCols = F;
+    orients.forEach(function (o) {
+      packs(o).forEach(function (L) {
+        var d = maxD(o, L.c, L.r);
+        if (d > best) { best = d; bestO = o; wrapCols = L.c; }
+      });
+    });
+    set.classList.add(bestO.cls || 'cv-wide');
+    var MIN = 4, MAX = tight ? 28 : 36;
+    var d = Math.min(MAX, Math.floor(best * 10) / 10);
+    if (!(d > 0)) d = MIN;
+    set.style.setProperty('--cv-d', d + 'px');
+    set.style.flexWrap = (!bestO.scatter && wrapCols < bestO.F) ? 'wrap' : 'nowrap';
+    if (!bestO.scatter) {
+      var gap = 0.35, pad = 0.25, setGap = 0.5, border = 4;
+      var cellK = bestO.cols + (bestO.cols - 1) * gap + 2 * pad;
+      var fw = wrapCols * (cellK * d + border) + (wrapCols - 1) * setGap * d;
+      set.style.maxWidth = Math.max(0, Math.min(availW, Math.ceil(fw + 0.5))) + 'px';
+    }
+    // Never bump dots up past what fits; shrink a little more if subpixels or the number label still overflow the host.
+    var fits = function () {
+      return set.scrollWidth <= availW + 1 && set.scrollHeight <= availH + 1 &&
+        box.scrollWidth <= box.clientWidth + 1 && box.scrollHeight <= box.clientHeight + 1;
+    };
+    var guard = 0;
+    while (guard++ < 24 && !fits()) {
+      d = Math.floor(d * 9) / 10;
+      if (d < MIN) { d = MIN; set.style.setProperty('--cv-d', d + 'px'); break; }
+      set.style.setProperty('--cv-d', d + 'px');
+      void set.offsetWidth;
+    }
+  }
+
+  A.CountVisual = { layout: cvLayout, html: cvHtml, bindQuickLook: cvBindQuickLook, fit: cvFit, DICE: CV_DICE };
+
   function frame(v) { return cvHtml(v, { pattern: v <= 5 ? 'five_frame' : 'ten_frame' }); }
   function frames2(v) { return cvHtml(v); }
 

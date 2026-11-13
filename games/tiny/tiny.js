@@ -87,14 +87,10 @@
       .then(goHome);
   }
   function goHome() { V.stop(); A.Store.save(); location.href = A.ROOT + 'index.html?from=game#games'; }
-  // design2: the Home button is small, in the top-left corner, and needs a press-and-hold (HOLD_MS) so a toddler's stray tap
-  // doesn't end the game; a quick tap just shows "Hold to go home". Grown-ups: hold it, press Escape, or use the keyboard (Enter).
-  var HOLD_MS = 800, hb = $('#homeBtn'), holdT = null, hintT = null;
-  function holdStart(e) { if (e.button > 0) return; e.preventDefault(); clearTimeout(holdT); hb.classList.remove('hint'); hb.classList.add('holding'); holdT = setTimeout(function () { holdT = null; hb.classList.remove('holding'); A.Audio.sfx('tap'); goHome(); }, HOLD_MS); }
-  function holdEnd() { if (!holdT) return; clearTimeout(holdT); holdT = null; hb.classList.remove('holding'); hb.classList.add('hint'); clearTimeout(hintT); hintT = setTimeout(function () { hb.classList.remove('hint'); }, 1800); }
-  hb.addEventListener('pointerdown', holdStart); hb.addEventListener('pointerup', holdEnd); hb.addEventListener('pointerleave', holdEnd); hb.addEventListener('pointercancel', holdEnd);
-  hb.addEventListener('contextmenu', function (e) { e.preventDefault(); });
-  hb.addEventListener('click', function (e) { if (e.detail === 0) { A.Audio.sfx('tap'); goHome(); } });   // keyboard Enter / Space only (a tap is handled by the hold)
+  // Home is a single tap (kids were having to press several times when it required a hold). Escape still works too.
+  var hb = $('#homeBtn');
+  if (A.UI && A.UI.bindHome) A.UI.bindHome(hb, goHome);
+  else hb.addEventListener('click', function () { A.Audio.sfx('tap'); goHome(); });
   $('#sayBtn').addEventListener('click', function () { if (st.q) V.say(st.q.say, { kind: 'tap' }); });
   var askEl = $('#askTxt'); if (askEl) { askEl.style.cursor = 'pointer'; askEl.addEventListener('click', function () { if (st.q) V.say(st.q.say, { kind: 'tap' }); }); }
   document.addEventListener('keydown', function (e) {
@@ -110,5 +106,5 @@
   A.HowTo.button('tiny', '#sayBtn');   // quality1 (C3)
   // play-time limit: check before the first prompt (never mid-round)
   (A.PlayTime ? A.PlayTime.checkpoint() : Promise.resolve(true)).then(function (ok) { if (ok) { A.HowTo.first('tiny').then(function () { return V.say(['tp_hello']); }).then(function () { start(); }); } });
-  window.__tiny = { HOLD_MS: HOLD_MS, st: st, P: function () { return P; }, ask: ask, start: start, finish: finish };
+  window.__tiny = { HOLD_MS: 0, st: st, P: function () { return P; }, ask: ask, start: start, finish: finish };
 })(window.Arcade);
