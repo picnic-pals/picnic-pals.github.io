@@ -3,7 +3,7 @@ body { background: linear-gradient(#fff3e3, #ffe6d4); }
 body.night { background: linear-gradient(#2c2a55, #4b3f78); }
 body.dusk { background: linear-gradient(#ffd2b0, #f5b9c8); }
 #room { flex-direction: column; padding: 10px 14px 6px; gap: 8px; }
-.rtop { display: flex; align-items: center; gap: 12px; padding-right: 64px; }
+.rtop { position: relative; display: flex; align-items: center; gap: 12px; padding-right: 64px; }
 .rtitle { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0; }
 .rtitle b { display: block; font-size: clamp(24px, 4.6vmin, 40px); color: var(--pink); text-shadow: 0 3px 0 #fff; line-height: 1.05; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rtitle small { font-size: 15px; color: var(--ink2); font-weight: 600; }
@@ -276,4 +276,53 @@ body.touchui #room .keys { display: none !important; }
   .rdemo .dsay, .roomintro .dsay { font-size: 16px; margin: 4px 0; }
   .rdemo .row2, .overlay.roomintro .row2 { flex: none; margin-top: auto; }
   .rdemo .bigbtn, .overlay.roomintro .bigbtn { min-height: 60px; min-width: 140px; font-size: 22px; padding: 0 1.2em; }
+}
+
+
+/* Saved is a flash, not a header slot. Kept above the compact header query so that rule can win. */
+.saved { position: absolute; right: 56px; top: 14px; z-index: 8; pointer-events: none; }
+
+/* r8: compact Picnic Spot header — Goal, Saved, and How-to stay on a 390 phone */
+@media (orientation: portrait) and (max-width: 500px) {
+  .rtop {
+    gap: 4px;
+    padding-right: 52px;
+    flex-wrap: nowrap;
+    min-width: 0;
+    align-items: center;
+  }
+  .rtitle { flex: 0 0 auto; min-width: 0; gap: 0; }
+  .rtitle b, .rtitle small { display: none; }
+  .rav { width: 36px; height: 36px; }
+  #room .rtop .iconbtn { width: 48px; height: 48px; min-width: 48px; min-height: 48px; flex: none; }
+  .iconbtn.help { font-size: 26px; }
+  .iconbtn.music { width: 40px; height: 40px; font-size: 18px; flex: none; }
+  .bits { padding: 3px 8px 3px 4px; gap: 3px; flex: none; }
+  .bits small { display: none; }
+  .bits b { font-size: 18px; }
+  .bits .bi { width: 26px; height: 26px; font-size: 14px; }
+  .jar { min-height: 48px; min-width: 48px; padding: 1px 8px 1px 2px; flex: none; }
+  .jar .jarsvg { width: 28px; height: 34px; }
+  .jar .jt { font-size: 12px; }
+  .saved {
+    position: absolute;
+    top: 66px;
+    right: 14px;
+    z-index: 8;
+    font-size: 12px;
+    pointer-events: none;
+  }
+}
+
+/* first-run coach line sits under the room, above Shop / My things */
+body:has(#room.screen.on) .friend-bubble {
+  left: 16px;
+  right: 16px;
+  max-width: none;
+  bottom: calc(210px + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+}
+body:has(#room.screen.on) .friend-bubble .fb-say { margin-bottom: 0; }
+@media (orientation: landscape) and (max-height: 500px) {
+  body:has(#room.screen.on) .friend-bubble { bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
 }

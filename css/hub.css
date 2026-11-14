@@ -674,13 +674,24 @@ body:has(#newkid.on) .tip-bubble { display: none !important; }
 
 /* ---- PT6: toddler landscape — shrink featured tiles so row 2 peeks ---- */
 @media (orientation: landscape) and (max-height: 500px) {
-  .tile.tiny.big, .tile.story.big {
+  #games .tile.tiny.big, #games .tile.story.big {
     min-height: 0;
-    max-height: 42vh;
+    max-height: 28vh;
+    overflow: hidden;
   }
-  .tiles.toddler .tile.big .tn { font-size: 16px; margin-top: 2px; }
-  .tiles.toddler .tile.big .scene { min-height: 64px; aspect-ratio: 2.4 / 1; }
+  .tiles.toddler .tile.big .tn {
+    font-size: 15px;
+    margin-top: 1px;
+    flex: 0 0 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-height: 1.3em;
+  }
+  .tiles.toddler .tile.big .scene { min-height: 0; aspect-ratio: 3.2 / 1; flex: 1 1 auto; }
   .tiles.toddler .tile.big .tsub { display: none; }
+  .tiles.toddler { gap: 6px; }
+  #games.toddler .tiles { padding-bottom: 4px; }
 }
 
 .tile.pancake .pancsc { position: absolute; inset: 0; display: flex; align-items: stretch; justify-content: stretch; overflow: hidden; border-radius: inherit; }

@@ -96,6 +96,7 @@ body::before, body::after { display: none !important; content: none !important; 
   cursor: pointer;
 }
 .sr-secondary { background: #fff1cd; border-color: #dfc68f; box-shadow: 0 3px #dfc68f; color: #3a2714; }
+.sr-menu .sr-btn, .sr-menu .sr-secondary { min-height: 60px; }
 .sr-btn.lock, .sr-btn:disabled { opacity: 0.7; cursor: default; }
 .sr-btn .pp-icon { width: 32px; height: 32px; flex-shrink: 0; }
 
@@ -284,14 +285,14 @@ body::before, body::after { display: none !important; content: none !important; 
 .sr-prog-flag { width: 20px; height: 20px; flex-shrink: 0; }
 .sr-prog-flag .pp-icon, .sr-prog-flag .pp-emoji { width: 20px; height: 20px; }
 
-/* Locked track art, cropped into a shorter race panel. */
+/* Live track art: leftover column height goes to the road, not the card. */
 .sr-track {
   position: relative;
   --ts: 1;
   --crop: 232;
-  flex: 0 0 280px;
-  height: 280px;
-  min-height: 0;
+  flex: 1 1 280px;
+  min-height: 220px;
+  height: auto;
   border-radius: 20px;
   overflow: hidden;
   border: 3px solid #5a3d1c;
@@ -542,7 +543,17 @@ body::before, body::after { display: none !important; content: none !important; 
 }
 .sr-picnic .pp-icon { position: relative; z-index: 1; width: 36px; height: 36px; margin-bottom: 6px; }
 
-/* Lanes sit inside the locked road band (y=348–428, ground y=408). */
+/* Lanes sit inside the road band. Y is in 512-canvas units and scales with --ts
+   because the stage is 512 * --ts tall (and kart top uses gy * --ts). */
+.sr-track {
+  --road-top: 348;
+  --road-bot: 428;
+  --gy-opp: 365;
+  --gy-me: 410;
+}
+.sr-track.picnic { --gy-me: 410; }
+.sr-track.candy { --road-top: 366; --road-bot: 411; --gy-opp: 368; --gy-me: 406; }
+.sr-track.pizza { --gy-me: 410; }
 .sr-lane {
   position: absolute;
   left: 0; right: 0;
@@ -550,21 +561,18 @@ body::before, body::after { display: none !important; content: none !important; 
   z-index: 4;
   pointer-events: none;
 }
-.sr-lane.opp { --gy: 365; }
-.sr-lane.me { --gy: 408; z-index: 5; }
-/* Front-lane ground sits on the visual road surface, not the lower curb/crust. */
-.sr-track.picnic .sr-lane.me { --gy: 410; }
-.sr-track.candy .sr-lane.me { --gy: 406; }
-.sr-track.pizza .sr-lane.me { --gy: 410; }
+.sr-lane.opp { --gy: var(--gy-opp); }
+.sr-lane.me { --gy: var(--gy-me); z-index: 5; }
 .sr-lane > div {
   position: absolute;
-  top: calc(var(--gy) / 512 * 100%);
+  top: calc(var(--gy) * var(--ts) * 1px);
   transition: left 0.55s ease-out;
 }
 .sr-lane .sr-kart {
   position: relative;
-  /* Ground of the 512 canvas is y=408, 79.6875% down the box. */
-  transform: translateY(-79.6875%);
+  /* Wheel contact is 79.6875% down the 512-canvas kart box (y=408). */
+  --kart-ground: -79.6875%;
+  transform: translateY(var(--kart-ground));
   bottom: auto;
   transition: none;
 }
@@ -635,9 +643,10 @@ body::before, body::after { display: none !important; content: none !important; 
 
 /* High-contrast question card — larger type, easy-to-tap answers */
 .sr-qcard {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   min-height: 0;
-  align-content: center;
+  max-height: 32%;
+  overflow: auto;
   background: #fff6dc;
   color: #2a1b0c;
   border: 3px solid #5a3d1c;
@@ -646,9 +655,10 @@ body::before, body::after { display: none !important; content: none !important; 
   box-shadow: 0 3px 0 #c9b17a, 0 8px 16px #0002;
   display: grid;
   grid-template-columns: 1fr 48px;
-  grid-template-rows: auto auto auto;
+  grid-template-rows: auto auto auto auto;
   gap: 6px 8px;
   align-items: start;
+  align-content: start;
 }
 .sr-qcard.boss { border-color: #8a5a12; background: #fff4c8; }
 .sr-qwho {
@@ -676,12 +686,16 @@ body::before, body::after { display: none !important; content: none !important; 
 }
 .sr-pics {
   grid-column: 1 / -1;
-  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  grid-row: 3;
+  display: flex; flex-wrap: nowrap; align-items: center; justify-content: center; gap: 6px;
   margin-top: 2px;
+  min-width: 0;
 }
-.sr-pics .pp-icon, .sr-pics .pp-emoji { width: 48px; height: 48px; object-fit: contain; }
+.sr-pics .pp-icon, .sr-pics .pp-emoji { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
+.sr-qcard .cv-set { --cv-d: 16px; }
 .sr-choices {
   grid-column: 1 / -1;
+  grid-row: 4;
   display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
   margin-top: 4px;
 }
@@ -802,10 +816,11 @@ body::before, body::after { display: none !important; content: none !important; 
   .sr-row { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .sr-part { width: auto; min-height: 110px; }
   .sr-part .pp-icon, .sr-part .pp-emoji { width: 64px; height: 64px; }
-  .sr-qcard { padding: 18px 18px 22px; gap: 10px 8px; }
+  .sr-qcard { padding: 12px 14px 14px; gap: 8px; max-height: 34%; overflow: auto; }
   .sr-choice { min-width: 136px; min-height: 132px; font-size: 42px; }
   .sr-choice .pp-icon, .sr-choice .pp-emoji { width: 80px; height: 80px; }
-  .sr-pics .pp-icon, .sr-pics .pp-emoji { width: 56px; height: 56px; }
+  .sr-pics .pp-icon, .sr-pics .pp-emoji { width: 40px; height: 40px; }
+  .sr-qcard .cv-set { --cv-d: 18px; }
   .sr-kart { --sz: 300px; width: var(--sz); height: var(--sz); }
   .sr-kart.sm { --sz: 250px; width: var(--sz); height: var(--sz); }
   .sr-preview .sr-kart { --sz: 340px; width: var(--sz); height: var(--sz); }
@@ -814,10 +829,9 @@ body::before, body::after { display: none !important; content: none !important; 
   .sr-track .sr-obstacle { width: 60px; height: 60px; }
   .sr-track .sr-obstacle .pp-icon, .sr-track .sr-obstacle .pp-emoji { width: 60px; height: 60px; }
   .sr-track {
-    --ts: 1.5;
-    --crop: 178.67;
-    flex: 0 0 500px;
-    height: 500px;
+    flex: 1 1 280px;
+    min-height: 220px;
+    height: auto;
   }
   .sr-lane.opp { --gy: 365; }
   .sr-preview { min-height: 280px; }
@@ -882,10 +896,9 @@ body::before, body::after { display: none !important; content: none !important; 
   .sr-obstacle .pp-icon, .sr-obstacle .pp-emoji { width: 72px; height: 72px; }
   .sr-preview { min-height: 150px; }
   .sr-track {
-    --ts: 0.88;
-    --crop: 284.7;
-    flex: 0 0 200px;
-    height: 200px;
+    flex: 1 1 200px;
+    min-height: 200px;
+    height: auto;
   }
   .sr-lane.opp { --gy: 365; }
   .sr-qcard { padding: 10px 10px 12px; }
@@ -977,11 +990,9 @@ body::before, body::after { display: none !important; content: none !important; 
   .sr-header button, .sr-coins { min-width: 60px; min-height: 60px; }
   .sr-header h1 { font-size: 20px; padding: 2px 6px; }
   .sr-track {
-    --box: 230;
-    height: calc(var(--box) * 1px);
-    flex: 0 0 calc(var(--box) * 1px);
-    --ts: calc(var(--box) / 280);
-    --crop: 232;
+    flex: 1 1 220px;
+    min-height: 180px;
+    height: auto;
   }
   .sr-track .sr-kart { --sz: 78px; width: var(--sz); height: var(--sz); }
   .sr-track .sr-kart.sm { --sz: 56px; width: var(--sz); height: var(--sz); }
@@ -1012,6 +1023,7 @@ body::before, body::after { display: none !important; content: none !important; 
   .sr-track .sr-kart.sm { --sz: 38px; }
   .sr-qcard {
     flex: 1 1 auto; min-height: 0;
+    max-height: none;
     padding: 4px 8px 8px; gap: 2px 6px;
     overflow: hidden;
     align-content: start;
@@ -1090,4 +1102,142 @@ body::before, body::after { display: none !important; content: none !important; 
   }
   .sr-podium-art.two .sr-podium-img { max-height: 28vh; width: auto; max-width: 100%; margin: 0 auto; display: block; }
   .sr-podium .sr-coins-won .pp-icon, .sr-podium .sr-coins-won .pp-emoji { width: 64px; height: 64px; }
+}
+
+
+/* r10: portrait menu targets are at least 60px; phone qcard stays compact so the track can grow. */
+@media (orientation: portrait) {
+  .sr-menu .sr-btn, .sr-menu .sr-secondary { min-height: 60px; }
+  .sr-qcard { max-height: 34%; padding: 8px 10px 10px; }
+  .sr-ask { font-size: 28px; }
+  .sr-choices { margin-top: 0; }
+  .sr-pics .pp-icon, .sr-pics .pp-emoji { width: 36px; height: 36px; }
+  .sr-qcard .cv-set { --cv-d: 16px; }
+}
+@media (orientation: portrait) and (min-width: 700px) and (min-height: 900px) {
+  .sr-qcard { max-height: 34%; }
+  .sr-ask { font-size: 28px; }
+}
+
+/* r8: short-landscape menu — shrink the garage preview and keep Race a friend in the fold */
+@media (orientation: landscape) and (max-height: 500px) {
+  .sr-menu {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: start;
+    align-items: stretch;
+    overflow: hidden;
+    gap: 6px;
+  }
+  .sr-menu .sr-preview {
+    flex: 0 0 30%;
+    min-height: 0 !important;
+    max-height: calc(100dvh - 72px);
+    padding: 4px 4px 0;
+  }
+  .sr-menu .sr-preview .sr-kart { --sz: 108px; width: var(--sz); height: var(--sz); }
+  .sr-menu .sr-panel:not(.sr-preview) {
+    flex: 1 1 62%;
+    min-width: 0;
+    padding: 6px 10px;
+  }
+  .sr-menu .sr-lead { font-size: 18px; margin: 0; }
+  .sr-menu .sr-sub { font-size: 13px; margin: 2px 0 0; }
+  .sr-menu .sr-actions {
+    flex: 1 1 62%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 0;
+  }
+  .sr-menu .sr-btn, .sr-menu .sr-secondary {
+    flex: 1 1 46%;
+    width: auto;
+    min-height: 60px;
+    font-size: 18px;
+    padding: 6px 10px;
+  }
+}
+
+
+/* r8: live track stays on screen; answers act like race items */
+.sr-track.live .sr-par-road { animation: srRoadLive 2.4s linear infinite; }
+.sr-track.live .sr-kart.boosting { animation: srBoostKick 0.55s ease-out; }
+.sr-track.slipping .sr-lane.me .sr-kart,
+.sr-track .sr-kart.slipping { animation: srSlip 0.6s ease-out; }
+@keyframes srIdle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes srBoostKick {
+  0% { transform: translateY(var(--kart-ground, -79.6875%)) translateX(-10px) scale(.96); }
+  60% { transform: translateY(var(--kart-ground, -79.6875%)) translateX(14px) scale(1.08); }
+  100% { transform: translateY(var(--kart-ground, -79.6875%)) translateX(0) scale(1); }
+}
+@keyframes srSlip {
+  0% { transform: translateY(var(--kart-ground, -79.6875%)); }
+  30% { transform: translateY(var(--kart-ground, -79.6875%)) translateX(-16px) rotate(-22deg); }
+  60% { transform: translateY(var(--kart-ground, -79.6875%)) translateX(-8px) rotate(14deg); }
+  100% { transform: translateY(var(--kart-ground, -79.6875%)); }
+}
+.sr-item {
+  position: absolute;
+  z-index: 8;
+  left: 28%;
+  bottom: 38%;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 2px #0004);
+}
+.sr-item.boost { animation: srItemBoost .7s ease-out both; }
+.sr-item.slip { animation: srItemSlip .7s ease-out both; }
+@keyframes srItemBoost {
+  0% { transform: translate(0, 12px) scale(.4); opacity: 0; }
+  35% { transform: translate(10px, -8px) scale(1.15); opacity: 1; }
+  100% { transform: translate(28px, -28px) scale(.8); opacity: 0; }
+}
+@keyframes srItemSlip {
+  0% { transform: translate(0, 0) rotate(0) scale(.6); opacity: 0; }
+  30% { transform: translate(-6px, 8px) rotate(-20deg) scale(1); opacity: 1; }
+  100% { transform: translate(-18px, 22px) rotate(-50deg) scale(.85); opacity: 0; }
+}
+.sr-choice.ok { animation: srChoiceOk .35s ease-out; }
+@keyframes srChoiceOk { 0% { transform: scale(.92); } 60% { transform: scale(1.06); } 100% { transform: scale(1); } }
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .sr-race {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(260px, 1fr);
+    grid-template-rows: auto auto 1fr auto;
+    gap: 4px 8px;
+    min-height: 0;
+    height: 100%;
+  }
+  .sr-pips { grid-column: 1; grid-row: 1; }
+  .sr-progress { grid-column: 1; grid-row: 2; display: block !important; }
+  .sr-track {
+    grid-column: 1;
+    grid-row: 3;
+    --box: 220;
+    height: calc(var(--box) * 1px) !important;
+    max-height: none !important;
+    flex: 0 0 calc(var(--box) * 1px) !important;
+    --ts: calc(var(--box) / 280);
+  }
+  .sr-qcard {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    flex: auto;
+    max-height: none;
+    overflow: auto;
+    align-content: center;
+  }
+  .sr-status { grid-column: 1; grid-row: 4; }
+  .sr-ask { font-size: 22px; }
+  .sr-choice { min-height: 60px; font-size: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sr-track.live .sr-lane .sr-kart,
+  .sr-track.slipping .sr-lane.me .sr-kart,
+  .sr-item.boost, .sr-item.slip, .sr-choice.ok { animation: none !important; }
 }

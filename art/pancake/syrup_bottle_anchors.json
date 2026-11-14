@@ -1,0 +1,65 @@
+{
+  "status": "locked",
+  "game": "pancake-stack-race",
+  "id": "syrup_bottle",
+  "pick": "v2 chubby round glass jug with a small loop handle",
+  "rotation_deg": 120,
+  "rotation_direction": "counter-clockwise from upright (mouth points down-left, body up-right)",
+  "notes": "Upright stays corked and matches options v2. Pour is that bottle rotated 120\u00b0 CCW with the cork removed: open glass neck rim and a hint of amber at the mouth. syrup_cork is a separate loose-cork sprite and is not composited into the pour frame. syrup_stream is unchanged from options v2.",
+  "upright": {
+    "file_png": "syrup_bottle_upright.png",
+    "file_webp": "syrup_bottle_upright.webp",
+    "size": [
+      348,
+      512
+    ],
+    "corked": true
+  },
+  "pour": {
+    "file_png": "syrup_bottle_pour.png",
+    "file_webp": "syrup_bottle_pour.webp",
+    "size": [
+      463,
+      374
+    ],
+    "corked": false,
+    "spout_tip": {
+      "x": 48,
+      "y": 305
+    },
+    "mouth_center_from_transform": {
+      "x": 50.2,
+      "y": 301.0
+    }
+  },
+  "stream": {
+    "file_png": "syrup_stream.png",
+    "file_webp": "syrup_stream.webp",
+    "size": [
+      128,
+      512
+    ],
+    "stream_width": 62,
+    "stream_center_x": 64.0,
+    "recommended_stream_x_offset": -16.0,
+    "recommended_stream_y": 305,
+    "dest_formula": "dest_x = spout_tip.x - stream_center_x; dest_y = spout_tip.y"
+  },
+  "cork": {
+    "file_png": "syrup_cork.png",
+    "file_webp": "syrup_cork.webp",
+    "size": [
+      129,
+      77
+    ],
+    "optional": true,
+    "baked_into_pour": false
+  },
+  "verify": {
+    "true_cyan_key_upright": 0,
+    "true_cyan_key_pour": 0,
+    "true_cyan_key_stream": 0,
+    "true_cyan_key_cork": 0,
+    "note": "Tight cyan-key count (near #00E5FF on fringe) is 0 on every sprite. Pour has normal pale-glass AA on the rim, not key fringe."
+  }
+}

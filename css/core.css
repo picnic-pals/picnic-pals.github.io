@@ -310,6 +310,7 @@ section.subj h3 small { font-weight: 500; font-size: .7em; }
 
 /* ---------- coach v2: placement check, mistake mini-lessons, picnic story problems ---------- */
 .placement-card .card { max-width: 640px; }
+body:has(.overlay.placement-card.on) .friend-bubble { display: none !important; }
 .pc-sub { font-size: clamp(18px, 3vmin, 24px); }
 .pc-dots { display: flex; gap: 8px; justify-content: center; margin: 4px 0 8px; } .pc-dots i { width: 14px; height: 14px; border-radius: 50%; background: #eee6f5; } .pc-dots i.done { background: #9fe0b5; } .pc-dots i.now { background: var(--pink); }
 .pc-q { font-size: clamp(24px, 4.6vmin, 40px); font-weight: 700; margin: 6px 0 10px; } .pc-pic { margin-bottom: 8px; }
@@ -373,6 +374,7 @@ section.subj h3 small { font-weight: 500; font-size: .7em; }
 .tip-bubble::after { content: ''; position: absolute; left: var(--ax, 50%); bottom: -11px; margin-left: -9px; border: 9px solid transparent; border-top-color: #fff; border-bottom: 0; }
 .tip-bubble.below::after { top: -11px; bottom: auto; border: 9px solid transparent; border-bottom-color: #fff; border-top: 0; }
 .tip-bubble.press { border-color: var(--mint, #8fe3c0); }
+.tip-bubble.compact { max-width: 180px; font-size: 14px; padding: 8px 10px; line-height: 1.25; }
 .friend-bubble { position: fixed; left: 14px; bottom: 14px; z-index: 300; display: flex; align-items: flex-end; gap: 6px; max-width: min(460px, 86vw);
   opacity: 0; transform: translateY(16px); transition: opacity .2s, transform .2s; pointer-events: none; }
 .friend-bubble.on { opacity: 1; transform: none; pointer-events: auto; }

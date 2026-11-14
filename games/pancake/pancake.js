@@ -6,7 +6,10 @@
 
   var G = K.newSession(P);
   var stats = P.games.pancake = P.games.pancake || { sessions: 0 };
-  var pose = 'front', nudge = '', drag = null, lastSay = '', busy = false, cheerT = null, raceT = null;
+  var pose = 'front', nudge = '', drag = null, lastSay = '', busy = false, cheerT = null, raceT = null, pourT = null, resultT = null;
+  var CHECK_LINE = 'When your stack is right, pour the syrup to check it!';
+  var ordersStarted = 0;
+  var hearTapped = 0;
 
   function fname(id) {
     var c = (A.FoodData && A.FoodData.cast || []).filter(function (f) { return f.id === id; })[0];
@@ -22,6 +25,22 @@
   }
   function persist() { K.saveState(P, G); A.Store.save(); }
   function promptSpeech() { return (G.order && (G.order.say || G.order.text)) || lastSay || ''; }
+  function resultMs() {
+    if (window.__pancake && typeof window.__pancake.resultMs === 'number') return window.__pancake.resultMs;
+    return 900;
+  }
+  function speakOrder(kind, withCheck) {
+    var line = promptSpeech() || '';
+    if (withCheck) {
+      if (line && !/[.!?]$/.test(line)) line += '.';
+      line = (line ? line + ' ' : '') + CHECK_LINE;
+    }
+    say(line, kind || 'prompt');
+  }
+  function syrupCheckSvg(cls, w) {
+    w = w || 28;
+    return '<svg class="' + (cls || 'pc-syrup-check') + '" viewBox="0 0 24 24" width="' + w + '" height="' + w + '" aria-hidden="true"><path d="M20.3 6.3a1.5 1.5 0 0 0-2.1 0L10 14.5 5.8 10.3a1.5 1.5 0 0 0-2.1 2.1l5.3 5.3a1.5 1.5 0 0 0 2.1 0l9.2-9.2a1.5 1.5 0 0 0 0-2.2z" fill="#1b8a54"/></svg>';
+  }
 
   function stopRace() { if (raceT) { clearInterval(raceT); raceT = null; } }
   function startRaceTick() { stopRace(); }
@@ -192,48 +211,27 @@
       '<rect x="29" y="68" width="14" height="11" rx="2" fill="#fff3c4" stroke="#5a3d1c" stroke-width="1.3"/>' +
       '</svg>';
   }
+  function artSrc(id, file) {
+    var s = Art && Art.src && Art.src(id);
+    return s || ('../../art/pancake/' + (file || (id + '.webp')));
+  }
   function pourMarkup() {
-    var src = (Art && Art.src) ? Art.src('topping_syrup') : '../../art/pancake/topping_syrup.webp';
-    /* Pouring pose: body up/right, mouth at bottom pointing DOWN. Spout at (36, 68). Stream 36,68 -> 36,116. */
-    var body = 'M36 2 C 36 0 44 -1 54 0 C 72 2 84 10 84 24 C 84 38 74 50 62 56 C 54 60 46 58 40 52 C 36 48 34 38 34 24 C 34 12 36 4 36 2 Z';
+    var puddle = artSrc('topping_syrup', 'topping_syrup.webp');
+    var up = artSrc('syrup_bottle_upright', 'syrup_bottle_upright.webp');
+    var pour = artSrc('syrup_bottle_pour', 'syrup_bottle_pour.webp');
+    var stream = artSrc('syrup_stream', 'syrup_stream.webp');
+    var cork = artSrc('syrup_cork', 'syrup_cork.webp');
+    /* Locked v2 jug. Pour sprite 463x374, spout_tip (48,305), stream dest (-16,305). */
     return '<div class="pc-pour" id="pcPour" hidden aria-hidden="true">' +
-      '<svg class="pc-pour-fx" viewBox="0 0 110 120" aria-hidden="true" overflow="visible">' +
-        '<defs>' +
-          '<linearGradient id="pcSyrupStream" x1="0" y1="0" x2="1" y2="0">' +
-            '<stop offset="0%" stop-color="#a43e0a"/>' +
-            '<stop offset="30%" stop-color="#e07a22"/>' +
-            '<stop offset="50%" stop-color="#ffcc66"/>' +
-            '<stop offset="70%" stop-color="#e07a22"/>' +
-            '<stop offset="100%" stop-color="#b84a0c"/>' +
-          '</linearGradient>' +
-          '<clipPath id="pcBottleClip"><path d="' + body + '"/></clipPath>' +
-        '</defs>' +
-        '<g transform="translate(36,68)">' +
-          '<g class="pc-pour-stream">' +
-            '<path class="pc-stream-line" d="M0 0 C -7 14 -7 30 0 48 C 7 30 7 14 0 0 Z" fill="url(#pcSyrupStream)" stroke="#8a3a12" stroke-width="0.8"/>' +
-            '<ellipse class="pc-stream-drop" cx="0" cy="48" rx="7" ry="5" fill="#d96a18"/>' +
-          '</g>' +
-        '</g>' +
-        '<g class="pc-pour-bottle-g pc-pour-bottle">' +
-            '<g>' +
-              '<path d="' + body + '" fill="#fff8ee" stroke="#5a3d1c" stroke-width="2.6" stroke-linejoin="round"/>' +
-              '<g clip-path="url(#pcBottleClip)">' +
-                '<g class="pc-syrup-level">' +
-                  '<ellipse cx="58" cy="30" rx="26" ry="24" fill="#e07a22"/>' +
-                  '<ellipse cx="52" cy="20" rx="14" ry="8" fill="#ffcc66" opacity=".5"/>' +
-                '</g>' +
-              '</g>' +
-              '<path d="M44 8 C 58 4 74 12 78 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".5"/>' +
-              '<rect x="52" y="18" width="15" height="16" rx="2" fill="#fff3c4" stroke="#5a3d1c" stroke-width="1.2"/>' +
-              '<path d="M40 50 C 36 56 34 62 36 68 C 38 62 40 56 48 52 C 46 56 42 56 40 50 Z" fill="#fff3e0" stroke="#5a3d1c" stroke-width="2.4" stroke-linejoin="round"/>' +
-              '<ellipse class="pc-pour-spout" cx="36" cy="68" rx="7.2" ry="4.6" fill="#8a3a12" stroke="#5a3d1c" stroke-width="2.2"/>' +
-              '<ellipse cx="36" cy="69" rx="4.2" ry="2.4" fill="#5a2208"/>' +
-              '<ellipse cx="36" cy="69.2" rx="2.2" ry="1.2" fill="#e07a22"/>' +
-            '</g>' +
-          '</g>' +
-      '</svg>' +
+      '<div class="pc-pour-fx">' +
+        '<div class="pc-pour-stream"><div class="pc-stream-line" style="background-image:url(\'' + stream + '\')"></div></div>' +
+        '<span class="pc-pour-spout"></span>' +
+        '<img class="pc-pour-bottle pc-pour-jug-pour" src="' + pour + '" alt="" draggable="false">' +
+        '<img class="pc-pour-jug-up" src="' + up + '" alt="" draggable="false">' +
+        '<img class="pc-pour-cork" src="' + cork + '" alt="" draggable="false">' +
+      '</div>' +
       '<div class="pc-pour-coat">' +
-        '<div class="pc-pour-puddle"><img src="' + src + '" alt="" draggable="false"></div>' +
+        '<div class="pc-pour-puddle"><img src="' + puddle + '" alt="" draggable="false"></div>' +
         '<svg class="pc-pour-drips" viewBox="0 0 100 160" preserveAspectRatio="none" aria-hidden="true">' +
           '<path class="drip d1" d="M28 4 C 22 34 32 62 24 94 C 18 122 30 142 26 158" fill="none" stroke="#c45c14" stroke-width="8" stroke-linecap="round"/>' +
           '<path class="drip d2" d="M72 6 C 80 38 66 70 74 102 C 80 126 68 146 72 158" fill="none" stroke="#d96a18" stroke-width="9" stroke-linecap="round"/>' +
@@ -274,10 +272,12 @@
     var wlv = K.wobbleLevel ? K.wobbleLevel(over) : 0;
     html += '<div class="pc-plate-col">';
     html += '<div class="pc-plate-wrap' + (wlv ? ' wobble wobble-' + wlv : '') + '" id="pcPlate" role="region" aria-label="Your plate">' + plateCakesHtml() + '</div>';
+    html += '<div class="pc-pour-fb" id="pcPourFb" hidden></div>';
     html += pourMarkup() + '</div>';
-    html += '<button type="button" class="pc-syrup" id="pcReady" aria-label="Syrup. Pour when you think the stack is right.">' +
-      bottleSvg(40).replace('class="pc-pour-bottle"', 'class="pc-syrup-art"') +
-      '<span>Syrup</span></button>';
+    html += '<button type="button" class="pc-syrup' + (ordersStarted > 0 && ordersStarted <= 2 ? ' hint' : '') + '" id="pcReady" aria-label="Check with syrup. Pour when you think the stack is right.">' +
+      syrupCheckSvg() +
+      '<img class="pc-syrup-art" src="' + artSrc('syrup_bottle_upright', 'syrup_bottle_upright.webp') + '" alt="" width="22" height="32" draggable="false">' +
+      '<span>Check with syrup</span></button>';
     html += '</div>';
     html += '<p class="pc-nudge" id="pcNudge" role="status">' + A.esc(nudge) + '</p>';
     html += '</div>';
@@ -410,6 +410,7 @@
     pour.style.setProperty('--aim-y', aimY + 'px');
     pour.style.setProperty('--stack-w', stackW + 'px');
     pour.style.setProperty('--stack-h', stackH + 'px');
+    void pour.offsetWidth;
     if (!opts || opts.nudge !== false) nudgeBottle(pour);
     return { aimX: aimX, aimY: aimY, stackW: stackW, stackH: stackH };
   }
@@ -417,40 +418,82 @@
     pad = pad == null ? 4 : pad;
     return !!a && !!b && a.right > b.left + pad && a.left < b.right - pad && a.bottom > b.top + pad && a.top < b.bottom - pad;
   }
+  function tightBottleBox(el) {
+    var r = el.getBoundingClientRect();
+    var insetL = r.width * 0.08, insetT = r.height * 0.12, insetR = r.width * 0.06, insetB = r.height * 0.1;
+    return { left: r.left + insetL, top: r.top + insetT, right: r.right - insetR, bottom: r.bottom - insetB };
+  }
   function nudgeBottle(pour) {
     if (!pour) return;
     var bottle = pour.querySelector('.pc-pour-bottle');
     if (!bottle) return;
-    var prompts = A.$$('#pcAsk, .pc-ask, .pc-num, .pc-bin');
+    var nums = A.$$('#pcAsk, .pc-ask, .pc-num');
+    var bins = A.$$('.pc-bin');
     var cakes = A.$$('#pcPlate .pc-cake');
-    var topHit = null, topR = null;
+    var topR = null;
     cakes.forEach(function (c) {
       var r = visBox(c);
-      if (!topR || r.top < topR.top - 1) { topHit = c; topR = r; }
+      if (!topR || r.top < topR.top - 1) topR = r;
     });
-    var dx = parseFloat(pour.style.getPropertyValue('--pour-dx')) || 0;
-    var i, r, hit, j, p, stream, sr, lastOk = dx;
-    pour.classList.add('measure');
-    for (i = 0; i < 16; i++) {
-      pour.style.setProperty('--pour-dx', dx + 'px');
-      r = bottle.getBoundingClientRect();
-      hit = false;
-      for (j = 0; j < prompts.length; j++) {
-        p = prompts[j].getBoundingClientRect();
-        if (p.width >= 4 && rectsOverlap(r, p, 2)) { hit = true; break; }
+    var viewR = (window.innerWidth || 412) - 4;
+    var dx = 0, dy = 0, i, raw, tight, hit, j, p, stream, sr, mid;
+    function bottleHits() {
+      raw = bottle.getBoundingClientRect();
+      tight = tightBottleBox(bottle);
+      for (j = 0; j < nums.length; j++) {
+        p = nums[j].getBoundingClientRect();
+        /* Negative pad keeps a few pixels of air around Make N. / the order number. */
+        if (p.width >= 4 && rectsOverlap(raw, p, -6)) return 'num';
       }
+      for (j = 0; j < bins.length; j++) {
+        p = bins[j].getBoundingClientRect();
+        if (p.width >= 4 && rectsOverlap(tight, p, 2)) return 'bin';
+      }
+      return null;
+    }
+    function streamOk() {
       stream = pour.querySelector('.pc-stream-line, .pc-pour-stream');
       sr = stream && stream.getBoundingClientRect();
-      if (topR && sr && sr.width + sr.height > 0) {
-        var mid = (sr.left + sr.right) / 2;
-        if (mid < topR.left + 4 || mid > topR.right - 4) {
-          pour.style.setProperty('--pour-dx', lastOk + 'px');
+      if (!sr || sr.width + sr.height <= 0) return true;
+      mid = (sr.left + sr.right) / 2;
+      if (topR && mid > topR.right - 4) return false;
+      if (topR && sr.bottom > topR.top + 40) return false;
+      return true;
+    }
+    pour.classList.add('measure');
+    void pour.offsetWidth;
+    for (i = 0; i < 16; i++) {
+      pour.style.setProperty('--pour-dx', dx + 'px');
+      void pour.offsetWidth;
+      raw = bottle.getBoundingClientRect();
+      if (i > 0 && raw.right > viewR) {
+        dx -= 8;
+        pour.style.setProperty('--pour-dx', dx + 'px');
+        break;
+      }
+      hit = bottleHits();
+      if (!hit) break;
+      if (!streamOk()) {
+        dx -= 8;
+        pour.style.setProperty('--pour-dx', Math.max(0, dx) + 'px');
+        break;
+      }
+      dx += 8;
+    }
+    /* If a horizontal shift would pull the stream off the stack, drop the jug instead. */
+    void pour.offsetWidth;
+    if (bottleHits()) {
+      for (i = 0; i < 8; i++) {
+        dy += 4;
+        pour.style.setProperty('--pour-dy', dy + 'px');
+        void pour.offsetWidth;
+        if (!streamOk()) {
+          dy -= 4;
+          pour.style.setProperty('--pour-dy', Math.max(0, dy) + 'px');
           break;
         }
+        if (!bottleHits()) break;
       }
-      lastOk = dx;
-      if (!hit) break;
-      dx += 12;
     }
     pour.classList.remove('measure');
   }
@@ -465,15 +508,20 @@
       pour.hidden = false;
       pour.setAttribute('aria-hidden', 'false');
       pour.classList.remove('on');
-      aimPour({ nudge: true });
+      aimPour({ nudge: false });
       void pour.offsetWidth;
       pour.classList.add('on');
-      requestAnimationFrame(function () { aimPour({ nudge: false }); });
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          nudgeBottle(pour);
+        });
+      });
     }
     A.Audio.sfx('soft');
     var ms = pourMs();
     if (ms <= 0) { if (then) then(); return; }
-    setTimeout(function () { if (then) then(); }, ms);
+    clearTimeout(pourT);
+    pourT = setTimeout(function () { pourT = null; if (then) then(); }, ms);
   }
   function onReady() {
     if (busy || G.phase !== 'stack' || !G.order) return;
@@ -484,23 +532,42 @@
       if (pour) { pour.hidden = true; pour.setAttribute('aria-hidden', 'true'); }
       if (wrap) wrap.classList.remove('pouring');
       if (wrap && wrap.parentNode && wrap.parentNode.classList) wrap.parentNode.classList.remove('pouring');
-      if (K.checkPlate(G.order, G.plate)) {
-        busy = false;
-        finishOrder();
-      } else {
-        K.failNudge(G);
-        var over = K.overBy ? K.overBy(G.order, G.plate) : 0;
-        nudge = 'That stack isn\'t quite right. Try again.';
-        var wlv = K.wobbleLevel ? K.wobbleLevel(Math.max(over, 1)) : 1;
-        if (wrap) {
-          wrap.classList.remove('wobble-1', 'wobble-2', 'wobble-3');
-          wrap.classList.add('wobble', 'wobble-' + wlv);
+      var ok = K.checkPlate(G.order, G.plate);
+      showPourFeedback(ok, function () {
+        if (ok) {
+          busy = false;
+          finishOrder();
+        } else {
+          K.failNudge(G);
+          var over = K.overBy ? K.overBy(G.order, G.plate) : 0;
+          nudge = 'Not yet, try again';
+          var wlv = K.wobbleLevel ? K.wobbleLevel(Math.max(over, 1)) : 1;
+          if (wrap) {
+            wrap.classList.remove('wobble-1', 'wobble-2', 'wobble-3');
+            wrap.classList.add('wobble', 'wobble-' + wlv);
+          }
+          var nEl = $('#pcNudge'); if (nEl) nEl.textContent = nudge;
+          say(nudge, 'chatter');
+          busy = false;
         }
-        var nEl = $('#pcNudge'); if (nEl) nEl.textContent = nudge;
-        say(nudge, 'chatter');
-        busy = false;
-      }
+      });
     });
+  }
+
+  function showPourFeedback(ok, then) {
+    var fb = $('#pcPourFb');
+    if (fb) {
+      fb.hidden = false;
+      fb.setAttribute('aria-hidden', 'false');
+      fb.className = 'pc-pour-fb on ' + (ok ? 'ok' : 'miss');
+      fb.innerHTML = ok
+        ? '<span class="pc-pour-check" role="img" aria-label="Right">' + syrupCheckSvg('pc-pour-check-mark', 120) + '</span>'
+        : '<span class="pc-pour-miss">Not yet, try again</span>';
+    }
+    var ms = resultMs();
+    if (ms <= 0) { if (then) then(); return; }
+    clearTimeout(resultT);
+    resultT = setTimeout(function () { resultT = null; if (then) then(); }, ms);
   }
 
   function finishOrder() {
@@ -584,7 +651,7 @@
     A.Store.save();
   }
   function howToText() {
-    return 'Tap a pancake to add it to your plate. Tap a pancake on the plate to take it off. Tap Syrup when you think the stack is right.';
+    return 'Tap a pancake to add it to your plate. Tap a pancake on the plate to take it off. Tap Check with syrup when you think the stack is right.';
   }
   function renderHowTo() {
     document.body.classList.remove('pc-won');
@@ -609,8 +676,9 @@
     K.nextOrder(G, P);
     window.__pancake.G = G;
     persist();
+    ordersStarted++;
     render();
-    if (G.order) say(promptSpeech(), 'prompt');
+    if (G.order) speakOrder('prompt', ordersStarted === 1);
     startRaceTick();
   }
   function boot() {
@@ -625,7 +693,7 @@
   }
 
   $('#pcHome').onclick = home;
-  $('#pcSpeak').onclick = function () { say(promptSpeech(), 'tap'); };
+  $('#pcSpeak').onclick = function () { hearTapped += 1; speakOrder('tap', hearTapped === 1); };
   window.addEventListener('resize', function () { if (G.phase !== 'win') render(); });
 
   window.__pancake = {
@@ -637,6 +705,10 @@
     serve: function () { onReady(); },
     showOrder: function (o) {
       stopRace();
+      clearTimeout(pourT); pourT = null;
+      clearTimeout(resultT); resultT = null;
+      clearTimeout(cheerT); cheerT = null;
+      busy = false; pose = 'front';
       G.order = o; G.phase = 'stack'; G.done = false; G.friend = o.friend || G.friend;
       G.plate = K.startPlate(o); G.firstTry = true; G.nudged = false; nudge = '';
       document.body.classList.remove('pc-won');
@@ -648,7 +720,9 @@
     showHowTo: function () { renderHowTo(); },
     cheerMs: 1600,
     pourMs: 1300,
-    aimPour: aimPour,
+    resultMs: 900,
+    CHECK_LINE: CHECK_LINE,
+    aimPour: aimPour, nudgeBottle: nudgeBottle,
     freezeRace: false,
     skipHowTo: false
   };

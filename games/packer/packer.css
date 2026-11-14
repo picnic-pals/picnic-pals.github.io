@@ -587,3 +587,46 @@ body.pk-won #pkContent {
   .pk-ask { font-size: 16px; }
   .pk-who { font-size: 14px; }
 }
+
+
+/* r8: juicier pack drops — fly in, basket sag, count badge tick */
+.pk-basket { position: relative; }
+.pk-count {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  z-index: 4;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #fff6dc;
+  border: 2px solid #5a3d1c;
+  color: #2a1b0c;
+  font-weight: 800;
+  font-size: 16px;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 2px 0 #c9b17a;
+}
+.pk-count.tick { animation: pkTick .35s ease-out; }
+.pk-item.pk-flyin { animation: pkFlyIn .4s cubic-bezier(.2, 1.4, .4, 1) both; }
+.pk-basket.sag .pk-basket-art { animation: pkSag .42s ease-out; transform-origin: 50% 100%; }
+@keyframes pkFlyIn {
+  0% { transform: translateY(-42px) scale(.4); opacity: 0; }
+  70% { transform: translateY(4px) scale(1.08); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes pkSag {
+  0% { transform: scale(1, 1); }
+  40% { transform: scale(1.06, .9) translateY(8px); }
+  100% { transform: scale(1, 1); }
+}
+@keyframes pkTick {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.28); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pk-item.pk-flyin, .pk-basket.sag .pk-basket-art, .pk-count.tick { animation: none !important; }
+}

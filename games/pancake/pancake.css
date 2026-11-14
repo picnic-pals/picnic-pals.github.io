@@ -322,37 +322,98 @@ html, body { margin: 0; height: 100%; background: #f7e2c0; color: #3a2714; font:
 .pc-plate-wrap.pouring .pc-pour,
 .pc-plate-col.pouring .pc-pour { display: block; }
 
+/* Locked v2 jug. Display width ~128px on a 412 phone (110-140).
+   Pour sprite is 463x374; spout_tip (48,305); stream dest (-16,305).
+   Pin the spout to --aim-x / just above --aim-y. */
 .pc-pour-fx {
+  --jug-w: 128px;
+  --stream-h: 36px;
   position: absolute;
   left: var(--aim-x, 50%);
   top: var(--aim-y, 20%);
-  width: var(--fx-w, 96px);
-  height: var(--fx-h, 90px);
+  width: var(--jug-w);
+  height: calc(374 / 463 * var(--jug-w));
   overflow: visible;
-  /* Spout is at x=36,y=68 in a 110x120 viewBox; pin spout x to aim-x, SVG bottom on the cake. */
-  transform: translate(calc(-1 * 36 / 110 * var(--fx-w, 96px) + var(--pour-dx, 0px)), -100%);
-  filter: drop-shadow(0 3px 2px rgba(0,0,0,.2));
+  transform: translate(
+    calc(-1 * 48 / 463 * var(--jug-w) + var(--pour-dx, 0px)),
+    calc(-1 * 305 / 463 * var(--jug-w) - var(--stream-h) + var(--pour-dy, 0px))
+  );
+  filter: drop-shadow(0 3px 2px rgba(0,0,0,.22));
   z-index: 5;
   pointer-events: none;
 }
-.pc-pour-bottle-g {
-  transform-box: view-box;
-  transform-origin: calc(36 / 110 * 100%) calc(68 / 120 * 100%);
+.pc-pour-spout {
+  position: absolute;
+  left: calc(48 / 463 * var(--jug-w));
+  top: calc(305 / 463 * var(--jug-w));
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  pointer-events: none;
 }
-.pc-pour.on .pc-pour-bottle-g { animation: pcTip 1.3s ease-in-out both; }
-.pc-pour.measure .pc-pour-bottle-g { animation: none !important; transform: rotate(0deg); }
 .pc-pour-stream {
-  transform-box: fill-box;
+  position: absolute;
+  left: calc(-16 / 463 * var(--jug-w));
+  top: calc(305 / 463 * var(--jug-w));
+  width: calc(128 / 463 * var(--jug-w));
+  height: var(--stream-h);
   transform-origin: 50% 0%;
+  z-index: 1;
+  overflow: hidden;
 }
-.pc-pour.on .pc-pour-stream { animation: pcStreamOut 1.3s ease-out both; }
+.pc-stream-line {
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat-y;
+  background-position: center top;
+  background-size: 100% auto;
+}
+.pc-pour.on .pc-pour-stream { animation: pcStreamGrow 1.3s ease-out both; }
 .pc-pour.measure .pc-pour-stream { animation: none !important; transform: scale(1, 1); opacity: 1; }
-.pc-stream-drop { opacity: 0; transform-box: fill-box; transform-origin: center; }
-.pc-pour.on .pc-stream-drop { animation: pcStreamDrop 1.3s ease-out both; }
-.pc-pour.measure .pc-stream-drop { animation: none !important; opacity: 1; }
-.pc-syrup-level { transform-box: fill-box; transform-origin: 50% 100%; }
-.pc-pour.on .pc-syrup-level { animation: pcDrain 1.3s ease-in both; }
-.pc-pour.measure .pc-syrup-level { animation: none !important; transform: translate(-4px, 14px); }
+
+.pc-pour-bottle,
+.pc-pour-jug-pour {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: auto;
+  display: block;
+  z-index: 2;
+  transform: rotate(0deg);
+  pointer-events: none;
+}
+.pc-pour.on .pc-pour-jug-pour { animation: pcJugPourIn 1.3s ease-out both; }
+.pc-pour.measure .pc-pour-jug-pour { animation: none !important; opacity: 1; }
+
+/* Upright corked jug, same pixel scale. Mouth ~ (174, 62) pinned to spout (48, 305). */
+.pc-pour-jug-up {
+  position: absolute;
+  width: calc(348 / 463 * var(--jug-w));
+  height: auto;
+  left: calc((48 - 174) / 463 * var(--jug-w));
+  top: calc((305 - 62) / 463 * var(--jug-w));
+  transform-origin: calc(174 / 348 * 100%) calc(62 / 512 * 100%);
+  z-index: 3;
+  pointer-events: none;
+  display: block;
+}
+.pc-pour.on .pc-pour-jug-up { animation: pcJugTip 1.3s ease-in-out both; }
+.pc-pour.measure .pc-pour-jug-up { animation: none !important; opacity: 0; }
+
+.pc-pour-cork {
+  position: absolute;
+  width: calc(129 / 463 * var(--jug-w));
+  height: auto;
+  left: calc((48 - 64) / 463 * var(--jug-w));
+  top: calc((305 - 44) / 463 * var(--jug-w));
+  transform-origin: 50% 80%;
+  z-index: 4;
+  pointer-events: none;
+  display: block;
+}
+.pc-pour.on .pc-pour-cork { animation: pcCorkPop 1.3s ease-out both; }
+.pc-pour.measure .pc-pour-cork { animation: none !important; opacity: 0; }
 
 .pc-pour-coat {
   position: absolute;
@@ -412,26 +473,27 @@ html, body { margin: 0; height: 100%; background: #f7e2c0; color: #3a2714; font:
 .pc-pour.on .pc-pour-drips .p2 { animation-delay: .08s; }
 .pc-pour.on .pc-pour-drips .p3 { animation-delay: .12s; }
 
-@keyframes pcTip {
-  0% { transform: rotate(58deg); }
-  22% { transform: rotate(24deg); }
-  42%, 100% { transform: rotate(0deg); }
+@keyframes pcJugTip {
+  0% { transform: rotate(8deg); opacity: 1; }
+  26% { transform: rotate(-120deg); opacity: 1; }
+  36%, 100% { transform: rotate(-120deg); opacity: 0; }
 }
-@keyframes pcStreamOut {
-  0%, 8% { transform: scale(0.35, 0); opacity: 0; }
-  18% { transform: scale(1, 0.4); opacity: 1; }
+@keyframes pcJugPourIn {
+  0%, 24% { opacity: 0; }
+  34%, 100% { opacity: 1; }
+}
+@keyframes pcCorkPop {
+  0%, 12% { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+  20% { opacity: 1; transform: translate(10px, -14px) rotate(-24deg); }
+  38% { opacity: 0; transform: translate(32px, -42px) rotate(-90deg); }
+  100% { opacity: 0; transform: translate(32px, -42px) rotate(-90deg); }
+}
+@keyframes pcStreamGrow {
+  0%, 20% { transform: scale(0.85, 0); opacity: 0; }
+  30% { transform: scale(1, 0.45); opacity: 1; }
   42% { transform: scale(1, 1); opacity: 1; }
-  72% { transform: scale(0.62, 1); opacity: 1; }
-  100% { transform: scale(0.28, 1); opacity: .95; }
-}
-@keyframes pcStreamDrop {
-  0%, 16% { opacity: 0; transform: scale(.4); }
-  28%, 70% { opacity: 1; transform: scale(1); }
-  100% { opacity: .55; transform: scale(.55); }
-}
-@keyframes pcDrain {
-  0%, 18% { transform: translate(0, 0); }
-  100% { transform: translate(-4px, 14px); }
+  72% { transform: scale(0.7, 1); opacity: 1; }
+  100% { transform: scale(0.36, 1); opacity: .95; }
 }
 @keyframes pcPuddle {
   0%, 36% { opacity: 0; transform: translate(-50%, -30%) scale(.25); }
@@ -448,21 +510,32 @@ html, body { margin: 0; height: 100%; background: #f7e2c0; color: #3a2714; font:
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
-  .pc-pour-fx { --fx-w: 74px; --fx-h: 70px; }
+  .pc-pour-fx { --jug-w: 90px; --stream-h: 24px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pc-pour-bottle, .pc-pour-stream, .pc-pour-puddle, .pc-pour-drips .drip, .pc-pour-drips .pool {
+  .pc-syrup.hint { animation: none !important; }
+  .pc-pour-bottle, .pc-pour-jug-up, .pc-pour-jug-pour, .pc-pour-cork,
+  .pc-pour-stream, .pc-pour-puddle, .pc-pour-drips .drip, .pc-pour-drips .pool {
     animation: none !important;
   }
-  .pc-pour.on .pc-pour-bottle-g { transform: rotate(0deg); }
-  .pc-pour.on .pc-pour-stream { transform: scale(0.5, 1); opacity: 1; }
-  .pc-pour.on .pc-stream-drop { opacity: .7; }
-  .pc-pour.on .pc-syrup-level { transform: translate(-4px, 14px); }
+  .pc-pour.on .pc-pour-jug-up,
+  .pc-pour.on .pc-pour-cork { opacity: 0; }
+  .pc-pour.on .pc-pour-jug-pour { opacity: 1; transform: rotate(0deg); }
+  .pc-pour.on .pc-pour-stream { transform: scale(0.7, 1); opacity: 1; }
   .pc-pour.on .pc-pour-puddle { opacity: 1; transform: translate(-50%, -30%) scale(1); }
   .pc-pour.on .pc-pour-drips .drip { stroke-dashoffset: 0; }
   .pc-pour.on .pc-pour-drips .pool { opacity: .95; transform: scale(1); }
 }
+
+.pc-syrup-art {
+  width: 22px;
+  height: auto;
+  display: block;
+  flex: none;
+  object-fit: contain;
+}
+.pc-syrup-check { width: 28px; height: 28px; flex: none; display: block; }
 
 .pc-stack-stage .pc-hit {
   position: absolute;
@@ -510,16 +583,39 @@ html, body { margin: 0; height: 100%; background: #f7e2c0; color: #3a2714; font:
 .pc-ready:focus-visible { outline: 3px solid #2a1b0c; outline-offset: 2px; }
 
 .pc-syrup {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  min-width: 160px; min-height: 60px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-width: 160px; min-height: 60px; height: auto;
   border: 3px solid #5a3d1c; border-radius: 999px;
   background: linear-gradient(#ffe3b0, #f0b45a);
-  color: #3a1f0a; font: 800 clamp(18px, 4vw, 24px)/1 system-ui, sans-serif;
+  color: #3a1f0a; font: 800 clamp(16px, 3.8vw, 22px)/1.15 system-ui, sans-serif;
   box-shadow: 0 5px 0 #c45c14; cursor: pointer;
-  padding: 0 18px; touch-action: manipulation;
+  padding: 6px 14px; touch-action: manipulation;
+  white-space: normal; text-align: left;
 }
 .pc-syrup:focus-visible { outline: 3px solid #2a1b0c; outline-offset: 2px; }
 .pc-syrup .pc-syrup-art { flex: none; }
+.pc-syrup.hint { animation: pcSyrupPulse 1.15s ease-in-out 3; }
+@keyframes pcSyrupPulse {
+  0%, 100% { box-shadow: 0 5px 0 #c45c14, 0 0 0 0 rgba(240, 194, 74, 0); }
+  50% { box-shadow: 0 5px 0 #c45c14, 0 0 0 8px rgba(240, 194, 74, 0.55); }
+}
+
+.pc-pour-fb {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none; z-index: 8;
+}
+.pc-pour-fb[hidden] { display: none; }
+.pc-pour-check { width: min(46%, 140px); display: block; filter: drop-shadow(0 4px 0 #1b8a5488); }
+.pc-pour-check-mark, .pc-pour-check svg { width: 100%; height: auto; display: block; }
+.pc-pour-miss {
+  background: #fffef8; color: #6b3a22;
+  border: 3px solid #5a3d1c; border-radius: 18px;
+  padding: 10px 16px;
+  font: 800 clamp(18px, 4.4vw, 26px)/1.2 system-ui, sans-serif;
+  text-align: center; max-width: 90%;
+  box-shadow: 0 4px 0 #e6d2a4;
+}
 
 .pc-nudge { margin: 0; min-height: 1.1em; text-align: center; font-size: 16px; color: #6b3a22; }
 
@@ -615,7 +711,10 @@ body.pc-won #pcCardHost { flex: 0 0 auto; }
   .pc-plate-wrap { min-height: 88px; width: 100%; flex: 1 1 auto; max-width: 100%; min-width: 0; padding-bottom: 0; }
   .pc-bin { min-width: 60px; min-height: 60px; padding: 2px 4px; }
   .pc-bin[data-kind="ten"], .pc-bin[data-kind="hundred"] { min-width: 60px; }
-  .pc-ready, .pc-syrup { min-width: 120px; padding: 0 12px; flex: none; }
+  .pc-ready, .pc-syrup { min-width: 132px; min-height: 60px; padding: 6px 10px; flex: none; }
+  .pc-syrup { font-size: 15px; }
+  .pc-syrup-check { width: 22px; height: 22px; }
+  .pc-syrup-art { width: 18px; }
   .pc-card { overflow: visible; padding-left: 8px; padding-right: 8px; }
   #pcCardHost { overflow: visible; }
   .pc-plate-art { width: min(100%, 180px); }

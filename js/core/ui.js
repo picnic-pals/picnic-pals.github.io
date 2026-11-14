@@ -430,17 +430,82 @@
     if (!tipEl) { tipEl = A.el('<div id="tipBubble" class="tip-bubble" role="tooltip" aria-hidden="true"></div>'); document.body.appendChild(tipEl); }
     return tipEl;
   }
+  function tipHitsPlay(b, el) {
+    var br = b.getBoundingClientRect();
+    var nodes = document.querySelectorAll('.tile .play');
+    var i, p, n;
+    for (i = 0; i < nodes.length; i++) {
+      n = nodes[i];
+      if (n === el || (el && el.contains && el.contains(n))) continue;
+      p = n.getBoundingClientRect();
+      if (p.width < 8 || p.height < 8) continue;
+      if (br.right > p.left + 4 && br.left < p.right - 4 && br.bottom > p.top + 4 && br.top < p.bottom - 4) return true;
+    }
+    return false;
+  }
   UI.showTip = function (el, how) {
     var t = el && el.getAttribute && el.getAttribute('data-tip'); if (!t) return;
-    // the native title would double up with ours: park it while ours shows
+    /* Touch screens: only long-press shows a tip, so a first tap never leaves a bubble on a Play button. */
+    if (how === 'hover' && window.matchMedia && window.matchMedia('(hover: none)').matches) return;
     if (el.hasAttribute('title')) { el.setAttribute('data-title', el.getAttribute('title')); el.removeAttribute('title'); }
     var b = tipBox(); b.textContent = t; b.className = 'tip-bubble on ' + (how || ''); tipFor = el;
     var r = el.getBoundingClientRect(), bw = Math.min(280, innerWidth - 16); b.style.maxWidth = bw + 'px';
-    var w = b.offsetWidth, h = b.offsetHeight, x = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)), y = r.top - h - 12, below = false;
+    var w = b.offsetWidth, h = b.offsetHeight;
+    var x = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2));
+    var y = r.top - h - 12, below = false;
     if (y < 6) { y = r.bottom + 12; below = true; }
     b.style.left = x + 'px'; b.style.top = y + 'px'; b.classList.toggle('below', below);
+    if (tipHitsPlay(b, el)) {
+      if (!below) { y = r.bottom + 12; below = true; }
+      else { y = Math.max(8, r.top - h - 12); below = false; }
+      b.style.top = y + 'px'; b.classList.toggle('below', below);
+    }
+    if (tipHitsPlay(b, el)) {
+      x = Math.min(innerWidth - w - 8, Math.max(8, r.right + 8));
+      y = Math.max(8, Math.min(innerHeight - h - 8, r.top));
+      b.style.left = x + 'px'; b.style.top = y + 'px'; b.classList.remove('below');
+    }
+    if (tipHitsPlay(b, el)) {
+      /* Last resort: park in a chrome gap, shrink if needed, or hide rather than cover a Play button. */
+      function clampTip(px, py) {
+        return {
+          x: Math.max(4, Math.min(innerWidth - w - 4, px)),
+          y: Math.max(4, Math.min(innerHeight - h - 4, py))
+        };
+      }
+      function tipSpots() {
+        var list = [], bar = document.querySelector('#games .topbar, .topbar'), acts = document.querySelector('#games .actions');
+        var br = bar && bar.getBoundingClientRect(), ar = acts && acts.getBoundingClientRect();
+        if (ar) {
+          list.push([8, ar.bottom + 6], [(innerWidth - w) / 2, ar.bottom + 6], [innerWidth - w - 8, ar.bottom + 6]);
+          list.push([8, ar.top - h - 6], [(innerWidth - w) / 2, ar.top - h - 6]);
+        }
+        if (br) list.push([8, br.bottom + 4], [(innerWidth - w) / 2, br.bottom + 4], [innerWidth - w - 8, br.bottom + 4]);
+        list.push(
+          [8, innerHeight - h - 8], [innerWidth - w - 8, innerHeight - h - 8],
+          [innerWidth - w - 8, 8], [(innerWidth - w) / 2, innerHeight - h - 8],
+          [(innerWidth - w) / 2, 8], [8, (innerHeight - h) / 2], [innerWidth - w - 8, (innerHeight - h) / 2]
+        );
+        return list;
+      }
+      function trySpots() {
+        var spots = tipSpots(), i, s, pos;
+        for (i = 0; i < spots.length; i++) {
+          pos = clampTip(spots[i][0], spots[i][1]);
+          b.style.left = pos.x + 'px'; b.style.top = pos.y + 'px'; b.classList.add('below');
+          if (!tipHitsPlay(b, el)) { x = pos.x; y = pos.y; return true; }
+        }
+        return false;
+      }
+      if (!trySpots()) {
+        b.classList.add('compact');
+        b.style.maxWidth = Math.min(180, innerWidth - 16) + 'px';
+        w = b.offsetWidth; h = b.offsetHeight;
+        if (!trySpots()) { UI.hideTip(); return; }
+      }
+    }
     b.style.setProperty('--ax', Math.max(14, Math.min(w - 14, r.left + r.width / 2 - x)) + 'px');
-    clearTimeout(tipT); if (how === 'press') tipT = setTimeout(UI.hideTip, 2600);
+    clearTimeout(tipT); if (how === 'press') tipT = setTimeout(UI.hideTip, 1800);
     UI.tipShown = { text: t, how: how || '' };
   };
   UI.hideTip = function () {

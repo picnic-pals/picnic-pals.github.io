@@ -319,13 +319,13 @@ body.tipq .jarchip { display: none !important; }
   .counter.jarmode { grid-template-columns: minmax(0, 1fr) auto; }
 }
 @media (orientation: landscape) and (max-height: 500px) {
-  #stand .tbar { min-height: 46px; padding-top: 6px; } #stand .sayagain { width: 48px; height: 48px; font-size: 24px; top: 6px; }
-  #stand .homebtn { width: 60px; height: 60px; min-width: 60px; min-height: 60px; } #howtoBtn.q1help { top: 76px; width: 60px; height: 60px; min-width: 60px; min-height: 60px; font-size: 22px; }
+  #stand .tbar { min-height: 46px; padding-top: 6px; padding-left: 148px; } #stand .sayagain { width: 48px; height: 48px; font-size: 24px; top: 6px; }
+  #stand .homebtn { width: 60px; height: 60px; min-width: 60px; min-height: 60px; } #howtoBtn.q1help { top: 6px; left: 76px; width: 60px; height: 60px; min-width: 60px; min-height: 60px; font-size: 22px; }
   .cust .friend { height: 22vh; } .cust .bubble { max-height: 70%; padding: 6px 10px; }
   .want b { font-size: 28px; } .want .emo { font-size: 34px; } .ticket p { font-size: 18px; } .ticket.long p { font-size: 15px; } .bubble .ask { font-size: 14px; } .bubble .line { font-size: 14px; } .rhead { font-size: 13px; }
   .bin { width: 62px; height: 62px; } .bin .emo { font-size: 32px; } .bin small { display: none; }
   .counter.pickmode .bin { width: 100px; height: 100px; } .counter.pickmode .bin .emo { font-size: 64px; }
-  .sbtn { min-height: 52px; font-size: 20px; min-width: 0; padding: 0 14px; }
+  .sbtn { min-height: 60px; font-size: 20px; min-width: 0; padding: 0 14px; }
   .counter { padding: 8px; gap: 6px; }
   .billbtn .bill { width: 70px; } .prices .tag { font-size: 26px; }
 }
@@ -453,7 +453,7 @@ body.tipq .jarchip { display: none !important; }
 .counter.paying.take .cashbox .sbtn.undo {
   flex: 0 0 auto;
   min-width: 84px;
-  min-height: 56px;
+  min-height: 60px;
   font-size: 22px;
   padding: 0 16px;
   margin: 0;
@@ -549,7 +549,7 @@ body.tipq .jarchip { display: none !important; }
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .counter.paying.take .billbtn.denom .bill { max-width: none; }
-  .counter.paying.take .cashbox .sbtn.undo { min-height: 52px; }
+  .counter.paying.take .cashbox .sbtn.undo { min-height: 60px; }
 }
 
 @media (orientation: landscape) {
@@ -587,7 +587,7 @@ body.tipq .jarchip { display: none !important; }
   .counter.paying.take .billbtn.denom .bill { width: 100% !important; }
   .counter.paying.take .pay-tally,
   .prices .pay-tally { font-size: 16px; padding: 4px 8px; border-width: 2px; }
-  .counter.paying.take .cashbox .sbtn.undo { min-height: 44px; min-width: 70px; font-size: 18px; }
+  .counter.paying.take .cashbox .sbtn.undo { min-height: 60px; min-width: 70px; font-size: 18px; }
   .counter.paying.take .cashbox .lbl { font-size: 12px; }
   .counter.paying.take .billbtn.in .bill,
   .counter.paying.take .billstack .bill { width: 110px !important; min-width: 110px !important; }
@@ -599,6 +599,55 @@ body.tipq .jarchip { display: none !important; }
   .bubble.pay { min-width: 0; }
   .bubble.pay .prices { gap: 6px; }
   .prices .tag { font-size: 28px; }
+}
+
+/* enough?: friend's bills sit inside the labeled box, not in the side wallet */
+.counter.paying.enough .bins { display: none; }
+.counter.paying.enough .tray {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+}
+.counter.paying.enough .cashbox.wal {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 36px 16px 16px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.counter.paying.enough .cashbox.wal .pile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 14px;
+  max-height: none;
+  overflow: visible;
+}
+.counter.paying.enough .cashbox.wal .billbtn .bill {
+  width: clamp(90px, 22vw, 140px);
+  height: auto;
+}
+@media (orientation: landscape) {
+  .counter.paying.enough {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: 1fr;
+    grid-template-areas: "tray acts";
+    align-items: stretch;
+    gap: 10px;
+  }
+  .counter.paying.enough .tray { grid-area: tray; min-height: 0; }
+  .counter.paying.enough .acts {
+    grid-area: acts;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0;
+  }
 }
 
 /* pay-ui-1113-fix: compact cashbox even if .paying is applied a beat later */

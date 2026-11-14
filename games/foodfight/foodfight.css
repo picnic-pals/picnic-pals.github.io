@@ -106,3 +106,6 @@ body::before, body::after { display: none !important; content: none !important; 
 .ff-confetti i { position:absolute;top:40%;width:9px;height:16px;background:var(--c);transform:rotate(var(--r));animation:ff-rain 1.3s ease-in forwards; }
 @keyframes ff-rain { to { top:100%;transform:rotate(300deg);opacity:0; } }
 @media(max-width:400px) { .ff-friend-row { gap:9px; }.ff-total b { font-size:20px; }.ff-total small { font-size:10px; }.ff-name { padding:4px 10px; }.ff-header { gap:5px; } }
+
+.ff-card.ff-solved .ff-number { font-size: clamp(36px, 7vh, 64px); font-weight: 800; }
+.ff-equation.ff-revealed { inset: auto 8% 6%; top: auto; font-size: clamp(14px, 2.4vh, 18px); flex-direction: row; gap: 4px; }

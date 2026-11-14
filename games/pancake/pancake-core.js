@@ -197,7 +197,7 @@
 
   function raceParams(band) {
     if (!band || band.toddler) return { step: 0.4, miss: 0, needed: 0 };
-    if (band.count) return { step: 0.5125, miss: 1.1, needed: 5 };
+    if (band.count) return { step: 0.55, miss: 1.5, needed: 6 };
     return { step: 0.7875, miss: 1.1, needed: 7 };
   }
   function winsRace(firstTries, band) {

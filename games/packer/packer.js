@@ -187,6 +187,7 @@
               '<div class="pk-items" id="pkItems">' + items + '</div>' +
               '<div class="pk-basket-front" aria-hidden="true"></div>' +
             '</div>' +
+            '<span class="pk-count" aria-hidden="true">' + G.basket.length + '</span>' +
           '</div>' +
         '</div>' +
         '<div class="pk-shelf" id="pkShelf">' + bins + '</div>' +
@@ -246,18 +247,18 @@
       if (drag.ghost) drag.ghost.remove();
       var add = !moved || over;
       drag = null;
-      if (add) addToBasket(id);
+      if (add) addToBasket(id, { juice: true });
     }
     document.addEventListener('pointermove', move);
     document.addEventListener('pointerup', up);
     document.addEventListener('pointercancel', up);
   }
 
-  function addToBasket(id) {
+  function addToBasket(id, opt) {
     if (busy || G.phase !== 'order' || !K.BY[id]) return;
     G.basket = K.addItem(G.basket, id);
     A.Audio.sfx('tap');
-    afterChange();
+    afterChange(opt && opt.juice ? 'in' : '');
   }
   function takeOut(uid) {
     if (busy || G.phase !== 'order') return;
@@ -265,17 +266,28 @@
     A.Audio.sfx('tap');
     afterChange();
   }
-  function afterChange() {
+  function juiceDrop() {
+    var b = $('#pkBasket');
+    if (!b) return;
+    b.classList.remove('sag'); void b.offsetWidth; b.classList.add('sag');
+    var last = b.querySelector('.pk-item:last-child');
+    if (last) { last.classList.remove('pk-flyin'); void last.offsetWidth; last.classList.add('pk-flyin'); }
+    var badge = b.querySelector('.pk-count');
+    if (badge) { badge.classList.remove('tick'); void badge.offsetWidth; badge.classList.add('tick'); }
+  }
+  function afterChange(juice) {
     pokeIdle();
     if (K.matches(G.basket, G.order.want)) {
       busy = true; nudgeText = '';
       renderOrder();
-      setTimeout(function () { finishOrder(); }, 350);
+      if (juice === 'in') juiceDrop();
+      setTimeout(function () { finishOrder(); }, 450);
     } else {
       if (K.overfilled(G.basket, G.order.want) && !nudgeText) {
         nudgeText = 'That looks like a little too much. Tap a food in the basket to take it out.';
       }
       renderOrder();
+      if (juice === 'in') juiceDrop();
     }
   }
   function renderFestoon(popNewest) {

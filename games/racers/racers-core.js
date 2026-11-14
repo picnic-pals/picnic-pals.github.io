@@ -387,9 +387,7 @@
     if (mode === 'boss') return t.bossPace;
     if (mode === 'best') return (bestPace || t.friendPace) * GHOST;
     var pace = t.friendPace;
-    var id = band && (band.id || band);
-    /* 4–5yo first Picnic Park friend: stock kart needs about 5/10. Later tracks keep the usual ramp. */
-    if (track === 'picnic' && (id === 'pre' || id === 'k')) pace = 84;
+    /* Ages 4–5 first Picnic Park friend uses the usual 7/10 bar (same friendPace as ages 6–7). Later tracks keep the usual ramp. */
     return pace;
   }
 

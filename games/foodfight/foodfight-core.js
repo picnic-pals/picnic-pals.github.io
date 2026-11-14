@@ -70,9 +70,11 @@
     var w = winner(g), ok = g.band.toddler || side === w;
     if (w < 0) { g.phase = 'tie'; return null; }
     g.judged = (g.judged || 0) + 1;
-    if (ok) { g.score[w] += g.pot; g.streak++; g.correctN = (g.correctN || 0) + 1; } else g.streak = 0;
+    /* A correct call always wins the pot for the player; a miss gives the pot to the other side. */
+    if (ok) { g.score[1] += g.pot; g.streak++; g.correctN = (g.correctN || 0) + 1; }
+    else { g.score[0] += g.pot; g.streak = 0; }
     var a = g.cards[w].value, b = g.cards[1 - w].value;
-    g.result = { correct: ok, winner: w, pot: ok ? g.pot : 0, message: g.band.toddler ? 'Splat! What a picnic!' : a + ' is ' + g.rule + ' than ' + b + (ok ? '!' : '. Take a look!') };
+    g.result = { correct: ok, winner: w, taker: ok ? 1 : 0, pot: g.pot, message: g.band.toddler ? 'Splat! What a picnic!' : a + ' is ' + g.rule + ' than ' + b + (ok ? '!' : '. Take a look!') };
     g.phase = g.flips === 10 ? 'done' : 'feedback'; return g.result;
   }
   function matchStars(g) {

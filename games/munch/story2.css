@@ -5,7 +5,7 @@ section.s2.on { display: flex; }
 section.s2[data-view="world"] { background: radial-gradient(ellipse at 50% 120%, #9fe0a0 0 45%, transparent 46%), linear-gradient(180deg, #bfe6ff, #e9f7ff 55%, #c9f0b8); }
 .s2-top { display: flex; align-items: center; gap: 10px; padding: 10px 76px 10px 14px; }   /* room for the gear (top right) */
 .s2-back, .s2-book { width: 60px; height: 60px; min-width: 60px; min-height: 60px; border-radius: 50%; border: 0; background: #fff; font-size: 16px; font-weight: 800; box-shadow: 0 3px 0 rgba(59,45,85,.15); cursor: pointer; overflow: hidden; display: grid; place-items: center; flex: none; }
-.s2-title { flex: 1; min-width: 0; font-size: 30px; font-weight: 700; color: #3b2d55; text-shadow: 0 2px 0 #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.s2-title { flex: 1; min-width: 0; font-size: 30px; font-weight: 700; color: #3b2d55; text-shadow: 0 2px 0 #fff; overflow: hidden; line-height: 1.15; }
 .s2-hero { display: flex; align-items: center; gap: 8px; border: 0; border-radius: 40px; background: #fff; padding: 4px 16px 4px 4px; box-shadow: 0 3px 0 rgba(59,45,85,.15); cursor: pointer; font: inherit; color: #3b2d55; }
 .s2-hero img { width: 56px; height: 56px; border-radius: 50%; background: #fff4f7; }
 .s2-hero .nm { font-weight: 700; font-size: 20px; }
@@ -64,10 +64,10 @@ section.s2.s2-tod .s2-lv.boss { width: 170px; height: 170px; } section.s2.s2-tod
 /* quality1 polish: phone top bar. The friend button ran under the gear (and off the screen). On a narrow screen the buttons
    are a little smaller and the friend button is just the friend's face with a small "switch" badge. */
 @media (max-width: 600px) {
-  .s2-top { gap: 8px; padding: 8px 76px 8px 8px; align-items: center; }
+  .s2-top { gap: 8px; padding: 8px 76px 8px 8px; align-items: center; flex-wrap: wrap; }
   .s2-back, .s2-book { width: 60px; height: 60px; min-width: 60px; min-height: 60px; font-size: 14px; flex: none; overflow: hidden; }
   .s2-top .q1help { width: 60px; height: 60px; min-width: 60px; min-height: 60px; font-size: 26px; }
-  .s2-title { font-size: 16px; min-width: 0; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .s2-title { flex: 1 0 100%; order: 5; font-size: 20px; min-width: 0; line-height: 1.15; overflow: visible; text-overflow: unset; white-space: nowrap; text-align: center; display: block; }
   .s2-hero { position: relative; padding: 3px; flex: none; }
   .s2-hero img { width: 44px; height: 44px; }
   .s2-hero .nm { display: none; }

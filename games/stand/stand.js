@@ -305,11 +305,18 @@
     $('#counter').classList.toggle('enough', m.kind === 'enough');
     $('#counter').classList.toggle('take', m.kind !== 'enough');
     if (m.kind === 'enough') {
-      var left = m.bills.slice(), run = 0;
-      left.forEach(function (v) { run += v; var b = A.el('<button class="billbtn" aria-label="' + v + ' dollar bill">' + billSvg(v) + (hint ? '<small class="run">$' + run + '</small>' : '') + '</button>');
-        b.addEventListener('click', function () { V.say([v, v === 1 ? 'ls_dollar' : 'ls_dollars'], { kind: 'tap' }); });
-        bins.appendChild(b); });
-      t.innerHTML = '<div class="cashbox wal"><span class="lbl">' + A.esc(fname(G.c.friend)) + '\'s bills</span></div>';
+      var left = m.bills.slice(), run = 0, bills = '';
+      left.forEach(function (v) {
+        run += v;
+        bills += '<button type="button" class="billbtn" data-v="' + v + '" aria-label="' + v + ' dollar bill">' + billSvg(v) + (hint ? '<small class="run">$' + run + '</small>' : '') + '</button>';
+      });
+      t.innerHTML = '<div class="cashbox wal"><span class="lbl">' + A.esc(fname(G.c.friend)) + '\'s bills</span><div class="pile">' + bills + '</div></div>';
+      A.$$('#tray .billbtn').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var v = +b.getAttribute('data-v');
+          V.say([v, v === 1 ? 'ls_dollar' : 'ls_dollars'], { kind: 'tap' });
+        });
+      });
     } else {
       var denoms = (S.payDenoms && S.payDenoms(P, m)) || [20, 10, 5, 1];
       denoms.forEach(function (v) {

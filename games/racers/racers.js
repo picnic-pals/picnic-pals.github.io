@@ -266,9 +266,10 @@
     }
     return '<div class="sr-whoosh" aria-hidden="true">' + bits + '</div>';
   }
-  function progressHtml(race, maxD) {
+  function progressHtml(race) {
+    var len = K.TRACK_LEN || 1000;
     function row(who, dist, cls, face) {
-      var pct = Math.max(2, Math.min(98, 100 * (dist / maxD)));
+      var pct = Math.max(2, Math.min(98, 100 * (dist / len)));
       var faceHtml = face === 'sil' ? '<div class="sr-sil"></div>' : '<img src="' + friendImg(face, 'front') + '" alt="">';
       return '<div class="sr-prog-row ' + cls + '">' + faceHtml +
         '<div class="sr-prog-track"><i style="left:' + pct + '%"></i></div>' +
@@ -347,15 +348,15 @@
     document.body.className = 'track-' + G.track;
     var q = K.current(G);
     var g = K.garageOf(family);
-    var maxD = Math.max(G.playerDist, G.oppDist, 1);
+    var trackLen = K.TRACK_LEN || 1000;
     /* World is 2.5 screens wide. Positions are % of that world. Camera follows the player. */
     var WORLD_SCREENS = 2.5;
     var START_AT = 3.2;
     var FINISH_AT = 92;
     var view = 100 / WORLD_SCREENS;
     var travel = FINISH_AT - START_AT;
-    var meLeft = START_AT + travel * (G.playerDist / maxD);
-    var opLeft = START_AT + travel * (G.oppDist / maxD);
+    var meLeft = START_AT + travel * Math.min(1, G.playerDist / trackLen);
+    var opLeft = START_AT + travel * Math.min(1, G.oppDist / trackLen);
     var focus = view * 0.30;
     var cam = meLeft - focus;
     if (cam < 0) cam = 0;
@@ -371,7 +372,12 @@
     if (G.boss) {
       boss = '<div class="sr-boss" id="srBoss" style="left:' + (obsLeft + 3) + '%"><img src="' + friendImg(G.friend, 'happy') + '" alt=""><span>Boss</span></div>';
     }
-    var boosting = G.phase === 'drive' && G.answers.length && G.answers[G.answers.length - 1].correct;
+    var lastAns = G.answers.length ? G.answers[G.answers.length - 1] : null;
+    var boosting = G.phase === 'drive' && lastAns && lastAns.correct;
+    var slipping = G.phase === 'drive' && lastAns && !lastAns.correct;
+    var itemFx = '';
+    if (boosting) itemFx = '<span class="sr-item boost" aria-hidden="true"><svg viewBox="0 0 32 32" width="36" height="36"><ellipse cx="16" cy="13" rx="13" ry="11" fill="#d94a4a" stroke="#5a3d1c" stroke-width="1.6"/><circle cx="11" cy="11" r="3.2" fill="#fff6dc"/><circle cx="19" cy="9" r="2.6" fill="#fff6dc"/><circle cx="21" cy="16" r="2.2" fill="#fff6dc"/><path d="M11 22h10v5c0 2.2-2.2 4-5 4s-5-1.8-5-4z" fill="#f4e2b8" stroke="#5a3d1c" stroke-width="1.5"/></svg></span>';
+    if (slipping) itemFx = '<span class="sr-item slip" aria-hidden="true"><svg viewBox="0 0 32 32" width="36" height="36"><path d="M6 22c2-8 8-14 18-16 2 6-1 12-8 16-4 2-8 2-10 0z" fill="#f0c84a" stroke="#5a3d1c" stroke-width="1.6"/><path d="M10 20c3-3 8-6 14-7" fill="none" stroke="#c9a024" stroke-width="1.4"/></svg></span>';
     var pips = '';
     for (var i = 0; i < G.n; i++) {
       var cls = i === G.i && G.phase !== 'podium' ? ' on' : '';
@@ -407,18 +413,19 @@
     $('#srContent').innerHTML =
       '<div class="sr-race">' +
         '<div class="sr-pips" aria-hidden="true">' + pips + '</div>' +
-        progressHtml(G, maxD) +
-        '<div class="sr-track ' + G.track + (boosting ? ' boosting' : '') + '" id="srTrack">' +
+        progressHtml(G) +
+        '<div class="sr-track ' + G.track + (boosting ? ' boosting' : '') + (slipping ? ' slipping' : '') + ((G.phase === 'question' || G.phase === 'drive') ? ' live' : '') + '" id="srTrack">' +
           trackStageHtml(G.track, cam, {
             meLeft: meLeft, opLeft: opLeft, obsLeft: obsLeft,
-            me: carHtml(g.car, P.blob, '', boosting ? 'boosting' : (G.phase === 'drive' ? 'rolling' : '')),
-            opp: carHtml(oppCarSpec(), G.boss ? null : G.friend, 'sm', boosting ? 'boosting' : (G.phase === 'drive' ? 'rolling' : '')),
+            me: carHtml(g.car, P.blob, '', boosting ? 'boosting' : (slipping ? 'slipping' : (G.phase === 'drive' || G.phase === 'question' ? 'rolling' : ''))),
+            opp: carHtml(oppCarSpec(), G.boss ? null : G.friend, 'sm', boosting ? 'boosting' : (G.phase === 'drive' || G.phase === 'question' ? 'rolling' : '')),
             obs: obs, boss: boss
           }) +
+          itemFx +
           whooshHtml() +
         '</div>' +
         card +
-        '<p class="sr-status" id="srStatus">' + (G.phase === 'drive' ? (G.answers[G.answers.length - 1] && G.answers[G.answers.length - 1].correct ? 'Boost!' : 'Keep going.') : '') + '</p>' +
+        '<p class="sr-status" id="srStatus">' + (G.phase === 'drive' ? (G.answers[G.answers.length - 1] && G.answers[G.answers.length - 1].correct ? 'Boost!' : 'Slip!') : '') + '</p>' +
       '</div>';
     var speak = $('#srCardSpeak');
     if (speak) speak.onclick = function () { sayQuestion(); };
@@ -426,6 +433,22 @@
       el.onclick = function () { pickChoice(+el.getAttribute('data-i')); };
     });
     coinsEl();
+    fitTrack();
+  }
+
+  function fitTrack() {
+    var el = document.getElementById('srTrack');
+    if (!el) return;
+    /* Short landscape keeps its side-panel size. Other viewports scale the 512 canvas to the flex track. */
+    if (window.matchMedia('(orientation: landscape) and (max-height: 500px)').matches) {
+      el.style.removeProperty('--ts');
+      el.style.removeProperty('--crop');
+      return;
+    }
+    var h = el.clientHeight;
+    if (h < 8) return;
+    el.style.setProperty('--ts', String(h / 280));
+    el.style.setProperty('--crop', '232');
   }
 
   function sayQuestion() {
@@ -448,7 +471,7 @@
     if (G.obstacle === null) {
       var o = $('#srObstacle'); if (o) o.classList.add('pop');
     }
-    say(res.correct ? (G.boss && res.done === false && !G.obstacle ? 'Cleared! Boost!' : 'Boost!') : 'No boost this time. Keep going.', 'chatter');
+    say(res.correct ? (G.boss && res.done === false && !G.obstacle ? 'Cleared! Boost!' : 'Boost!') : 'Slip! Keep going.', 'chatter');
     if (res.done) {
       setTimeout(function () { busy = false; renderPodium(); }, 550);
       return;
@@ -528,6 +551,8 @@
     else say('Snack Racers. Race your food car.', 'tap');
   };
   headerIcons();
+
+  window.addEventListener('resize', fitTrack);
 
   window.__racers = {
     family: family, stats: stats,
