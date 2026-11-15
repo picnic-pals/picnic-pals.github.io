@@ -2,6 +2,7 @@
 (function (A) {
   'use strict';
   A.UI.boot();
+  if (A.Music) A.Music.play('racers');
   var P = A.Store.active();
   if (!P) { location.replace(A.ROOT + 'index.html#players'); return; }
   var K = A.Racers, $ = A.$, I = A.Icons;

@@ -465,7 +465,7 @@
   });
   UI.arrowNav && UI.arrowNav(function () { return A.$$('#stand button'); });
   UI.gear({ onClose: function () { if (A.Music) A.Music.apply(); } });
-  if (A.Music) A.Music.play('hub');
+  if (A.Music) A.Music.play('stand');
   function start() {
     G.plan = S.planDay(P, STORY ? { n: 4, rush: false } : {}); G.i = 0; G.tst = Date.now();
     $('#sunny').innerHTML = G.plan.sunny ? '☀️' : '⛅'; document.body.classList.toggle('sunnyday', !!G.plan.sunny); document.body.classList.toggle('tod', G.tod);

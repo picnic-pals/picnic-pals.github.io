@@ -1,9 +1,11 @@
-/* Blob Arcade — background music, made live with Web Audio (no audio files, no copyrighted tunes).
-   A tiny sequencer plays soft marimba melodies over bass, pad and light percussion. Melodies are generated
-   from a pentatonic scale in 4-bar sections (A A' B A'' …, with a gentle "breather" every few sections),
-   so the loop keeps changing without getting busy. Tracks: 'hub' (calm), 'game' (bouncy), game + fast
-   (a little quicker when the timer is low) and a short victory jingle.
-   Music ducks under the voice and has its own on/off + volume (grown-up Settings), separate from sound effects. */
+/* Picnic Pals — background music. Prefers recorded FreePats CC0 tracks in
+   assets/music/ (m4a, with mp3 fallback). If a file is missing or fails to
+   load, the original live Web Audio sequencer is used instead. Melodies in
+   the fallback are generated from a pentatonic scale. Tracks include hub,
+   racers, pancake, map, stand, ballpark, munch (also requested as 'game'),
+   bubble, cozy, and a one-shot win jingle. Music ducks under the voice and
+   has its own on/off + volume (grown-up Settings), separate from sound effects.
+   Files start only after the first tap/key (browser autoplay / iOS unlock). */
 (function (A) {
   'use strict';
   function S() { return A.Store.settings; }
@@ -18,7 +20,15 @@
   var CHORD = { 0: [0, 4, 7], 2: [2, 5, 9], 4: [4, 7, 11], 5: [5, 9, 12], 7: [7, 11, 14], 9: [9, 12, 16] };
   var PENTA = [0, 2, 4, 7, 9];
   var AC = null, out = null, duck = null, noise = null, timer = null;
-  var st = { want: null, track: null, playing: false, fast: false, ducked: false, step: 0, next: 0, section: 0, motif: null, notes: 0, jingles: 0 };
+  var st = { want: null, track: null, playing: false, fast: false, ducked: false, step: 0, next: 0, section: 0, motif: null, notes: 0, jingles: 0, source: null, seq: 0, fileError: null };
+
+  /* Recorded cues (seconds match the mastered loops / win jingle). 'game' is the
+     historical name munch gameplay uses; it plays the munch file. */
+  var FILE_ID = { hub: 'hub', racers: 'racers', pancake: 'pancake', map: 'map', stand: 'stand', ballpark: 'ballpark', munch: 'munch', bubble: 'bubble', cozy: 'cozy', win: 'win', game: 'munch' };
+  var FILE_DUR = { hub: 27.428571, racers: 53.333333, pancake: 64, map: 67.2, stand: 71.111111, ballpark: 68.571429, munch: 54.857143, bubble: 64, cozy: 72, win: 3.9 };
+  var PROC_FOR = { hub: 'hub', racers: 'game', pancake: 'game', map: 'hub', stand: 'hub', ballpark: 'ballpark', munch: 'game', bubble: 'game', cozy: 'cozy', game: 'game' };
+  var fileRaw = {}, fileBuf = {}, fileFailed = {}, fileWait = {};
+  var fileSrc = null, fileGain = null, fileUsing = null, jingleT = null;
 
   function rnd(seed) { return function () { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
   var R = rnd(Date.now() % 100000 + 7);
@@ -34,6 +44,76 @@
     noise = buf; return true;
   }
   function vol() { var s = S(); return s.music === false || s.muteAll ? 0 : .22 * (s.musicVol == null ? .5 : s.musicVol) * 2; }
+
+  function fileUrl(id, ext) { return (A.ROOT || '') + 'assets/music/' + id + '.' + ext; }
+  function preferExt() {
+    var a = document.createElement('audio'), m4 = '';
+    try { m4 = a.canPlayType('audio/mp4; codecs="mp4a.40.2"') || a.canPlayType('audio/aac') || a.canPlayType('audio/mp4'); } catch (e) {}
+    return m4 ? ['m4a', 'mp3'] : ['mp3', 'm4a'];
+  }
+  function canFetchFiles() {
+    /* file:// pages cannot fetch sibling audio (Chrome CORS). Use the live sequencer instead. */
+    try { return location.protocol !== 'file:'; } catch (e) { return false; }
+  }
+  function prefetch(id) {
+    if (!id || fileRaw[id] || fileBuf[id] || fileFailed[id]) return fileRaw[id];
+    if (!canFetchFiles()) { fileFailed[id] = true; return Promise.resolve(null); }
+    var exts = preferExt();
+    fileRaw[id] = (function tryExt(i) {
+      if (i >= exts.length) { fileFailed[id] = true; return Promise.resolve(null); }
+      return fetch(fileUrl(id, exts[i])).then(function (r) {
+        if (!r.ok) return tryExt(i + 1);
+        return r.arrayBuffer();
+      }).catch(function () { return tryExt(i + 1); });
+    })(0);
+    return fileRaw[id];
+  }
+  function decodeRaw(ab) {
+    var copy = ab.slice(0);
+    try {
+      var p = AC.decodeAudioData(copy);
+      if (p && typeof p.then === 'function') return p;
+    } catch (e) {}
+    return new Promise(function (res, rej) { AC.decodeAudioData(ab.slice(0), res, rej); });
+  }
+  function polishSeam(data, sr) {
+    var n = Math.max(2, Math.round(0.008 * sr));
+    if (data.length < 4 * n) return;
+    var start = data[0];
+    for (var i = 0; i < n; i++) {
+      var f = i / (n - 1), idx = data.length - n + i;
+      data[idx] = data[idx] * (1 - f) + start * f;
+    }
+  }
+  function fitBuffer(buf, id, loop) {
+    var dur = FILE_DUR[id], want = dur ? Math.round(dur * buf.sampleRate) : buf.length;
+    var take = Math.min(buf.length, Math.max(1, want));
+    var outb = AC.createBuffer(buf.numberOfChannels, take, buf.sampleRate);
+    for (var c = 0; c < buf.numberOfChannels; c++) {
+      var src = buf.getChannelData(c), dst = outb.getChannelData(c);
+      dst.set(src.subarray(0, take));
+      if (loop) polishSeam(dst, buf.sampleRate);
+    }
+    return outb;
+  }
+  function bufferOf(id) {
+    if (fileBuf[id]) return Promise.resolve(fileBuf[id]);
+    if (fileFailed[id]) return Promise.resolve(null);
+    if (fileWait[id]) return fileWait[id];
+    fileWait[id] = prefetch(id).then(function (ab) {
+      if (!ab || !setup()) return null;
+      var loop = id !== 'win';
+      return decodeRaw(ab).then(function (buf) {
+        fileBuf[id] = fitBuffer(buf, id, loop);
+        return fileBuf[id];
+      });
+    }).catch(function (err) {
+      fileFailed[id] = true;
+      st.fileError = (id + ': ' + (err && err.message ? err.message : err));
+      return null;
+    });
+    return fileWait[id];
+  }
 
   /* ---------- instruments ---------- */
   function env(g, t, a, peak, dec) { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + dec); }
@@ -103,11 +183,11 @@
     return best;
   }
 
-  /* ---------- sequencer ---------- */
-  function stepDur() { var T = TRACKS[st.track]; return 60 / (T.bpm * (st.fast ? 1.2 : 1)) / 2; }
+  /* ---------- sequencer (procedural fallback) ---------- */
+  function stepDur() { var T = TRACKS[st.proc || st.track]; return 60 / (T.bpm * (st.fast ? 1.2 : 1)) / 2; }
   function schedule() {
-    if (!AC || !st.track) return;
-    var T = TRACKS[st.track], sc = scaleNotes(T.root);
+    if (!AC || !(st.proc || (st.track && TRACKS[st.track]))) return;
+    var T = TRACKS[st.proc || st.track], sc = scaleNotes(T.root);
     while (st.next < AC.currentTime + .3) {
       var t = st.next, i = st.step, bar = Math.floor(i / 8) % 4, beat = i % 8, secN = Math.floor(i / 32);
       if (i % 32 === 0) { // new 4-bar section
@@ -137,35 +217,127 @@
       st.next += stepDur(); st.step++;
     }
   }
-  function startLoop(name) {
-    if (!setup()) { st.want = name; return; }
-    stopLoop(true);
-    st.track = name; st.playing = true; st.step = 0; st.motif = null; st.next = AC.currentTime + .08;
+  function fadeOutGain(g, quick) {
+    if (!AC || !g) return;
+    var t = AC.currentTime;
+    g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + (quick ? .05 : .4));
+  }
+  function stopFile(quick) {
+    if (!fileSrc && !fileGain) return;
+    var src = fileSrc, g = fileGain;
+    fileSrc = fileGain = null; fileUsing = null;
+    fadeOutGain(g, quick);
+    if (src) { try { src.stop(AC ? AC.currentTime + (quick ? .08 : .45) : 0); } catch (e) {} }
+  }
+  function stopProc(quick) {
+    clearInterval(timer); timer = null; st.proc = null;
+    if (st.source === 'proc') fadeOutGain(out, quick);
+  }
+  function stopAll(quick) {
+    clearTimeout(jingleT); jingleT = null;
+    stopFile(quick); stopProc(quick);
+    st.playing = false; st.track = null; st.source = null;
+    if (AC && out && !fileGain) {
+      /* out.gain is shared; restore after a fade so the next start can ramp up */
+    }
+  }
+  function startProc(name) {
+    var proc = TRACKS[name] ? name : (PROC_FOR[name] || 'hub');
+    if (!TRACKS[proc] || !setup()) return;
+    stopFile(true);
+    clearInterval(timer); timer = null;
+    st.track = name; st.proc = proc; st.playing = true; st.source = 'proc'; st.step = 0; st.motif = null; st.next = AC.currentTime + .08;
     out.gain.cancelScheduledValues(AC.currentTime); out.gain.setValueAtTime(0.0001, AC.currentTime); out.gain.exponentialRampToValueAtTime(Math.max(vol(), 0.0001), AC.currentTime + 1.2);
     timer = setInterval(schedule, 40); schedule();
   }
+  function startBuffer(buf, id, name, loop) {
+    stopFile(true); stopProc(true);
+    if (!setup()) return;
+    fileGain = AC.createGain(); fileGain.gain.value = 1;
+    fileSrc = AC.createBufferSource();
+    fileSrc.buffer = buf;
+    fileSrc.loop = !!loop;
+    fileSrc.playbackRate.value = (loop && st.fast) ? 1.2 : 1;
+    fileSrc.connect(fileGain); fileGain.connect(out);
+    st.track = name; st.playing = true; st.source = 'file'; st.proc = null; fileUsing = id;
+    out.gain.cancelScheduledValues(AC.currentTime); out.gain.setValueAtTime(0.0001, AC.currentTime); out.gain.exponentialRampToValueAtTime(Math.max(vol(), 0.0001), AC.currentTime + (loop ? 1.2 : .08));
+    fileSrc.start(AC.currentTime + .05);
+    if (!loop) {
+      fileSrc.onended = function () {
+        if (fileUsing !== id) return;
+        fileSrc = fileGain = null; fileUsing = null;
+        st.playing = false; st.track = null; st.source = null;
+        if (st.want && S().music !== false && !S().muteAll && !document.hidden) play(st.want);
+      };
+    }
+  }
+  function startFileOrProc(name) {
+    var id = FILE_ID[name];
+    var seq = ++st.seq;
+    if (!id) { startProc(name); return; }
+    prefetch(id);
+    if (fileBuf[id]) { startBuffer(fileBuf[id], id, name, id !== 'win'); return; }
+    if (fileFailed[id]) { startProc(name); return; }
+    /* Give a short window for a file already being fetched to decode before falling back. */
+    var started = false;
+    var delay = setTimeout(function () {
+      if (st.seq !== seq || started) return;
+      started = true;
+      startProc(name);
+    }, 450);
+    bufferOf(id).then(function (buf) {
+      if (st.seq !== seq) return;
+      clearTimeout(delay);
+      if (S().music === false || S().muteAll || document.hidden) return;
+      if (!buf) { if (!started) { started = true; startProc(name); } return; }
+      startBuffer(buf, id, name, id !== 'win');
+    });
+  }
+  function startLoop(name) { startFileOrProc(name); }
   function stopLoop(quick) {
-    clearInterval(timer); timer = null; st.playing = false; st.track = null;
-    if (AC && out) { var t = AC.currentTime; out.gain.cancelScheduledValues(t); out.gain.setValueAtTime(out.gain.value, t); out.gain.linearRampToValueAtTime(0, t + (quick ? .05 : .4)); }
+    var keepWant = st.want;
+    stopAll(quick);
+    st.want = keepWant;
   }
   function play(name) {
-    st.want = name;
-    if (S().music === false || S().muteAll || document.hidden) return;
-    if (st.track === name && st.playing) return;
-    startLoop(name);
+    try {
+      st.want = name;
+      if (FILE_ID[name]) prefetch(FILE_ID[name]);
+      if (S().music === false || S().muteAll || document.hidden) return;
+      if (st.track === name && st.playing) return;
+      if (!setup()) return;
+      startFileOrProc(name);
+    } catch (e) { st.fileError = 'play:' + (e && e.message ? e.message : e); }
   }
   function stop() { st.want = null; stopLoop(); }
   function jingle() { // short victory tune (plays even if the loop is stopped; respects the music switch)
+    try {
     if (S().music === false || !setup()) return;
-    var keep = st.want; stopLoop(true); st.want = keep;
-    var t = AC.currentTime + .05, r = 72;
-    out.gain.cancelScheduledValues(t); out.gain.setValueAtTime(Math.max(vol(), .0001), t);
-    [[0, 0], [4, .12], [7, .24], [12, .36], [9, .6], [12, .72]].forEach(function (x) { bell(t + x[1], r + x[0], 1); });
-    [0, 4, 7, 12].forEach(function (c) { bell(t + 1.0, r + c, .7); }); bass(t + 1.0, r - 24, .8); hit(t + 1.0, 'kick', .8);
+    var keep = st.want; stopLoop(true); st.want = keep; st.seq++;
+    var seq = st.seq;
     st.jingles++;
+    function resume() {
+      if (st.want === keep && keep && !st.playing && S().music !== false && !S().muteAll && !document.hidden) play(keep);
+    }
+    bufferOf('win').then(function (buf) {
+      if (st.seq !== seq || S().music === false) return;
+      if (buf) {
+        startBuffer(buf, 'win', 'win', false);
+        clearTimeout(jingleT);
+        jingleT = setTimeout(function () { if (st.seq === seq) resume(); }, Math.round((FILE_DUR.win + 0.4) * 1000));
+        return;
+      }
+      var t = AC.currentTime + .05, r = 72;
+      out.gain.cancelScheduledValues(t); out.gain.setValueAtTime(Math.max(vol(), .0001), t);
+      [[0, 0], [4, .12], [7, .24], [12, .36], [9, .6], [12, .72]].forEach(function (x) { bell(t + x[1], r + x[0], 1); });
+      [0, 4, 7, 12].forEach(function (c) { bell(t + 1.0, r + c, .7); }); bass(t + 1.0, r - 24, .8); hit(t + 1.0, 'kick', .8);
+      clearTimeout(jingleT); jingleT = setTimeout(resume, 1800);
+    });
+    } catch (e) { st.fileError = 'jingle:' + (e && e.message ? e.message : e); }
   }
   // Blob Baseball "charge" fanfare: an original rising organ call, then two claps (our own tune, not the stadium classic)
   function charge() {
+    try {
     if (S().music === false || !setup()) return;
     var keep = st.want, was = st.playing && st.track; if (was) stopLoop(true); st.want = keep;
     var t = AC.currentTime + .05, r = 67;
@@ -175,8 +347,14 @@
     hit(t + 1.85, 'snap', 1.4); hit(t + 2.15, 'snap', 1.4);
     st.charges = (st.charges || 0) + 1;
     if (was) setTimeout(function () { if (st.want === was && !st.playing) play(was); }, 2600);
+    } catch (e) { st.fileError = 'charge:' + (e && e.message ? e.message : e); }
   }
-  function setFast(on) { st.fast = !!on; }
+  function setFast(on) {
+    st.fast = !!on;
+    if (fileSrc && fileUsing && fileUsing !== 'win') {
+      try { fileSrc.playbackRate.setTargetAtTime(st.fast ? 1.2 : 1, AC.currentTime, .04); } catch (e) { fileSrc.playbackRate.value = st.fast ? 1.2 : 1; }
+    }
+  }
   function setDuck(on) {
     st.ducked = !!on; if (!AC || !duck) return; var t = AC.currentTime;
     duck.gain.cancelScheduledValues(t); duck.gain.setValueAtTime(duck.gain.value, t); duck.gain.linearRampToValueAtTime(on ? .3 : 1, t + (on ? .15 : .7));
@@ -193,6 +371,9 @@
   A.on('audio:unlocked', function () { if (st.want && !st.playing) play(st.want); });
   document.addEventListener('visibilitychange', function () { if (document.hidden) { var w = st.want; stopLoop(true); st.want = w; } else if (st.want) play(st.want); });
 
+  prefetch('hub');
+  prefetch('win');
+
   A.Music = { play: play, stop: stop, jingle: jingle, charge: charge, setFast: setFast, apply: apply, toggle: toggle,
-    state: function () { return { want: st.want, track: st.track, playing: st.playing, fast: st.fast, ducked: st.ducked, duckGain: duck ? +duck.gain.value.toFixed(2) : null, notes: st.notes, jingles: st.jingles, charges: st.charges || 0, section: st.section }; } };
+    state: function () { return { want: st.want, track: st.track, playing: st.playing, fast: st.fast, ducked: st.ducked, duckGain: duck ? +duck.gain.value.toFixed(2) : null, notes: st.notes, jingles: st.jingles, charges: st.charges || 0, section: st.section, source: st.source, file: fileUsing || null, fileError: st.fileError }; } };
 })(window.Arcade);

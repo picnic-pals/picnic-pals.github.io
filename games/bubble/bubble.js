@@ -208,5 +208,5 @@
     popBad: function () { var b = G.bubbles.find(function (x) { return !x.gone && !x.golden && !B.matches(G.t, x.c); }); if (!b && G.t.bad && G.t.bad.length) b = spawn(G.t.bad[0]); if (b) pop(b); return !!b; },
     spawn: spawn, endRound: endRound, offerStorm: offerStorm };
   A.HowTo.button('bubble', '#sayBtn');   // quality1 (C3)
-  A.HowTo.first('bubble').then(start);
+  A.HowTo.first('bubble').then(function () { if (A.Music) A.Music.play('bubble'); start(); });
 })(window.Arcade);

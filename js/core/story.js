@@ -186,7 +186,8 @@
       var b = p.unlocks.blobs || (p.unlocks.blobs = {}); if (!A.Rewards && !b[c.blob]) { b[c.blob] = Date.now(); out.firstWin = true; } }
     return out;
   }
-  function unlockAll(p) { var b = p.unlocks.blobs || (p.unlocks.blobs = {}); A.Blobs.CAST.forEach(function (c) { if (!b[c.id]) b[c.id] = Date.now(); }); }
+  function isGarden(id) { return A.GardenFriends && A.GardenFriends.isGarden && A.GardenFriends.isGarden(id); }
+  function unlockAll(p) { var b = p.unlocks.blobs || (p.unlocks.blobs = {}); A.Blobs.CAST.forEach(function (c) { if (isGarden(c.id)) return; if (!b[c.id]) b[c.id] = Date.now(); }); }
   function defaultPath(p) { return A.Age.little(p) ? 'little' : 'big'; }   // Little Steps by default at 4 and under (A.Age)
   function path(p) { var s = data(p); return s.path || defaultPath(p); }
   function setPath(p, id) { var s = data(p); if (s.path === id) return; s.path = id; s.run = null; }   // a new path starts a new journey

@@ -727,5 +727,6 @@
     skipHowTo: false
   };
 
+  if (A.Music) A.Music.play('pancake');
   boot();
 })(window.Arcade);

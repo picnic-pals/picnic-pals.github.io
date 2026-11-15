@@ -1,0 +1,164 @@
+/* Garden layout. Painted r2 backgrounds, 6-plot bed, seed shelf, 60px+ targets. No emoji in the UI. */
+html, body { margin: 0; height: 100%; background: #7ec6ea; color: #2d4a28; font: 700 18px/1.25 system-ui, sans-serif; }
+#garden {
+  box-sizing: border-box;
+  height: 100%; height: 100dvh;
+  max-width: 1100px; margin: 0 auto;
+  display: flex; flex-direction: column;
+  padding: 6px 10px 8px;
+  gap: 6px; min-height: 0;
+  position: relative;
+}
+.gd-header {
+  display: flex; align-items: center; gap: 8px;
+  min-height: 60px; flex: none;
+  position: relative; z-index: 3;
+}
+.gd-header h1 {
+  flex: 1; margin: 0; text-align: center;
+  font-size: clamp(18px, 4.4vw, 28px); color: #245224;
+  text-shadow: 0 2px 0 #e8ffd0;
+}
+.gd-header button, .gd-action, .gd-choice, .gd-water, .gd-packet, .gd-spot {
+  min-width: 60px; min-height: 60px;
+  border: 3px solid #3a6a32; border-radius: 16px;
+  background: #fffdf6; color: #2d4a28;
+  font: 800 16px/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+.gd-packet, .gd-spot {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  border-radius: 50%;
+}
+.gd-header button:focus-visible,
+.gd-action:focus-visible,
+.gd-choice:focus-visible,
+.gd-water:focus-visible,
+.gd-packet:focus-visible,
+.gd-spot:focus-visible { outline: 3px solid #2a7a4a; outline-offset: 2px; }
+
+.gd-stage { flex: 1; min-height: 0; display: flex; flex-direction: column; position: relative; }
+
+.gd-bg, .gd-title-bg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  pointer-events: none;
+  z-index: 0;
+}
+body.gd-land .gd-bg, body.gd-land .gd-title-bg { object-position: center center; }
+
+/* Title */
+.gd-title {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  border: 3px solid #3a6a32; border-radius: 22px; overflow: hidden; position: relative;
+}
+.gd-title-ui, .gd-msg-ui {
+  position: relative; z-index: 1;
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  padding: 8px 10px 12px;
+}
+.gd-title h2 { margin: 8px 0 0; font-size: clamp(28px, 8vw, 48px); color: #245224; text-shadow: 0 3px 0 #e8ffd0, 0 0 12px #fff; }
+.gd-title .gd-tag { margin: 4px 0 8px; font-size: 16px; color: #2d4a28; text-align: center; text-shadow: 0 1px 0 #fff; }
+.gd-beds {
+  display: flex; gap: 8px; justify-content: center; align-items: flex-end; flex: 1; width: 100%;
+  padding: 0 6px 8px;
+}
+.gd-bed {
+  flex: 1; max-width: 90px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  min-width: 0;
+}
+.gd-bed img {
+  width: 100%; max-width: 80px; height: auto; aspect-ratio: 1;
+  object-fit: contain; pointer-events: none;
+}
+.gd-bed .nm { font-size: 11px; text-align: center; margin-top: 2px; line-height: 1.1; }
+.gd-actions { display: flex; gap: 10px; justify-content: center; width: 100%; }
+.gd-action { padding: 0 18px; background: #fff36a; font-size: 20px; min-width: 160px; }
+
+/* Play: scene is the top two thirds; question card keeps the bottom third clear. */
+.gd-play { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+.gd-scene {
+  flex: 2 1 0; min-height: 0; position: relative;
+  border: 3px solid #3a6a32; border-radius: 22px; overflow: hidden;
+  background: #8fd0ee;
+}
+.gd-shelf-art, .gd-bed-art, .gd-sun, .gd-cloud, .gd-can, .gd-stream {
+  position: absolute; pointer-events: none; z-index: 1;
+  object-fit: contain;
+}
+.gd-sun { z-index: 2; transform-origin: center; transition: transform .4s ease; }
+.gd-sun.on { transform: scale(1.12); }
+.gd-cloud { z-index: 2; opacity: .95; }
+.gd-bed-art { z-index: 3; }
+.gd-packet { z-index: 5; overflow: visible; }
+.gd-packet img { pointer-events: none; object-fit: contain; }
+.gd-packet.held img { filter: drop-shadow(0 0 6px #fff36a) drop-shadow(0 0 2px #fff); transform: scale(1.08); }
+.gd-packet.shut:not(.gone) img { filter: grayscale(1) brightness(1.1); opacity: .45; }
+.gd-packet.gone { visibility: hidden; pointer-events: none; }
+.gd-spot { z-index: 6; overflow: visible; }
+.gd-spot.empty { z-index: 4; }
+.gd-spot.selected { box-shadow: 0 0 0 4px #fff36a, 0 0 0 7px #3a6a32; }
+.gd-plant, .gd-burst, .gd-spark {
+  position: absolute; pointer-events: none; object-fit: contain;
+  z-index: 2;
+}
+.gd-burst, .gd-spark { z-index: 3; }
+.gd-can, .gd-stream { z-index: 8; }
+.gd-can { opacity: 0; transition: opacity .25s ease; }
+.gd-can.pour { opacity: 1; }
+
+.gd-card {
+  flex: 1 1 0; min-width: 0; min-height: 0;
+  background: #fffdf6; border: 3px solid #3a6a32; border-radius: 18px;
+  padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px;
+  position: relative; z-index: 2;
+  overflow: auto;
+}
+.gd-ask { margin: 0; font-size: clamp(18px, 4.6vw, 26px); color: #244020; text-align: center; }
+.gd-nudge { margin: 0; font-size: 16px; color: #6a3a16; text-align: center; min-height: 1.2em; }
+.gd-pic { display: flex; justify-content: center; }
+.gd-choices { display: grid; gap: 8px; grid-template-columns: repeat(3, 1fr); }
+.gd-choices.n4 { grid-template-columns: repeat(2, 1fr); }
+.gd-choices.n2 { grid-template-columns: repeat(2, 1fr); }
+.gd-choice { font-size: clamp(18px, 5vw, 26px); padding: 8px; background: #e8ffd0; }
+.gd-choice.wrong { background: #ffd0c8; animation: gshake .35s ease; }
+.gd-choice.right { background: #c8f5a0; }
+@keyframes gshake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+.gd-water { width: 100%; background: #8fd4ff; font-size: 22px; }
+
+/* Rest / pop / done cards */
+.gd-msg {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  border: 3px solid #3a6a32; border-radius: 22px;
+  overflow: hidden; position: relative;
+}
+.gd-msg-ui { justify-content: center; text-align: center; gap: 10px; padding: 16px; }
+.gd-msg-ui img { width: min(46vw, 220px); height: auto; }
+.gd-msg h2 { margin: 0; font-size: clamp(22px, 5.5vw, 34px); color: #245224; text-shadow: 0 2px 0 #e8ffd0; }
+.gd-msg p { margin: 0; font-size: 18px; }
+.gd-msg .gd-actions { margin-top: 8px; flex-wrap: wrap; }
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .gd-header { min-height: 56px; }
+  .gd-header h1 { font-size: 20px; }
+  .gd-play { flex-direction: row; }
+  .gd-scene { flex: 1 1 56%; }
+  .gd-card { flex: 1 1 44%; }
+  .gd-title h2 { font-size: 28px; margin-top: 2px; }
+  .gd-ask { font-size: 18px; }
+  .gd-msg-ui { padding: 8px 12px; gap: 6px; justify-content: center; overflow: auto; }
+  .gd-msg-ui img { width: min(18vw, 100px); }
+  .gd-msg h2 { font-size: 22px; }
+  .gd-msg p { font-size: 15px; }
+  .gd-msg .gd-actions { margin-top: 4px; }
+}
+@media (min-width: 900px) and (orientation: landscape) {
+  .gd-play { flex-direction: row; }
+  .gd-scene { flex: 1 1 56%; }
+  .gd-card { flex: 1 1 40%; justify-content: center; }
+}

@@ -1,0 +1,17 @@
+Picnic Pals music credits
+=========================
+
+The background tunes and the win jingle are original music written for Picnic Pals.
+
+Recorded instruments come from the FreePats project and are dedicated to the
+public domain (CC0 1.0). Banks used: Upright Piano KW, Spanish Classical Guitar,
+Finger Bass YR, Concert Harp, Kalimba, Ukulele, World Percussion, and Xylophone
+Medium Mallets. Authors and performers include Gonzalo and Roberto of FreePats,
+Inma Martínez de Miguel, Andrea Biasior, Xavimart (Javier), Mateusz Dąbrowski,
+and the Versilian Community Sample Library (Versilian Studios; Concert Harp
+performed by K. Smith). https://freepats.zenvoid.org/
+
+The flute is an original synthesized instrument written for Picnic Pals, not a
+third-party sample.
+
+Soundfont (.sf2) files are not shipped with the game.

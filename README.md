@@ -35,7 +35,7 @@ js/core/room-catalog.js    Blob Room shop: 64 items (categories, prices, special
 js/core/friends.js         blob friendships: levels, points (play as / visits / taps), bios and what each level unlocks
 js/core/story.js           Blob Island story data: areas, stops, paths, scoring, high scores, friend challenges (blob unlocks)
 js/core/bonus-questions.js 127 picture questions for Munch's bonus stars (ages 4–7, 11 categories)
-js/core/music.js           live Web Audio music (hub, game, faster low-timer variant, victory jingle), ducks under the voice
+js/core/music.js           recorded FreePats CC0 tracks (m4a/mp3) with live Web Audio fallback; ducks under the voice
 js/core/sightwords.js      Dolch Pre-Primer (40) + Primer (52) lists for the upcoming Sight Words game
 js/core/voice-lines.js     every spoken line with an ID (drives recorder, playback and the recording script)
 js/core/audio.js           Web Audio sound effects + voice manager (your recording → your file → built-in clip → browser speech) + IndexedDB clip store
@@ -65,8 +65,9 @@ The Munch start menu offers **Story**, **Free Play** and **2 Players**. Keyboard
 - **Bonus stars.** In most rounds a sparkly star appears on a free square; walk onto it for a picture question (3–4 emoji choices, all
   read aloud; arrows/WASD + Space/F, 1–4, or click). Right = +15 s (or +1 star with the timer off); wrong = "Good try! The answer is …",
   no penalty. 127 questions in 11 categories; recently asked ones are skipped; age ≤ 5 gets the easier half.
-- **Music.** Original, generated live (Web Audio, pentatonic marimba + bass + pad + light drums, new melody every few bars). Separate
-  on/off and volume in Settings; 🎵 button or **M** to mute. It ducks under speech and starts after the first tap/key.
+- **Music.** Original Picnic Pals tunes, played from recorded files (`assets/music/`, m4a with mp3 fallback). Instruments are FreePats
+  CC0 recordings (piano, guitar, bass, harp, kalimba, ukulele, xylophone, percussion) plus an original flute. If a file cannot load, a live
+  Web Audio fallback keeps playing. Separate on/off and volume in Settings; 🎵 button or **M** to mute. Music ducks under speech and starts after the first tap/key.
 - **2 Players** (same keyboard): Player 1 = arrows + Space/Enter, Player 2 = W/A/S/D + F. Pick a partner (another profile or a Guest:
   easy/medium/hard), then **Team** (shared total and stars) or **Race** (first to finish wins; else more munched; ties are ties).
   The 6×4 grid has 12 cells per player, blue or orange with an initial badge, each player's rule uses their own skill and level.
@@ -300,6 +301,12 @@ After putting files in `audio/voice/`, run `node tools/make-voice-manifest.js` (
 See `RECORDING_SCRIPT.md` for what to record.
 
 ### Regenerating the built-in clips
+Music instruments (CC0, FreePats): Upright Piano KW, Spanish Classical Guitar, Finger Bass YR, Concert Harp,
+Kalimba, Ukulele, World Percussion, and Xylophone Medium Mallets, recorded or banked by the FreePats project
+(Gonzalo, Roberto, Inma Martínez de Miguel, Andrea Biasior, Xavimart / Javier, Mateusz Dąbrowski, and the
+Versilian Community Sample Library / Versilian Studios, Concert Harp performed by K. Smith). The flute is an
+original instrument written for Picnic Pals. Soundfont files are not shipped; see `assets/music/CREDITS.txt`.
+
 Kokoro TTS (Apache-2.0, offline): `pip install kokoro-onnx soundfile pyloudnorm`, download `kokoro-v1.0.onnx` + `voices-v1.0.bin`
 (github.com/thewh1teagle/kokoro-onnx releases, "model-files-v1.0"), ffmpeg installed, then
 `python tools/generate-tts.py --models <folder> --voice af_heart` (synthesized at speed 1.0, then slowed to 0.9 with rubberband) (only changed lines are re-rendered; `--force` redoes all;

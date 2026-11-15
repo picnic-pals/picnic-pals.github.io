@@ -18,6 +18,7 @@
     { id: 'racers', name: A.TITLES.racers, sub: 'Race your food car', cls: 'racers', href: 'games/racers/index.html', ready: true, all: true, voice: [{ text: 'Snack Racers' }], say: [{ text: 'Snack Racers' }], tip: 'Your food car drives itself. Answer questions to boost. Race a friend, a boss, or your best time!' },
     { id: 'bakeshop', name: A.TITLES.bakeshop, sub: 'Set the oven clock', cls: 'bakeshop', href: 'games/bakeshop/index.html', ready: true, all: true, voice: [{ text: 'Bake Shop Clock' }], say: [{ text: 'Bake Shop Clock' }], tip: 'Friends want a treat ready on time. Match or set the oven clock so it comes out just right!' },
     { id: 'pancake', name: A.TITLES.pancake, sub: 'Stack and race a friend', cls: 'pancake', href: 'games/pancake/index.html', ready: true, all: true, voice: [{ text: 'Pancake Stack Race' }], say: [{ text: 'Pancake Stack Race' }], tip: 'Race a friend to finish breakfast orders. Stack pancakes to make the number, then serve!' },
+    { id: 'garden', name: A.TITLES.garden, sub: 'Grow a new friend', cls: 'garden', href: 'games/garden/index.html', ready: true, all: true, voice: [{ text: 'Garden' }], say: [{ text: 'Garden' }], tip: 'Each right answer does a garden job. Watch a plant grow, then a new friend pops out and joins you!' },
     { id: 'bubble', name: A.TITLES.bubble, sub: 'Pop the right bubbles', cls: 'bubble', href: 'games/bubble/index.html', ready: true, all: true, voice: ['bp_title'], say: ['bp_title'], tip: 'Pop the bubbles your friend asks for: colors, animals, letters, numbers, words.' },
     // p4: Coloring (all ages; toddlers get Fill + Stickers). No stars, no right or wrong; pictures go to the kid's Gallery.
     { id: 'color', name: A.TITLES.color, sub: 'Color, stickers & gallery', cls: 'color', href: 'games/color/index.html', ready: true, all: true, voice: ['cl_title'], say: ['cl_title'], tip: 'Color pictures of your friends and places. Tap to fill, draw with a brush, add stickers, and save to your gallery.' },
@@ -61,6 +62,10 @@
     }
     if (g.id === 'bakeshop') {
       return '<div class="bakesc" aria-hidden="true"><svg viewBox="0 0 80 80"><rect x="8" y="10" width="64" height="62" rx="8" fill="#6b3a4a" stroke="#3a2714" stroke-width="3"/><circle cx="40" cy="40" r="22" fill="#fff8e7" stroke="#c9a36a" stroke-width="3"/><line x1="40" y1="40" x2="40" y2="24" stroke="#b63442" stroke-width="3" stroke-linecap="round"/><line x1="40" y1="40" x2="52" y2="40" stroke="#3a2714" stroke-width="2" stroke-linecap="round"/><circle cx="40" cy="40" r="3" fill="#3a2714"/><circle cx="26" cy="64" r="3" fill="#e8d4a8"/><circle cx="40" cy="64" r="3" fill="#e8d4a8"/><circle cx="54" cy="64" r="3" fill="#e8d4a8"/></svg></div>' +
+        '<div class="who2">' + B.forProfile(p, { expr: 'happy' }) + '</div>';
+    }
+    if (g.id === 'garden') {
+      return '<div class="gardsc" aria-hidden="true"><svg viewBox="0 0 80 80"><rect x="0" y="0" width="80" height="46" fill="#9fe4ff"/><circle cx="62" cy="16" r="9" fill="#ffd23c"/><rect x="0" y="46" width="80" height="10" fill="#7ec86a"/><rect x="0" y="56" width="80" height="24" fill="#c4a06a"/><ellipse cx="40" cy="68" rx="22" ry="8" fill="#8a5a2a"/><path d="M40 68 C39 52 43 44 40 32" stroke="#2d7a32" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="32" cy="38" rx="8" ry="4" fill="#7cbc3a" transform="rotate(-28 32 38)"/><ellipse cx="48" cy="40" rx="8" ry="4" fill="#8fd45a" transform="rotate(26 48 40)"/></svg></div>' +
         '<div class="who2">' + B.forProfile(p, { expr: 'happy' }) + '</div>';
     }
     if (g.id === 'tiny') {   // big, simple: three food friends on the picnic blanket
@@ -378,7 +383,9 @@
   function bioText(c) { return c.name + '! ' + c.personality + ' Favorite thing: ' + c.favorite + '. ' + c.name + ' says: ' + c.catchphrase; }
   function renderFriends() {
     me = A.Store.active(); if (!me) return go('players');
-    var ids = A.Store.STARTER_BLOBS.concat(B.ORDER || []), got = ids.filter(function (id) { return R.unlocked(me, 'blob', id); }).length;
+    var ids = A.Store.STARTER_BLOBS.concat(B.ORDER || []);
+    ((A.FoodData && A.FoodData.garden) || []).forEach(function (id) { if (ids.indexOf(id) < 0) ids.push(id); });
+    var got = ids.filter(function (id) { return R.unlocked(me, 'blob', id); }).length;
     // design1: only friends already met, and just a count (no total, no locked "???" cards or hints)
     $('#frTitle').textContent = me.name + "'s Picnic Pals"; $('#frCnt').textContent = got + ' friend' + (got === 1 ? '' : 's');
     var box = $('#frCards'); box.innerHTML = '';

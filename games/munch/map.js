@@ -241,6 +241,7 @@
     if (o.from != null && o.to != null && o.to !== o.from) sel = itemOf(o.to);
     if (o.selectItem != null) sel = o.selectItem;
     A.$$('.screen').forEach(function (s) { s.classList.toggle('on', s === sec); });
+    if (A.Music) A.Music.play('map');
     render();
     return new Promise(function (res) {
       resolveFn = res;
