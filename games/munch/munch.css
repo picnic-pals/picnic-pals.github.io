@@ -3,7 +3,9 @@
 .top { display: flex; align-items: center; gap: 10px; padding-right: 64px; min-height: 64px; }
 .rule { flex: 1; display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 24px; padding: 8px 10px 8px 18px; box-shadow: 0 5px 0 var(--line), 0 10px 20px #8a6fc020; min-height: 66px; cursor: pointer; }
 .rule .txt { flex: 1; font-size: clamp(20px, 3.6vmin, 36px); font-weight: 700; line-height: 1.15; }
-.rule .hint { display: block; font-size: .55em; font-weight: 500; color: var(--ink2); margin-top: 2px; }
+.rule { flex-wrap: wrap; }
+.rule .hint, .rule .hint.st, .rule .st-hint { display: block; flex: 1 1 100%; font-size: 16px; font-weight: 600; color: var(--ink2); margin-top: 4px; max-height: 4.8em; overflow: auto; }
+.rule .txt .hint { font-size: 16px; }
 .rule.pop { animation: rpop .4s; }
 @keyframes rpop { 40% { transform: scale(1.02); } }
 .speak { width: 56px; height: 56px; flex: none; border-radius: 50%; background: var(--sky2); display: grid; place-items: center; box-shadow: 0 4px 0 #b6d8f5; }
@@ -33,15 +35,17 @@
 .cell.here .lbl:has(.st-ansnum) {
   transform: translateY(calc(var(--cs) * -.32)) scale(.78);
 }
-#ruleTxt .st-pic, #ruleTxt .cv-set { flex-shrink: 0; max-width: 100%; vertical-align: middle; }
+#ruleTxt .st-pic, #ruleTxt .cv-set { flex-shrink: 1; max-width: 100%; max-height: 88px; vertical-align: middle; } #ruleTxt .cv-set { --cv-d: 16px; }
 .rule .txt { min-width: 0; }
 #board { position: relative; display: grid; --cs: 100px; }
 .cell { position: relative; border-radius: 22%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: calc(var(--cs) * .34);
   box-shadow: 0 calc(var(--cs) * .06) 0 #0000001a; transition: transform .12s, background .3s, opacity .3s; cursor: pointer; overflow: visible; min-width: 0; min-height: 0; }
 .cell:active { transform: scale(.96); }
 .cell .lbl { display: flex; align-items: center; justify-content: center; transition: transform .2s; white-space: nowrap; pointer-events: none;
-  font-size: calc(var(--cs) * .34); max-width: 92%; max-height: 100% !important; overflow: hidden; text-align: center; }
-.cell.long .lbl { font-size: calc(var(--cs) * .2); }
+  font-size: calc(var(--cs) * .34); max-width: 92%; max-height: 100%; overflow: hidden; text-align: center; }
+.cell.long .lbl { font-size: calc(var(--cs) * .26); }
+.cell.wrap .lbl { font-size: calc(var(--cs) * .24); }
+.cell .qclock, .cell svg.qclock { width: 86%; height: auto; min-width: 64px; }
 /* long answers (phrases): fitCells() in munch.js wraps them at spaces (never inside a word) and shrinks the label (its own --cs) down to a 13px minimum */
 .cell.wrap .lbl { white-space: normal; overflow-wrap: normal; word-break: normal; hyphens: none; flex-wrap: wrap; }
 .cell .lbl, .cell .lbl .ea-word { line-height: 1.22; }   /* line box >= the font's glyph box, so labels never report a 1px overflow */
@@ -492,3 +496,65 @@ body.challenge .timer .clock::after { content: ' ⭐'; }
 .cell .lk-pic { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.05; }
 .cell .lk-pic .pb-frames { font-size: .55em; }
 .cell .lk-row { display: inline-flex; gap: 2px; } .cell .lk-row .pb-frames { font-size: .45em; }
+
+/* stage2: readable rule bar inside the fixed stage.
+   Window media still follow the viewport, not the 400×720 / 1024×640 design
+   stage, so tablet windows (768×1024, 1280×800) kept the large chrome and
+   a 32px uncapped story crushed #boardWrap to a few pixels (--cs floor 20). */
+html.stage-on .rule .txt { font-size: 32px; }
+html.stage-on .rule .hint,
+html.stage-on .rule .hint.st,
+html.stage-on .rule .st-hint,
+html.stage-on .rule .txt .hint { font-size: 20px; }
+html.stage-on #ruleTxt .st-pic,
+html.stage-on #ruleTxt .cv-set { max-height: 88px; }
+html.stage-on #ruleTxt .cv-set { --cv-d: 22px; }
+html.stage-on #boardWrap { min-height: 42%; }
+
+/* Portrait stage is a 400×720 phone even when the window is a tall tablet. */
+html.stage-on[data-stage="portrait"] .top { min-height: 52px; max-height: 30%; overflow: auto; }
+html.stage-on[data-stage="portrait"] .rule { min-height: 0; }
+html.stage-on[data-stage="portrait"] .rule .txt { font-size: 20px; }
+html.stage-on[data-stage="portrait"] .rule .hint,
+html.stage-on[data-stage="portrait"] .rule .hint.st,
+html.stage-on[data-stage="portrait"] .rule .st-hint,
+html.stage-on[data-stage="portrait"] .rule .txt .hint { font-size: 16px; }
+html.stage-on[data-stage="portrait"] #ruleTxt .st-pic,
+html.stage-on[data-stage="portrait"] #ruleTxt .cv-set { max-height: 72px; }
+html.stage-on[data-stage="portrait"] .bottom { min-height: 0; max-height: 22%; overflow: auto; }
+html.stage-on[data-stage="portrait"] .bubble { min-height: 0; font-size: 18px; }
+html.stage-on[data-stage="portrait"] .keys { min-height: 24px; font-size: 14px; }
+html.stage-on[data-stage="portrait"] .keys .grp:last-child { display: none; }
+html.stage-on[data-stage="portrait"] body.two .keys .grp:last-child { display: flex; }
+html.stage-on[data-stage="portrait"] .speak { width: 46px; height: 46px; }
+html.stage-on[data-stage="portrait"] .hearts svg { width: 28px; height: 28px; }
+html.stage-on[data-stage="portrait"] #munchBtn { font-size: 24px; }
+
+/* Landscape stage is 1024×640: put the board beside the rule (same packing as
+   the short-landscape media, which only applies when the window is ≤500px tall). */
+html.stage-on[data-stage="landscape"] body.two #game.screen.on {
+  display: grid;
+  grid-template-columns: minmax(240px, 40%) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto auto auto;
+  align-items: stretch;
+  gap: 4px 10px;
+}
+html.stage-on[data-stage="landscape"] body.two #game .top {
+  grid-column: 1;
+  grid-row: 1;
+  flex-wrap: wrap;
+  padding-right: 8px;
+  min-height: 0;
+  max-height: 100%;
+  overflow: auto;
+  align-self: stretch;
+}
+html.stage-on[data-stage="landscape"] body.two #game .top .rule { flex: 1 1 100%; order: 5; margin-right: 0; min-height: 0; }
+html.stage-on[data-stage="landscape"] body.two #game .timer { grid-column: 1; grid-row: 2; align-self: start; margin: 0; }
+html.stage-on[data-stage="landscape"] body.two #game #boardWrap { grid-column: 2; grid-row: 1 / 3; min-width: 0; min-height: 42%; }
+html.stage-on[data-stage="landscape"] body.two #game .bottom { grid-column: 1 / -1; grid-row: 3; min-height: 0; }
+html.stage-on[data-stage="landscape"] body.two #game .keys,
+html.stage-on[data-stage="landscape"] body.two #game #touchHint { grid-column: 1 / -1; grid-row: auto; }
+html.stage-on body.two .rule .txt { font-size: 18px; }
+html.stage-on body.two .prule { align-items: flex-start; }
+html.stage-on body.two .prule .rt { max-height: 6.5em; overflow: auto; }

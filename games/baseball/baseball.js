@@ -402,7 +402,10 @@
     // from the next level / skill (Q.step +1). Without a coach model it falls back to the old bigger-numbers step.
     var pl = bat(), r = pl.round, q, g = 0, n = nChoices(pl.P);
     // v2p2b: after a miss on a step, the same pitch comes back once with its picture hint (strategy first), choices reshuffled
-    if (G.retry && G.retry.who === pl) { q = G.retry.q; var hl = G.retry.lvl; G.retry = null; var right = q.choices[q.answer]; q.choices = A.shuffle ? A.shuffle(q.choices.slice()) : q.choices.slice().sort(function () { return Math.random() - .5; }); q.answer = q.choices.indexOf(right); q.retry = true; q.hard = false; q.hintHtml = hl >= 2 ? q.hint2 || q.hint : q.hint; q.stretch = false; return q; }
+    if (G.retry && G.retry.who === pl) { q = G.retry.q; var hl = G.retry.lvl; G.retry = null; var right = q.choices[q.answer];
+      var keepOrder = true;   // lc1115b: never reshuffle on a retry so a remembered tile stays put
+      if (!keepOrder) { q.choices = A.shuffle ? A.shuffle(q.choices.slice()) : q.choices.slice().sort(function () { return Math.random() - .5; }); q.answer = q.choices.indexOf(right); }
+      q.retry = true; q.hard = false; q.hintHtml = hl >= 2 ? q.hint2 || q.hint : q.hint; q.stretch = false; return q; }
     var stretch = !G.missLast && (G.forceStretch != null ? !!G.forceStretch : Math.random() < R.stretchRate(G.recentAt.slice(-6)));
     if (r.review) { var cs = C.current(pl.P, (r.skill && r.skill.subject) || 'math'); if (cs) r = { skill: cs, level: C.state(pl.P, cs.id).level, review: false }; }
     var coach = A.Coach && A.Coach.pickItem && !pl.P.guest, st;
@@ -435,7 +438,14 @@
   // the coach's item id for a pitch: the fact / word (e.g. "3 + 4"), like Picnic Munch's cells
   function itemKey(q) { var t = String(q.text || '').replace(/<[^>]*>/g, ' '), m = t.match(/(\d+)\s*([+−-])\s*(\d+)/); return m ? m[1] + ' ' + (m[2] === '-' ? '−' : m[2]) + ' ' + m[3] : (t.replace(/\s+/g, ' ').trim() || q.key); }
   // hint for a step pitch whose generator has none (the old two-level skills): the strategy picture for its fact
-  function bbHint(q) { var f = A.Steps.parseFact(itemKey(q)); if (f) { q.hint = A.Steps.factHint(f, 1, q.skill); q.hint2 = A.Steps.factHint(f, 2, q.skill); } }
+  function bbHint(q) {
+    var f = A.Steps && A.Steps.parseFact && A.Steps.parseFact(itemKey(q));
+    if (f && A.Steps.factHint) { q.hint = A.Steps.factHint(f, 1, q.skill); q.hint2 = A.Steps.factHint(f, 2, q.skill); return; }
+    var blob = String(q.pic || '') + ' ' + String(q.text || '');
+    if (/cv-set|cv-frame|cv-dice|st-pic|st-objs|sbpic|rdot|How many/.test(blob)) {
+      q.hint = q.hint2 = 'Count the dots.';
+    }
+  }
   function isPhraseChoice(c) {
     if (!c) return false;
     if (c.long || c.html) return true;
@@ -457,7 +467,21 @@
   function renderQuestion(q, opt) {
     opt = opt || {};
     var txt = opt.text != null ? opt.text : q.text;
-    $('#qTxt').innerHTML = txt; var hh = q.retry && q.hintHtml ? '<div class="bb-hint">' + q.hintHtml + '</div>' : ''; $('#qPic').innerHTML = (q.pic || '') + hh; $('#qPic').classList.toggle('on', !!(q.pic || hh));
+    var plain = String(txt || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (/^How many\??$/i.test(plain)) txt = 'How many dots?';
+    $('#qTxt').innerHTML = txt;
+    var hintRaw = q.retry ? (q.hint || q.hintHtml || '') : '';
+    if (hintRaw && /cv-set|cv-frame|cv-dice|st-pic|qcoin/.test(String(hintRaw))) hintRaw = (!/cv-set|cv-frame|cv-dice|st-pic/.test(String(q.hint || ''))) ? (q.hint || 'Count the dots.') : 'Count the dots.';
+    var hintText = String(hintRaw || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    var hintEl = $('#qHint');
+    if (!hintEl) {
+      hintEl = A.el('<p class="bb-hint" id="qHint" hidden></p>');
+      var sign = $('#sign') || ($('#qTxt') && $('#qTxt').parentNode);
+      if (sign) sign.appendChild(hintEl);
+    }
+    if (hintEl) { hintEl.textContent = hintText; hintEl.hidden = !hintText; }
+    $('#qPic').innerHTML = q.pic || '';
+    $('#qPic').classList.toggle('on', !!q.pic);
     var box = $('#cards'); box.innerHTML = '';
     var phrases = !opt.hideCards && q.choices.some(isPhraseChoice);
     box.classList.toggle('n3', q.choices.length === 3);
@@ -594,7 +618,7 @@
     // v2p2b: answer time (from when the question finished being read) feeds the step fast-skip; a retry after a hint is hinted
     pl.pitches++; var sig = C.recordAnswer(pl.P, q.skill, ok, { key: itemKey(q), ms: G.voiceDone ? Math.round(e * 1000) : null, hint: !!q.retry });
     if (sig && sig.speedy) pl.speedy = true;
-    if (!ok && !q.retry && !q.bonus && A.Steps && A.Steps.STEPS[q.skill] && !pl.P.guest) { if (!q.hint) bbHint(q); if (q.hint) G.retry = { q: q, who: pl, lvl: (G.missRun = (G.missRun || 0) + 1) >= 2 ? 2 : 1 }; }
+    if (!ok && !q.retry && !pl.P.guest) { if (!q.hint) bbHint(q); if (q.hint && (q.bonus || (A.Steps && A.Steps.STEPS[q.skill]) || /How many|Count the/.test(String(q.text || '')))) G.retry = { q: q, who: pl, lvl: (G.missRun = (G.missRun || 0) + 1) >= 2 ? 2 : 1 }; }
     if (ok) G.missRun = 0;
     if (q.atLevel) { if (ok) pl.hr++; else pl.hw++; }
     if (!q.stretch) { G.recentAt.push(ok); if (G.recentAt.length > 10) G.recentAt.shift(); }
@@ -626,7 +650,7 @@
     var c = [ans], d = 1; while (c.length < n && d < 30) { [ans + d, ans - d].forEach(function (v) { if (c.length < n && v >= lo && v <= hi && c.indexOf(v) < 0) c.push(v); }); d++; }
     c.sort(function (a, b) { return a - b; }); return c;
   }
-  function dots(n, cls) { var h = ''; for (var i = 0; i < n; i++) h += '<i class="rdot ' + (cls || '') + '"></i>'; return '<span class="rdots">' + h + '</span>'; }
+  function dots(n, cls) { var h = ''; for (var i = 0; i < n; i++) h += '<i class="rdot ' + (cls || '') + '"></i>'; return '<span class="rdots' + (cls ? ' rdots-' + cls : '') + '" aria-label="' + n + ' ' + (cls === 'runner' ? (n === 1 ? 'runner' : 'runners') : (cls || 'marks')) + '">' + h + (cls === 'runner' ? '<b class="rdot-cap">' + (n === 1 ? '1 runner' : n + ' runners') + '</b>' : '') + '</span>'; }
   function ask(bq) {
     // bq: { text, pic, choices: [labels], answer, explain, kind }
     return new Promise(function (res) {
@@ -636,7 +660,7 @@
       var spoken = String(bq.spoken || bq.text).replace(/<[^>]*>/g, ' ').replace(/ = /g, ' is ').replace(/\s+/g, ' ').trim();
       var q = G.q = { bonus: true, kind: bq.kind, text: bq.text, pic: bq.pic || '', answer: bq.answer, explain: bq.explain, choices: bq.choices.map(function (l) { return { label: String(l) }; }), say: [{ id: 'bbq_' + bq.kind, text: spoken }] };
       $('#swingTag').innerHTML = '<small>' + (bq.tag || '⚾ Baseball question!') + '</small>'; $('#swingTag').className = 'swingtag on bonusq';
-      renderQuestion(q); document.body.classList.add('bonusing'); $('#sign').classList.remove('done');
+      renderQuestion(q); document.body.classList.add('bonusing'); if (bq.kind === 'onbase') document.body.classList.add('count-runners'); $('#sign').classList.remove('done');
       G._bonusRes = res; G.accept = true; G.busy = false; G.voiceDone = false; G.qT0 = G.qShown = Date.now();
       var fb = A.$('#friendBubble'); if (fb) fb.classList.remove('on');   // never leave the last pitch's words up
       V.say(q.say, { kind: 'prompt' });
@@ -651,7 +675,7 @@
     var res = G._bonusRes; G._bonusRes = null;
     if (A.Age.preReader(bat().P) && q.explain) V.say([{ id: 'bbq_explain', text: (ok ? 'Yes! ' : '') + String(q.explain).replace(/<[^>]*>/g, ' ') }], { kind: ok ? 'chatter' : 'answer' });   // design2: read the answer aloud too
     G.bonusWait = ok ? A.Pace.ms('RESULT') : A.Pace.ms('HINT', q.explain || ''); return wait(G.bonusWait).then(function () {   // the beat: long enough to read the explanation
- document.body.classList.remove('bonusing'); G.q = null; G.busy = false; $('#cards').innerHTML = ''; $('#qTxt').innerHTML = ''; $('#qPic').innerHTML = ''; if (G.tagLater && G.top) rivalTag(G.tagLater); G.tagLater = null; if (res) res(ok); });
+ document.body.classList.remove('bonusing', 'count-runners'); G.q = null; G.busy = false; $('#cards').innerHTML = ''; $('#qTxt').innerHTML = ''; $('#qPic').innerHTML = ''; if (G.tagLater && G.top) rivalTag(G.tagLater); G.tagLater = null; if (res) res(ok); });
   }
   var BASEN = ['home', '1st', '2nd', '3rd', 'home'];
   function whereChoices(from) { return [1, 2, 3, 4].filter(function (x) { return x !== from; }); }   // 1st / 2nd / 3rd / Home minus the runner's base
@@ -671,8 +695,9 @@
     var okK = A.Learn && A.Learn.sluggerKinds ? A.Learn.sluggerKinds(bat().P) : null, kOk = function (k) { return !okK || okK.indexOf('bb_' + k) >= 0; };
     if (okK && !little) { if (plan.runs > 0 && kOk('runs')) { /* below */ } else if (kOk('left') && plan.runs === 0) { /* below */ } else return Promise.resolve(); }
     if (little || (plan.runs === 0 && Math.random() < .5 && (!okK || kOk('onbase')))) {
-      var ans = little && plan.runs > 0 && Math.random() < .5 ? plan.runs : onb, isRuns = little && plan.runs > 0 && ans === plan.runs;
-      if (isRuns) return ask({ kind: 'runs', text: 'How many runs scored? Count the stars!', pic: dots(plan.runs, 'run'), choices: choiceSet(plan.runs, n, 0, 8), answer: choiceSet(plan.runs, n, 0, 8).indexOf(plan.runs), explain: plan.runs + (plan.runs === 1 ? ' run!' : ' runs!'), tag: '⭐ Count the runs!' });
+      if (little || (A.Age.preReader && A.Age.preReader(bat().P))) return Promise.resolve();   // lc1115: pre-K baseball has no runner/scoreboard questions
+      var ans = plan.runs > 0 && Math.random() < .5 ? plan.runs : onb, isRuns = plan.runs > 0 && ans === plan.runs;
+      if (isRuns) return ask({ kind: 'runs', text: 'How many runs scored? Count the run dots!', pic: dots(plan.runs, 'run'), choices: choiceSet(plan.runs, n, 0, 8), answer: choiceSet(plan.runs, n, 0, 8).indexOf(plan.runs), explain: plan.runs + (plan.runs === 1 ? ' run!' : ' runs!'), tag: '⭐ Count the runs!' });
       return ask({ kind: 'onbase', text: 'How many runners are on base now?', pic: dots(onb, 'runner'), choices: choiceSet(onb, n, 0, 3), answer: choiceSet(onb, n, 0, 3).indexOf(onb), explain: onb + (onb === 1 ? ' runner' : ' runners') + ' on base.', tag: '🏃 Count the runners!' });
     }
     if (plan.runs > 0) { var cs = choiceSet(plan.runs, n, 0, 4); return ask({ kind: 'runs', text: 'How many runs scored on that ' + z.name.toLowerCase() + '?', choices: cs, answer: cs.indexOf(plan.runs), explain: plan.runs + (plan.runs === 1 ? ' run scored.' : ' runs scored.'), tag: '🏃 Base-running question!' }); }
@@ -687,14 +712,13 @@
     G.scoreQ[G.inning] = 1; renderBoard();   // v2p1a: the stadium board and the question's picture always show the same score (both use totalRuns)
     var tag = '📋 Scoreboard question!';
     // v2p1a: every scoreboard question shows the score as a picture (a dot per run, in rows of 5 next to the number) and uses short words
-    if (A.Age.preReader(P1)) {   // design2: 5 and under: count the dots (no "runs to tie / to win" arithmetic)
-      if (them > 10) return Promise.resolve();
-      var c0 = choiceSet(them, n, 0, 12); return ask({ kind: 'count', text: 'How many runs do the Sprouts have?', pic: sbPic([['riv', them, true]]), choices: c0, answer: c0.indexOf(them), explain: 'The Sprouts have ' + them + '.', tag: tag });
-    }
+    if (A.Age.preReader(P1)) return Promise.resolve();   // lc1115: pre-K stays off the scoreboard (no runner/score questions)
     if (them === me && A.Learn && A.Learn.sluggerKinds && A.Learn.sluggerKinds(P1).indexOf('bb_tied') < 0) return Promise.resolve();   // quality1: below her band
-    if (them === me) { var add = A.rnd(1, 3), c1 = choiceSet(me + add, n, 0, 30); return ask({ kind: 'tied', text: 'You have ' + me + '. You get ' + add + ' more. How many now?', pic: sbPic([['me', me, false, add]]), choices: c1, answer: c1.indexOf(me + add), explain: me + ' + ' + add + ' = ' + (me + add) + '.', tag: tag }); }
+    if (them === me) { var add = A.rnd(1, 3), c1 = choiceSet(me + add, n, 0, 30); return ask({ kind: 'tied', text: 'You have ' + me + '. You get ' + add + ' more. How many now?', pic: sbPic([['me', me, false, add]]), spoken: 'You have ' + me + '. You get ' + add + ' more. How many now?', choices: c1, answer: c1.indexOf(me + add), explain: me + ' + ' + add + ' = ' + (me + add) + '.', tag: tag }); }
     var win = Math.random() < .5, need = them - me + (win ? 1 : 0), c2 = choiceSet(need, n, 1, 30);
-    return ask({ kind: win ? 'towin' : 'totie', text: 'How many more runs to ' + (win ? '<b>win</b>' : '<b>tie</b>') + '?', pic: sbPic([['riv', them], ['me', me]]), spoken: 'The Sprouts have ' + them + '. You have ' + me + '. How many more runs to ' + (win ? 'win' : 'tie') + '?', choices: c2, answer: c2.indexOf(need), explain: win ? (them - me) + ' more ties it. 1 more wins: ' + need + '.' : me + ' + ' + need + ' = ' + them + '. A tie!', tag: tag });
+    var toWinTxt = 'How many more runs to ' + (win ? '<b>win</b>' : '<b>tie</b>') + '?';
+    var toWinSay = 'The Sprouts have ' + them + '. You have ' + me + '. How many more runs to ' + (win ? 'win' : 'tie') + '?';
+    return ask({ kind: win ? 'towin' : 'totie', text: toWinTxt, pic: sbPic([['riv', them], ['me', me]]), spoken: toWinSay, choices: c2, answer: c2.indexOf(need), explain: win ? (them - me) + ' more ties it. 1 more wins: ' + need + '.' : me + ' + ' + need + ' = ' + them + '. A tie!', tag: tag });
   }
   // v2p1a: a little scoreboard picture. rows: [who ('riv' | 'me'), runs, hideNumber, extra runs drawn as new dots]
   function sbPic(rows) {
@@ -998,7 +1022,8 @@
     passReading: function () { return G.phase === 'pass-read' && !!(G.q && G.q.passage); },
     enterPassageAsk: function () { if (G.q && G.q.passage) enterPassageAsk(G.q); },
     enterPassageRead: function () { if (G.q && G.q.passage) enterPassageRead(G.q, true); },
-    fitCards: fitCards,
+    fitCards: fitCards, renderQuestion: renderQuestion,
+
     set speed(v) { SPEED = v; }, get speed() { return SPEED; },
     scoreQ: scoreQuestion, sbPic: sbPic, runQ: runQuestion,   // v2p1a test hooks (+ quality1: runQ for the base-running picture)
     total: totalRuns, endGame: endGame, R: R, RIV: RIV, rival: RIVALON, maxOuts: maxOuts, mercy: mercy, isBonus: function () { return !!(G.q && G.q.bonus); }, whereChoices: function (from) { return whereChoices(from).map(function (x) { return x === 4 ? 'Home 🏠' : BASEN[x]; }); }, story: STORYB ? { stop: SI, cfg: SC, end: endStory } : null, bases: function () { return G.bases.map(Boolean); }

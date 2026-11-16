@@ -547,7 +547,7 @@
      Shown once on a player's first play of that game (P.howto[game]) and any time behind the "?" button. Automated browsers
      skip the first-play card (like breaks.js) unless localStorage blobArcade.howto = '1'. */
   var HOWTO = {
-    munch: { e: '😋', title: 'Picnic Munch', lines: ['Read the question at the top.', 'Walk your friend to a right answer and munch it!'] },
+    munch: { e: '😋', title: 'Picnic Munch', steps: [{ e: '👀', t: 'Look at the top' }, { e: '🚶', t: 'Walk to a match' }, { e: '😋', t: 'Munch it!' }], lines: ['Look at the picture or words at the top.', 'Walk your friend to a right answer and munch it!'] },
     bubble: { e: '🫧', title: 'Bubble Pop',
       steps: [{ e: '👂', t: 'Listen' }, { e: '👆', t: 'Pop match' }, { e: '⭐', t: 'Stars!' }],
       lines: ['Listen, or look at the card.', 'Pop the matching bubble.', 'Get stars!'] },

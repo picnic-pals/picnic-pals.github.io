@@ -20,7 +20,7 @@ body { background: linear-gradient(#fff6e8, #ffe9f1); }
 .cue:empty { display: none; }
 .cuepic img { width: clamp(90px, 15vmin, 130px); height: auto; display: block; background: #fff; border-radius: 28px; padding: 8px; box-shadow: 0 0 0 5px #ffd6e3; }
 .cueswatch { display: block; width: 100px; height: 100px; border-radius: 50%; box-shadow: 0 0 0 6px #fff, 0 6px 0 6px #0001; }
-.asktxt { font-size: 18px; color: var(--ink2); margin: 0; max-width: 180px; }   /* small, for grown-ups; the prompt is spoken */
+.asktxt { font-size: 28px; color: var(--ink2); margin: 0; max-width: 240px; font-weight: 700; }
 .tgrid { flex: 1; width: 100%; max-width: 980px; display: grid; gap: clamp(14px, 3vmin, 28px); align-content: center; justify-content: center; grid-template-columns: repeat(3, minmax(150px, 280px)); }
 .tgrid.n4 { grid-template-columns: repeat(4, minmax(140px, 230px)); }
 @media (orientation: portrait) { .tgrid, .tgrid.n4 { grid-template-columns: repeat(2, minmax(150px, 300px)); } .tgrid.n3 .ttile:last-child { grid-column: 1 / span 2; justify-self: center; width: 50%; } }
@@ -60,7 +60,7 @@ body { background: linear-gradient(#fff6e8, #ffe9f1); }
   .pal img { width: 48px; height: auto; }
   .cuepic img { width: 44px; height: auto; padding: 4px; border-radius: 14px; }
   .cueswatch { width: 44px; height: 44px; }
-  .asktxt { font-size: 20px; max-width: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .asktxt { font-size: 32px; max-width: none; }
   .tgrid, .tgrid.n4 {
     flex: 1 1 auto;
     min-height: 0;

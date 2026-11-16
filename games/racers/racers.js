@@ -386,29 +386,38 @@
       pips += '<i class="' + cls + '"></i>';
     }
     var card = '';
-    if (G.phase === 'question' && q) {
+    var showQ = (G.phase === 'question' && q) ? q : (G.phase === 'drive' && G.missHint && G.missQ ? G.missQ : null);
+    if (showQ) {
+      q = showQ;
       var pics = '';
       if (q.kind === 'count' && q.count != null && A.CountVisual) {
-        var foodIcon = '';
-        if (q.food && K.BY[q.food]) foodIcon = icon(K.BY[q.food].icon, 56, 'pic');
-        pics = '<div class="sr-pics" id="srPics">' + foodIcon + A.CountVisual.html(q.count) + '</div>';
+        var food = q.food && K.BY[q.food], item = food ? food.icon : q.food;
+        pics = '<div class="sr-pics" id="srPics">' + A.CountVisual.html(q.count, { item: item, noun: (food && food.plural) || 'foods' }) + '</div>';
       } else if (q.kind === 'count' && q.pic && q.pic.length) {
         pics = '<div class="sr-pics" id="srPics">' + q.pic.map(function (id) {
           var f = K.BY[id]; return icon(f ? f.icon : id, 56, 'pic');
         }).join('') + '</div>';
+      } else if ((q.kind === 'add' || q.kind === 'sub' || q.kind === 'missing') && A.CountVisual && q.a != null) {
+        var cvOpt = { noun: 'dots', noLabels: true };
+        var factPic;
+        if (q.kind === 'sub') factPic = A.CountVisual.html(q.a, cvOpt) + '<i class="pb-op">−</i>' + A.CountVisual.html(q.b, cvOpt);
+        else if (q.kind === 'missing') factPic = A.CountVisual.html(q.a, cvOpt) + '<i class="pb-op">+</i><b class="sr-qmark">?</b>';
+        else factPic = A.CountVisual.html(q.a, cvOpt) + '<i class="pb-op">+</i>' + A.CountVisual.html(q.b, cvOpt);
+        pics = '<div class="sr-pics sr-fact" id="srPics">' + factPic + '</div>';
       }
+      if (G.missHint) pics += '<p class="sr-hint">' + A.esc(G.missHint) + '</p>';
       var choices = q.choices.map(function (c, idx) {
         return '<button class="sr-choice" data-i="' + idx + '">' +
           (c.icon ? icon(c.icon, 64, 'ch') : '') +
           (c.icon ? '<span class="sr-visually-hidden">' + A.esc(c.label) + '</span>' : A.esc(c.label)) +
         '</button>';
       }).join('');
-      card = '<div class="sr-qcard' + (G.boss && G.obstacle ? ' boss' : '') + '" id="srCard">' +
+      card = '<div class="sr-qcard' + (G.boss && G.obstacle ? ' boss' : '') + (G.phase === 'drive' && G.missHint ? ' hinting' : '') + '" id="srCard">' +
         '<div class="sr-qwho">' + A.esc(qWho()) + '</div>' +
         '<button id="srCardSpeak" aria-label="Read the question aloud">' + icon('🔊', 32, 'cardspeak') + '</button>' +
         '<p class="sr-ask" id="srAsk">' + A.esc(q.text) + '</p>' +
         pics +
-        '<div class="sr-choices" id="srChoices">' + choices + '</div>' +
+        (G.phase === 'drive' && G.missHint ? '' : '<div class="sr-choices" id="srChoices">' + choices + '</div>') +
       '</div>';
     }
     $('#srContent').innerHTML =
@@ -461,6 +470,7 @@
     if (busy || !G || G.phase !== 'question') return;
     busy = true;
     var ms = Date.now() - (askedAt || Date.now());
+    var missed = K.current(G);
     var res = K.applyAnswer(G, i, family, P, { ms: ms, now: Date.now() });
     persist();
     if (!res) { busy = false; return; }
@@ -477,14 +487,29 @@
       setTimeout(function () { busy = false; renderPodium(); }, 550);
       return;
     }
+    var wait = 700;
+    if (!res.correct) {
+      var food = missed && missed.food && K.BY[missed.food];
+      G.missQ = missed;
+      if (missed && missed.kind === 'count') G.missHint = 'Count the ' + ((food && food.plural) || 'foods') + '.';
+      else if (missed && missed.kind === 'add') G.missHint = (missed.a + missed.b > 10) ? ('Make 10, then add the rest. ' + missed.a + ' + ' + missed.b + '.') : ('Count the dots: ' + missed.a + ' + ' + missed.b + '.');
+      else if (missed && missed.kind === 'sub') G.missHint = 'Start at ' + missed.a + ' and take away ' + missed.b + '.';
+      else if (missed && missed.kind === 'missing') G.missHint = 'How many more to get from ' + missed.a + ' to ' + missed.b + '?';
+      else G.missHint = 'Look again, then try the next one.';
+      wait = 1400;
+    } else {
+      G.missHint = '';
+      G.missQ = null;
+    }
     renderRace();
     setTimeout(function () {
+      G.missHint = ''; G.missQ = null;
       K.nextQuestion(G);
       askedAt = Date.now();
       busy = false;
       renderRace();
       sayQuestion();
-    }, 700);
+    }, wait);
   }
 
   function renderPodium() {

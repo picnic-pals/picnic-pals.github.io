@@ -82,8 +82,8 @@
       while (set.length < n && g++ < 60) { var w = T + pick([-2, -1, 1, 2]); if (w < lo || w > hi) continue; var aa = rnd(Math.max(0, w - 10), Math.min(10, w)), l = aa + ' + ' + (w - aa) + ' = ' + T; if (set.indexOf(l) < 0) set.push(l); }
       return set.length === n ? choicesFrom({ text: 'Which one is ' + em('true') + '?', say: tx('true', 'Which one is true?'), fact: [a, 'w_plus', b, 'w_is', T], variant: 'trueEq' }, set, right) : null;
     },
-    bond: function (a, b, T, n, lo, hi) { var h = rnd(0, 1), m = h ? b : a; return numQ({ text: 'What is the hidden part?', pic: bondPic(a, b, T, h), say: tx('bond', 'What is the hidden part?'), fact: [a, 'w_plus', b, 'w_is', T], variant: 'bond' }, near(m, n, 0, 10), m); },
-    bondFixed: function (a, b, T, h, n) { var m = h ? b : a; return numQ({ text: 'What is the hidden part?', pic: bondPic(a, b, T, h), say: tx('bond', 'What is the hidden part?'), fact: ['w_thats', m], variant: 'bond' }, near(m, n, 0, 20), m); },
+    bond: function (a, b, T, n, lo, hi) { var h = rnd(0, 1), m = h ? b : a; return numQ({ text: 'What number is hiding?', pic: bondPic(a, b, T, h), say: tx('bond', 'What number is hiding?'), fact: [a, 'w_plus', b, 'w_is', T], variant: 'bond' }, near(m, n, 0, 10), m); },
+    bondFixed: function (a, b, T, h, n) { var m = h ? b : a; return numQ({ text: 'What number is hiding?', pic: bondPic(a, b, T, h), say: tx('bond', 'What number is hiding?'), fact: ['w_thats', m], variant: 'bond' }, near(m, n, 0, 20), m); },
     line: function (a, b, T, n, lo, hi) { var L0 = T > 10 ? 10 : 0, L1 = L0 + 10; if (T > L1) return null; return numQ({ text: 'What number is the star on?', pic: linePic(L0, L1, T), say: tx('line', 'What number is the star on?'), fact: ['w_thats', T], variant: 'line' }, near(T, n, L0, L1, [-1, 1, -2, 2]), T); },
     strategy: function (a, b, T, n) {
       var big = Math.max(a, b), sm = Math.min(a, b); if (big < 8 || big > 9 || T <= 10) return null; var give = 10 - big, right = '10 + ' + (sm - give);
@@ -113,12 +113,16 @@
     fmt: function (h, m) { return (h || 12) + ':' + (m < 10 ? '0' : '') + m; },
     face: function (h, m, opt) {
       opt = opt || {}; h = ((h - 1 + 12) % 12) + 1; m = ((m % 60) + 60) % 60;
-      var ha = (h % 12) * 30 + m * 0.5, ma = m * 6, sz = opt.small ? 120 : 180;
+      var ha = (h % 12) * 30 + m * 0.5, ma = m * 6, sz = opt.small ? 168 : 200;
       var nums = '', i, a, x, y;
+      var ticks = '';
       for (i = 1; i <= 12; i++) {
         a = (i * 30 - 90) * Math.PI / 180; x = 100 + Math.cos(a) * 72; y = 100 + Math.sin(a) * 72;
         nums += '<text x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" text-anchor="middle" dominant-baseline="middle">' + i + '</text>';
+        var inner = (i % 3 === 0) ? 82 : 86, outer = 90;
+        ticks += '<line class="qc-tick' + (i % 3 === 0 ? ' major' : '') + '" x1="' + (100 + Math.cos(a) * inner).toFixed(1) + '" y1="' + (100 + Math.sin(a) * inner).toFixed(1) + '" x2="' + (100 + Math.cos(a) * outer).toFixed(1) + '" y2="' + (100 + Math.sin(a) * outer).toFixed(1) + '" stroke-width="' + (i % 3 === 0 ? 3 : 1.5) + '" stroke="#3a2a55"/>';
       }
+      nums = ticks + nums;
       function hand(deg, len, cls, w) {
         var rad = (deg - 90) * Math.PI / 180, x2 = 100 + Math.cos(rad) * len, y2 = 100 + Math.sin(rad) * len;
         return '<line class="' + cls + '" x1="100" y1="100" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke-width="' + w + '" stroke-linecap="round"/>';

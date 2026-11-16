@@ -653,7 +653,9 @@
   function howToText() {
     return 'Tap a pancake to add it to your plate. Tap a pancake on the plate to take it off. Tap Check with syrup when you think the stack is right.';
   }
+  var howOpen = false;
   function renderHowTo() {
+    howOpen = true;
     document.body.classList.remove('pc-won');
     renderStand();
     var art = (Art.has && Art.has('pancake_gold') ? Art.cake('one', 'gold', 56) : '') +
@@ -667,6 +669,7 @@
       '</div>';
     say(howToText(), 'prompt');
     $('#pcHowGo').onclick = function () {
+      howOpen = false;
       markHowTo();
       startOrder();
     };
@@ -694,7 +697,10 @@
 
   $('#pcHome').onclick = home;
   $('#pcSpeak').onclick = function () { hearTapped += 1; speakOrder('tap', hearTapped === 1); };
-  window.addEventListener('resize', function () { if (G.phase !== 'win') render(); });
+  window.addEventListener('resize', function () {
+    if (howOpen) { renderHowTo(); return; }
+    if (G.phase !== 'win') render();
+  });
 
   window.__pancake = {
     G: G, startOrder: startOrder, render: render,

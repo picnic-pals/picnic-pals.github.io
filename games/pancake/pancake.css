@@ -765,10 +765,19 @@ body.pc-won #pcCardHost { flex: 0 0 auto; }
   body.pc-won #pcCardHost { flex: 1 1 40%; overflow: visible; }
 }
 @media (min-width: 700px) and (min-height: 700px) {
-  .pc-bin { min-width: 88px; min-height: 80px; }
-  .pc-cake { min-width: 64px; min-height: 64px; }
-  .pc-num { font-size: 80px; }
+  html:not(.stage-on) .pc-bin { min-width: 88px; min-height: 80px; }
+  html:not(.stage-on) .pc-cake { min-width: 64px; min-height: 64px; }
+  html:not(.stage-on) .pc-num { font-size: 80px; }
 }
+/* Portrait stage is 400x720 even on an iPad viewport — use the phone packing layout. */
+html.stage-on[data-stage="portrait"] .pc-num { font-size: clamp(32px, 14vw, 48px); }
+html.stage-on[data-stage="portrait"] .pc-friend-img { width: 36px; height: 36px; }
+html.stage-on[data-stage="portrait"] .pc-card .cv-set { transform: scale(.72); margin-bottom: -16px; }
+html.stage-on[data-stage="portrait"] body:not(.pc-won) .pc-stand { flex: 0 0 auto; min-height: 0; max-height: 18%; }
+html.stage-on[data-stage="portrait"] body.pc-won .pc-stand { max-height: none; }
+html.stage-on[data-stage="portrait"] #pcCardHost { flex: 1 1 auto; min-height: 0; }
+html.stage-on[data-stage="portrait"] .pc-plate-wrap { min-height: 0; }
+html.stage-on[data-stage="portrait"] .pc-play { min-height: 0; }
 @media (max-width: 420px) {
   .pc-ask { font-size: clamp(16px, 4.8vw, 22px); }
   .pc-num { font-size: clamp(32px, 14vw, 48px); }
@@ -795,4 +804,40 @@ body.pc-won #pcCardHost { flex: 0 0 auto; }
   display: block;
   object-fit: fill;
   transform: none;
+}
+
+/* stage2: pancake ask stays readable on the stage */
+html.stage-on .pc-ask { font-size: 28px; }
+
+
+/* Stage scale can shrink 60 design-px targets below 60 rendered px. Keep taps at least 60px on screen. */
+html.stage-on #pancake {
+  --pc-hit: max(62px, calc(62px / var(--stage-scale, 1)));
+}
+html.stage-on .pc-header { min-height: var(--pc-hit); }
+html.stage-on .pc-header button,
+html.stage-on .pc-bin,
+html.stage-on .pc-cake,
+html.stage-on .pc-ready,
+html.stage-on .pc-syrup,
+html.stage-on .pc-winbtns button {
+  min-width: var(--pc-hit);
+  min-height: var(--pc-hit);
+}
+/* Short-landscape sets stream to 24px; after scale (~0.61 at 844x390) that is under 16px. */
+html.stage-on .pc-pour-fx { --stream-h: max(36px, calc(18px / var(--stage-scale, 1))); }
+
+html.stage-on .pc-stack-stage .pc-hit {
+  min-width: var(--pc-hit);
+  min-height: var(--pc-hit);
+}
+
+html.stage-on[data-stage="landscape"] .pc-stack-stage {
+  transform: translateY(-12px);
+}
+
+html.stage-on #pcHowGo,
+html.stage-on .pc-how .pc-ready {
+  min-width: var(--pc-hit);
+  min-height: var(--pc-hit);
 }

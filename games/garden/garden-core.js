@@ -232,13 +232,46 @@
     for (v2 = lo; out.length < n && v2 <= hi + n; v2++) if (out.indexOf(v2) < 0) out.push(v2);
     return out;
   }
-  function numQ(text, say, T, vals, fact, skill) {
-    var arr = vals.slice();
-    return {
+  function esc(s) {
+    return (A.esc ? A.esc(s) : String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'));
+  }
+  function foodIcon(food, size) {
+    var raw = (food && (food.icon || food.id || food.name)) || 'cherries';
+    var byId = { cherry: 'food.cherries', cherries: 'food.cherries', sprout: 'scenery.seedling', seed: 'scenery.seedling', pea: 'scenery.seedling', tomato: 'food.tomato', carrot: 'food.carrot', potato: 'food.potato', pumpkin: 'gaps.pumpkin' };
+    var id = byId[raw] || byId[(food && food.plural) || ''] || ('food.' + raw);
+    var opt = { size: size || 40, decorative: true, cls: 'pp-pic gd-food', context: 'question', word: (food && (food.plural || food.name)) || raw };
+    if (A.Icons && A.Icons.html) {
+      var html = A.Icons.html(id, opt);
+      if (html && html.indexOf('<img') >= 0) return html;
+      html = A.Icons.html('', opt);
+      if (html && html.indexOf('<img') >= 0) return html;
+      return html;
+    }
+    return esc(String((food && food.name) || raw));
+  }
+  function arrayPic(food, rows, cols) {
+    var r, c, h = '<div class="gd-array" role="img" aria-label="' + rows + ' rows of ' + cols + ' ' + esc(food.plural) + '">';
+    for (r = 0; r < rows; r++) {
+      h += '<div class="gd-arow">';
+      for (c = 0; c < cols; c++) h += foodIcon(food, 36);
+      h += '</div>';
+    }
+    return h + '</div>';
+  }
+  function countByHint(rows, cols) {
+    var i, seq = [];
+    for (i = 1; i <= rows; i++) seq.push(i * cols);
+    return 'Count by ' + cols + 's: ' + seq.join(', ') + '.';
+  }
+  function numQ(text, say, T, vals, fact, skill, extra) {
+    var arr = vals.slice(), q;
+    q = {
       text: text, say: say, fact: fact || ('The answer is ' + T + '.'), skill: skill || null,
       choices: arr.map(function (v) { return { label: String(v), say: String(v), value: v }; }),
       answer: arr.indexOf(T)
     };
+    if (extra) { var k; for (k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) q[k] = extra[k]; }
+    return q;
   }
 
   function gardenMath(p, band, rng) {
@@ -258,7 +291,8 @@
         rows + ' rows of ' + cols + ' ' + food.plural + '. How many ' + food.plural + '?',
         T, shuffle(rng, near(T, nChoices, 2, Math.max(hi, T + 4), rng)),
         rows + ' rows of ' + cols + ' is ' + T + '.',
-        'wordprob'
+        'wordprob',
+        { pic: arrayPic(food, rows, cols), rows: rows, cols: cols, food: food, hint: countByHint(rows, cols) }
       );
     }
     if (kind === 'addseeds') {
@@ -270,19 +304,23 @@
         'You planted ' + a + ' ' + (a === 1 ? food.name : food.plural) + ', then ' + b + ' more. How many now?',
         T, shuffle(rng, near(T, nChoices, 1, Math.max(hi, T + 3), rng)),
         a + ' plus ' + b + ' is ' + T + '.',
-        T <= 10 ? 'add10' : 'add20'
+        T <= 10 ? 'add10' : 'add20',
+        { pic: arrayPic(food, 1, a) + '<span class="gd-op">+</span>' + arrayPic(food, 1, b), a: a, b: b, food: food,
+          hint: 'Start at ' + a + ' and count on ' + b + ' more.' }
       );
     }
     if (kind === 'pick') {
-      a = num(rng, 4, band.id === 'g2' ? 18 : 10);
-      b = num(rng, 1, Math.min(6, a - 1));
+      // lc1115b: grade 1 should not get 4-pick-1 style items
+      a = num(rng, band.id === 'g1' ? 8 : 4, band.id === 'g2' ? 18 : (band.id === 'g1' ? 12 : 10));
+      b = num(rng, band.id === 'g1' ? 2 : 1, Math.min(band.id === 'g1' ? 5 : 6, a - (band.id === 'g1' ? 3 : 1)));
       T = a - b;
       return numQ(
         'There are ' + a + ' ' + food.plural + '. You pick ' + b + '. How many are left?',
         'There are ' + a + ' ' + food.plural + '. You pick ' + b + '. How many are left?',
         T, shuffle(rng, near(T, nChoices, 0, Math.max(hi, a), rng)),
         a + ' minus ' + b + ' is ' + T + '.',
-        a <= 10 ? 'sub10' : 'sub20'
+        a <= 10 ? 'sub10' : 'sub20',
+        { pic: arrayPic(food, 1, a), a: a, b: b, food: food, hint: 'Start at ' + a + ' and take away ' + b + '.' }
       );
     }
     T = num(rng, 1, band.id === 'pre' ? 6 : 10);
@@ -356,6 +394,8 @@
 
   function hintFor(q) {
     if (!q) return 'Let us look again.';
+    if (q.hint) return q.hint;
+    if (q.rows && q.cols) return countByHint(q.rows, q.cols);
     if (q.misses >= 2 && q.fact) {
       if (typeof q.fact === 'string') return q.fact;
     }

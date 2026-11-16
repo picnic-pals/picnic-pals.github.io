@@ -37,32 +37,68 @@
     }
     return L;
   }
-  function cvDot(on, ones) { return '<i class="' + (on ? (ones ? 'cv-dot on ones' : 'cv-dot on') : 'cv-dot') + '"></i>'; }
-  function cvFrame(fr) {
+  function cvItemHtml(opt) {
+    opt = opt || {};
+    if (opt.itemHtml) return opt.itemHtml;
+    var key = opt.item || opt.icon;
+    if (!key) return '';
+    if (A.Icons && A.Icons.html) return A.Icons.html(key, { size: opt.itemSize || 48, decorative: true, cls: 'pp-pic cv-food', context: 'question' });
+    return A.esc ? A.esc(String(key)) : String(key);
+  }
+  function cvHasItem(opt) { return !!(opt && (opt.item || opt.icon || opt.itemHtml)); }
+  function cvFoodOpt(opt, n) {
+    opt = opt || {};
+    if (!cvHasItem(opt) || opt.pattern || opt.five_frame || opt.scattered) return opt;
+    var o = {}, k;
+    for (k in opt) if (Object.prototype.hasOwnProperty.call(opt, k)) o[k] = opt[k];
+    if ((typeof n === 'number' ? n : 0) <= 5) { o.five_frame = true; o.pattern = 'five_frame'; }
+    return o;
+  }
+  function cvDot(on, ones, opt) {
+    var item = cvItemHtml(opt);
+    if (item) return '<i class="cv-dot cv-item' + (on ? ' on' : ' empty') + (ones && on ? ' ones' : '') + '">' + (on ? item : '') + '</i>';
+    return '<i class="' + (on ? (ones ? 'cv-dot on ones' : 'cv-dot on') : 'cv-dot') + '"></i>';
+  }
+  function cvFrame(fr, opt) {
     var cells = fr.cells || 10, filled = fr.filled || 0, ones = fr.color === 'ones', h = '<span class="cv-frame' + (cells === 5 ? ' cv-five' : '') + '" aria-hidden="true">', i;
-    for (i = 0; i < cells; i++) h += cvDot(i < filled, ones);
+    for (i = 0; i < cells; i++) h += cvDot(i < filled, ones, opt);
     return h + '</span>';
   }
-  function cvDice(n) {
+  function cvDice(n, opt) {
     var spots = CV_DICE[n] || CV_DICE[1], grid = {}; spots.forEach(function (p) { grid[p[0] + ',' + p[1]] = 1; });
-    var h = '<span class="cv-dice" aria-hidden="true">', r, c;
-    for (r = 0; r < 3; r++) for (c = 0; c < 3; c++) h += cvDot(!!grid[c + ',' + r], false);
+    // lc1115b: draw only filled pips so empty 3x3 cells are not countable
+    var h = '<span class="cv-dice cv-pips" aria-hidden="true">', r, c;
+    for (r = 0; r < 3; r++) for (c = 0; c < 3; c++) {
+      if (grid[c + ',' + r]) h += cvDot(true, false, opt);
+      else h += '<i class="cv-dot cv-pip-empty" aria-hidden="true"></i>';
+    }
     return h + '</span>';
   }
-  function cvScatter(n) {
+  function cvScatter(n, opt) {
     var h = '<span class="cv-scatter" aria-hidden="true">', i;
-    for (i = 0; i < n; i++) h += cvDot(true, false);
+    for (i = 0; i < n; i++) h += cvDot(true, false, opt);
     return h + '</span>';
   }
   function cvHtml(nOrL, opt) {
     opt = opt || {};
+    var n0 = (nOrL && typeof nOrL === 'object' && nOrL.n != null) ? nOrL.n : nOrL;
+    opt = cvFoodOpt(opt, n0);
     var L = (nOrL && typeof nOrL === 'object' && nOrL.n != null) ? nOrL : cvLayout(nOrL, opt);
-    var inner = '', label = 'A picture of ' + L.n;
-    if (L.scattered) inner = cvScatter(L.n);
-    else if (L.pattern === 'dice') inner = cvDice(L.n);
-    else if (L.frames && L.frames.length) inner = L.frames.map(cvFrame).join('');
+    var inner = '', noun = opt.noun || opt.word || '', label = 'A picture of ' + L.n + (noun ? ' ' + noun : '');
+    if (L.scattered) inner = cvScatter(L.n, opt);
+    else if (L.pattern === 'dice') inner = cvDice(L.n, opt);
+    else if (L.frames && L.frames.length) inner = L.frames.map(function (fr) { return cvFrame(fr, opt); }).join('');
     var nFrames = (L.frames && L.frames.length) || (L.pattern === 'dice' || L.scattered ? 1 : 0);
-    var html = '<span class="cv-set" data-n="' + L.n + '" data-structure="' + (L.structure || '') + '" data-frames="' + nFrames + '" role="img" aria-label="' + label + '">' + inner + '</span>';
+    var structAttr = String(L.structure || '').replace(/\+/g, 'and');
+    if (L.frames && L.frames.length > 1 && !opt.noLabels) {
+      var filled = 0;
+      inner = L.frames.map(function (fr, i) {
+        filled += fr.filled || 0;
+        var cap = (fr.filled === (fr.cells || 10) && (fr.cells || 10) === 10) ? String(filled) : ('+' + (fr.filled || 0));
+        return '<span class="cv-framewrap">' + cvFrame(fr, opt) + '<span class="cv-flab">' + cap + '</span></span>';
+      }).join('');
+    }
+    var html = '<span class="cv-set' + (cvHasItem(opt) ? ' cv-foods' : '') + '" data-n="' + L.n + '" data-structure="' + structAttr + '" data-frames="' + nFrames + '" role="img" aria-label="' + label.replace(/"/g, '&quot;') + '">' + inner + '</span>';
     if (L.quick_look) {
       html = '<div class="cv-ql" data-ql="1"><div class="cv-ql-pic">' + html + '</div><button type="button" class="cv-showagain">Show again</button></div>';
     }
@@ -204,7 +240,7 @@
     }
   }
 
-  A.CountVisual = { layout: cvLayout, html: cvHtml, bindQuickLook: cvBindQuickLook, fit: cvFit, DICE: CV_DICE };
+  A.CountVisual = { layout: cvLayout, html: cvHtml, bindQuickLook: cvBindQuickLook, fit: cvFit, DICE: CV_DICE, itemHtml: cvItemHtml };
 
   function frame(v) { return cvHtml(v, { pattern: v <= 5 ? 'five_frame' : 'ten_frame' }); }
   function frames2(v) { return cvHtml(v); }
@@ -236,13 +272,14 @@
       say = [a, 'wp_friends_sat', b, 'wp_more_came', 'wp_how_many_friends']; }
     else if (kind === 0) { text = P.name + ' had ' + a + ' ' + food + ' in the picnic basket. ' + P.name + ' ate ' + b + '. How many ' + food + ' are left?';
       say = [P.part, 'wp_had', a, 'wp_f_' + food, 'wp_in_basket', P.part, 'wp_ate', b, 'wp_how_many', 'wp_f_' + food, 'wp_left']; }
-    else { text = 'There were ' + a + ' ' + food + ' on the blanket. ' + P.name + ' took ' + b + ' away. How many are left?';
-      say = ['wp_there_were', a, 'wp_f_' + food, 'wp_on_blanket', P.part, 'wp_took', b, 'wp_away', 'wp_how_many_left']; }
+    else { text = 'There were ' + a + ' ' + food + ' on the blanket. ' + P.name + ' took ' + b + ' away. How many ' + food + ' are left?';
+      say = ['wp_there_were', a, 'wp_f_' + food, 'wp_on_blanket', P.part, 'wp_took', b, 'wp_away', 'wp_how_many', 'wp_f_' + food, 'wp_left']; }
     var wrongOp = op === '+' ? Math.abs(a - b) : a + b;
     function mk(v) { return { label: String(v), fact: v === ans ? ['w_thats', v] : ['w_thats', v, 'w_not', ans] }; }
-    var pic = '<span class="wp-pic" aria-hidden="true"><span class="pet">' + P.em + '</span>' +
-      (A.CountVisual ? (op === '+' ? A.CountVisual.html(a) + '<i class="pb-op">+</i>' + A.CountVisual.html(b) : A.CountVisual.html(a))
-        : (op === '+' ? Array(Math.min(a, 20) + 1).join(f.em) + ' + ' + Array(Math.min(b, 20) + 1).join(f.em) : Array(Math.min(a, 20) + 1).join(f.em))) + '</span>';
+    var foodOpt = { item: f.em, noun: food }, petIcon = (A.Icons && A.Icons.html) ? A.Icons.html(P.em, { size: 40, decorative: true, cls: 'pp-pic', context: 'question' }) : '';
+    function foodsOf(n) { return A.CountVisual ? A.CountVisual.html(n, foodOpt) : Array(Math.min(n, 20) + 1).join(f.em); }
+    var pic = '<span class="wp-pic" aria-hidden="true">' + (petIcon ? '<span class="pet">' + petIcon + '</span>' : '') +
+      (op === '+' ? foodsOf(a) + '<i class="pb-op">+</i>' + foodsOf(b) : foodsOf(a)) + '</span>';
     return { text: '<span class="wp-text">' + A.esc(text) + '</span>', plain: text, pic: pic, hint: 'Draw the story: make a dot for each one, then ' + (op === '+' ? 'put them together.' : 'cross out the ones that go away.'), say: say, story: true,
       wp: { a: a, b: b, op: op, ans: ans, food: f.id, em: f.em, text: text, pet: P.name },
       good: function () { return mk(ans); },
@@ -262,7 +299,7 @@
         var gi = 0;
         function goodN() { var k = gi++ % (L ? 3 : 2); if (k === 0) return { label: String(N), fact: ['w_thats', N] }; if (k === 1) return { label: String(N), html: frame(N), fact: ['w_thats', N] };
           var a = rnd(0, N); return { label: a + ' + ' + (N - a), fact: [a, 'w_plus', N - a, 'w_is', N] }; }
-        return { text: 'Munch the number ' + em(N) + ' ' + frame(N), hint: 'Look for ' + N + ' dots too!', say: ['munch_rule_number', N],
+        return { text: 'Munch the number ' + em(N), hint: 'Look for ' + N + '!', say: ['munch_rule_number', N],
           good: goodN, bad: function () { var v; do { v = rnd(0, max); } while (v === N); if (L && Math.random() < .3) { var a = rnd(0, v); return { label: a + ' + ' + (v - a), fact: [a, 'w_plus', v - a, 'w_is', v, 'w_not', N] }; } return mk(v); } };
       } },
     { id: 'compare', name: 'Bigger & smaller', short: 'Compare numbers to 20', strand: 'Counting', std: 'K.CC.7 / 1.NBT.3', grade: '1', sayFact: true,

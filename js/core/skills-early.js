@@ -60,7 +60,20 @@
     return function (L, n) {
       var r = gen(L), good = r.good(), cells = [good], keys = {}, labels = {}, g = 0; keys[good.k] = 1; labels[good.label] = 1;
       while (cells.length < n && g++ < 300) { var b = r.bad(); if (!keys[b.k] && !labels[b.label]) { keys[b.k] = 1; labels[b.label] = 1; cells.push(b); } }
-      var arr = A.shuffle(cells.slice()), Q = q(r);
+      var arr = A.shuffle(cells.slice()), Q = q(r, good);
+      // lc1115: keep letter-choice case in sync with the prompt ("Which one is the letter b?").
+      // Only for the letters skill (every cell key is a single letter). Sight words include
+      // "I" and "a"; rewriting those from c.k's first character would turn "it" into "I".
+      if (good && /^[A-Za-z]$/.test(String(good.label || '')) && !r.starts
+          && arr.every(function (c) { return c && /^[A-Za-z]$/.test(String(c.k || '')); })) {
+        var up = good.label === good.label.toUpperCase();
+        arr.forEach(function (c) {
+          if (!c || !c.k) return;
+          var ch = String(c.k).charAt(0);
+          c.label = up ? ch.toUpperCase() : ch.toLowerCase();
+          if (typeof ltrHtml === 'function') c.html = ltrHtml(c.label);
+        });
+      }
       return { text: Q.text, pic: Q.pic || null, say: Q.say, listen: !!(Q.listen || r.listen), fact: good.fact, answer: arr.indexOf(good), target: r.target,
         choices: arr.map(function (c) { return { label: c.label, html: c.html, say: c.name, k: c.k }; }) };
     };
@@ -125,7 +138,7 @@
         good: function () { return mk(T); },
         bad: function () { var close = (E.LETTER_CLOSE[T] || '').split('').filter(function (x) { return pool.indexOf(x) >= 0; }); return mk(close.length && Math.random() < (L ? .55 : .3) ? pick(close) : pick(others(pool, T))); } };
     } });
-  SK[2].ask = askFrom(SK[2].gen, function (r) { if (r.starts) return { listen: true, text: 'Which one starts with ' + em(r.target.toUpperCase()) + '?', say: ['q_which_starts', 'lt_' + r.target] }; return { text: 'Which one is the letter ' + em(r.target.toUpperCase()) + '?', say: ['q_which_letter', 'lt_' + r.target] }; });
+  SK[2].ask = askFrom(SK[2].gen, function (r, good) { if (r.starts) return { listen: true, text: 'Which one starts with ' + em(r.target.toUpperCase()) + '?', say: ['q_which_starts', 'lt_' + r.target] }; var shown = (good && good.label) || r.target.toUpperCase(); return { text: 'Which one is the letter ' + em(shown) + '?', say: ['q_which_letter', 'lt_' + r.target] }; });
 
   /* ----- Beginning sounds (Reading & Words) ----- */
   SK.push({ id: 'begsound', name: 'Beginning sounds', short: 'Pictures that start with a letter’s sound', strand: 'Phonics', std: 'K.RF.2d / K.RF.3a', grade: 'PK–K', subject: 'reading', sayFact: true, secs: [11, 12],

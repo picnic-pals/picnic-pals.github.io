@@ -272,6 +272,22 @@
     for (id in c) if (c[id] > ((want && want[id]) || 0)) return true;
     return false;
   }
+  function overfilledId(basket, want) {
+    var c = countsOf(basket || []), id;
+    for (id in c) if (c[id] > ((want && want[id]) || 0) && want && want[id]) return id;
+    for (id in c) if (c[id] > ((want && want[id]) || 0)) return id;
+    return null;
+  }
+  function extraKinds(basket, want) {
+    var c = countsOf(basket || []), out = [], id;
+    for (id in c) if (c[id] > 0 && !(want && want[id])) out.push(id);
+    return out;
+  }
+  function countLabel(basket) {
+    var c = countsOf(basket || []), parts = [], id;
+    for (id in c) if (c[id] > 0) parts.push(c[id] + ' ' + noun(id, c[id]));
+    return parts.length ? parts.join(', ') : '0';
+  }
   function missing(basket, want) {
     var c = countsOf(basket || []), out = {}, id;
     for (id in (want || {})) if ((c[id] || 0) < want[id]) out[id] = want[id] - (c[id] || 0);
@@ -380,7 +396,7 @@
   A.Packer = {
     FOODS: FOODS, BY: BY, DECOS: DECOS, bandFor: bandFor, makeOrder: makeOrder,
     fillPre: fillPre, addItem: addItem, takeOut: takeOut, countsOf: countsOf,
-    matches: matches, overfilled: overfilled, missing: missing, sameCounts: sameCounts,
+    matches: matches, overfilled: overfilled, overfilledId: overfilledId, extraKinds: extraKinds, countLabel: countLabel, missing: missing, sameCounts: sameCounts,
     phrase: phrase, listPhrases: listPhrases, noun: noun,
     newSession: newSession, nextOrder: nextOrder, complete: complete,
     failNudge: failNudge, autoPlace: autoPlace, nextDeco: nextDeco, saveState: saveState, friendsOf: friendsOf

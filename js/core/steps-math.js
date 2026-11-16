@@ -36,7 +36,23 @@
     var h = '<span class="st-tens">', full = Math.floor(n / 10), rest = n % 10; for (var i = 0; i < full; i++) h += tf({ on: 10, x: o.xTen && i === full - 1 ? 10 : 0 }); if (rest || !full) h += tf({ on: rest, x: o.xOnes || 0, g: o.g || 0 }); return h + '</span>';
   }
   var FOODS = ['🍎', '🍓', '🫐', '🥕', '🍪', '🧁', '🍌', '🍇'];
-  function objs(n, e) { var h = '<span class="st-objs">'; for (var i = 0; i < n; i++) h += (i && i % 5 === 0 ? '<br>' : '') + '<i>' + e + '</i>'; return h + '</span>'; }
+  function iconOf(e, sz) { return (A.Icons && A.Icons.html) ? A.Icons.html(e, { size: sz || 48, decorative: true, cls: 'pp-pic', context: 'question' }) : e; }
+  function foodNoun(e) {
+    var r = A.Icons && A.Icons.resolve && A.Icons.resolve(e, { context: 'question' }), word = (r && r.entry && r.entry.label) || 'foods';
+    var plural = /s$/.test(word) && !/us$/.test(word) ? word : (/y$/.test(word) && !/[aeiou]y$/.test(word) ? word.slice(0, -1) + 'ies' : word + 's');
+    if (word === 'red apple') { word = 'apple'; plural = 'apples'; }
+    if (word === 'blueberry') plural = 'blueberries';
+    if (word === 'tomato') plural = 'tomatoes';
+    if (word === 'potato') plural = 'potatoes';
+    if (word === 'sandwich') plural = 'sandwiches';
+    return { word: word, plural: plural, key: e, icon: iconOf(e, 32) };
+  }
+  function askNoun(text, iconHtml) { return (iconHtml ? '<span class="ask-noun">' + iconHtml + '</span> ' : '') + text; }
+  function sayText(id, text) { return { id: id, text: text }; }
+  function objs(n, e) {
+    if (A.CountVisual && n >= 1) return A.CountVisual.html(n, { item: e, noun: foodNoun(e).plural });
+    var h = '<span class="st-objs">'; for (var i = 0; i < n; i++) h += (i && i % 5 === 0 ? '<br>' : '') + '<i>' + iconOf(e) + '</i>'; return h + '</span>';
+  }
   function plate(m) { var h = '<span class="st-plate" aria-hidden="true">'; for (var i = 0; i < m; i++) h += '<i></i>'; return h + '</span>'; }
   function track(nums) { return '<span class="st-track">' + nums.map(function (v) { return v == null ? '<b class="q">?</b>' : '<b>' + v + '</b>'; }).join('') + '</span>'; }
   // number line lo..hi; o: { st: start, hops: [[from, to], ...], end: show landing }
@@ -122,7 +138,7 @@
     if (A.CountVisual) pic = A.CountVisual.html(n, { pattern: n <= 5 && how !== 'tens' && Math.random() < .5 ? 'dice' : (n <= 5 ? 'five_frame' : null) });
     else pic = how === 'tens' ? tens(n) : objs(n, pick(FOODS));
     return { key: 'cnt' + n, ans: n, wrong: cntWrong(n, lo, hi),
-      text: 'How many?', pic: pic, say: ['st_how_many'],
+      text: 'How many dots?', pic: pic, say: [sayText('st_how_many_dots', 'How many dots?')],
       // Numeral only: the count picture lives on the question card. html is set so A7 picturizeCell will not add tile dots.
       cell: function (v) { return { label: String(v), html: '<span class="st-ansnum">' + (A.esc ? A.esc(String(v)) : String(v)) + '</span>', fact: ['w_thats', v] }; },
       hint: function (l) { return how === 'tens' || n > 5 ? box(tens(n), l >= 2 ? Math.floor(n / 10) * 10 + ' and ' + (n % 10) + ' more is <b>' + n + '</b>.' : 'Count the full tens, then the rest.') : box(A.CountVisual ? A.CountVisual.html(n) : tf({ on: n }), l >= 2 ? 'Count them: … <b>' + n + '</b>!' : 'Touch each one and count.'); } };
@@ -151,10 +167,11 @@
   function moreLess(sign, hi, dotsFirst, st) {
     var dots = dotsFirst && (!st || (st.attempts || 0) < 12 || Math.random() < .3), n = dots ? rnd(sign > 0 ? 1 : 2, sign > 0 ? 9 : 10) : rnd(sign > 0 ? 1 : 2, sign > 0 ? hi - 1 : hi), ans = n + sign, e = pick(FOODS);
     var w = within([n, ans + sign, ans - sign], 0, hi + 1, ans);
-    var text = dots ? (sign > 0 ? 'One more comes! How many now?' : 'Jammy eats one. How many now?') : 'What is one ' + (sign > 0 ? 'more' : 'less') + ' than ' + em(n) + '?';
+    var fn = foodNoun(e), moreTxt = 'One more ' + fn.word + ' comes! How many ' + fn.plural + ' now?', lessTxt = 'Jammy eats one ' + fn.word + '. How many ' + fn.plural + ' now?';
+    var text = dots ? askNoun(sign > 0 ? moreTxt : lessTxt, fn.icon) : 'What is one ' + (sign > 0 ? 'more' : 'less') + ' than ' + em(n) + '?';
     return { key: (sign > 0 ? 'more' : 'less') + n + (dots ? 'd' : ''), ans: ans, wrong: w, text: text,
-      pic: dots ? (sign > 0 ? tf({ on: n, g: 1 }) : objs(n, e)) : null, say: dots ? [n, sign > 0 ? 'st_one_more' : 'st_one_less'] : [sign > 0 ? 'st_one_more_than' : 'st_one_less_than', n],
-      cell: function (v) { return numCell(v, { dots: dots }); },
+      pic: dots ? objs(n, e) : null, say: dots ? [sayText(sign > 0 ? 'st_one_more' : 'st_one_less', (sign > 0 ? moreTxt : lessTxt))] : [sign > 0 ? 'st_one_more_than' : 'st_one_less_than', n],
+      cell: function (v) { return dots ? { label: String(v), html: '<span class="st-ansnum">' + (A.esc ? A.esc(String(v)) : String(v)) + '</span>', fact: ['w_thats', v] } : numCell(v); },
       hint: function (l) { return dots ? box(sign > 0 ? tf({ on: n, b: 1 }) : tf({ on: n, x: 1 }), l >= 2 ? 'Count them: <b>' + ans + '</b>.' : sign > 0 ? 'Count the dots, then one more.' : 'One is gone. Count the ones that are left.')
         : box(nline(Math.max(0, n - 3), n + 3, { st: n, ans: ans, end: l >= 2, blank: false, hops: l >= 2 ? [[n, ans]] : [] }), l >= 2 ? 'One hop ' + (sign > 0 ? 'up' : 'back') + ' from ' + n + ': <b>' + ans + '</b>.' : 'Find ' + n + ' on the number line. Hop one ' + (sign > 0 ? 'up' : 'back') + '.'); } };
   }
@@ -174,7 +191,7 @@
   function make5Item() {
     if (Math.random() < .6) {
       var k = rnd(1, 4), ans = 5 - k;
-      return { key: 'fill' + k, ans: ans, wrong: within([ans - 1, ans + 1, ans + 2], 1, 5, ans), text: 'How many more to fill it?', pic: tf({ on: k }, 5), say: ['st_fill5'], pictures: true,
+      return { key: 'fill' + k, ans: ans, wrong: within([ans - 1, ans + 1, ans + 2], 1, 5, ans), text: 'How many more dots to fill the five-frame?', pic: tf({ on: k }, 5), say: [sayText('st_fill5', 'How many more dots to fill the five-frame?')], pictures: true,
         cell: function (v) { return { label: WORDS[v] + ' dot' + (v === 1 ? '' : 's'), html: plate(v), fact: [] }; },
         hint: function (l) { return box(l >= 2 ? tf({ on: k, b: ans }, 5) : tf({ on: k, g: ans }, 5), l >= 2 ? 'Fill the empty spots!' : 'Look at the empty spots.'); } };
     }
@@ -192,7 +209,8 @@
   function bigPic(e) { return A.Icons ? A.Icons.html(e, { size: 64, decorative: true, cls: 'pp-pic' }) : e; }
   function tinyItem(hi) {
     var n = rnd(1, hi), e = pick(BIG), w = within([n - 1, n + 1, n + 2], 1, hi + 1, n);
-    return { key: 'tc' + n, ans: n, wrong: w, text: 'How many?', pic: '<span class="st-objs big tap" data-n="' + n + '">' + Array.apply(null, Array(n)).map(function () { return '<i>' + bigPic(e) + '</i>'; }).join('') + '</span>', say: ['st_how_many'], pictures: true,
+    var tn = foodNoun(e), tAsk = 'How many ' + tn.plural + '?';
+    return { key: 'tc' + n, ans: n, wrong: w, text: askNoun(tAsk, tn.icon), pic: '<span class="st-objs big tap" data-n="' + n + '">' + Array.apply(null, Array(n)).map(function () { return '<i>' + bigPic(e) + '</i>'; }).join('') + '</span>', say: [sayText('st_how_many_n', tAsk)], pictures: true,
       cell: function (v) { return { label: String(v), html: '<span class="st-numdot big">' + plate(v) + '<b>' + v + '</b></span>', fact: ['w_thats', v] }; },
       hint: function (l) { return box('<span class="st-objs big">' + Array.apply(null, Array(n)).map(function (_, i) { return '<i>' + bigPic(e) + (l >= 2 ? '<sub>' + (i + 1) + '</sub>' : '') + '</i>'; }).join('') + '</span>', l >= 2 ? 'One, two… <b>' + n + '</b>!' : 'Tap each one and count!'); } };
   }
@@ -391,8 +409,8 @@
     var t = rnd(1, 9), o = rnd(0, 9), v = t * 10 + o, k = pick(['blocks', 'expanded', 'tensCount']), ans = k === 'tensCount' ? t : v;
     return { key: 'pv' + k + v, variant: k, ans: ans,
       wrong: k === 'tensCount' ? uniq([o, t + 1, t - 1, v].filter(function (x) { return x !== ans && x >= 0; })).slice(0, 3) : pvUniq(v, [10 * o + t, t + o, v + 10, v - 10, v + 1]).slice(0, 3),
-      text: k === 'blocks' ? 'How many in all?' : k === 'expanded' ? em(t * 10 + ' + ' + o) + ' makes what number?' : 'How many full tens are in ' + em(v) + '?',
-      pic: k === 'blocks' ? pvPic(t, o) : '', say: [{ id: 'pv100_' + k, text: k === 'blocks' ? 'How many in all?' : k === 'expanded' ? t * 10 + ' plus ' + o + ' makes what number?' : 'How many full tens are in ' + v + '?' }], cell: pvCell,
+      text: k === 'blocks' ? 'How many cubes in all?' : k === 'expanded' ? em(t * 10 + ' + ' + o) + ' makes what number?' : 'How many full tens are in ' + em(v) + '?',
+      pic: k === 'blocks' ? pvPic(t, o) : '', say: [{ id: 'pv100_' + k, text: k === 'blocks' ? 'How many cubes in all?' : k === 'expanded' ? t * 10 + ' plus ' + o + ' makes what number?' : 'How many full tens are in ' + v + '?' }], cell: pvCell,
       hint: function (l) { return box(pvPic(t, o), l >= 2 ? t + ' tens and ' + o + ' ones make ' + v + '. The answer is <b>' + ans + '</b>.' : 'A long rod is one ten. Count the rods, then the single ones.'); } };
   }
   function pvCompareItem() {
@@ -539,8 +557,8 @@
   }
   function tmPickH() { return rnd(1, 12); }
   function tmPickM(kind) { return kind === 'hour_half' ? (Math.random() < .5 ? 0 : 30) : pick([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]); }
-  function tmCellTime(v) { var p = tmParse(v); return { label: String(v), html: p ? tmFace(p.h, p.m, true) : null, fact: ['w_thats', { id: 'tm_say', text: String(v).replace(':', ' ') }], long: true }; }
-  function tmCellDigital(v) { return { label: String(v), fact: ['w_thats', { id: 'tm_say', text: String(v).replace(':', ' ') }] }; }
+  function tmCellTime(v) { var p = tmParse(v); return { label: String(v), html: p ? tmFace(p.h, p.m, true) : null, fact: ['w_thats', { id: 'tm_say', text: String(v) }], long: true }; }
+  function tmCellDigital(v) { return { label: String(v), fact: ['w_thats', { id: 'tm_say', text: String(v) }] }; }
   function tmAmPmEvents() {
     return [
       { ev: 'eats breakfast', ap: 'a.m.' }, { ev: 'gets ready for school', ap: 'a.m.' }, { ev: 'sees the sunrise', ap: 'a.m.' },
@@ -565,7 +583,7 @@
     // which clock / digital→analog
     if (r < .55) {
       return { variant: r < .3 ? 'pickClock' : 'matchDigital', key: 'clk' + t, ans: t, wrong: wrong, text: r < .3 ? 'Which clock shows ' + em(t) + '?' : 'Match the digital time ' + em(t) + ' to the clock.',
-        say: [{ id: 'tm_which', text: 'Which clock shows ' + t.replace(':', ' ') + '?' }], cell: tmCellTime, hint: hint };
+        say: [{ id: 'tm_which', text: 'Which clock shows ' + t + '?' }], cell: tmCellTime, hint: hint };
     }
     // read the analog clock
     return { variant: 'readClock', key: 'read' + t, ans: t, wrong: wrong, pic: tmFace(h, m), text: 'What time does the clock show?',
@@ -579,7 +597,7 @@
       var vals = choices(it.ans, it.wrong, n);
       return { variant: it.variant, text: it.text, pic: it.pic || null, say: it.say, fact: it.cell(it.ans).fact || [], answer: vals.indexOf(it.ans), target: it.key,
         hint: it.hint(1), hint2: it.hint(2),
-        choices: vals.map(function (v) { var c = it.cell(v); return { label: c.label, html: c.html || null, say: [String(v).replace(':', ' ')], value: v, long: !!c.long }; }) };
+        choices: vals.map(function (v) { var c = it.cell(v); return { label: c.label, html: c.html || null, say: [String(v)], value: v, long: !!c.long }; }) };
     };
   }
   function timeGen(kind) {
@@ -587,7 +605,7 @@
       // Munch boards need several distinct goods: category boards (o'clock vs half past, or a shared minute)
       if (kind === 'hour_half') {
         var half = Math.random() < .5, hours = A.shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]), gi = 0, bi = 0;
-        function mk(h, m) { var lab = tmFmt(h, m); return { label: lab, html: tmFace(h, m, true), fact: ['w_thats', { id: 'tm_say', text: lab.replace(':', ' ') }], k: lab, long: true }; }
+        function mk(h, m) { var lab = tmFmt(h, m); return { label: lab, html: tmFace(h, m, true), fact: ['w_thats', { id: 'tm_say', text: lab }], k: lab, long: true }; }
         return { text: half ? 'Munch the half-past times' : 'Munch the o’clock times', say: [{ id: half ? 'tm_munch_half' : 'tm_munch_hour', text: half ? 'Munch the half past times' : 'Munch the oclock times' }], target: half ? 'half' : 'hour',
           stepHint: function (cell, lvl) { var p = tmParse(cell && cell.label); if (!p) return ''; var face = tmFace(p.h, p.m); return box(face, lvl >= 2 ? 'That clock shows <b>' + cell.label + '</b>.' : (half ? 'Half past: long hand on 6.' : 'O’clock: long hand on 12.')); },
           good: function () { return mk(hours[gi++ % 12], half ? 30 : 0); },
@@ -595,7 +613,7 @@
       }
       var mm = pick([5, 10, 15, 20, 25, 35, 40, 45, 50, 55]), hours = A.shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]), gi = 0, bi = 0;
       var other = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].filter(function (x) { return x !== mm; });
-      function mk2(h, m) { var lab = tmFmt(h, m); return { label: lab, html: tmFace(h, m, true), fact: ['w_thats', { id: 'tm_say', text: lab.replace(':', ' ') }], k: lab, long: true }; }
+      function mk2(h, m) { var lab = tmFmt(h, m); return { label: lab, html: tmFace(h, m, true), fact: ['w_thats', { id: 'tm_say', text: lab }], k: lab, long: true }; }
       return { text: 'Munch the clocks that show ' + em(':' + (mm < 10 ? '0' : '') + mm), say: [{ id: 'tm_munch_min', text: 'Munch the clocks that show ' + mm + ' minutes' }], target: mm,
         stepHint: function (cell, lvl) { var p = tmParse(cell && cell.label); if (!p) return ''; return box(tmFace(p.h, p.m), lvl >= 2 ? 'Count by 5s to the long hand: <b>' + cell.label + '</b>.' : 'Each number the long hand passes is 5 minutes.'); },
         good: function () { return mk2(hours[gi++ % 12], mm); },
@@ -745,7 +763,7 @@
     // how much money?
     var bag2 = cnRandBag(100), tot2 = cnTotal(bag2), wrong2 = cnDistractors(bag2).slice(0, 3);
     return { variant: 'countCoins', key: 'cnt' + cnKey(bag2), ans: tot2, wrong: wrong2, pic: cnBag(bag2),
-      text: 'How much money?', say: [{ id: 'cn_how', text: 'How much money?' }], cell: cnCellCents,
+      text: 'How much are these coins worth?', say: [{ id: 'cn_how', text: 'How much are these coins worth?' }], cell: cnCellCents,
       hint: function (l) { return box(cnBag(bag2), l >= 2 ? 'Count bigger coins first. Total: <b>' + cnFmt(tot2) + '</b>.' : 'Quarters (25¢), dimes (10¢), nickels (5¢), pennies (1¢).'); } };
   }
 
@@ -850,7 +868,7 @@
     if (roll < .28 && r >= 2 && c >= 2) {
       var ans = A.Arrays.addSentence(r, c), wrong = arAddWrong(r, c).slice(0, 3);
       return { variant: 'array_add', key: 'add' + r + 'x' + c + food.id, ans: ans, wrong: wrong, pic: pic, r: r, c: c,
-        text: 'Which addition sentence matches?',
+        text: 'Which addition sentence matches ' + r + ' rows of ' + c + '?',
         say: [{ id: 'ar_add', text: 'Which addition sentence matches ' + r + ' rows of ' + c + '?' }],
         cell: function (v) { return { label: String(v), fact: ['w_thats', { id: 'ar_sent', text: String(v) }], long: true }; },
         hint: function (l) { return box(pic, l >= 2 ? 'There are <b>' + r + '</b> rows of <b>' + c + '</b>, so <b>' + ans + '</b>.' : 'Each row has the same number. Add that number once per row.'); } };
@@ -868,15 +886,15 @@
     if (roll < .72) {
       var wc = arUniq(c, [r, c + 1, Math.max(1, c - 1), r + c, tot, r + 1, Math.max(1, r - 1)]).slice(0, 3);
       return { variant: 'howManyInRow', key: 'cols' + r + 'x' + c + food.id, ans: c, wrong: wc, pic: pic, r: r, c: c,
-        text: 'How many in each row?',
-        say: [{ id: 'ar_inrow', text: 'How many in each row?' }],
+        text: 'How many ' + obj + ' in each row?',
+        say: [{ id: 'ar_inrow', text: 'How many ' + obj + ' in each row?' }],
         cell: function (v) { return { label: String(v), fact: ['w_thats', v] }; },
         hint: function (l) { return box(pic, l >= 2 ? 'Each row has <b>' + c + '</b> ' + obj + '.' : 'Pick one row and count across.'); } };
     }
     // array_total: how many in all
     var wt = arTotalWrong(r, c).slice(0, 3);
     return { variant: 'array_total', key: 'tot' + r + 'x' + c + food.id + rnd(1, 3), ans: tot, wrong: wt, pic: pic, r: r, c: c,
-      text: 'How many in all?',
+      text: 'How many ' + food.many + ' in all?',
       say: [{ id: 'ar_tot', text: 'How many ' + food.many + ' in all?' }],
       cell: function (v) { return { label: String(v), fact: ['w_thats', v] }; },
       hint: function (l) { return box(pic, l >= 2 ? '<b>' + r + '</b> rows of <b>' + c + '</b> is <b>' + tot + '</b>.' : 'Add the same number for each row, or count them all.'); } };
@@ -1197,7 +1215,22 @@
     var s = STEPS[sid], ids = C.list(s.subject).map(function (k) { return k.id; }), from = Math.max(0, ids.indexOf(sid)), left = ids.length - from, stride = Math.max(1, Math.ceil(left / PROBE_N)), plan = [];
     // a warm-up that starts in pre-K never places past make-5 (addition is earned in play, after the P gate)
     var mk = ids.indexOf('pk_make5'), ttop = bandTopOf(p) && s.subject === 'math' ? ids.indexOf(bandTopOf(p)) : -1, last = ids.length - 1; while (last > from && !STEPS[ids[last]]) last--; var end = mk >= 0 && from < mk ? mk - 1 : last; if (ttop >= from) end = Math.min(end, ttop); left = end - from + 1; var npv = ids.slice(from, end + 1).filter(function (x) { return /^pv_(tens|compare|ten_more)$/.test(x); }).length;   /* batch1: only the 3 quality1 place-value steps (the 2nd-grade pv_hto / pv_cmp3 count) */ left -= npv; /* quality1: the 3 new place-value steps do not stretch the stride (same picks as before below them; a strong kid still warms up through place value and even/odd) */ if (s.topic) { var BN0 = { T: 0, P: 1, E: 2 }; while (end > from && BN0[STEPS[ids[end]].band] > BN0[band(p)]) end--; left = end - from + 1; } stride = Math.max(1, Math.ceil(left / PROBE_N));
-    for (var i = from; i <= end; i += stride) plan.push(i);
+    // lc1115: early counting warm-ups ask every step (no skip from count-to-10 onto 20).
+    if (s.subject === 'math' && from <= ids.indexOf('pk_count20') && ids.indexOf('pk_count20') >= 0) stride = 1;
+    // pre-K warm-up stays in band: no teen "before", no count-to-30, no 10+7.
+    if (s.subject === 'math' && band(p) === 'P' && bandTopOf(p)) {
+      var capP = ids.indexOf('pk_numid20');
+      if (capP >= from) end = Math.min(end, capP);
+    }
+    // grade-1: 2-digit regrouping and a.m./p.m. wait until place value is ready
+    function probeBlocked(id) {
+      if (s.subject === 'math' && band(p) === 'P' && bandTopOf(p) && !/^(t_|count10$|pk_)/.test(id)) return true;
+      if (!/^(a2_regroup|s2_regroup|time_5min)$/.test(id)) return false;
+      var st = C.state && C.state(p, 'pv_tens');
+      return !(st && (st.status === 'mastered' || st.placed));
+    }
+    while (end > from && probeBlocked(ids[end])) end--;
+    for (var i = from; i <= end; i += stride) { if (probeBlocked(ids[i])) continue; plan.push(i); }
     if (s.topic) { var BN = { T: 0, P: 1, E: 2 }; while (end > from && BN[STEPS[ids[end]].band] > BN[band(p)]) end--; plan = plan.filter(function (i) { return i <= end; }); }
     if (plan[plan.length - 1] !== end) plan.push(end);
     // batch1: the FIRST pick above her own grade is asked twice in a row (two different items); both must be right to place past

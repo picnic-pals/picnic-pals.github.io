@@ -121,11 +121,24 @@ body.gd-land .gd-bg, body.gd-land .gd-title-bg { object-position: center center;
 }
 .gd-ask { margin: 0; font-size: clamp(18px, 4.6vw, 26px); color: #244020; text-align: center; }
 .gd-nudge { margin: 0; font-size: 16px; color: #6a3a16; text-align: center; min-height: 1.2em; }
-.gd-pic { display: flex; justify-content: center; }
-.gd-choices { display: grid; gap: 8px; grid-template-columns: repeat(3, 1fr); }
+.gd-pic { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px; }
+.gd-array { display: inline-flex; flex-direction: column; gap: 4px; padding: 6px 8px; background: #fffbe8; border-radius: 12px; border: 2px solid #d9e8b0; }
+.gd-arow { display: flex; gap: 4px; justify-content: center; }
+.gd-array .pp-pic, .gd-array img, .gd-food { width: 32px; height: 32px; object-fit: contain; }
+.gd-op { font-size: 28px; font-weight: 800; color: #244020; padding: 0 4px; }
+.gd-choices { display: grid; gap: 8px; grid-template-columns: repeat(3, 1fr); flex-shrink: 0; }
 .gd-choices.n4 { grid-template-columns: repeat(2, 1fr); }
 .gd-choices.n2 { grid-template-columns: repeat(2, 1fr); }
 .gd-choice { font-size: clamp(18px, 5vw, 26px); padding: 8px; background: #e8ffd0; }
+@media (max-width: 500px) and (orientation: portrait) {
+  .gd-scene { flex: 1 1 0; }
+  .gd-card { flex: 1.15 1 0; }
+  .gd-array { gap: 2px; padding: 4px 6px; }
+  .gd-array .pp-pic, .gd-array img, .gd-food { width: 22px; height: 22px; }
+  .gd-choices.n4 { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .gd-choice { padding: 6px 2px; font-size: 18px; }
+}
+
 .gd-choice.wrong { background: #ffd0c8; animation: gshake .35s ease; }
 .gd-choice.right { background: #c8f5a0; }
 @keyframes gshake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
@@ -162,3 +175,11 @@ body.gd-land .gd-bg, body.gd-land .gd-title-bg { object-position: center center;
   .gd-scene { flex: 1 1 56%; }
   .gd-card { flex: 1 1 40%; justify-content: center; }
 }
+
+/* stage2: garden prompt and miss hint stay readable on the stage */
+html.stage-on .gd-ask { font-size: 32px; }
+html.stage-on .gd-nudge { font-size: 20px; }
+
+
+/* Stage-enlarged ask text can make the order card more than 45% of the play area. */
+html.stage-on .gd-card { max-height: 45%; overflow: auto; }

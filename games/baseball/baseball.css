@@ -212,6 +212,11 @@ body.bonusing .sign { border-color: #c9b2ff; }
 .rdots { display: inline-flex; flex-wrap: wrap; gap: 6px; max-width: 7.5em; justify-content: center; vertical-align: middle; }
 .rdot { display: inline-block; width: .5em; height: .5em; border-radius: 50%; background: #ffd23c; border: 2px solid #b07800; }
 .rdot.riv { background: #6fcf73; border-color: #2e7d32; } .rdot.runner { background: #9fd2ff; border-color: #2a6cc4; }
+.rdots-runner { gap: 8px; max-width: none; align-items: center; }
+.rdots-runner .rdot { width: 1.15em; height: 1.15em; border-width: 3px; }
+.rdot-cap { margin-left: 8px; font-size: .85em; font-weight: 800; color: #1a4a8a; }
+body.count-runners #runners .runner { filter: drop-shadow(0 0 8px #fff) drop-shadow(0 0 14px #4aa3ff); }
+body.count-runners #fielders, body.count-runners #pitcherG, body.count-runners #batterG { opacity: .35; }
 .pop.dir { font-size: calc(var(--u) * 1.9); color: #fff; }
 .pop.riv { color: #a8f0b0; }
 .vsline { text-align: center; font-weight: 700; font-size: 1.1em; margin: .3em 0; }
@@ -357,8 +362,8 @@ body.passage-ask .cards { min-height: 0; }
   body.passage-ask #parkWrap { min-height: 110px; }
 }
 @media (min-width: 700px) {
-  body.passage-read #parkWrap { height: min(32vh, 280px); }
-  body.passage-ask .sign { max-height: min(18vh, 150px); }
+  html:not(.stage-on) body.passage-read #parkWrap { height: min(32vh, 280px); }
+  html:not(.stage-on) body.passage-ask .sign { max-height: min(18vh, 150px); }
 }
 @media (orientation: landscape) and (max-height: 500px) {
   body.passage-read #game .top { max-height: calc(100dvh - 100px); overflow: hidden; }
@@ -467,4 +472,169 @@ body.passage-ask .cards { min-height: 0; }
 @media (orientation: portrait) {
   .sign:has(.cv-set) .qrow { align-items: flex-start; }
   .sign .qpic .cv-set { --cv-d: clamp(16px, 5vw, 30px); }
+}
+
+
+/* ---------- fixed design stage (arcade/css/stage.css) — question bar typography (stage2) ---------- */
+/* Stack the prompt, ten-frames, and hint so they read at arm's length on a 412px phone.
+   The field (#parkWrap) is flex:1 and shrinks to give the bar room. */
+html.stage-on #game .top {
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 8px;
+  min-height: 0;
+  padding: 8px 10px 6px;
+}
+html.stage-on #game .top .sign {
+  order: 5;
+  flex: 1 1 100%;
+  width: 100%;
+  max-width: 100%;
+  margin-right: 0; /* cancel the portrait -58px that clipped the speaker */
+  box-sizing: border-box;
+  overflow: visible;
+  padding: 10px 12px 12px;
+  gap: 8px;
+}
+html.stage-on .sign .qrow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    "txt speak shot"
+    "pic  pic   pic";
+  column-gap: 8px;
+  row-gap: 8px;
+  align-items: start;
+  min-height: 0;
+}
+html.stage-on .sign .qtxt {
+  grid-area: txt;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1.15;
+  min-width: 0;
+}
+html.stage-on .sign .speak {
+  grid-area: speak;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  margin: 0;
+  align-self: start;
+}
+html.stage-on .sign .shot {
+  grid-area: shot;
+  font-size: 20px;
+  min-width: 0;
+  align-self: center;
+}
+html.stage-on .sign .qpic,
+html.stage-on .sign .qpic.on {
+  grid-area: pic;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 100%;
+  font-size: 28px;
+}
+html.stage-on .sign .qpic:not(.on) { display: none; }
+html.stage-on .sign .qpic .cv-set,
+html.stage-on .sign .qpic .cv-set.cv-frames {
+  --cv-d: 22px;
+  flex-wrap: nowrap;
+  justify-content: center;
+}
+html.stage-on .sign .cv-flab {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+html.stage-on .bb-hint {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #5a4a7a;
+  max-width: 100%;
+  text-align: center;
+  overflow: visible;
+}
+html.stage-on .swingtag { font-size: 18px; line-height: 22px; }
+html.stage-on .cards { min-height: 0; }
+html.stage-on .bcard.rich { font-size: 32px; }
+html.stage-on .friend-bubble { max-width: min(360px, 90%); }
+
+/* Passage questions keep their own scrolling typography. */
+html.stage-on body.passage-read .sign .qtxt,
+html.stage-on body.passage-ask .sign .qtxt { font-size: 22px; }
+
+html.stage-on[data-stage="portrait"] .sign .qtxt { font-size: 36px; }
+html.stage-on[data-stage="portrait"] .sign .qpic .cv-set { --cv-d: 22px; }
+html.stage-on[data-stage="portrait"] .cards { flex-wrap: wrap; gap: 8px; padding: 6px 10px 8px; }
+html.stage-on[data-stage="portrait"] .bcard { flex: 1 1 42%; min-width: 140px; min-height: 72px; padding: 16px 8px 8px; }
+html.stage-on[data-stage="portrait"] #game .keys { display: none; }
+
+html.stage-on[data-stage="landscape"] .sign .qtxt { font-size: 38px; }
+html.stage-on[data-stage="landscape"] .sign .qpic .cv-set { --cv-d: 24px; }
+html.stage-on[data-stage="landscape"] .bb-hint { font-size: 22px; }
+html.stage-on[data-stage="landscape"] .sign .cv-flab { font-size: 18px; }
+html.stage-on[data-stage="landscape"] .cards { flex-wrap: nowrap; gap: 12px; padding: 8px 16px; }
+html.stage-on[data-stage="landscape"] .bcard { flex: 1 1 0; min-width: 0; min-height: 100px; padding: 16px 8px 10px; }
+
+
+/* Stage scale shrinks 60 design-px "I'm ready"; 32vh / 100dvh park and typography
+   follow the window, not the 400x720 / 1024x640 stage. */
+html.stage-on body.passage-read .pass-ready {
+  min-height: max(62px, calc(62px / var(--stage-scale, 1)));
+  min-width: max(140px, calc(140px / var(--stage-scale, 1)));
+}
+html.stage-on body.passage-read #game .top {
+  max-height: none;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+html.stage-on body.passage-read .sign {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+  max-height: none;
+}
+html.stage-on body.passage-read .sign .qrow {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  align-items: stretch;
+}
+html.stage-on[data-stage="portrait"] body.passage-read .sign .qtxt,
+html.stage-on[data-stage="landscape"] body.passage-read .sign .qtxt,
+html.stage-on body.passage-read .sign .qtxt,
+html.stage-on body.passage-ask .sign .qtxt {
+  font-size: 22px;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  align-self: stretch;
+}
+html.stage-on body.passage-read .qp-pass .qp-title { font-size: 18px; }
+html.stage-on body.passage-read .qp-pass .qp-body { font-size: 16px; line-height: 1.32; }
+html.stage-on body.passage-read .pass-actions {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 2;
+  background: #fffdf6;
+  padding: 6px 0 4px;
+  margin-top: 0;
+}
+html.stage-on[data-stage="portrait"] body.passage-read #parkWrap {
+  height: min(16%, 110px);
+  min-height: 80px;
+}
+html.stage-on[data-stage="landscape"] body.passage-read #parkWrap {
+  height: min(28%, 180px);
+  min-height: max(132px, calc(82px / var(--stage-scale, 1)));
 }

@@ -38,6 +38,7 @@
   SHAPES.forEach(function (s) { lines.push(['tp_find_' + s.id, s.find]); lines.push(['tp_is_' + s.id, s.is]); });
   COLORS.forEach(function (c) { lines.push(['tp_color_' + c.id, c.ask]); lines.push(['tp_c_' + c.id, c.is]); });
   [1, 2, 3].forEach(function (n) { lines.push(['tp_count_' + n, 'Find ' + NUM[n] + '!']); lines.push(['tp_n_' + n, "That's " + NUM[n] + '!']); });
+  // lc1115: count prompts name the food in the spoken line (tp_count_<n>_<food>) via tiny.js; these remain fallbacks.
   var PT = [['pt_stop', 'Great stopping point! You played so well today. Time to rest.'], ['pt_bye', 'Bye bye! See you next time!'],
     ['pt_stretch', 'Time for a stretch! Reach up high, wiggle your fingers, and take a big breath.']];
   A.Tiny = { FOODS: FOODS, SHAPES: SHAPES, COLORS: COLORS, NUM: NUM, LINES: lines, PT_LINES: PT, ROUND: 6 };

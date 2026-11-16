@@ -673,6 +673,15 @@ body::before, body::after { display: none !important; content: none !important; 
   display: flex; align-items: center; justify-content: center;
 }
 .sr-qcard #srCardSpeak .pp-icon { width: 32px; height: 32px; }
+.sr-hint {
+  margin: 8px 0 0;
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: #fff4d6;
+  color: #5a3d1c;
+  font: 700 18px/1.3 inherit;
+  text-align: center;
+}
 .sr-ask {
   grid-column: 1; grid-row: 2;
   margin: 0;
@@ -684,6 +693,9 @@ body::before, body::after { display: none !important; content: none !important; 
   overflow-wrap: anywhere;
   word-break: break-word;
 }
+.sr-fact { max-height: 56px; overflow: hidden; align-items: center; }
+.sr-fact .cv-set { --cv-d: 8px; }
+.sr-fact .pb-op, .sr-fact .sr-qmark { font-size: 22px; margin: 0 4px; }
 .sr-pics {
   grid-column: 1 / -1;
   grid-row: 3;
@@ -692,7 +704,8 @@ body::before, body::after { display: none !important; content: none !important; 
   min-width: 0;
 }
 .sr-pics .pp-icon, .sr-pics .pp-emoji { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
-.sr-qcard .cv-set { --cv-d: 16px; }
+.sr-qcard .cv-set { --cv-d: 36px; }
+.sr-qcard .cv-set.cv-foods { --cv-d: 42px; }
 .sr-choices {
   grid-column: 1 / -1;
   grid-row: 4;
@@ -813,69 +826,120 @@ body::before, body::after { display: none !important; content: none !important; 
 }
 
 @media (min-width: 700px) and (min-height: 900px) {
-  .sr-row { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-  .sr-part { width: auto; min-height: 110px; }
-  .sr-part .pp-icon, .sr-part .pp-emoji { width: 64px; height: 64px; }
-  .sr-qcard { padding: 12px 14px 14px; gap: 8px; max-height: 34%; overflow: auto; }
-  .sr-choice { min-width: 136px; min-height: 132px; font-size: 42px; }
-  .sr-choice .pp-icon, .sr-choice .pp-emoji { width: 80px; height: 80px; }
-  .sr-pics .pp-icon, .sr-pics .pp-emoji { width: 40px; height: 40px; }
-  .sr-qcard .cv-set { --cv-d: 18px; }
-  .sr-kart { --sz: 300px; width: var(--sz); height: var(--sz); }
-  .sr-kart.sm { --sz: 250px; width: var(--sz); height: var(--sz); }
-  .sr-preview .sr-kart { --sz: 340px; width: var(--sz); height: var(--sz); }
-  .sr-track .sr-kart { --sz: 112px; width: var(--sz); height: var(--sz); }
-  .sr-track .sr-kart.sm { --sz: 80px; width: var(--sz); height: var(--sz); }
-  .sr-track .sr-obstacle { width: 60px; height: 60px; }
-  .sr-track .sr-obstacle .pp-icon, .sr-track .sr-obstacle .pp-emoji { width: 60px; height: 60px; }
-  .sr-track {
+  
+  html:not(.stage-on) .sr-row { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  
+  html:not(.stage-on) .sr-part { width: auto; min-height: 110px; }
+  
+  html:not(.stage-on) .sr-part .pp-icon,
+  html:not(.stage-on) .sr-part .pp-emoji { width: 64px; height: 64px; }
+  
+  html:not(.stage-on) .sr-qcard { padding: 12px 14px 14px; gap: 8px; max-height: 34%; overflow: auto; }
+  
+  html:not(.stage-on) .sr-choice { min-width: 136px; min-height: 132px; font-size: 42px; }
+  
+  html:not(.stage-on) .sr-choice .pp-icon,
+  html:not(.stage-on) .sr-choice .pp-emoji { width: 80px; height: 80px; }
+  
+  html:not(.stage-on) .sr-pics .pp-icon,
+  html:not(.stage-on) .sr-pics .pp-emoji { width: 40px; height: 40px; }
+  
+  html:not(.stage-on) .sr-qcard .cv-set { --cv-d: 40px; }
+  
+  html:not(.stage-on) .sr-qcard .cv-set.cv-foods { --cv-d: 48px; }
+  
+  html:not(.stage-on) .sr-kart { --sz: 300px; width: var(--sz); height: var(--sz); }
+  
+  html:not(.stage-on) .sr-kart.sm { --sz: 250px; width: var(--sz); height: var(--sz); }
+  
+  html:not(.stage-on) .sr-preview .sr-kart { --sz: 340px; width: var(--sz); height: var(--sz); }
+  
+  html:not(.stage-on) .sr-track .sr-kart { --sz: 112px; width: var(--sz); height: var(--sz); }
+  
+  html:not(.stage-on) .sr-track .sr-kart.sm { --sz: 80px; width: var(--sz); height: var(--sz); }
+  
+  html:not(.stage-on) .sr-track .sr-obstacle { width: 60px; height: 60px; }
+  
+  html:not(.stage-on) .sr-track .sr-obstacle .pp-icon,
+  html:not(.stage-on) .sr-track .sr-obstacle .pp-emoji { width: 60px; height: 60px; }
+  
+  html:not(.stage-on) .sr-track {
     flex: 1 1 280px;
     min-height: 220px;
     height: auto;
   }
-  .sr-lane.opp { --gy: 365; }
-  .sr-preview { min-height: 280px; }
-  .sr-garage .sr-preview { min-height: 300px; }
-  .sr-thumb { width: 80px; height: 80px; }
-  .sr-obstacle { width: 120px; height: 120px; }
-  .sr-obstacle .pp-icon, .sr-obstacle .pp-emoji { width: 120px; height: 120px; }
-  .sr-boss { width: 120px; }
-  .sr-boss img { width: 116px; height: 116px; }
   
-.sr-podium-art {
+  html:not(.stage-on) .sr-lane.opp { --gy: 365; }
+  
+  html:not(.stage-on) .sr-preview { min-height: 280px; }
+  
+  html:not(.stage-on) .sr-garage .sr-preview { min-height: 300px; }
+  
+  html:not(.stage-on) .sr-thumb { width: 80px; height: 80px; }
+  
+  html:not(.stage-on) .sr-obstacle { width: 120px; height: 120px; }
+  
+  html:not(.stage-on) .sr-obstacle .pp-icon,
+  html:not(.stage-on) .sr-obstacle .pp-emoji { width: 120px; height: 120px; }
+  
+  html:not(.stage-on) .sr-boss { width: 120px; }
+  
+  html:not(.stage-on) .sr-boss img { width: 116px; height: 116px; }
+  
+
+  
+html:not(.stage-on) .sr-podium-art {
   width: 100%;
   max-width: 680px;
   margin: 0 auto;
   padding-top: 20%;
   flex: 1 1 auto;
 }
-.sr-podium-stage { position: relative; width: 100%; }
-.sr-podium-img {
+
+html:not(.stage-on) .sr-podium-stage { position: relative; width: 100%; }
+
+html:not(.stage-on) .sr-podium-img {
   width: 100%;
   height: auto;
   display: block;
   pointer-events: none;
 }
-.sr-onstep {
+
+html:not(.stage-on) .sr-onstep {
   position: absolute;
   width: 34%;
   transform: translate(-50%, -79.7%);
   z-index: 2;
 }
-.sr-onstep.first { left: 47.2%; top: 14.2%; width: 40%; z-index: 3; }
-.sr-onstep.second { left: 18.0%; top: 32.6%; width: 34%; }
-.sr-onstep.third { left: 79.1%; top: 44.9%; width: 30%; }
-.sr-onstep .sr-kart { filter: drop-shadow(0 4px 4px rgba(40,24,8,0.35)); width: 100%; height: auto; aspect-ratio: 1; }
-.sr-stands { min-height: 340px; }
-  .sr-stand.first img { width: 200px; height: 200px; }
-  .sr-stand.second img { width: 150px; height: 150px; }
-  .sr-stand.third img { width: 120px; height: 120px; }
-  .sr-stand.first .sr-sil { width: 200px; height: 200px; }
-  .sr-stand.second .sr-sil { width: 150px; height: 150px; }
-  .sr-coins-won .pp-icon, .sr-coins-won .pp-emoji { width: 110px; height: 110px; }
-  .sr-ask { font-size: 32px; }
-  .sr-prop.tree { width: 80px; }
-  .sr-prop.tree .pp-icon { width: 80px; }
+
+html:not(.stage-on) .sr-onstep.first { left: 47.2%; top: 14.2%; width: 40%; z-index: 3; }
+
+html:not(.stage-on) .sr-onstep.second { left: 18.0%; top: 32.6%; width: 34%; }
+
+html:not(.stage-on) .sr-onstep.third { left: 79.1%; top: 44.9%; width: 30%; }
+
+html:not(.stage-on) .sr-onstep .sr-kart { filter: drop-shadow(0 4px 4px rgba(40,24,8,0.35)); width: 100%; height: auto; aspect-ratio: 1; }
+
+html:not(.stage-on) .sr-stands { min-height: 340px; }
+  
+  html:not(.stage-on) .sr-stand.first img { width: 200px; height: 200px; }
+  
+  html:not(.stage-on) .sr-stand.second img { width: 150px; height: 150px; }
+  
+  html:not(.stage-on) .sr-stand.third img { width: 120px; height: 120px; }
+  
+  html:not(.stage-on) .sr-stand.first .sr-sil { width: 200px; height: 200px; }
+  
+  html:not(.stage-on) .sr-stand.second .sr-sil { width: 150px; height: 150px; }
+  
+  html:not(.stage-on) .sr-coins-won .pp-icon,
+  html:not(.stage-on) .sr-coins-won .pp-emoji { width: 110px; height: 110px; }
+  
+  html:not(.stage-on) .sr-ask { font-size: 32px; }
+  
+  html:not(.stage-on) .sr-prop.tree { width: 80px; }
+  
+  html:not(.stage-on) .sr-prop.tree .pp-icon { width: 80px; }
 }
 @media (max-width: 400px) {
   #racers { padding: 6px 8px 8px; gap: 6px; }
@@ -985,57 +1049,74 @@ body::before, body::after { display: none !important; content: none !important; 
 
 /* ---- playtester round 3: short-height landscape, 60px header, compact podium ---- */
 @media (orientation: landscape) and (max-height: 820px) {
-  #racers { width: min(100%, 1100px); padding: 4px 8px 6px; gap: 4px; }
-  .sr-header { min-height: 60px; gap: 6px; }
-  .sr-header button, .sr-coins { min-width: 60px; min-height: 60px; }
-  .sr-header h1 { font-size: 20px; padding: 2px 6px; }
-  .sr-track {
+  html:not(.stage-on) #racers { width: min(100%, 1100px); padding: 4px 8px 6px; gap: 4px; }
+  html:not(.stage-on) .sr-header { min-height: 60px; gap: 6px; }
+  html:not(.stage-on) .sr-header button, html:not(.stage-on) .sr-coins { min-width: 60px; min-height: 60px; }
+  html:not(.stage-on) .sr-header h1 { font-size: 20px; padding: 2px 6px; }
+  html:not(.stage-on) .sr-track {
     flex: 1 1 220px;
     min-height: 180px;
     height: auto;
   }
-  .sr-track .sr-kart { --sz: 78px; width: var(--sz); height: var(--sz); }
-  .sr-track .sr-kart.sm { --sz: 56px; width: var(--sz); height: var(--sz); }
-  .sr-qcard { padding: 8px 10px 10px; gap: 6px; min-height: 0; overflow: auto; }
-  .sr-ask { font-size: 22px; }
-  .sr-choice { min-width: 100px; min-height: 64px; font-size: 28px; }
-  .sr-choice .pp-icon, .sr-choice .pp-emoji { width: 48px; height: 48px; }
-  .sr-pics .pp-icon, .sr-pics .pp-emoji { width: 36px; height: 36px; }
-  .sr-podium { gap: 6px; }
-  .sr-podium-art { flex: 0 1 auto; max-height: min(38vh, 240px); padding-top: 0; width: min(100%, 420px); }
-  .sr-podium h2 { font-size: 24px; }
-  .sr-podium > p { font-size: 16px; }
-  .sr-coins-won .pp-icon, .sr-coins-won .pp-emoji { width: 48px; height: 48px; }
-  .sr-podium .sr-actions { flex: 0 0 auto; margin-top: auto; }
-  .sr-podium .sr-action, .sr-podium .sr-secondary { min-height: 48px; }
+  html:not(.stage-on) .sr-track .sr-kart { --sz: 78px; width: var(--sz); height: var(--sz); }
+  html:not(.stage-on) .sr-track .sr-kart.sm { --sz: 56px; width: var(--sz); height: var(--sz); }
+  html:not(.stage-on) .sr-qcard { padding: 8px 10px 10px; gap: 6px; min-height: 0; overflow: auto; }
+  html:not(.stage-on) .sr-ask { font-size: 22px; }
+  html:not(.stage-on) .sr-choice { min-width: 100px; min-height: 64px; font-size: 28px; }
+  html:not(.stage-on) .sr-choice .pp-icon, html:not(.stage-on) .sr-choice .pp-emoji { width: 48px; height: 48px; }
+  html:not(.stage-on) .sr-pics .pp-icon, html:not(.stage-on) .sr-pics .pp-emoji { width: 36px; height: 36px; }
+  html:not(.stage-on) .sr-podium { gap: 6px; }
+  html:not(.stage-on) .sr-podium-art { flex: 0 1 auto; max-height: min(38vh, 240px); padding-top: 0; width: min(100%, 420px); }
+  html:not(.stage-on) .sr-podium h2 { font-size: 24px; }
+  html:not(.stage-on) .sr-podium > p { font-size: 16px; }
+  html:not(.stage-on) .sr-coins-won .pp-icon, html:not(.stage-on) .sr-coins-won .pp-emoji { width: 48px; height: 48px; }
+  html:not(.stage-on) .sr-podium .sr-actions { flex: 0 0 auto; margin-top: auto; }
+  html:not(.stage-on) .sr-podium .sr-action, html:not(.stage-on) .sr-podium .sr-secondary { min-height: 48px; }
 }
 @media (orientation: landscape) and (max-height: 500px) {
-  #racers { padding: 2px 6px 8px; gap: 2px; }
-  #srContent { gap: 4px; min-height: 0; }
-  .sr-progress { display: none; }
-  .sr-track {
+  
+  html:not(.stage-on) #racers { padding: 2px 6px 8px; gap: 2px; }
+  
+  html:not(.stage-on) #srContent { gap: 4px; min-height: 0; }
+  
+  html:not(.stage-on) .sr-progress { display: none; }
+  
+  html:not(.stage-on) .sr-track {
     --box: 124;
     height: calc(var(--box) * 1px);
     flex: 0 0 calc(var(--box) * 1px);
     max-height: 124px;
   }
-  .sr-track .sr-kart { --sz: 52px; }
-  .sr-track .sr-kart.sm { --sz: 38px; }
-  .sr-qcard {
+  
+  html:not(.stage-on) .sr-track .sr-kart { --sz: 52px; }
+  
+  html:not(.stage-on) .sr-track .sr-kart.sm { --sz: 38px; }
+  
+  html:not(.stage-on) .sr-qcard {
     flex: 1 1 auto; min-height: 0;
     max-height: none;
     padding: 4px 8px 8px; gap: 2px 6px;
     overflow: hidden;
     align-content: start;
   }
-  .sr-qwho { font-size: 13px; }
-  .sr-ask { font-size: 18px; line-height: 1.15; }
-  .sr-pics { margin-top: 0; gap: 2px; }
-  .sr-pics .pp-icon, .sr-pics .pp-emoji { width: 26px; height: 26px; }
-  .sr-choices { flex-wrap: nowrap; margin: 6px 0 8px; gap: 8px; }
-  .sr-choice { min-height: 60px; min-width: 0; flex: 1; font-size: 22px; padding: 4px 6px; }
-  .sr-choice .pp-icon, .sr-choice .pp-emoji { width: 36px; height: 36px; }
-  .sr-podium {
+  
+  html:not(.stage-on) .sr-qwho { font-size: 13px; }
+  
+  html:not(.stage-on) .sr-ask { font-size: 18px; line-height: 1.15; }
+  
+  html:not(.stage-on) .sr-pics { margin-top: 0; gap: 2px; }
+  
+  html:not(.stage-on) .sr-pics .pp-icon,
+  html:not(.stage-on) .sr-pics .pp-emoji { width: 26px; height: 26px; }
+  
+  html:not(.stage-on) .sr-choices { flex-wrap: nowrap; margin: 6px 0 8px; gap: 8px; }
+  
+  html:not(.stage-on) .sr-choice { min-height: 60px; min-width: 0; flex: 1; font-size: 22px; padding: 4px 6px; }
+  
+  html:not(.stage-on) .sr-choice .pp-icon,
+  html:not(.stage-on) .sr-choice .pp-emoji { width: 36px; height: 36px; }
+  
+  html:not(.stage-on) .sr-podium {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(240px, 1.1fr);
     grid-template-rows: auto auto 1fr auto;
@@ -1044,10 +1125,15 @@ body::before, body::after { display: none !important; content: none !important; 
     height: 100%;
     min-height: 0;
   }
-  .sr-podium.celebrate::before { grid-column: 2; height: 32px; margin: 0 auto 0; }
-  .sr-podium h2 { grid-column: 2; font-size: 20px; margin: 0; }
-  .sr-podium .sr-coins-won, .sr-podium > p { grid-column: 2; }
-  .sr-podium-art {
+  
+  html:not(.stage-on) .sr-podium.celebrate::before { grid-column: 2; height: 32px; margin: 0 auto 0; }
+  
+  html:not(.stage-on) .sr-podium h2 { grid-column: 2; font-size: 20px; margin: 0; }
+  
+  html:not(.stage-on) .sr-podium .sr-coins-won,
+  html:not(.stage-on) .sr-podium > p { grid-column: 2; }
+  
+  html:not(.stage-on) .sr-podium-art {
     grid-column: 1;
     grid-row: 1 / -1;
     flex: none;
@@ -1059,8 +1145,11 @@ body::before, body::after { display: none !important; content: none !important; 
     padding-top: 18%;
     align-self: stretch;
   }
-  .sr-podium .sr-actions { grid-column: 2; flex: 0 0 auto; width: 100%; }
-  .sr-podium .sr-action, .sr-podium .sr-secondary { min-height: 40px; }
+  
+  html:not(.stage-on) .sr-podium .sr-actions { grid-column: 2; flex: 0 0 auto; width: 100%; }
+  
+  html:not(.stage-on) .sr-podium .sr-action,
+  html:not(.stage-on) .sr-podium .sr-secondary { min-height: 40px; }
 }
 
 
@@ -1112,16 +1201,20 @@ body::before, body::after { display: none !important; content: none !important; 
   .sr-ask { font-size: 28px; }
   .sr-choices { margin-top: 0; }
   .sr-pics .pp-icon, .sr-pics .pp-emoji { width: 36px; height: 36px; }
-  .sr-qcard .cv-set { --cv-d: 16px; }
+  .sr-qcard .cv-set { --cv-d: 36px; }
+.sr-qcard .cv-set.cv-foods { --cv-d: 42px; }
 }
 @media (orientation: portrait) and (min-width: 700px) and (min-height: 900px) {
-  .sr-qcard { max-height: 34%; }
-  .sr-ask { font-size: 28px; }
+  
+  html:not(.stage-on) .sr-qcard { max-height: 34%; }
+  
+  html:not(.stage-on) .sr-ask { font-size: 28px; }
 }
 
 /* r8: short-landscape menu — shrink the garage preview and keep Race a friend in the fold */
 @media (orientation: landscape) and (max-height: 500px) {
-  .sr-menu {
+  
+  html:not(.stage-on) .sr-menu {
     flex-direction: row;
     flex-wrap: wrap;
     align-content: start;
@@ -1129,28 +1222,36 @@ body::before, body::after { display: none !important; content: none !important; 
     overflow: hidden;
     gap: 6px;
   }
-  .sr-menu .sr-preview {
+  
+  html:not(.stage-on) .sr-menu .sr-preview {
     flex: 0 0 30%;
     min-height: 0 !important;
     max-height: calc(100dvh - 72px);
     padding: 4px 4px 0;
   }
-  .sr-menu .sr-preview .sr-kart { --sz: 108px; width: var(--sz); height: var(--sz); }
-  .sr-menu .sr-panel:not(.sr-preview) {
+  
+  html:not(.stage-on) .sr-menu .sr-preview .sr-kart { --sz: 108px; width: var(--sz); height: var(--sz); }
+  
+  html:not(.stage-on) .sr-menu .sr-panel:not(.sr-preview) {
     flex: 1 1 62%;
     min-width: 0;
     padding: 6px 10px;
   }
-  .sr-menu .sr-lead { font-size: 18px; margin: 0; }
-  .sr-menu .sr-sub { font-size: 13px; margin: 2px 0 0; }
-  .sr-menu .sr-actions {
+  
+  html:not(.stage-on) .sr-menu .sr-lead { font-size: 18px; margin: 0; }
+  
+  html:not(.stage-on) .sr-menu .sr-sub { font-size: 13px; margin: 2px 0 0; }
+  
+  html:not(.stage-on) .sr-menu .sr-actions {
     flex: 1 1 62%;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 6px;
     min-width: 0;
   }
-  .sr-menu .sr-btn, .sr-menu .sr-secondary {
+  
+  html:not(.stage-on) .sr-menu .sr-btn,
+  html:not(.stage-on) .sr-menu .sr-secondary {
     flex: 1 1 46%;
     width: auto;
     min-height: 60px;
@@ -1204,7 +1305,8 @@ body::before, body::after { display: none !important; content: none !important; 
 @keyframes srChoiceOk { 0% { transform: scale(.92); } 60% { transform: scale(1.06); } 100% { transform: scale(1); } }
 
 @media (orientation: landscape) and (max-height: 500px) {
-  .sr-race {
+  
+  html:not(.stage-on) .sr-race {
     display: grid;
     grid-template-columns: minmax(0, 1.35fr) minmax(260px, 1fr);
     grid-template-rows: auto auto 1fr auto;
@@ -1212,9 +1314,12 @@ body::before, body::after { display: none !important; content: none !important; 
     min-height: 0;
     height: 100%;
   }
-  .sr-pips { grid-column: 1; grid-row: 1; }
-  .sr-progress { grid-column: 1; grid-row: 2; display: block !important; }
-  .sr-track {
+  
+  html:not(.stage-on) .sr-pips { grid-column: 1; grid-row: 1; }
+  
+  html:not(.stage-on) .sr-progress { grid-column: 1; grid-row: 2; display: block !important; }
+  
+  html:not(.stage-on) .sr-track {
     grid-column: 1;
     grid-row: 3;
     --box: 220;
@@ -1223,7 +1328,8 @@ body::before, body::after { display: none !important; content: none !important; 
     flex: 0 0 calc(var(--box) * 1px) !important;
     --ts: calc(var(--box) / 280);
   }
-  .sr-qcard {
+  
+  html:not(.stage-on) .sr-qcard {
     grid-column: 2;
     grid-row: 1 / -1;
     flex: auto;
@@ -1231,13 +1337,112 @@ body::before, body::after { display: none !important; content: none !important; 
     overflow: auto;
     align-content: center;
   }
-  .sr-status { grid-column: 1; grid-row: 4; }
-  .sr-ask { font-size: 22px; }
-  .sr-choice { min-height: 60px; font-size: 24px; }
+  
+  html:not(.stage-on) .sr-status { grid-column: 1; grid-row: 4; }
+  
+  html:not(.stage-on) .sr-ask { font-size: 22px; }
+  
+  html:not(.stage-on) .sr-choice { min-height: 60px; font-size: 24px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .sr-track.live .sr-lane .sr-kart,
   .sr-track.slipping .sr-lane.me .sr-kart,
   .sr-item.boost, .sr-item.slip, .sr-choice.ok { animation: none !important; }
+}
+
+@media (max-height: 500px) {
+  .sr-fact { max-height: 28px; }
+  .sr-fact .cv-set { --cv-d: 6px; }
+  .sr-fact .cv-frame, .sr-fact .cv-five { transform: scale(0.7); transform-origin: left center; }
+}
+
+/* stage2: keep the question card readable when viewport media queries would shrink it */
+html.stage-on .sr-ask { font-size: 32px; }
+html.stage-on .sr-fact { max-height: none; }
+html.stage-on .sr-fact .cv-set { --cv-d: 16px; }
+html.stage-on .sr-hint, html.stage-on .sr-nudge { font-size: 20px; }
+
+
+/* Keep header taps at 60px rendered and answer tiles at 44px rendered under stage scale.
+   Add a little slack for subpixel rounding, and pull the choice row up on a short landscape viewport. */
+html.stage-on .sr-header { min-height: max(62px, calc(62px / var(--stage-scale, 1))); }
+html.stage-on .sr-header button,
+html.stage-on .sr-coins {
+  min-width: max(62px, calc(62px / var(--stage-scale, 1)));
+  min-height: max(62px, calc(62px / var(--stage-scale, 1)));
+}
+html.stage-on .sr-choice {
+  min-width: max(76px, calc(46px / var(--stage-scale, 1)));
+  min-height: max(76px, calc(46px / var(--stage-scale, 1)));
+}
+/* Let the 1024x640 design track keep its default flex/min-height so --ts
+   stays aligned with the road art (kartOnRoad). */
+html.stage-on[data-stage="landscape"] .sr-qcard {
+  padding: 4px 8px 4px;
+  max-height: none;
+  margin-top: -52px;
+  position: relative;
+  z-index: 3;
+}
+html.stage-on[data-stage="landscape"] .sr-track {
+  flex: 1 1 362px;
+  min-height: 362px;
+  --box: 362;
+  --ts: calc(var(--box) / 280);
+}
+html.stage-on[data-stage="landscape"] #racers {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  box-sizing: border-box;
+  padding-bottom: 16px;
+}
+
+html.stage-on[data-stage="landscape"] .sr-pics { margin: 0; gap: 2px; }
+html.stage-on[data-stage="landscape"] .sr-pics .pp-icon,
+html.stage-on[data-stage="landscape"] .sr-pics .pp-emoji { width: 22px; height: 22px; }
+html.stage-on[data-stage="landscape"] .sr-pics .cv-set,
+html.stage-on[data-stage="landscape"] .sr-pics .cv-frame { height: 24px; --cv-d: 14px; transform: none; }
+html.stage-on[data-stage="landscape"] .sr-pics { max-height: 26px; overflow: hidden; }
+html.stage-on[data-stage="landscape"] .sr-choices { margin-top: 2px; margin-bottom: 0; }
+html.stage-on[data-stage="landscape"] .sr-qcard { gap: 2px; }
+html.stage-on[data-stage="landscape"] .sr-who, html.stage-on[data-stage="landscape"] .sr-qwho { margin: 0; }
+
+
+html.stage-on[data-stage="landscape"] .sr-progress { display: none; }
+html.stage-on[data-stage="landscape"] .sr-pips { height: auto; min-height: 0; margin: 0; padding: 0; }
+html.stage-on[data-stage="landscape"] #racers,
+html.stage-on[data-stage="landscape"] #srContent { gap: 2px; }
+
+html.stage-on[data-stage="landscape"] .sr-podium {
+  min-height: 0;
+  gap: 6px;
+  overflow: hidden;
+}
+html.stage-on[data-stage="landscape"] .sr-podium-art,
+html.stage-on[data-stage="landscape"] .sr-podium-art.two,
+html.stage-on[data-stage="landscape"] .sr-podium-img,
+html.stage-on[data-stage="landscape"] .sr-podium-art.two .sr-podium-img {
+  max-height: 200px !important;
+  padding-top: 0 !important;
+  height: auto !important;
+}
+html.stage-on[data-stage="landscape"] .sr-podium {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+html.stage-on[data-stage="landscape"] .sr-podium .sr-actions {
+  margin-top: 8px;
+  padding: 0;
+  height: auto;
+  max-height: 80px;
+}
+html.stage-on[data-stage="landscape"] .sr-podium .sr-actions,
+html.stage-on[data-stage="landscape"] #srAgain,
+html.stage-on[data-stage="landscape"] .sr-podium .sr-action {
+  flex-shrink: 0;
+  min-height: 48px;
 }

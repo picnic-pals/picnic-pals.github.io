@@ -97,7 +97,7 @@
   var ORDER_STEPS = [
     { id: 'o_match', name: 'Match the picture', band: 'T', fast: false,
       params: function (ctx) { return { id: anyPick(ctx), n: ctx.band === 'T' && !ctx.done ? 2 : 3 }; },
-      build: function (P, ctx) { var o = pickOrder(P, ctx, ids(ingr(ctx.p))); o.say = ['ls_this_one']; o.want = [{ id: P.id, n: 1 }]; o.showPic = true; return o; } },
+      build: function (P, ctx) { var o = pickOrder(P, ctx, ids(ingr(ctx.p))); var nm0 = (BY[P.id] && BY[P.id].name) || 'one'; o.say = [{ id: 'ls_this_one', text: 'Can I have this ' + nm0 + ', please?' }]; o.want = [{ id: P.id, n: 1 }]; o.showPic = true; o.thisOne = true; return o; } },
     { id: 'o_color', name: 'Find the color', band: 'T', fast: false,
       params: function (ctx) { return { id: pick(ingr(ctx.p).filter(function (x) { return SAYC.indexOf(x.color) >= 0; })).id, n: ctx.band === 'T' && !ctx.done ? 2 : 3 }; },
       build: function (P, ctx) { var c = BY[P.id].color, seen = {}; seen[c] = 1;
@@ -119,7 +119,7 @@
       build: function (P, ctx) { var pool = ingr(ctx.p), good = pool.filter(function (x) { return x.color === P.color; }), bad = shuffle(pool.filter(function (x) { return x.color !== P.color; }));
         var bins = shuffle(shuffle(good).slice(0, 2).concat(bad.slice(0, good.length >= 2 ? 2 : 3)));
         var o = { kind: 'build', bins: ids(bins), need: null, cat: { color: P.color, n: P.n }, no: [], pre: {} };
-        o.say = ['ls_only', P.n, 'ls_c_' + P.color, { id: 'sr1_sort_things', text: 'things? Only that color, please!' }]; o.want = [{ swatch: P.color, n: P.n }]; o.showPic = true; o.countAloud = true; return o; } },
+        o.say = [{ id: 'sr1_sort_only', text: 'Can I have only ' + P.n + ' ' + P.color + ' things, please?' }]; o.want = [{ swatch: P.color, n: P.n }]; o.showPic = true; o.countAloud = true; return o; } },
     { id: 'o_read', name: 'Read the ticket', band: 'E', ok: function (p) { return readerOk(p); },
       params: function (ctx) { var a = mainPick(ctx), ad = pick(of('add', ctx.p)).id, no = RNG() < .7 ? pick(ids(of('add', ctx.p).concat(of('top', ctx.p))).filter(function (x) { return x !== ad; })) : null; return { a: a, na: rnd(1, 4), b: ad, nb: rnd(1, 3), no: no }; },
       build: function (P, ctx) { var o = { kind: 'build', bins: shuffle([P.a, P.b].concat(P.no ? [P.no] : [], decoys(ctx, [P.a, P.b, P.no], P.no ? 1 : 2))), need: {}, no: P.no ? [P.no] : [], pre: {} };

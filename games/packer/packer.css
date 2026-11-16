@@ -440,19 +440,33 @@ body::before, body::after { display: none !important; content: none !important; 
 
 
 @media (min-width: 700px) {
-  .pk-friend { height: 220px; max-height: 220px; }
-  .pk-basket { width: min(100%, 280px); height: 200px; }
-  .pk-basket.has-art { width: min(100%, 520px); height: auto; }
-  .pk-basket-handle { height: 54px; top: 2px; }
-  .pk-basket-back { top: 48px; }
-  .pk-basket.has-art .pk-basket-back { top: 0; }
-  .pk-items { top: 60px; }
-  .pk-basket.has-art .pk-item { --pk-item: 76px; }
-  .pk-item { width: 44px; height: 44px; }
-  .pk-item .pp-icon, .pk-item .pp-emoji { width: 40px; height: 40px; }
-  .pk-bin { width: 128px; height: 128px; min-width: 120px; min-height: 120px; border-radius: 24px; }
-  .pk-shelf { --pk-shelf-min: 300px; padding: 16px 16px 16px; gap: 12px 14px; }
-  .pk-basket.has-art { width: min(100%, 520px, calc(418px * 356 / 352)); max-height: 418px; }
+  
+  html:not(.stage-on) .pk-friend { height: 220px; max-height: 220px; }
+  
+  html:not(.stage-on) .pk-basket { width: min(100%, 280px); height: 200px; }
+  
+  html:not(.stage-on) .pk-basket.has-art { width: min(100%, 520px); height: auto; }
+  
+  html:not(.stage-on) .pk-basket-handle { height: 54px; top: 2px; }
+  
+  html:not(.stage-on) .pk-basket-back { top: 48px; }
+  
+  html:not(.stage-on) .pk-basket.has-art .pk-basket-back { top: 0; }
+  
+  html:not(.stage-on) .pk-items { top: 60px; }
+  
+  html:not(.stage-on) .pk-basket.has-art .pk-item { --pk-item: 76px; }
+  
+  html:not(.stage-on) .pk-item { width: 44px; height: 44px; }
+  
+  html:not(.stage-on) .pk-item .pp-icon,
+  html:not(.stage-on) .pk-item .pp-emoji { width: 40px; height: 40px; }
+  
+  html:not(.stage-on) .pk-bin { width: 128px; height: 128px; min-width: 120px; min-height: 120px; border-radius: 24px; }
+  
+  html:not(.stage-on) .pk-shelf { --pk-shelf-min: 300px; padding: 16px 16px 16px; gap: 12px 14px; }
+  
+  html:not(.stage-on) .pk-basket.has-art { width: min(100%, 520px, calc(418px * 356 / 352)); max-height: 418px; }
 }
 
 @media (max-width: 400px) {
@@ -597,14 +611,18 @@ body.pk-won #pkContent {
   top: 6px;
   z-index: 4;
   min-width: 28px;
-  height: 28px;
-  padding: 0 7px;
+  height: auto;
+  min-height: 28px;
+  max-width: min(180px, 70%);
+  padding: 2px 8px;
   border-radius: 999px;
   background: #fff6dc;
   border: 2px solid #5a3d1c;
   color: #2a1b0c;
   font-weight: 800;
-  font-size: 16px;
+  font-size: 13px;
+  line-height: 1.15;
+  text-align: center;
   display: grid;
   place-items: center;
   box-shadow: 0 2px 0 #c9b17a;
@@ -629,4 +647,41 @@ body.pk-won #pkContent {
 }
 @media (prefers-reduced-motion: reduce) {
   .pk-item.pk-flyin, .pk-basket.sag .pk-basket-art, .pk-count.tick { animation: none !important; }
+}
+
+/* stage2: order text stays readable on the 400-wide portrait stage */
+html.stage-on .pk-ask { font-size: 28px; }
+html.stage-on .pk-who { font-size: 18px; }
+
+
+/* Portrait stage is 400x720 even on an iPad viewport — use the phone packing layout. */
+html.stage-on[data-stage="portrait"] #packer { padding: 6px 8px 8px; gap: 6px; }
+html.stage-on[data-stage="portrait"] .pk-header { min-height: 60px; gap: 5px; }
+html.stage-on[data-stage="portrait"] .pk-num { font-size: 36px; }
+html.stage-on[data-stage="portrait"] .pk-pics .pp-icon,
+html.stage-on[data-stage="portrait"] .pk-pics .pp-emoji { width: 48px; height: 48px; }
+html.stage-on[data-stage="portrait"] .pk-row { grid-template-columns: 76px minmax(0, 1fr); }
+html.stage-on[data-stage="portrait"] .pk-friend { height: 148px; max-height: 148px; }
+html.stage-on[data-stage="portrait"] .pk-basket { width: min(100%, 210px); height: 148px; }
+html.stage-on[data-stage="portrait"] .pk-basket.has-art { width: 100%; height: auto; max-width: 100%; max-height: none; }
+html.stage-on[data-stage="portrait"] .pk-basket-handle { height: 40px; border-width: 6px; }
+html.stage-on[data-stage="portrait"] .pk-basket-back { top: 34px; }
+html.stage-on[data-stage="portrait"] .pk-basket.has-art .pk-basket-back { top: 0; }
+html.stage-on[data-stage="portrait"] .pk-items { top: 44px; }
+html.stage-on[data-stage="portrait"] .pk-basket.has-art .pk-item { --pk-item: 50px; }
+html.stage-on[data-stage="portrait"] .pk-bin { width: 84px; height: 84px; min-width: 76px; min-height: 76px; }
+html.stage-on[data-stage="portrait"] .pk-shelf { padding: 14px 12px 12px; }
+html.stage-on[data-stage="portrait"] .pk-item { width: 28px; height: 28px; }
+html.stage-on[data-stage="portrait"] .pk-item .pp-icon,
+html.stage-on[data-stage="portrait"] .pk-item .pp-emoji { width: 26px; height: 26px; }
+html.stage-on[data-stage="portrait"] .pk-win p { font-size: 22px; }
+
+html.stage-on .pk-header button,
+html.stage-on #pkSpeak {
+  min-width: max(62px, calc(62px / var(--stage-scale, 1)));
+  min-height: max(62px, calc(62px / var(--stage-scale, 1)));
+}
+html.stage-on .pk-item::after {
+  width: max(62px, calc(62px / var(--stage-scale, 1)));
+  height: max(62px, calc(62px / var(--stage-scale, 1)));
 }

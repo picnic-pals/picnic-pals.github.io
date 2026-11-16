@@ -61,7 +61,8 @@
       var n = o.want[id], pics = '', k;
       if (o.kind === 'picture') {
         if (n > 5 && A.CountVisual) {
-          h += '<span class="pk-group pk-frame" aria-label="' + A.esc(K.phrase(id, n)) + '">' + foodIcon(id, 56) + A.CountVisual.html(n) + '</span>';
+          var f = K.BY && K.BY[id], item = (f && (f.icon || f.emoji)) || id;
+          h += '<span class="pk-group pk-frame" aria-label="' + A.esc(K.phrase(id, n)) + '">' + A.CountVisual.html(n, { item: item, noun: K.phrase(id, n) }) + '</span>';
         } else {
           for (k = 0; k < n; k++) pics += foodIcon(id, 56);
           h += '<span class="pk-group pk-repeat" aria-label="' + A.esc(K.phrase(id, n)) + '">' + pics + '</span>';
@@ -115,7 +116,8 @@
     if (!W || !H) return;
     var n = items.length;
     if (!n) return;
-    var base = window.innerWidth <= 400 ? 28 : 44;
+    var staged = document.documentElement && document.documentElement.classList.contains('stage-on');
+    var base = (!staged && window.innerWidth <= 400) ? 28 : 44;
     var mouth0 = 0.26, mouth1 = 0.58;
     var mouthW = (mouth1 - mouth0) * W;
     var plan = rowPlan(n);
@@ -125,8 +127,8 @@
       var fit = mouthW / (frontN - 0.12 * (frontN - 1));
       if (fit < size) size = Math.max(base * 1.5, fit);
     }
-    var tuck = 0.32;
-    var rise = size / H * 0.52;
+    var tuck = 0.10;   // bottoms stay under the rim; high enough that half the item stays visible
+    var rise = size / H * 0.70;  // rise enough that back rows are not buried under the front row
     var i, r, row, count, span, start, step, k, xf, yb, el;
     var idx = 0;
     for (r = 0; r < plan.length; r++) {
@@ -187,7 +189,7 @@
               '<div class="pk-items" id="pkItems">' + items + '</div>' +
               '<div class="pk-basket-front" aria-hidden="true"></div>' +
             '</div>' +
-            '<span class="pk-count" aria-hidden="true">' + G.basket.length + '</span>' +
+            '<span class="pk-count" title="' + A.esc(K.countLabel ? K.countLabel(G.basket) : String(G.basket.length)) + '" aria-label="' + A.esc(K.countLabel ? K.countLabel(G.basket) : (G.basket.length + ' items')) + '">' + A.esc(K.countLabel ? K.countLabel(G.basket) : String(G.basket.length)) + '</span>' +
           '</div>' +
         '</div>' +
         '<div class="pk-shelf" id="pkShelf">' + bins + '</div>' +
@@ -283,8 +285,15 @@
       if (juice === 'in') juiceDrop();
       setTimeout(function () { finishOrder(); }, 450);
     } else {
-      if (K.overfilled(G.basket, G.order.want) && !nudgeText) {
-        nudgeText = 'That looks like a little too much. Tap a food in the basket to take it out.';
+      if (!nudgeText) {
+        var extras = K.extraKinds ? K.extraKinds(G.basket, G.order.want) : [];
+        if (extras.length) {
+          var nm = K.noun(extras[0], 1), wantIds = Object.keys(G.order.want || {}), instead = wantIds.length === 1 ? K.noun(wantIds[0], 1) : null;
+          nudgeText = instead ? ('The ' + nm + ' is not a ' + instead + '. Take the ' + nm + ' out.') : ('The ' + nm + ' is not on the order. Take the ' + nm + ' out.');
+        } else if (K.overfilled(G.basket, G.order.want)) {
+          var too = K.overfilledId ? K.overfilledId(G.basket, G.order.want) : null;
+          nudgeText = too ? ('That is too many ' + K.noun(too, 2) + '. Take one out.') : 'That looks like a little too much. Tap a food in the basket to take it out.';
+        }
       }
       renderOrder();
       if (juice === 'in') juiceDrop();
@@ -385,7 +394,13 @@
       else {
         var miss = K.missing(G.basket, G.order.want);
         var id = Object.keys(miss)[0];
-        nudgeText = id ? 'Look for ' + K.noun(id, 2) + ' on the shelf.' : 'Almost there. Check the order again.';
+        var extras2 = K.extraKinds ? K.extraKinds(G.basket, G.order.want) : [];
+        if (extras2.length) {
+          var nm2 = K.noun(extras2[0], 1);
+          nudgeText = 'The ' + nm2 + ' is not on the order. Take the ' + nm2 + ' out.';
+        } else {
+          nudgeText = id ? 'Look for ' + K.noun(id, 2) + ' on the shelf.' : 'Almost there. Check the order again.';
+        }
         A.$$('.pk-bin').forEach(function (el) { if (el.getAttribute('data-id') === id) el.classList.add('hint'); });
       }
       var n = $('#pkNudge'); if (n) n.textContent = nudgeText;

@@ -148,6 +148,10 @@
     var cg = curGl(p, subj);
     if (cg != null && cg < f) {
       var cl = ceil(p, subj), alt = sh >= 0 && C.list(subj).some(function (k) { var st = p.skills && p.skills[k.id], v = glTop(k.id), v0 = glAt(k, 0); return v != null && v >= f && (v0 == null || v0 <= cl) && st && st.status !== 'locked'; });
+      // lc1115: a below-floor step skill (t_count3 / pk_count10 on a grade-1 save) must not drag the floor down,
+      // or the band lock can never move her on.
+      var curS = C.current(p, subj);
+      if (!alt && curS && /^(t_count3|t_count5|count10|pk_count10)$/.test(curS.id) && glTop(curS.id) < baseFloor(p, subj)) alt = true;
       if (!alt) f = cg;
     }
     return f;
@@ -254,7 +258,7 @@
     var f = floor(p, subj);
     // the current skill itself fell under her floor (she showed more since it opened, e.g. a reading warm-up): move on to the
     // next in-band skill, or let the in-band top skills take turns. Never a below-floor skill as her "current" round.
-    if (!r.review && !r.check && !r.dropBack && !s.isStep && !(p.math && p.math.pin) && C.track(p, subj).current === s.id && glTop(s.id) != null && glTop(s.id) < f) {
+    if (!r.review && !r.check && !r.dropBack && !(p.math && p.math.pin) && C.track(p, subj).current === s.id && glTop(s.id) != null && glTop(s.id) < f) {
       var Lc = C.list(subj), Tc = C.track(p, subj), nx = null;
       for (var j = Lc.indexOf(s) + 1; j < Lc.length; j++) { var sj = p.skills[Lc[j].id], vj = glTop(Lc[j].id), v0j = glAt(Lc[j], 0); if ((vj == null || vj >= f) && (v0j == null || v0j <= ceil(p, subj)) && (!sj || sj.status !== 'mastered')) { nx = Lc[j]; break; } }
       var tl = topList(p, subj); if (!nx && tl.length) nx = tl[Math.floor(Math.random() * tl.length)];
@@ -341,9 +345,10 @@
   }
   function numPic(label) { var m = String(label).match(/^\s*(\d+)\s*$/); if (!m || +m[1] > 40) return null; return '<span class="pbpic num"><b>' + m[1] + '</b>' + dotsFor(+m[1]) + '</span>'; }
   function picturizeCell(c) { if (!c || c.html) return c; var h = eqPic(c.label) || numPic(c.label); if (h) { c.html = h; c.long = c.long || /pb-row/.test(h); c.pictured = true; } return c; }
+  function noAutoPic(s) { var id = (s && s.id) || s || ''; return /^(count10|pk_numid|pk_next|pk_before)/.test(id); }
   function textPic(text) { var m = String(text).replace(/<[^>]+>/g, ' ').match(/(\d+)/g); if (!m || /pb-frames|st-pic|frame/.test(text)) return text; var n = +m[m.length - 1]; if (n > 30) return text; return text + '<span class="st-pic pb-target">' + dotsFor(n) + '</span>'; }
   function picturizeGen(s) {
-    if (!s || s.__pb || !s.gen) return; var g0 = s.gen; s.__pb = true;
+    if (!s || s.__pb || !s.gen || noAutoPic(s)) return; var g0 = s.gen; s.__pb = true;
     s.gen = function (L) {
       var r = g0.apply(this, arguments), p = S.ctx.p; if (!r || !pBand(p)) return r;
       var gd = r.good, bd = r.bad; if (gd) r.good = function () { return picturizeCell(gd.apply(this, arguments)); }; if (bd) r.bad = function () { return picturizeCell(bd.apply(this, arguments)); };
@@ -352,11 +357,14 @@
   }
   function picturizeAsk(q) {
     if (!q || !q.choices) return q;
+    // lc1115b: numeral naming and next/before stay numerals — do not auto-add ten-frames or dice
+    if (noAutoPic(q.skill)) { q.pictures = true; return q; }
     // all or nothing: when one numeral choice is too big to draw (a reversed-digit distractor like 91 on "Find 19"), no choice gets
     // dots, so a bare one never stands out (numeral naming is the skill there; the ask keeps its picture)
     var pics = q.choices.map(function (c) { return c.html ? null : eqPic(c.label) || numPic(c.label); });
+    var hasCountPic = !!(q.pic && /cv-set|cv-frame|cv-dice|st-pic|st-objs|pb-frames|frame/.test(String(q.pic))) || /cv-set|st-pic/.test(String(q.text || ''));
     var allNum = q.choices.every(function (c, i) { return c.html || pics[i] || !/^\s*\d/.test(String(c.label)); });
-    if (allNum) q.choices.forEach(function (c, i) { if (pics[i]) c.html = pics[i]; });
+    if (allNum && !hasCountPic) q.choices.forEach(function (c, i) { if (pics[i]) c.html = pics[i]; });
     var plain = String(q.text || '').replace(/<[^>]+>/g, ' ');
     if (!q.pic && /\d/.test(plain)) { var nums = (plain.match(/\d+/g) || []).map(Number).filter(function (n) { return n <= 30; }); if (nums.length) q.pic = '<span class="pb-qpic">' + nums.map(dotsFor).join('<i class="pb-op">' + (/−|-/.test(plain) ? '−' : /\+/.test(plain) ? '+' : '·') + '</i>') + '</span>'; }
     q.pictures = true; return q;
@@ -379,7 +387,7 @@
   function earnedTop(p, subj) { var f = floor(p, subj); return C.list(subj).filter(function (s) { var st = p.skills && p.skills[s.id]; return st && st.status === 'mastered' && !st.placed && (glTop(s.id) == null || glTop(s.id) >= f); }).slice(-3); }
   function storyPick(p, subj, i, little, boss) {
     var f = floor(p, subj), cur = C.current(p, subj); if (!cur) return null;
-    if (glTop(cur.id) != null && glTop(cur.id) < f && !cur.isStep) { var tl0 = topList(p, subj); if (tl0.length) cur = tl0[(i || 0) % tl0.length]; }   // her current fell under the floor: an in-band top skill
+    if (glTop(cur.id) != null && glTop(cur.id) < f) { var tl0 = topList(p, subj); if (tl0.length) cur = tl0[(i || 0) % tl0.length]; }   // her current fell under the floor: an in-band top skill
     var cst = C.state(p, cur.id), top = Math.max(0, (cur.levels || [1]).length - 1), clv = cur.isStep ? 0 : Math.min(cst.level || 0, top);
     var cands = [{ skill: cur.id, level: clv }];
     if (!little && !boss) {
@@ -411,8 +419,30 @@
           // batch1: she is finding this subject hard lately (under 60% first try): the stop uses a skill she has earned in her band
           else if (fitOf(p, subj) === 'ease' && !(ast && ast.status === 'mastered')) { var er = earnedTop(p, subj); if (er.length) { var e0 = er[(i || 0) % er.length]; c.skill = e0.id; c.level = lowestLevelInBand(e0, floor(p, subj)); c.lowered = true; c.eased = true; } } }
       }
-      return c;
+      return capStorySkill(p, c, i);
     };
+  }
+  // lc1115b: Story first stops follow the child's in-band skill and never open pre-K on count-to-30
+  // or grade 1 on quarter-hour clocks just because a warm-up placed them there.
+  function capStorySkill(p, c, i) {
+    if (!c || !c.skill || !p) return c;
+    var st = ST.STOPS && ST.STOPS[i], early = !c.side && (!st || st.n === 1 || i === 0);
+    var sid = c.skill, sk = C.byId[sid], earned = function (id) {
+      var s = p.skills && p.skills[id]; return !!(s && s.status === 'mastered' && !s.placed);
+    };
+    if (early && sk && C.subjectOf(sk) === 'math') {
+      var pk = storyPick(p, 'math', i, true, false);
+      if (pk) { c.skill = pk.skill; c.level = pk.level; sid = c.skill; }
+    }
+    if (/^(pk_count30|pk_next30|pk_more1_30)$/.test(sid) && (early || !earned(sid))) {
+      var back = earned('pk_count20') ? 'pk_count20' : (C.byId.pk_count10 ? 'pk_count10' : 'count10');
+      if (C.byId[back]) { c.skill = back; c.level = 0; c.lowered = true; sid = back; }
+    }
+    if ((sid === 'time_5min' || sid === 'skip_count') && (floor(p, 'math') < 4) && !earned(sid) && !earned('pv_tens')) {
+      var alt = (sid === 'time_5min' && C.byId.time_hour_half) ? 'time_hour_half' : (C.current(p, 'math') && C.current(p, 'math').id) || 'a_dbl';
+      if (C.byId[alt] && alt !== sid) { c.skill = alt; c.level = 0; c.lowered = true; }
+    }
+    return c;
   }
 
   /* ---------- 8. A5: placement v2 for non-step ladders (reading): ~5 picks, binary search, can jump bands ---------- */
@@ -437,6 +467,8 @@
     // (digraphs and 1st-grade sight words sit before opposites); those are neither asked nor placed
     var L = L0.filter(function (k, i) { var v0 = glAt(k, 0); return i <= i0 || v0 == null || v0 <= cl; }), from = L.indexOf(s), hi = L.length - 1;
     while (hi > from && glAt(L[hi], 0) > cl) hi--;
+    // lc1115b: a SH/CH/TH (digraph) warm-up only asks digraph items, not audio-only sight words or opposites
+    if (s && s.id === 'digraph' && from >= 0) hi = from;
     var norm = Math.min(ageFloor(p), subjCap(subj, ageFloor(p))) + 1 + (aheadElsewhere(p, subj) >= 1 ? 1 : 0);   // batch1: capped band floor   // the age band's own grade, one band higher when strong elsewhere
     var first = from; for (var k = from; k <= hi; k++) { first = k; if (glAt(L[k], 0) >= norm) break; }
     return { subj: subj, ids: L.map(function (x) { return x.id; }), from: from, lo: from, hi: hi, mid: Math.max(from, Math.min(hi, first)), asked: 0, right: -1, log: [], done: false, boost: aheadElsewhere(p, subj) >= 1, own: ownGrade(p) };
@@ -504,7 +536,7 @@
   function bubbleSub(p, id) { var n = glLevels(id), f = famFloor(p, id); for (var s = 0; s < n; s++) if (gl(id, s) >= f) return s; return -1; }   // first in-band sub-level, -1 = none
   // Slugger: the base-running / scoreboard question kinds this child can get (never below her math floor; pre-readers count dots)
   function sluggerKinds(p) {
-    var pre = A.Age.preReader(p), fm = floor(p, 'math'), f = famFloor(p, 'bb_where'), all = pre ? ['bb_runs', 'bb_onbase', 'bb_count'] : ['bb_where', 'bb_runs', 'bb_left', 'bb_towin', 'bb_tied', 'bb_totie'];
+    var pre = A.Age.preReader(p), fm = floor(p, 'math'), f = famFloor(p, 'bb_where'), all = pre ? ['bb_count'] : ['bb_where', 'bb_runs', 'bb_left', 'bb_towin', 'bb_tied', 'bb_totie'];
     // batch1: a child working a grade or more above them (floor 3.5+: 2nd-grade math) gets no base-running questions at all
     // (they are 1st-grade math); the pitches carry her level
     var ok = all.filter(function (k) { return gl(k, 0) >= f; }); if (!pre && fm >= 3.5) return [];

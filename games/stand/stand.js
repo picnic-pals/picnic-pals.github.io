@@ -144,13 +144,14 @@
     if (G.rush.on) startRushClock();
     renderOrder(); patStart();
     var pre = o.why === 'easy' ? ['ls_easy'] : o.why === 'warmup' && !G.warmSaid ? (G.warmSaid = true, ['ls_warmup']) : [];
-    var fl = flv(G.c.flavor); pre = [{ id: 'sr1_hi_' + fl.id + (G.c.fav ? '_fav' : ''), text: G.c.fav ? 'Hi! ' + cap(fl.name) + ' is my favorite!' : 'Hi! I would like ' + fl.name + '.' }].concat(pre);
+    var fl = flv(G.c.flavor);
+    if (!(o.thisOne && G.tod)) pre = [{ id: 'sr1_hi_' + fl.id + (G.c.fav ? '_fav' : ''), text: G.c.fav ? 'Hi! ' + cap(fl.name) + ' is my favorite!' : 'Hi! I would like ' + fl.name + '.' }].concat(pre);
     if (o.memory) say(pre.concat(o.say, o.ticketSay)).then(function () { flipSoon(o); }); else say(pre.concat(o.say)); G.t0 = Date.now();
   }
   function renderBubble() {
     var o = G.o, hint = G.miss > 0;
     var pics = '<div class="wants">' + o.want.map(function (w, k) { return (k && !w.no ? '<i class="wplus">+</i>' : '') + wantHtml(w); }).join('') + '</div>';
-    var fl = flv(G.c.flavor), head = '<div class="rhead">' + flIcon(fl.id) + '<span>' + A.esc(cap(o.silly ? 'pickle ' + fl.name + '?!' : fl.name)) + '</span>' + (G.c.fav ? '<em>⭐ favorite</em>' : '') + '</div>';
+    var fl = flv(G.c.flavor), hideHead = !!(o.thisOne && G.tod), head = hideHead ? '' : '<div class="rhead">' + flIcon(fl.id) + '<span>' + A.esc(cap(o.silly ? 'pickle ' + fl.name + '?!' : fl.name)) + '</span>' + (G.c.fav ? '<em>⭐ favorite</em>' : '') + '</div>';
     if (o.memory && G.flipped && !hint) {   // stand2: "remember the order": the ticket has flipped over; a big Peek button shows it again
       bubble('<div class="ticket back" aria-label="The ticket flipped over. Remember the order!"><span class="think">🤔</span><p>Remember?</p></div>', 'tk mem');
       var pk = A.el('<button class="sbtn peek" aria-label="Peek at the ticket">👀 Peek</button>'); pk.addEventListener('click', peek); $('#bubble').appendChild(pk); return;

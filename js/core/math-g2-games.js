@@ -40,15 +40,15 @@
     { id: 'g2_bb_skip5', prompt: 'Count by 5s: 35, 40, 45, ?', choices: [46, 50, 55, 40], answer: 50 },
     { id: 'g2_bb_clock', prompt: 'What time does the clock show?', choices: ['3:20', '4:15', '3:04', '2:20'], answer: '3:20',
       pic: function () { return clockPic(3, 20); } },
-    { id: 'g2_bb_money', prompt: 'How much money?', choices: ['53¢', '7¢', '48¢', '43¢'], answer: '53¢',
+    { id: 'g2_bb_money', prompt: 'How much are these coins worth?', choices: ['53¢', '7¢', '48¢', '43¢'], answer: '53¢',
       pic: function () { return coinPic('1 quarter, 2 dimes, 1 nickel, 3 pennies'); } },
-    { id: 'g2_bb_array', prompt: '3 rows of 4. How many?', choices: [7, 4, 12, 3], answer: 12,
+    { id: 'g2_bb_array', prompt: '3 rows of 4. How many in all?', choices: [7, 4, 12, 3], answer: 12,
       pic: function () { return arrayPic(3, 4); } },
     { id: 'g2_bb_addreg', prompt: '38 + 25 = ?', choices: [53, 63, 73, 13], answer: 63 }
   ];
   var MU = [
     { id: 'g2_mu_4tens', rule: 'Munch the numbers with 4 tens.', targets: [40, 43, 47, 49], distractors: [14, 34, 4, 54] },
-    { id: 'g2_mu_skip10', rule: 'Munch the numbers you say when you count by 10s, starting at 20.', targets: [20, 30, 40, 50, 60], distractors: [21, 25, 35, 45, 52] },
+    { id: 'g2_mu_skip10', rule: 'Munch the count-by-10s: 20, 30, 40, …', targets: [20, 30, 40, 50, 60], distractors: [21, 25, 35, 45, 52] },
     { id: 'g2_mu_halfpast', rule: 'Munch the clocks that show half past.', targets: ['1:30', '4:30', '8:30', '11:30'], distractors: ['1:00', '4:15', '8:00', '3:20'], clock: true },
     { id: 'g2_mu_25c', rule: 'Munch the coin sets that equal 25¢.',
       targets: ['1 quarter', '2 dimes and 1 nickel', '5 nickels', '1 dime and 3 nickels'],
@@ -69,11 +69,19 @@
       '<line x1="50" y1="50" x2="' + (50 + Math.cos((angM - 90) * Math.PI / 180) * 32) + '" y2="' + (50 + Math.sin((angM - 90) * Math.PI / 180) * 32) + '" stroke="#b71c1c" stroke-width="3" stroke-linecap="round"/>' +
       '<circle cx="50" cy="50" r="3" fill="#3b2d55"/></svg></span>';
   }
+  function coinBagOf(set) {
+    var bag = {}, map = { quarter: 'quarter', quarters: 'quarter', dime: 'dime', dimes: 'dime', nickel: 'nickel', nickels: 'nickel', penny: 'penny', pennies: 'penny' };
+    String(set || '').toLowerCase().replace(/(\d+)\s+(quarters?|dimes?|nickels?|penn(?:y|ies))/g, function (_, n, w) {
+      var id = map[w]; if (id) bag[id] = (bag[id] || 0) + (+n);
+    });
+    return bag;
+  }
   function coinPic(set) {
+    if (A.Coins && A.Coins.bag) return A.Coins.bag(coinBagOf(set), { small: true });
     return '<span class="g2-coins" aria-hidden="true">' + A.esc(set) + '</span>';
   }
   function arrayPic(r, c) {
-    var h = '<span class="g2-array" style="grid-template-columns:repeat(' + c + ', 14px)" aria-hidden="true">', i, j;
+    var h = '<span class="g2-array" style="grid-template-columns:repeat(' + c + ', 18px)" aria-hidden="true">', i, j;
     for (i = 0; i < r; i++) for (j = 0; j < c; j++) h += '<i></i>';
     return h + '</span>';
   }

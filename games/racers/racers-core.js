@@ -402,9 +402,19 @@
     var band = bandFor(p);
     var tier = (opt.tier != null) ? opt.tier : ((p && p.games && p.games.racers && p.games.racers.tier) || 0);
     var rng = rngOf(opt.rng);
-    var qs = [], i, used = {};
+    var qs = [], i, used = {}, recent = [];
+    function factKey(q) {
+      if (!q) return '';
+      if (q.kind === 'count') return 'c:' + q.food + ':' + q.count;
+      if (q.a != null && q.b != null) return (q.kind || 'f') + ':' + q.a + ':' + q.b + ':' + (q.op || '');
+      return 't:' + String(q.text || '');
+    }
     for (i = 0; i < NQ; i++) {
-      qs.push(makeQuestion(p, { band: band, tier: tier, rng: rng }));
+      var q, g = 0, key;
+      do { q = makeQuestion(p, { band: band, tier: tier, rng: rng }); key = factKey(q); } while (recent.indexOf(key) >= 0 && g++ < 24);
+      qs.push(q);
+      recent.push(key);
+      if (recent.length > 3) recent.shift();
     }
     var nObs = mode === 'boss' ? track.obstacles : 0;
     var slots = [], obs = [];

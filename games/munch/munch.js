@@ -201,6 +201,8 @@
     board.style.setProperty('--icon-cs', CS + 'px');  // artswap: icon/emoji size ignores fitCells label shrink
     PL.map(function (p) { return p.el; }).concat([grumEl, starEl]).forEach(function (e) { if (e) { e.style.width = CS + 'px'; e.style.height = CS + 'px'; } });
     place(false); fitCells();
+    if (layout._fitT) cancelAnimationFrame(layout._fitT);
+    layout._fitT = requestAnimationFrame(function () { fitCells(); });
   }
   // Make every tile label fit inside its tile: first shrink on one line (a little), then wrap at spaces and shrink again,
   // never below MIN_FONT px for the label's text. Shrinking sets the label's own --cs, so pictures/frames scale with the text.
@@ -210,7 +212,8 @@
   function fitCell(d) {
     var l = d.querySelector('.lbl'); if (!l) return;
     l.style.removeProperty('--cs'); d.classList.remove('wrap', 'tight');
-    l.style.maxWidth = Math.floor(d.clientWidth * .92) + 'px'; l.style.maxHeight = d.clientHeight + 'px';   // full tile height (92% left 3-line phrases short at 1024x640)
+    l.style.maxWidth = Math.floor(d.clientWidth * .92) + 'px';
+    l.style.setProperty('max-height', d.clientHeight + 'px', 'important');   // full tile height (css max-height:100% can undershoot by a few px)
     if (l.querySelector('.st-ansnum')) {
       l.style.maxWidth = Math.floor(d.clientWidth * .88) + 'px';
       return;   // How-many numerals are sized from --icon-cs (~48% of the tile); do not shrink them
@@ -223,6 +226,16 @@
     d.classList.add('wrap'); k = 1; l.style.removeProperty('--cs');
     while (over(l) && f0 * k * .94 >= MIN_FONT) { k *= .94; l.style.setProperty('--cs', (CS * k) + 'px'); }
     if (over(l)) d.classList.add('tight');   // still too big at the minimum size (caller can test for .tight)
+    // Subpixel / line-box can report 1–2px of scroll overflow even when the
+    // phrase fits in the tile. Grow the label box (capped to the cell) so
+    // scrollWidth/Height <= clientWidth/Height.
+    if (l.scrollHeight > l.clientHeight && l.scrollHeight <= l.clientHeight + 2 && l.scrollHeight <= d.clientHeight) {
+      l.style.minHeight = l.scrollHeight + 'px';
+    }
+    if (l.scrollWidth > l.clientWidth && l.scrollWidth <= l.clientWidth + 2 && l.scrollWidth <= d.clientWidth) {
+      l.style.minWidth = l.scrollWidth + 'px';
+    }
+    if (!over(l)) d.classList.remove('tight');
   }
   function fitCells() { cellEls.forEach(fitCell); }
   function xy(p, dx) { return 'translate(' + (p.c * (CW + GAP) + (CW - CS) / 2 + (dx || 0)) + 'px,' + (p.r * (CS + GAP)) + 'px)'; }
@@ -254,7 +267,13 @@
   // talk(): the bubble always shows the words; the voice follows the player's "How much talking" setting (A.Talk). kind defaults to chatter (Full only).
   function talk(parts, show, kind) { if (show !== false) bubble(V.text(parts)); return V.say(parts, { kind: kind || 'chatter' }); }
   V.ownBubble = true;   // Munch has its own food-friend bubble (#bubble): no extra friendBubble
-  function blocked() { return UI.cardOpen || B.open || A.Parent.isOpen() || !!A.$('#gate'); }
+  var skipGuard = 0;
+  function armSkipGuard() { skipGuard = Date.now() + 500; }
+  function blocked() {
+    // Stage may move/remove a body-appended overlay without going through close(); don't let a stale flag eat movement keys.
+    if (UI.cardOpen && !document.querySelector('.overlay.on, .cutscene')) UI.cardOpen = false;
+    return UI.cardOpen || B.open || A.Parent.isOpen() || !!A.$('#gate') || !!A.$('.cutscene');
+  }
 
   /* ---------- movement & munching ---------- */
   function onCellTap(i) { // mouse / touch: Player 1 only
@@ -760,7 +779,7 @@
       function close(e) {
         if (done || (e && e !== 'auto' && e.repeat === true) || (e !== 'auto' && !csLock.ready())) { if (!done && e !== 'auto') csLock.dropped++; return; } done = true;
         timers.forEach(clearTimeout); document.removeEventListener('keydown', onKey, true);
-        ov.classList.add('bye'); setTimeout(function () { ov.remove(); UI.cardOpen = !!document.querySelector('.overlay.on'); resolve(); }, 220);
+        ov.classList.add('bye'); if (e !== 'auto') armSkipGuard(); setTimeout(function () { ov.remove(); UI.cardOpen = !!document.querySelector('.overlay.on'); resolve(); }, 220);
       }
       function onKey(e) { if (/^( |Enter|f|F|Escape)$/.test(e.key)) { e.preventDefault(); e.stopPropagation(); close(e); } }
       document.addEventListener('keydown', onKey, true);
@@ -988,6 +1007,7 @@
   var KEYS2 = { w: [-1, 0], s: [1, 0], a: [0, -1], d: [0, 1] };
   function flashKey(sel) { var el = A.$('#keys kbd[data-k="' + sel + '"]'); if (!el) return; el.classList.add('hit'); setTimeout(function () { el.classList.remove('hit'); }, 140); }
   document.addEventListener('keydown', function (e) {
+    if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
     if (B.open) { if (bonusKey(e)) return; }
     if (blocked()) return;
     var k = e.key, lk = k.length === 1 ? k.toLowerCase() : k, now = Date.now(), who = -1, mv = null, mu = false;
@@ -1001,8 +1021,8 @@
     e.preventDefault();
     var pl = PL[who]; flashKey(mv ? (KEYS1[k] ? k : lk) : (lk === 'f' ? 'f' : ' '));
     if (mv) { if (e.repeat && now - pl.lastMove < 150) return; pl.lastMove = now; moveBy(who, mv[0], mv[1]); }
-    else if (mu) { if (e.repeat) return; if (who === 0) { var mb = $('#munchBtn'); mb.classList.add('pressed'); setTimeout(function () { mb.classList.remove('pressed'); }, 120); } munch(who); }
-  });
+    else if (mu) { if (e.repeat || now < skipGuard) return; if (who === 0) { var mb = $('#munchBtn'); mb.classList.add('pressed'); setTimeout(function () { mb.classList.remove('pressed'); }, 120); } munch(who); }
+  }, true);
   $('#munchBtn').addEventListener('click', function (e) { if (e.detail === 0) return; munch(0); });
   $('#speakBtn').addEventListener('click', function (e) { e.stopPropagation(); if (!S.voice) { bubble('Voice is off (grown-up settings).'); return; } speakRule(); });
   $('#rule').addEventListener('click', speakRule);

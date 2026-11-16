@@ -132,3 +132,6 @@ body {
   .bub .emo .pp-emoji { font-size: 42px; }
   .target .emo .pp-emoji { font-size: 42px; }
 }
+
+/* stage2: target prompt stays readable on a 400-wide portrait stage */
+html.stage-on .target .ask { font-size: 28px; }

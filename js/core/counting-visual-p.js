@@ -19,14 +19,14 @@
   }
 
   var BB = [
-    { id: 'cv_bb_13', style: 'how_many', n: 13, prompt: 'How many?', choices: [12, 13, 14, 10], pattern: 'ten_frames' },
-    { id: 'cv_bb_07', style: 'how_many', n: 7, prompt: 'How many?', choices: [6, 7, 8, 5] },
-    { id: 'cv_bb_24', style: 'how_many', n: 24, prompt: 'How many?', choices: [23, 24, 25, 20], stretch: true },
-    { id: 'cv_bb_27', style: 'how_many', n: 27, prompt: 'How many?', choices: [26, 27, 28, 20], stretch: true },
-    { id: 'cv_bb_04', style: 'how_many', n: 4, prompt: 'How many?', choices: [3, 4, 5, 2], pattern: 'dice' },
-    { id: 'cv_bb_ql8', style: 'quick_look', n: 8, prompt: 'How many did you see?', choices: [7, 8, 9, 5], quick_look: true },
+    { id: 'cv_bb_13', style: 'how_many', n: 13, prompt: 'How many dots?', choices: [12, 13, 14, 10], pattern: 'ten_frames' },
+    { id: 'cv_bb_07', style: 'how_many', n: 7, prompt: 'How many dots?', choices: [6, 7, 8, 5] },
+    { id: 'cv_bb_24', style: 'how_many', n: 24, prompt: 'How many dots?', choices: [23, 24, 25, 20], stretch: true },
+    { id: 'cv_bb_27', style: 'how_many', n: 27, prompt: 'How many dots?', choices: [26, 27, 28, 20], stretch: true },
+    { id: 'cv_bb_04', style: 'how_many', n: 4, prompt: 'How many dots?', choices: [3, 4, 5, 2], pattern: 'dice' },
+    { id: 'cv_bb_ql8', style: 'quick_look', n: 8, prompt: 'How many dots did you see?', choices: [7, 8, 9, 5], quick_look: true },
     { id: 'cv_bb_next16', style: 'number_path', n: 16, prompt: 'What number comes next?', answer: 17, choices: [15, 16, 17, 18] },
-    { id: 'cv_bb_onemore', style: 'one_more_pic', n: 8, prompt: 'One more comes. How many now?', answer: 9, choices: [8, 9, 10, 7] }
+    { id: 'cv_bb_onemore', style: 'one_more_pic', n: 8, prompt: 'One more dot comes. How many dots now?', answer: 9, choices: [8, 9, 10, 7] }
   ];
   var MU = [
     { id: 'cv_mu_eight', rule: 'Munch the pictures that show 8.', n: 8, targets: [8, 8, 8, 8], distractors: [7, 9, 10, 5] },
@@ -38,11 +38,11 @@
     if (it.style === 'number_path') {
       var ans = it.answer, nums = [it.n - 2, it.n - 1, it.n, null];
       return { text: it.prompt, pic: '<span class="st-track">' + nums.map(function (v) { return v == null ? '<b class="q">?</b>' : '<b>' + v + '</b>'; }).join('') + '</span>',
-        say: ['st_what_next'], answer: ans, choices: it.choices.slice(), pictures: true, id: it.id };
+        say: [{ id: 'st_what_next', text: it.prompt }], answer: ans, choices: it.choices.slice(), pictures: true, id: it.id };
     }
     var n = it.n, ans = it.answer != null ? it.answer : n, pic = CV.html(n, { pattern: it.pattern, quick_look: !!it.quick_look });
     if (it.style === 'one_more_pic') pic = CV.html(n) + '<span class="cv-arrive" aria-hidden="true">+ one</span>';
-    return { text: it.prompt, pic: pic, say: ['st_how_many'], answer: ans, choices: it.choices.slice(), pictures: true, id: it.id, quick_look: !!it.quick_look };
+    return { text: it.prompt, pic: pic, say: [{ id: 'st_how_many_dots', text: it.prompt }], answer: ans, choices: it.choices.slice(), pictures: true, id: it.id, quick_look: !!it.quick_look };
   }
 
   function poolBB(p) {
@@ -72,7 +72,7 @@
       return { label: String(n), html: CV.html(n, { pattern: n <= 5 ? 'dice' : null }), fact: ok ? ['w_thats', n] : [], k: (ok ? 't' : 'd') + n + '-' + Math.random().toString(36).slice(2, 5) };
     }
     return {
-      text: b.rule, say: ['st_how_many'], pictures: true, target: b.id, skill: 'counting_visual_p',
+      text: b.rule, say: [{ id: 'st_munch_rule', text: b.rule }], pictures: true, target: b.id, skill: 'counting_visual_p',
       good: function () { var n = b.targets[ti++ % b.targets.length]; return cell(n, true); },
       bad: function () { var n = b.distractors[di++ % b.distractors.length]; return cell(n, false); }
     };

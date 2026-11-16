@@ -656,10 +656,54 @@ body.tipq .jarchip { display: none !important; }
 
 /* portrait iPad: 2x2 so bills use the freed vertical space */
 @media (orientation: portrait) and (min-width: 601px) {
-  .counter.paying.take .bins.wallet {
+  html:not(.stage-on) .counter.paying.take .bins.wallet {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     max-width: 560px;
     margin: 0 auto;
     width: 100%;
   }
 }
+
+/* stage2: order/ask text floor so compact media queries don't shrink under 18px */
+html.stage-on .bubble .ask { font-size: 22px; }
+html.stage-on .bubble .line { font-size: 20px; }
+html.stage-on .rhead { font-size: 18px; }
+
+
+/* Stage portrait is a 400x720 design, even on an iPad window. Use the phone
+   packing so the pitcher stays large and the order bubble does not overflow. */
+html.stage-on[data-stage="portrait"] .cust .bubble { flex: 1 1 0; max-width: none; overflow: hidden; }
+html.stage-on[data-stage="portrait"] .cust { padding: 0 2px; max-height: 38%; }
+html.stage-on[data-stage="portrait"] .cust .friend { height: clamp(90px, 15%, 150px); max-width: 34%; }
+html.stage-on[data-stage="portrait"] #stand .tbar { min-height: 64px; padding-left: 148px; padding-right: 136px; }
+html.stage-on[data-stage="portrait"] #howtoBtn.q1help { top: 8px; left: 76px; width: 60px; height: 60px; min-width: 60px; min-height: 60px; font-size: 24px; }
+html.stage-on[data-stage="portrait"] .want b { font-size: 32px; }
+html.stage-on[data-stage="portrait"] .want .emo { font-size: 40px; }
+html.stage-on[data-stage="portrait"] .wplus { font-size: 26px; }
+html.stage-on[data-stage="portrait"] .sbtn { min-height: 60px; font-size: 24px; }
+html.stage-on[data-stage="portrait"] .bins { flex-wrap: nowrap; }
+html.stage-on[data-stage="portrait"] .pitcher {
+  width: min(100cqh, 84cqw, 280px);
+  height: min(100cqh, 84cqw, 280px);
+  min-width: 140px;
+  min-height: 140px;
+}
+html.stage-on[data-stage="portrait"] .cupspot:has(.precup) .pitcher {
+  width: min(100cqh, 62cqw, 280px);
+  height: min(100cqh, 62cqw, 280px);
+  min-width: 120px;
+  min-height: 120px;
+}
+
+html.stage-on[data-stage="portrait"] .ticket,
+html.stage-on[data-stage="portrait"] .ticket.back,
+html.stage-on[data-stage="portrait"] .ticket.long {
+  min-width: 0;
+  max-width: 100%;
+  padding: 6px 38px 6px 12px;
+  box-sizing: border-box;
+}
+html.stage-on[data-stage="portrait"] .ticket p { font-size: 22px; }
+html.stage-on[data-stage="portrait"] .ticket.long p { font-size: 19px; }
+html.stage-on[data-stage="portrait"] .cust { max-height: none; }
+html.stage-on[data-stage="portrait"] .cust .bubble { overflow: visible; max-height: none; }

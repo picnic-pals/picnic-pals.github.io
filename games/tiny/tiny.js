@@ -30,16 +30,22 @@
       say = ['tp_find_' + ss[ans].id];
     } else if (kind === 'color') {
       var cols = pick(T.COLORS, n); ans = A.rnd(0, n - 1);
-      tiles = cols.map(function (c) {
-        var f = A.shuffle(T.FOODS.filter(function (x) { return x.c === c.id; }))[0];
-        if (f && Math.random() < .7) return { art: foodArt(f.id), name: 'tp_is_' + f.id, label: f.w };
-        var s = A.pick(T.SHAPES); return { art: shapeArt(s, c.hex), name: 'tp_c_' + c.id, label: c.id + ' ' + s.id };
+      // Keep one kind of tile (all foods or all shapes). Blueberry is only bluish, so a blue ask uses clearly blue shapes.
+      var foodsFor = cols.map(function (c) { return A.shuffle(T.FOODS.filter(function (x) { return x.c === c.id; }))[0] || null; });
+      var useFoods = cols[ans].id !== 'blue' && foodsFor.every(Boolean);
+      tiles = cols.map(function (c, k) {
+        if (useFoods) return { art: foodArt(foodsFor[k].id), name: 'tp_is_' + foodsFor[k].id, label: foodsFor[k].w };
+        var s = T.SHAPES[k % T.SHAPES.length];
+        return { art: shapeArt(s, c.hex), name: 'tp_c_' + c.id, label: c.id + ' ' + s.id };
       });
       say = ['tp_color_' + cols[ans].id]; cue = '<span class="cueswatch" style="background:' + cols[ans].hex + '"></span>';
     } else { // count 1-3
       var f2 = A.pick(T.FOODS), nums = A.shuffle([1, 2, 3]); ans = A.rnd(0, 2);
       tiles = nums.map(function (k) { var h = ''; for (var j = 0; j < k; j++) h += foodArt(f2.id); return { art: '<span class="grp g' + k + '">' + h + '</span>', name: 'tp_n_' + k, label: T.NUM[k] }; });
-      say = ['tp_count_' + nums[ans]];
+      var want = nums[ans], noun = want === 1 ? f2.w : (f2.w === 'grapes' || /s$/.test(f2.w) ? f2.w : f2.w + 's');
+      if (f2.w === 'blueberry') noun = want === 1 ? 'blueberry' : 'blueberries';
+      say = [{ id: 'tp_count_' + want + '_' + f2.id, text: 'Find ' + T.NUM[want] + ' ' + noun + '!' }];
+      cue = '<span class="cuepic">' + foodArt(f2.id) + '</span>';
     }
     return { kind: kind, tiles: tiles, ans: ans, say: say, cue: cue };
   }
@@ -52,7 +58,7 @@
   function ask() {
     var kind = st.kinds[st.i], n = kind === 'count' ? 3 : st.i >= 3 && (kind === 'food' || kind === 'shape') ? 4 : 3;
     var q = st.q = make(kind, n); st.busy = false;
-    $('#cue').innerHTML = q.cue; $('#askTxt').textContent = V.text(q.say); pal('front'); dots();
+    $('#cue').innerHTML = q.cue; $('#askTxt').textContent = (q.say && q.say[0] && q.say[0].text) || V.text(q.say); pal('front'); dots();
     var grid = $('#grid'); grid.innerHTML = ''; grid.className = 'tgrid n' + q.tiles.length;
     q.tiles.forEach(function (t, k) {
       var b = A.el('<button class="ttile" data-k="' + k + '" aria-label="' + A.esc(t.label) + '"><span class="tart">' + t.art + '</span></button>');

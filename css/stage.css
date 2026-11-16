@@ -1,0 +1,41 @@
+/* Picnic Pals — a fixed design stage, scaled uniformly to the viewport (letterboxed). */
+html.stage-on, html.stage-on body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+.stage-frame {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: inherit;
+}
+.stage-scale {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  overflow: hidden;
+}
+/* position:fixed descendants use the transformed stage as their containing block */
+html.stage-on .stage-scale .screen {
+  width: 100%;
+  height: 100%;
+}
+
+/* vh/dvh still follow the window. Game shells must fill the design stage instead. */
+html.stage-on .stage-scale #game,
+html.stage-on .stage-scale #racers,
+html.stage-on .stage-scale #packer,
+html.stage-on .stage-scale #garden,
+html.stage-on .stage-scale #stand,
+html.stage-on .stage-scale #pancake {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+}
