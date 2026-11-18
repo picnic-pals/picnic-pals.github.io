@@ -39,8 +39,8 @@
 
   function headerIcons() {
     var t = $('#pkTimer'), s = $('#pkSpeak');
-    if (t && !t.querySelector('.pp-icon')) t.innerHTML = icon('⏱️', 32, 'timer');
-    if (s && !s.querySelector('.pp-icon')) s.innerHTML = icon('🔊', 32, 'speak');
+    if (t && !t.querySelector('.pp-icon')) t.innerHTML = icon('ui.timer', 32, 'timer');
+    if (s && !s.querySelector('.pp-icon')) s.innerHTML = icon('ui.speaker', 32, 'speak');
     syncTimerBtn();
   }
   function syncTimerBtn() {
@@ -55,25 +55,36 @@
   }
 
   function orderPics(o) {
-    if (o.kind !== 'picture' && o.kind !== 'count') return '';
+    if (!o || !o.want) return '';
+    var have = K.countsOf(G.basket || []);
     var h = '<div class="pk-pics">';
     Object.keys(o.want).forEach(function (id) {
-      var n = o.want[id], pics = '', k;
-      if (o.kind === 'picture') {
-        if (n > 5 && A.CountVisual) {
-          var f = K.BY && K.BY[id], item = (f && (f.icon || f.emoji)) || id;
-          h += '<span class="pk-group pk-frame" aria-label="' + A.esc(K.phrase(id, n)) + '">' + A.CountVisual.html(n, { item: item, noun: K.phrase(id, n) }) + '</span>';
-        } else {
-          for (k = 0; k < n; k++) pics += foodIcon(id, 56);
-          h += '<span class="pk-group pk-repeat" aria-label="' + A.esc(K.phrase(id, n)) + '">' + pics + '</span>';
+      var need = o.want[id], got = have[id] || 0, k, slots = '';
+      var packed = Math.min(got, need), extra = Math.max(0, got - need);
+      var done = packed >= need && extra === 0;
+      var showNum = o.kind !== 'picture' || need > 5;
+      var cls = 'pk-group' + (done ? ' pk-done' : '') + (extra ? ' pk-over' : '') + (packed < need ? ' pk-short' : '');
+      if (need <= 8) {
+        for (k = 0; k < need; k++) {
+          slots += '<span class="pk-slot' + (k < packed ? ' packed' : ' empty') + '">' + foodIcon(id, 48) +
+            (k < packed ? '<i class="pk-slot-ok" aria-hidden="true"></i>' : '') + '</span>';
         }
       } else {
-        h += '<span class="pk-group" aria-label="' + A.esc(K.phrase(id, n)) + '"><b class="pk-num">' + n + '</b>' + foodIcon(id, 56) + '</span>';
+        slots += foodIcon(id, 48) + '<span class="pk-pips" aria-hidden="true">';
+        for (k = 0; k < need; k++) slots += '<i class="pk-pip' + (k < packed ? ' on' : '') + '"></i>';
+        slots += '</span>';
       }
+      for (k = 0; k < Math.min(extra, 3); k++) {
+        slots += '<span class="pk-slot extra">' + foodIcon(id, 48) + '</span>';
+      }
+      h += '<span class="' + cls + '" data-id="' + A.esc(id) + '" data-need="' + need + '" data-have="' + got + '" aria-label="' + A.esc(K.phrase(id, need)) + '">';
+      if (showNum) h += '<b class="pk-num">' + packed + '<span class="pk-needn">/' + need + '</span></b>';
+      h += slots;
+      if (done) h += icon('ui.check', 28, 'done');
+      h += '</span>';
     });
     return h + '</div>';
   }
-
 
   /* Locked art is 512x384. Front lip at center is y=210. JS seats a staggered
      pile in the mouth so each food stays large and countable. */
@@ -116,19 +127,18 @@
     if (!W || !H) return;
     var n = items.length;
     if (!n) return;
-    var staged = document.documentElement && document.documentElement.classList.contains('stage-on');
-    var base = (!staged && window.innerWidth <= 400) ? 28 : 44;
+    var base = 56;
     var mouth0 = 0.26, mouth1 = 0.58;
     var mouthW = (mouth1 - mouth0) * W;
     var plan = rowPlan(n);
     var frontN = plan[0] || 1;
-    var size = Math.min(base * 2, Math.max(base * 1.6, mouthW / Math.max(1, frontN + 0.15)));
+    var size = Math.min(base * 1.65, Math.max(base, mouthW / Math.max(1, frontN + 0.15)));
     if (frontN > 1) {
       var fit = mouthW / (frontN - 0.12 * (frontN - 1));
-      if (fit < size) size = Math.max(base * 1.5, fit);
+      if (fit < size) size = Math.max(48, fit);
     }
-    var tuck = 0.10;   // bottoms stay under the rim; high enough that half the item stays visible
-    var rise = size / H * 0.70;  // rise enough that back rows are not buried under the front row
+    var tuck = -0.02;  // bottoms just under or at the rim; most of each food stays visible above the wall
+    var rise = size / H * 0.88;  // rise enough that back rows are not buried under the front row
     var i, r, row, count, span, start, step, k, xf, yb, el;
     var idx = 0;
     for (r = 0; r < plan.length; r++) {
@@ -153,7 +163,10 @@
         el.style.height = size + 'px';
         el.style.left = (xf * 100) + '%';
         el.style.top = (yb * 100) + '%';
+        el.style.transform = 'translate(-50%, -100%)';
         el.style.zIndex = String(20 - r);
+        var ic = el.querySelector('.pp-icon, .pp-emoji');
+        if (ic) { ic.style.width = '100%'; ic.style.height = '100%'; }
       }
     }
   }
@@ -161,10 +174,12 @@
   function renderOrder() {
     var o = G.order;
     if (!o) return;
+    hideHand();
     var who = (o.boss ? 'Picnic Boss ' : '') + fname(o.friend) + (o.boss ? ' has a big order!' : ' says:');
-    var crown = o.boss ? '<span class="pk-crown">' + icon('👑', 48, 'crown') + '</span>' : '';
+    var crown = o.boss ? '<span class="pk-crown">' + icon('gaps.crown', 48, 'crown') + '</span>' : '';
+    var extras = extraUidSet(G.basket, o.want);
     var items = G.basket.map(function (it) {
-      return '<button class="pk-item' + (it.pre ? ' pre' : '') + '" data-uid="' + A.esc(it.uid) + '" aria-label="Take out ' + A.esc(K.noun(it.id, 1)) + '">' + foodIcon(it.id, 96) + '</button>';
+      return '<button class="pk-item' + (it.pre ? ' pre' : '') + (extras[it.uid] ? ' extra' : '') + '" data-uid="' + A.esc(it.uid) + '" data-id="' + A.esc(it.id) + '" aria-label="Take out ' + A.esc(K.noun(it.id, 1)) + '">' + foodIcon(it.id, 96) + '</button>';
     }).join('');
     var bins = o.bins.map(function (id) {
       return '<button class="pk-bin" data-id="' + id + '" aria-label="Add ' + A.esc(K.noun(id, 1)) + '">' + foodIcon(id, 128) + '</button>';
@@ -173,7 +188,7 @@
     $('#pkContent').innerHTML =
       '<div class="pk-card' + (o.boss ? ' boss' : '') + '" id="pkCard">' +
         '<div class="pk-who">' + A.esc(who) + '</div>' +
-        '<button class="pk-cardspeak" id="pkCardSpeak" aria-label="Read the order aloud">' + icon('🔊', 32, 'cardspeak') + '</button>' +
+        '<button class="pk-cardspeak" id="pkCardSpeak" aria-label="Read the order aloud">' + icon('ui.speaker', 32, 'cardspeak') + '</button>' +
         '<p class="pk-ask" id="pkAsk">' + A.esc(o.text) + '</p>' +
         orderPics(o) +
       '</div>' +
@@ -260,7 +275,7 @@
     if (busy || G.phase !== 'order' || !K.BY[id]) return;
     G.basket = K.addItem(G.basket, id);
     A.Audio.sfx('tap');
-    afterChange(opt && opt.juice ? 'in' : '');
+    afterChange(opt && opt.juice ? 'in' : '', id);
   }
   function takeOut(uid) {
     if (busy || G.phase !== 'order') return;
@@ -268,6 +283,86 @@
     A.Audio.sfx('tap');
     afterChange();
   }
+
+  function extraUidSet(basket, want) {
+    var counts = {}, extra = {}, i, it;
+    for (i = 0; i < (basket || []).length; i++) {
+      it = basket[i];
+      counts[it.id] = (counts[it.id] || 0) + 1;
+      if (counts[it.id] > ((want && want[it.id]) || 0)) extra[it.uid] = true;
+    }
+    return extra;
+  }
+  function issueNudge() {
+    if (!G.order) return '';
+    var extras = K.extraKinds ? K.extraKinds(G.basket, G.order.want) : [];
+    if (extras.length) {
+      var nm = K.noun(extras[0], 1), wantIds = Object.keys(G.order.want || {}), instead = wantIds.length === 1 ? K.noun(wantIds[0], 1) : null;
+      return instead ? ('The ' + nm + ' is not a ' + instead + '. Take the ' + nm + ' out.') : ('The ' + nm + ' is not on the order. Take the ' + nm + ' out.');
+    }
+    if (K.overfilled(G.basket, G.order.want)) {
+      var too = K.overfilledId ? K.overfilledId(G.basket, G.order.want) : null;
+      return too ? ('That is too many ' + K.noun(too, 2) + '. Take one out.') : 'That looks like a little too much. Tap a food in the basket to take it out.';
+    }
+    return '';
+  }
+  function flashWrong(id) {
+    var item = document.querySelector('#pkItems .pk-item.extra[data-id="' + id + '"]') ||
+      document.querySelector('#pkItems .pk-item.extra:last-child') ||
+      document.querySelector('#pkItems .pk-item:last-child');
+    var bin = document.querySelector('.pk-bin[data-id="' + id + '"]');
+    var group = document.querySelector('.pk-group[data-id="' + id + '"]');
+    [item, bin, group].forEach(function (el) {
+      if (!el) return;
+      el.classList.remove('pk-wrong');
+      void el.offsetWidth;
+      el.classList.add('pk-wrong');
+    });
+  }
+  var HAND_SVG = '<svg class="pk-hand-svg" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true" focusable="false"><path fill="#ffe0b0" stroke="#5a3d1c" stroke-width="2.4" stroke-linejoin="round" d="M28 8c2.4-1 5.4.4 6.2 3.2l3.2 12.2 1.2-6.2c.7-3 4-4.2 6.4-2.6 2 1.3 2.6 4 1.6 6.3l-3.4 8.2 6.4-3c2.6-1.2 5.8.2 6.6 3 .8 2.8-.8 5.6-3.6 6.5L38 40.2l1.2 14.4c.2 2.6-1.8 4.8-4.4 4.8h-8.2c-2.2 0-4-1.6-4.4-3.8L19.6 40.6c-3.6-2.2-5.8-6.2-5.8-10.5V22c0-2.8 2.4-5 5.2-4.8 2.2.2 4 2 4.4 4.2l1.2 6.2V12.4C24.6 10 26.2 8.4 28 8z"/><circle cx="24.5" cy="18.5" r="1.6" fill="#5a3d1c"/><circle cx="31.5" cy="17.5" r="1.6" fill="#5a3d1c"/><path d="M24 23.5c2 2 6.6 2 8.4 0" fill="none" stroke="#5a3d1c" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  function hideHand() {
+    var h = $('#pkHand');
+    if (h && h.parentNode) h.parentNode.removeChild(h);
+  }
+  function hostLocal(host, clientX, clientY) {
+    var r = host.getBoundingClientRect();
+    var scale = host.offsetWidth ? (r.width / host.offsetWidth) : 1;
+    if (!scale) scale = 1;
+    return { x: (clientX - r.left) / scale, y: (clientY - r.top) / scale };
+  }
+  function placeHand(target) {
+    if (!target) return;
+    var host = document.getElementById('packer') || document.body;
+    hideHand();
+    var hand = A.el('<div class="pk-hand" id="pkHand" aria-hidden="true">' + HAND_SVG + '</div>');
+    host.appendChild(hand);
+    var r = target.getBoundingClientRect();
+    var pt = hostLocal(host, r.left + r.width * 0.65, r.top + r.height * 0.15);
+    hand.style.left = pt.x + 'px';
+    hand.style.top = pt.y + 'px';
+  }
+  function nextIdleTarget() {
+    if (!G.order || G.phase !== 'order') return null;
+    var extraEl = document.querySelector('#pkItems .pk-item.extra');
+    if (extraEl) return extraEl;
+    if (K.overfilled(G.basket, G.order.want)) {
+      var too = K.overfilledId(G.basket, G.order.want);
+      var over = too && document.querySelector('#pkItems .pk-item[data-id="' + too + '"]:last-of-type');
+      if (over) return over;
+      return document.querySelector('#pkItems .pk-item');
+    }
+    var miss = K.missing(G.basket, G.order.want);
+    var id = Object.keys(miss)[0];
+    if (id) return document.querySelector('.pk-bin[data-id="' + id + '"]');
+    return document.querySelector('.pk-bin');
+  }
+  function showIdleHand() {
+    if (G.phase !== 'order' || busy) return null;
+    var t = nextIdleTarget();
+    if (t) placeHand(t);
+    return t;
+  }
+
   function juiceDrop() {
     var b = $('#pkBasket');
     if (!b) return;
@@ -277,26 +372,21 @@
     var badge = b.querySelector('.pk-count');
     if (badge) { badge.classList.remove('tick'); void badge.offsetWidth; badge.classList.add('tick'); }
   }
-  function afterChange(juice) {
+  function afterChange(juice, lastId) {
     pokeIdle();
+    hideHand();
     if (K.matches(G.basket, G.order.want)) {
       busy = true; nudgeText = '';
       renderOrder();
       if (juice === 'in') juiceDrop();
       setTimeout(function () { finishOrder(); }, 450);
     } else {
-      if (!nudgeText) {
-        var extras = K.extraKinds ? K.extraKinds(G.basket, G.order.want) : [];
-        if (extras.length) {
-          var nm = K.noun(extras[0], 1), wantIds = Object.keys(G.order.want || {}), instead = wantIds.length === 1 ? K.noun(wantIds[0], 1) : null;
-          nudgeText = instead ? ('The ' + nm + ' is not a ' + instead + '. Take the ' + nm + ' out.') : ('The ' + nm + ' is not on the order. Take the ' + nm + ' out.');
-        } else if (K.overfilled(G.basket, G.order.want)) {
-          var too = K.overfilledId ? K.overfilledId(G.basket, G.order.want) : null;
-          nudgeText = too ? ('That is too many ' + K.noun(too, 2) + '. Take one out.') : 'That looks like a little too much. Tap a food in the basket to take it out.';
-        }
-      }
+      nudgeText = issueNudge() || '';
+      var wrong = !!(lastId && (K.extraKinds(G.basket, G.order.want).indexOf(lastId) >= 0 ||
+        ((K.countsOf(G.basket)[lastId] || 0) > ((G.order.want && G.order.want[lastId]) || 0))));
       renderOrder();
       if (juice === 'in') juiceDrop();
+      if (wrong) flashWrong(lastId);
     }
   }
   function renderFestoon(popNewest) {
@@ -332,6 +422,7 @@
   }
 
   function renderWin() {
+    hideHand();
     stopTimer();
     if (!stats.wonThis) { stats.sessions = (stats.sessions || 0) + 1; A.Store.earnStars(P, 1, 'packer'); stats.wonThis = true; }
     K.saveState(P, G); A.Store.save();
@@ -384,28 +475,27 @@
   }
   function stopTimer() { clearInterval(timerIv); timerIv = null; }
 
+  var idleMs = 7000;
   function pokeIdle() {
     clearTimeout(idleT);
+    hideHand();
     if (G.phase !== 'order') return;
     idleT = setTimeout(function () {
       if (G.phase !== 'order' || busy) return;
       K.failNudge(G);
-      if (K.overfilled(G.basket, G.order.want)) nudgeText = 'You can tap a food in the basket to take it out.';
-      else {
-        var miss = K.missing(G.basket, G.order.want);
-        var id = Object.keys(miss)[0];
-        var extras2 = K.extraKinds ? K.extraKinds(G.basket, G.order.want) : [];
-        if (extras2.length) {
-          var nm2 = K.noun(extras2[0], 1);
-          nudgeText = 'The ' + nm2 + ' is not on the order. Take the ' + nm2 + ' out.';
-        } else {
-          nudgeText = id ? 'Look for ' + K.noun(id, 2) + ' on the shelf.' : 'Almost there. Check the order again.';
-        }
+      var miss = K.missing(G.basket, G.order.want);
+      var id = Object.keys(miss)[0];
+      var extras2 = K.extraKinds ? K.extraKinds(G.basket, G.order.want) : [];
+      if (K.overfilled(G.basket, G.order.want) || extras2.length) {
+        nudgeText = issueNudge() || 'You can tap a food in the basket to take it out.';
+      } else {
+        nudgeText = id ? 'Look for ' + K.noun(id, 2) + ' on the shelf.' : 'Almost there. Check the order again.';
         A.$$('.pk-bin').forEach(function (el) { if (el.getAttribute('data-id') === id) el.classList.add('hint'); });
       }
       var n = $('#pkNudge'); if (n) n.textContent = nudgeText;
+      showIdleHand();
       say(nudgeText, 'chatter');
-    }, 14000);
+    }, idleMs);
   }
 
   function startOrder(opt) {
@@ -442,11 +532,13 @@
   $('#pkSpeak').onclick = function () { say(orderText() || 'Let\'s pack a picnic!', 'tap'); };
   $('#pkTimer').onclick = toggleTimer;
   headerIcons();
+  if (A.HowTo) A.HowTo.button('packer', '#pkHome');
 
   window.__packer = {
     G: G, render: renderOrder, renderWin: renderWin, renderFestoon: renderFestoon,
     addToBasket: addToBasket, takeOut: takeOut, startOrder: startOrder,
-    cheerMs: 2500,
+    cheerMs: 2500, showIdleHand: showIdleHand, pokeIdle: pokeIdle, hideHand: hideHand,
+    get idleMs() { return idleMs; }, set idleMs(v) { idleMs = v; },
     setOrder: function (opt) { G.phase = 'ready'; G.done = false; startOrder(opt || {}); },
     setFestoon: function (scene) {
       G.scene = scene || [];
@@ -462,5 +554,5 @@
     layoutBasket: layoutBasket
   };
 
-  startOrder();
+  (A.HowTo && A.HowTo.first ? A.HowTo.first('packer') : Promise.resolve()).then(function () { startOrder(); });
 })(window.Arcade);

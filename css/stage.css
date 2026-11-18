@@ -39,3 +39,8 @@ html.stage-on .stage-scale #pancake {
   margin-left: auto;
   margin-right: auto;
 }
+
+html.stage-on .stage-scale #boot {
+  width: 100%;
+  height: 100%;
+}

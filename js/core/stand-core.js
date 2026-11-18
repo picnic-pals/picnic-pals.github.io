@@ -281,6 +281,8 @@
     if (!g || typeof g !== 'object') g = G.stand = {};
     if (!g.v) g.v = 1; g.days = g.days || 0; g.customers = g.customers || 0; g.tips = g.tips || 0; g.steps = g.steps || {}; g.tracks = g.tracks || {}; g.missed = g.missed || {}; g.up = g.up || {}; g.rush = g.rush || { tries: 0, wins: 0 };
     if (!g.fl || typeof g.fl !== 'object' || !Array.isArray(g.fl.got)) g.fl = { got: ['plain'], pd: 0, last: '' };   // stand-r1: unlocked flavors (schema 4, safe default)
+    if (g.jar == null || g.jar !== g.jar) g.jar = g.tips || 0;   // spendable tip jar (lifetime g.tips stays a running total)
+    if (!g.eq || typeof g.eq !== 'object') g.eq = {};
     return g;
   }
   function sst(p, id) { var g = data(p), s = g.steps[id]; if (!s) s = g.steps[id] = { n: 0, ok: 0, hist: [], days: {}, fast: 0, status: 'locked' }; return s; }
@@ -456,10 +458,51 @@
     if (!r.tod && walked >= 3) return 0;
     return Math.min(3, s);
   }
-  function finishDay(p, r) { var g = data(p); g.days++; g.customers += r.served || 0; g.tips += r.tips || 0; g.best = Math.max(g.best || 0, r.tips || 0); g.lastDay = today(); g.cups = (g.cups || 0) + (r.served || 0); r.newFlavor = notePlayDay(p); if (r.rushTried) g.rush.tries++; if (r.rushWon) g.rush.wins++; return dayStars(r); }
+  function finishDay(p, r) { var g = data(p); g.days++; g.customers += r.served || 0; g.tips += r.tips || 0; g.jar += r.tips || 0; g.best = Math.max(g.best || 0, r.tips || 0); g.lastDay = today(); g.cups = (g.cups || 0) + (r.served || 0); r.newFlavor = notePlayDay(p); if (r.rushTried) g.rush.tries++; if (r.rushWon) g.rush.wins++; return dayStars(r); }
   function summary(p) { var g = data(p); return ORDER.map(function (lad) { var L = LADDERS[lad], T = g.tracks[lad]; return { ladder: lad, open: !!L.gate(p), cur: T ? T.cur : null, steps: L.ids.map(function (id) { var s = g.steps[id] || {}; return { id: id, name: STEPS[id].name, status: s.status || 'locked', placed: !!s.placed, n: s.n || 0, acc: s.n ? Math.round(100 * s.ok / s.n) : null }; }) }; }); }
 
-  A.Stand = { ITEMS: ITEMS, BY: BY, COLORS: COLORS, FLAVORS: FLAVORS, FL: FL, FLAVOR_DAYS: FLAVOR_DAYS, flavors: flavors, hasFlavor: hasFlavor, notePlayDay: notePlayDay, favOf: favOf, ingr: ingr, tipFor: tipFor, patienceMs: patienceMs, BILLS: BILLS, UPGRADES: UPGRADES, upgrade: upgrade, owned: owned, LADDERS: LADDERS, STEPS: STEPS, ORDER: ORDER, ladder: ladder,
+
+  /* ---------- tip shop (cosmetic stand upgrades paid with saved tips; no pressure, no timers) ---------- */
+  var SHOP = [
+    { id: 'awning-blue', slot: 'awning', name: 'Blue awning', price: 5 },
+    { id: 'cups-pink', slot: 'cups', name: 'Pink cups', price: 6 },
+    { id: 'sign-sunny', slot: 'sign', name: 'Sunny sign', price: 8 },
+    { id: 'flavor-berry', slot: 'flavor', name: 'Berry lemonade', price: 10 },
+    { id: 'awning-mint', slot: 'awning', name: 'Mint awning', price: 12 },
+    { id: 'cups-rainbow', slot: 'cups', name: 'Rainbow cups', price: 15 }
+  ];
+  var SHOPBY = {}; SHOP.forEach(function (it) { SHOPBY[it.id] = it; });
+  function jarOf(p) { return data(p).jar || 0; }
+  function shopItem(id) { return SHOPBY[id] || null; }
+  function looks(p) {
+    var g = data(p), eq = g.eq || {};
+    return { awning: eq.awning || '', cups: eq.cups || '', sign: eq.sign || '', flavor: eq.flavor || '' };
+  }
+  function canBuy(p, id) {
+    var it = SHOPBY[id];
+    return !!(it && !owned(p, id) && jarOf(p) >= it.price);
+  }
+  function equip(p, id) {
+    var it = SHOPBY[id], g = data(p);
+    if (!it || !owned(p, id)) return false;
+    if (!g.eq || typeof g.eq !== 'object') g.eq = {};
+    if (g.eq[it.slot] === id) g.eq[it.slot] = '';
+    else g.eq[it.slot] = id;
+    return true;
+  }
+  function buy(p, id) {
+    var it = SHOPBY[id], g = data(p);
+    if (!it) return { ok: false, reason: 'missing' };
+    if (owned(p, id)) return { ok: false, reason: 'owned' };
+    if ((g.jar || 0) < it.price) return { ok: false, reason: 'need' };
+    g.jar -= it.price;
+    g.up[id] = 1;
+    if (!g.eq || typeof g.eq !== 'object') g.eq = {};
+    g.eq[it.slot] = id;
+    return { ok: true, jar: g.jar, id: id };
+  }
+
+  A.Stand = { ITEMS: ITEMS, BY: BY, COLORS: COLORS, FLAVORS: FLAVORS, FL: FL, FLAVOR_DAYS: FLAVOR_DAYS, flavors: flavors, hasFlavor: hasFlavor, notePlayDay: notePlayDay, favOf: favOf, ingr: ingr, tipFor: tipFor, patienceMs: patienceMs, BILLS: BILLS, UPGRADES: UPGRADES, upgrade: upgrade, owned: owned, SHOP: SHOP, shopItem: shopItem, jar: jarOf, looks: looks, canBuy: canBuy, buy: buy, equip: equip, LADDERS: LADDERS, STEPS: STEPS, ORDER: ORDER, ladder: ladder,
     band: band, toddler: toddler, moneyOpen: moneyOpen, mathCount10: mathCount10, mathMastered: mathMastered, readerOk: readerOk, stepOk: stepOk, data: data, state: sst, track: track, nextStep: nextStep, makeOrder: makeOrder, checkOrder: checkOrder, checkPay: checkPay, payDenoms: payDenoms,
     record: record, ready: ready, RULE: RULE, STEADY: STEADY, fastMs: fastMs, sunny: sunny, rushOk: rushOk, customers: customers, planDay: planDay, sillyOrder: sillyOrder, dayStars: dayStars, finishDay: finishDay,
     summary: summary, bandTop: bandTop, inBand: inBand, bigReader: bigReader, count: count, seed01: seed01,

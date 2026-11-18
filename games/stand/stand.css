@@ -707,3 +707,243 @@ html.stage-on[data-stage="portrait"] .ticket p { font-size: 22px; }
 html.stage-on[data-stage="portrait"] .ticket.long p { font-size: 19px; }
 html.stage-on[data-stage="portrait"] .cust { max-height: none; }
 html.stage-on[data-stage="portrait"] .cust .bubble { overflow: visible; max-height: none; }
+
+/* ---------- tip shop + ready screen + visible cosmetic upgrades (tips1118) ---------- */
+#stand.up-awning-blue > .awning,
+#stand.up-awning-mint > .awning,
+.ready-preview .awning {
+  display: block !important;
+  z-index: 2;
+  pointer-events: none;
+}
+.ready-preview .awning {
+  background: repeating-linear-gradient(90deg, #ffd23c 0 60px, #fff 60px 120px);
+}
+.ready-preview .awning::after {
+  background: radial-gradient(circle at 30px 0, #ffd23c 15px, transparent 16px) 0 0 / 120px 16px repeat-x,
+    radial-gradient(circle at 90px 0, #fff 15px, transparent 16px) 0 0 / 120px 16px repeat-x;
+}
+#stand.up-awning-blue > .awning,
+#stand.up-awning-blue .ready-preview .awning {
+  background: repeating-linear-gradient(90deg, #7ec8ff 0 60px, #fff 60px 120px);
+}
+#stand.up-awning-blue > .awning::after,
+#stand.up-awning-blue .ready-preview .awning::after {
+  background: radial-gradient(circle at 30px 0, #7ec8ff 15px, transparent 16px) 0 0 / 120px 16px repeat-x,
+    radial-gradient(circle at 90px 0, #fff 15px, transparent 16px) 0 0 / 120px 16px repeat-x;
+}
+#stand.up-awning-mint > .awning,
+#stand.up-awning-mint .ready-preview .awning {
+  background: repeating-linear-gradient(90deg, #7ed9a8 0 60px, #fff 60px 120px);
+}
+#stand.up-awning-mint > .awning::after,
+#stand.up-awning-mint .ready-preview .awning::after {
+  background: radial-gradient(circle at 30px 0, #7ed9a8 15px, transparent 16px) 0 0 / 120px 16px repeat-x,
+    radial-gradient(circle at 90px 0, #fff 15px 15px, transparent 16px) 0 0 / 120px 16px repeat-x;
+}
+
+.stand-sign {
+  display: none;
+  position: absolute;
+  top: 52px;
+  left: 70px;
+  width: 108px;
+  height: 86px;
+  z-index: 3;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 0 #00000022);
+}
+.stand-sign.on { display: block; }
+.stand-sign .signsvg { width: 100%; height: 100%; display: block; }
+html.stage-on[data-stage="landscape"] .stand-sign { top: 44px; left: 88px; width: 120px; height: 94px; }
+
+body.stand-ready .tbar .dots,
+body.stand-ready .jarchip,
+body.stand-ready .rushbar,
+body.stand-ready .standrow,
+body.stand-ready #stand > .awning { visibility: hidden; }
+body.stand-ready .stand-sign { display: none; }
+
+.ready, .tipshop {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+.ready[hidden], .tipshop[hidden] { display: none !important; }
+
+.ready {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 72px 18px 18px;
+  gap: 12px;
+}
+.ready-preview {
+  position: relative;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 180px;
+  border-radius: 28px;
+  background: linear-gradient(#bfe6ff 0 42%, #d8f5c4 42% 70%, #f7e0b0 70%);
+  overflow: hidden;
+  box-shadow: inset 0 -10px 0 #e9c88a, 0 6px 0 #e6d6b8;
+}
+.ready-preview .awning { position: absolute; left: 0; right: 0; top: 0; height: 26px; }
+.ready-preview .r-sign { position: absolute; top: 28px; left: 16px; width: 100px; height: 80px; }
+.ready-preview .r-sign svg { width: 100%; height: 100%; }
+.ready-wares {
+  position: absolute;
+  left: 0; right: 0; bottom: 10px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  height: 68%;
+}
+.ready-wares .psvg { width: min(200px, 48%); height: 100%; }
+.ready-wares .cupsvg { width: min(130px, 32%); height: 78%; }
+
+.ready-jar, .shop-jar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border-radius: 24px;
+  padding: 6px 16px 6px 8px;
+  box-shadow: 0 5px 0 #e6dcc8;
+  min-height: 64px;
+}
+.ready-jar .jsvg, .shop-jar .jsvg { width: 52px; height: 56px; display: block; }
+.pricepics { display: inline-flex; align-items: center; gap: 6px; }
+.pricepics .bill { width: 64px; height: 32px; display: block; }
+.pricepics b { font-size: 32px; font-weight: 800; color: #2f7a3b; line-height: 1; }
+.ready-acts { display: flex; gap: 12px; width: 100%; }
+.ready-btn {
+  flex: 1 1 0;
+  min-height: 72px;
+  min-width: 60px;
+  border: 0;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 22px;
+  font-weight: 800;
+  color: #4a3b6b;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.ready-btn.shop { background: #fff4c4; box-shadow: 0 6px 0 #e8c66a; }
+.ready-btn.open { background: #8fe3c0; box-shadow: 0 6px 0 #5fc79c; }
+.ready-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 #0002; }
+.ready-btn .rb-art { width: 48px; height: 52px; display: block; }
+.ready-btn .rb-art .jsvg { width: 100%; height: 100%; }
+.ready-btn .rb-lab { font-weight: 800; }
+
+.tipshop {
+  display: flex;
+  flex-direction: column;
+  background: #f7eefe;
+  padding: 10px 12px 12px;
+  gap: 10px;
+}
+.shop-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  padding-right: 80px;
+  box-sizing: border-box;
+}
+html.stage-on[data-stage="landscape"] .shop-top { padding-right: 120px; }
+.shop-jar { min-width: 0; }
+.ready-total { display: inline-flex; align-items: center; min-width: 0; }
+.shop-back {
+  min-width: 72px;
+  min-height: 60px;
+  border: 0;
+  border-radius: 22px;
+  background: #fff;
+  font-size: 20px;
+  font-weight: 800;
+  color: #4a3b6b;
+  box-shadow: 0 4px 0 #e6dcc8;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.shop-jar { flex: 1 1 auto; }
+.shop-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  align-content: stretch;
+}
+.shop-item {
+  min-height: 120px;
+  min-width: 60px;
+  border: 0;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 5px 0 #e6dcc8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 6px 6px;
+  cursor: pointer;
+  touch-action: manipulation;
+  color: #4a3b6b;
+}
+.shop-item .si-art { width: 86px; height: 64px; display: flex; align-items: center; justify-content: center; }
+.shop-item .si-art svg { width: 100%; height: 100%; display: block; }
+.shop-item .si-name { font-size: 16px; font-weight: 800; text-align: center; line-height: 1.15; }
+.shop-item .si-price { display: flex; align-items: center; justify-content: center; min-height: 28px; }
+.shop-item .si-price .bill { width: 44px; height: 22px; }
+.shop-item .si-price b { font-size: 22px; }
+.shop-item .si-got { font-size: 15px; font-weight: 800; color: #2f7a3b; background: #e7f8ea; border-radius: 999px; padding: 2px 10px; }
+.shop-item .si-got.on-stand { background: #fff2b8; color: #8a6d3b; }
+.shop-item.owned { box-shadow: 0 5px 0 #b8e0c4; }
+.shop-item.on { outline: 4px solid #ffd23c; background: #fffdf3; }
+.shop-item.need { opacity: .7; }
+.shop-item.shake { animation: shopshake .4s ease; }
+@keyframes shopshake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-7px) rotate(-2deg); }
+  75% { transform: translateX(7px) rotate(2deg); }
+}
+@media (prefers-reduced-motion: reduce) { .shop-item.shake { animation: none; } }
+
+html.stage-on[data-stage="landscape"] .ready {
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 56px 20px 16px;
+  align-items: stretch;
+}
+html.stage-on[data-stage="landscape"] .ready-preview {
+  flex: 1 1 54%;
+  min-height: 0;
+  height: auto;
+}
+html.stage-on[data-stage="landscape"] .ready-jar { flex: 0 0 auto; }
+html.stage-on[data-stage="landscape"] .ready-acts {
+  flex: 1 1 38%;
+  flex-direction: column;
+  justify-content: center;
+}
+html.stage-on[data-stage="landscape"] .shop-grid {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+html.stage-on[data-stage="landscape"] .shop-item { min-height: 0; }
+html.stage-on[data-stage="landscape"] .stand-sign { top: 40px; left: 120px; }
+
+html.stage-on[data-stage="portrait"] .ready { padding-top: 78px; }
+html.stage-on[data-stage="portrait"] .shop-item { min-height: 0; }
+html.stage-on[data-stage="portrait"] .shop-item .si-art { width: 74px; height: 54px; }
+html.stage-on[data-stage="portrait"] .shop-item .si-name { font-size: 15px; }

@@ -4551,6 +4551,117 @@
           }
         }
       ]
+    },
+    {
+      "id": "object.thumb",
+      "emoji": [
+        "👍",
+        "👍️"
+      ],
+      "label": "thumb",
+      "file": "objects/thumb.png",
+      "set": "objects",
+      "sizes": {
+        "256": "objects/thumb.png",
+        "64": "objects/thumb_64.png",
+        "48": "objects/thumb_48.png",
+        "32": "objects/thumb_32.png"
+      }
+    },
+    {
+      "id": "ui.three",
+      "emoji": [
+        "3️⃣",
+        "3⃣"
+      ],
+      "label": "three",
+      "file": "ui/three.png",
+      "set": "ui",
+      "sizes": {
+        "256": "ui/three.png",
+        "64": "ui/three_64.png",
+        "48": "ui/three_48.png",
+        "32": "ui/three_32.png"
+      }
+    },
+    {
+      "id": "object.thread",
+      "emoji": [
+        "🧵",
+        "🔵️"
+      ],
+      "label": "thread",
+      "file": "objects/thread.png",
+      "set": "objects",
+      "sizes": {
+        "256": "objects/thread.png",
+        "64": "objects/thread_64.png",
+        "48": "objects/thread_48.png",
+        "32": "objects/thread_32.png"
+      }
+    },
+    {
+      "id": "object.slide",
+      "emoji": [
+        "🛝"
+      ],
+      "label": "slide",
+      "file": "objects/slide.png",
+      "set": "objects",
+      "sizes": {
+        "256": "objects/slide.png",
+        "64": "objects/slide_64.png",
+        "48": "objects/slide_48.png",
+        "32": "objects/slide_32.png"
+      }
+    },
+    {
+      "id": "body.feet",
+      "emoji": [
+        "👣",
+        "👣️"
+      ],
+      "label": "feet",
+      "file": "body/feet.png",
+      "set": "body",
+      "sizes": {
+        "256": "body/feet.png",
+        "64": "body/feet_64.png",
+        "48": "body/feet_48.png",
+        "32": "body/feet_32.png"
+      }
+    },
+    {
+      "id": "object.sleep",
+      "emoji": [
+        "😴",
+        "😴️"
+      ],
+      "label": "sleep",
+      "file": "objects/sleep.png",
+      "set": "objects",
+      "sizes": {
+        "256": "objects/sleep.png",
+        "64": "objects/sleep_64.png",
+        "48": "objects/sleep_48.png",
+        "32": "objects/sleep_32.png"
+      }
+    },
+    {
+      "id": "object.seat",
+      "emoji": [
+        "💺",
+        "💺️"
+      ],
+      "label": "seat",
+      "file": "objects/seat.png",
+      "set": "objects",
+      "sizes": {
+        "256": "objects/seat.png",
+        "64": "objects/seat_64.png",
+        "48": "objects/seat_48.png",
+        "32": "objects/seat_32.png"
+      }
     }
   ],
   "words": {
@@ -4827,17 +4938,24 @@
     "pretzel": "food.pretzel",
     "lantern": "object.lantern",
     "paper lantern": "object.lantern",
-    "bunting": "object.bunting"
+    "bunting": "object.bunting",
+    "thumb": "object.thumb",
+    "three": "ui.three",
+    "thread": "object.thread",
+    "slide": "object.slide",
+    "feet": "body.feet",
+    "sleep": "object.sleep",
+    "seat": "object.seat"
   },
   "counts": {
-    "ui": 38,
+    "ui": 39,
     "animals": 72,
     "food": 52,
     "scenery": 32,
     "nature": 24,
-    "total": 295,
-    "objects": 61,
-    "body": 7,
+    "total": 302,
+    "objects": 66,
+    "body": 8,
     "gaps": 9
   }
 }

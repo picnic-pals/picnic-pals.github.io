@@ -125,7 +125,7 @@
       var d = document.createElement('div'); d.className = 'cell in c' + ((i * 3 + Math.floor(i / COLS)) % 5) + (c.long ? ' long' : '') + (TWO ? ' own p' + (c.owner + 1) : '');
       d.style.animationDelay = (Math.floor(i / COLS) * 70 + (i % COLS) * 45) + 'ms';
       d.setAttribute('role', 'button'); d.setAttribute('aria-label', (TWO ? PL[c.owner].name + ': ' : '') + c.label);
-      d.innerHTML = '<span class="lbl">' + (c.html || A.esc(c.label)) + '</span><span class="crumb">✿</span>' + (TWO ? '<span class="tagdot">' + A.esc(PL[c.owner].name.charAt(0).toUpperCase()) + '</span>' : '');
+      d.innerHTML = '<span class="lbl">' + (c.html || A.esc(c.label)) + '</span><span class="crumb">' + (A.Icons ? A.Icons.html('🌼', { size: 32, decorative: true, cls: 'pp-pic', slot: 'munch:crumb' }) : '') + '</span>' + (TWO ? '<span class="tagdot">' + A.esc(PL[c.owner].name.charAt(0).toUpperCase()) + '</span>' : '');
       d.addEventListener('click', function () { onCellTap(i); });
       board.appendChild(d); cellEls.push(d);
     });
@@ -144,7 +144,12 @@
     if (!TWO) {
       var pl = PL[0];
       // strategy hint only after a mistake (never up front)
-      $('#ruleTxt').innerHTML = pl.rule.text + (pl.rule.stepHint && pl.wrong > 0 ? '<span class="hint st">' + pl.rule.stepHint(pl.lastMiss, pl.wrong >= 2 ? 2 : 1) + '</span>' : pl.rule.hint && pl.wrong > 0 ? '<span class="hint">' + pl.rule.hint + '</span>' : '');   // v2p2a: a step shows a picture hint (ten-frame / number line) after a miss, to the answer after 2
+      var parts = (A.CountVisual && A.CountVisual.display) ? A.CountVisual.display(pl.rule) : { text: pl.rule.text, pic: pl.rule.pic || '' };
+      var hintHtml = (pl.rule.stepHint && pl.wrong > 0 ? '<span class="hint st">' + pl.rule.stepHint(pl.lastMiss, pl.wrong >= 2 ? 2 : 1) + '</span>' : pl.rule.hint && pl.wrong > 0 ? '<span class="hint">' + pl.rule.hint + '</span>' : '');
+      // One picture copy, in a slot the panel can scale. v2p2a: a step shows a picture hint after a miss.
+      $('#ruleTxt').innerHTML = parts.text + (parts.pic ? '<span class="st-pic">' + parts.pic + '</span>' : '') + hintHtml;
+      if (A.CountVisual && A.CountVisual.fit) A.CountVisual.fit($('#ruleTxt'));
+      fitRulePic();
       var chip = $('#levelChip'), s = pl.round.skill;
       chip.textContent = pl.round.story ? ((ST.placeName && ST.placeName(pl.round.stop)) || pl.round.stop.area.name) + ' · Stop ' + pl.round.stop.n : pl.round.review ? 'Review: ' + s.name : pl.round.testOut ? 'Test-out: ' + s.name + ' · 5 to skip ahead' : s.name + (s.isStep ? '' : ' · Level ' + (pl.round.level + 1)) + (pl.round.boards > 1 ? ' · Board ' + pl.round.board + ' of ' + pl.round.boards : '');
       if (pl.round.story && SR && SR.cfg && SR.cfg.boss && A.Story2.PLACES[A.Story2.placeOfStop(SR.i)].art) chip.textContent = 'Mini boss: ' + SR.cfg.bossName;
@@ -156,6 +161,41 @@
         '<span class="cnt">' + (pl.done ? '✓ All done!' : pl.correct + ' / ' + pl.nOk) + '</span></div>';
     }).join('');
     $('#levelChip').textContent = MODE === 'team' ? 'Team munch' : 'Munch race'; $('#levelChip').classList.remove('review');
+    if (A.CountVisual && A.CountVisual.fit) A.CountVisual.fit($('#ruleTxt'));
+    fitRulePic();
+  }
+  function fitRulePic() {
+    var top = document.querySelector('#game .top') || document.querySelector('.top');
+    var set = document.querySelector('#ruleTxt .cv-set');
+    var txt = $('#ruleTxt');
+    if (!top || !txt) return;
+    top.classList.toggle('has-cv', !!set);
+    void top.offsetHeight;
+    if (set) {
+      var frames = set.querySelectorAll('.cv-frame, .cv-framewrap').length;
+      set.style.flexWrap = (frames > 2) ? 'wrap' : 'nowrap';
+    }
+    var d = 16;
+    if (set) set.style.setProperty('--cv-d', d + 'px');
+    var guard = 0, floor = 14;
+    function overflows() { return top.scrollHeight > top.clientHeight + 1; }
+    while (guard++ < 24 && overflows()) {
+      if (set && d > floor) {
+        d -= 1;
+        set.style.setProperty('--cv-d', d + 'px');
+      } else {
+        var fs = parseFloat(window.getComputedStyle(txt).fontSize) || 20;
+        if (fs > 14) txt.style.fontSize = (fs - 1) + 'px';
+        else if (set && d > 10) {   // only shrink dots below 14 when the panel still overflows
+          d -= 1;
+          set.style.setProperty('--cv-d', d + 'px');
+        } else {
+          var rule = document.querySelector('#game .rule') || document.querySelector('.rule');
+          if (rule) rule.style.padding = '4px 8px';
+          break;
+        }
+      }
+    }
   }
   function renderSide() {
     if (!TWO) { renderHearts(); return; }
@@ -196,13 +236,37 @@
     // skills with phrase answers (stories) get wider tiles when there is room (same rows, so the walk/munch grid is unchanged)
     var wide = PL.some(function (pl) { return pl.round && pl.round.skill && pl.round.skill.wideCells; });
     CW = wide ? Math.max(CS, Math.min(Math.floor((W - GAP * (COLS - 1)) / COLS), Math.round(CS * 1.7))) : CS;
-    board.style.gridTemplateColumns = 'repeat(' + COLS + ',' + CW + 'px)'; board.style.gridAutoRows = CS + 'px'; board.style.gap = GAP + 'px';
+    board.style.gridTemplateColumns = 'repeat(' + COLS + ', ' + CW + 'px)';
+    board.style.gridTemplateRows = 'repeat(' + ROWS + ', ' + CS + 'px)';
+    board.style.gridAutoRows = CS + 'px';
+    board.style.gap = GAP + 'px';
+    var bw = COLS * CW + GAP * (COLS - 1), bh = ROWS * CS + GAP * (ROWS - 1);
+    board.style.width = bw + 'px';
+    board.style.height = bh + 'px';
+    board.style.minWidth = bw + 'px';
+    board.style.minHeight = bh + 'px';
+    board.style.maxWidth = bw + 'px';
+    board.style.maxHeight = bh + 'px';
+    board.style.flexShrink = '0';
     board.style.setProperty('--cs', CS + 'px');
     board.style.setProperty('--icon-cs', CS + 'px');  // artswap: icon/emoji size ignores fitCells label shrink
     PL.map(function (p) { return p.el; }).concat([grumEl, starEl]).forEach(function (e) { if (e) { e.style.width = CS + 'px'; e.style.height = CS + 'px'; } });
     place(false); fitCells();
     if (layout._fitT) cancelAnimationFrame(layout._fitT);
-    layout._fitT = requestAnimationFrame(function () { fitCells(); });
+    layout._fitT = requestAnimationFrame(function () {
+      fitCells();
+      var h0 = wrap.clientHeight;
+      fitRulePic();
+      fitBubble();
+      // Growing .has-cv / .has-longmsg changes wrap height after the first layout, which
+      // can leave the top row of tiles under the timer. Relayout once when the wrap moves.
+      if (!layout._didRelayout && Math.abs(wrap.clientHeight - h0) > 2) {
+        layout._didRelayout = true;
+        layout();
+      } else {
+        layout._didRelayout = false;
+      }
+    });
   }
   // Make every tile label fit inside its tile: first shrink on one line (a little), then wrap at spaces and shrink again,
   // never below MIN_FONT px for the label's text. Shrinking sets the label's own --cs, so pictures/frames scale with the text.
@@ -254,16 +318,37 @@
     var h = $('#hearts'); h.className = 'hearts'; h.innerHTML = '';
     if (GENTLE && !TWO) { h.classList.add('gentle'); h.setAttribute('aria-hidden', 'true'); return; }   // gentle: no hearts to lose
     for (var i = 0; i < 3; i++) { var s = document.createElement('span'); s.innerHTML = HEART; var sv = s.firstChild; if (i >= G.hearts) sv.classList.add('gone'); if (lost && i === G.hearts) sv.classList.add('pop'); if (gained && i === G.hearts - 1) sv.classList.add('gainone'); h.appendChild(sv); }
-    if (G.freeMax && !TWO) for (var f = 0; f < G.freeMax; f++) { var fb = document.createElement('i'); fb.className = 'freetry' + (f < G.free ? '' : ' used'); fb.textContent = document.body.classList.contains('s2-fighting') ? '?' : '💡'; fb.title = 'Free tries: an oops gives a hint and keeps your hearts'; h.appendChild(fb); }
+    if (G.freeMax && !TWO) for (var f = 0; f < G.freeMax; f++) { var fb = document.createElement('i'); fb.className = 'freetry' + (f < G.free ? '' : ' used'); fb.innerHTML = document.body.classList.contains('s2-fighting') ? '?' : (A.Icons ? A.Icons.html('💡', { size: 32, decorative: true, cls: 'pp-pic', slot: 'munch:freetry' }) : ''); fb.title = 'Free tries: an oops gives a hint and keeps your hearts'; h.appendChild(fb); }
   }
   // after9 hint-before-heart: the first oops on a board keeps the hearts and makes a right snack near the player glow
   function freeHint(pl) {
     pl.freeHinted = true; var best = -1, bd = 1e9;
     G.cells.forEach(function (c, i) { if (!c.ok || c.eaten || (TWO && c.owner !== pl.i)) return; var d = Math.abs(Math.floor(i / COLS) - pl.pos.r) + Math.abs(i % COLS - pl.pos.c); if (d < bd) { bd = d; best = i; } });
     cellEls.forEach(function (e) { e.classList.remove('nudge'); }); if (best >= 0) cellEls[best].classList.add('nudge');
-    setTimeout(function () { if (!G.active) return; bubble((document.body.classList.contains('s2-fighting') ? '' : '💡 ') + 'Free try! No heart lost. Try the glowing one!'); talk(['coach_easy_one'], false); }, 1500);
+    setTimeout(function () { if (!G.active) return; bubble('Free try! No heart lost. Try the glowing one!'); talk(['coach_easy_one'], false); }, 1500);
   }
-  function bubble(t) { var b = $('#bubble'); $('#bubbleMsg').textContent = t; b.classList.remove('say'); void b.offsetWidth; b.classList.add('say'); }
+  function bubble(t) { var b = $('#bubble'); $('#bubbleMsg').textContent = t; b.classList.remove('say'); void b.offsetWidth; b.classList.add('say'); fitBubble(); }
+  function fitBubble() {
+    var bottom = document.querySelector('#game .bottom') || document.querySelector('.bottom');
+    var msg = $('#bubbleMsg');
+    var box = $('#bubble') || document.querySelector('.bubble');
+    if (!bottom || !msg || !box) return;
+    var wrapH0 = wrap ? wrap.clientHeight : 0;
+    var long = (msg.textContent || '').length > 32 || msg.scrollHeight > msg.clientHeight + 1 || bottom.scrollHeight > bottom.clientHeight + 1;
+    bottom.classList.toggle('has-longmsg', !!long);
+    void bottom.offsetHeight;
+    var fs = parseFloat(window.getComputedStyle(box).fontSize) || 16, guard = 0;
+    while (guard++ < 10 && bottom.scrollHeight > bottom.clientHeight + 1 && fs > 13) {
+      fs -= 1;
+      box.style.fontSize = fs + 'px';
+    }
+    // A long hint can shrink #boardWrap after the first layout; size tiles again.
+    if (wrap && !fitBubble._relayout && wrapH0 && Math.abs(wrap.clientHeight - wrapH0) > 2) {
+      fitBubble._relayout = true;
+      layout();
+      fitBubble._relayout = false;
+    }
+  }
   // talk(): the bubble always shows the words; the voice follows the player's "How much talking" setting (A.Talk). kind defaults to chatter (Full only).
   function talk(parts, show, kind) { if (show !== false) bubble(V.text(parts)); return V.say(parts, { kind: kind || 'chatter' }); }
   V.ownBubble = true;   // Munch has its own food-friend bubble (#bubble): no extra friendBubble
@@ -298,8 +383,30 @@
     pl.pos.r = r; pl.pos.c = c; moved(pl);
   }
   function moved(pl) { place(true); anim(pl, 'hop', 230); SFX.step(); checkBump(); checkStar(pl); poke(); }
-  // 2026-10-22 voice: the 14-second idle "how to play" reminder is gone (the key / touch hints stay on screen); poke() only clears old timers
-  function poke() { clearTimeout(G.idleT); G.idleT = null; }
+  // Idle pointing hand (same art as Packer) after a few quiet seconds, aimed at a matching tile.
+  var IDLE_MS = 6000;
+  var HAND_SVG = '<svg class="mm-hand-svg" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true" focusable="false"><path fill="#ffe0b0" stroke="#5a3d1c" stroke-width="2.4" stroke-linejoin="round" d="M28 8c2.4-1 5.4.4 6.2 3.2l3.2 12.2 1.2-6.2c.7-3 4-4.2 6.4-2.6 2 1.3 2.6 4 1.6 6.3l-3.4 8.2 6.4-3c2.6-1.2 5.8.2 6.6 3 .8 2.8-.8 5.6-3.6 6.5L38 40.2l1.2 14.4c.2 2.6-1.8 4.8-4.4 4.8h-8.2c-2.2 0-4-1.6-4.4-3.8L19.6 40.6c-3.6-2.2-5.8-6.2-5.8-10.5V22c0-2.8 2.4-5 5.2-4.8 2.2.2 4 2 4.4 4.2l1.2 6.2V12.4C24.6 10 26.2 8.4 28 8z"/><circle cx="24.5" cy="18.5" r="1.6" fill="#5a3d1c"/><circle cx="31.5" cy="17.5" r="1.6" fill="#5a3d1c"/><path d="M24 23.5c2 2 6.6 2 8.4 0" fill="none" stroke="#5a3d1c" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  function hideHand() { var h = document.getElementById('mmHand'); if (h && h.parentNode) h.parentNode.removeChild(h); }
+  function nearestGood(pl) {
+    var best = -1, bd = 1e9;
+    G.cells.forEach(function (c, i) { if (!c.ok || c.eaten || (TWO && c.owner !== pl.i)) return; var d = Math.abs(Math.floor(i / COLS) - pl.pos.r) + Math.abs(i % COLS - pl.pos.c); if (d < bd) { bd = d; best = i; } });
+    return best;
+  }
+  function showIdleHand() {
+    if (!G.active || blocked()) return null;
+    hideHand();
+    var pl = PL[0], best = nearestGood(pl);
+    if (best < 0 || !cellEls[best]) return null;
+    var host = wrap || board;
+    var hand = A.el('<div class="mm-hand" id="mmHand" aria-hidden="true">' + HAND_SVG + '</div>');
+    host.appendChild(hand);
+    var t = cellEls[best].getBoundingClientRect(), hr = host.getBoundingClientRect();
+    var scale = host.offsetWidth ? (hr.width / host.offsetWidth) : 1; if (!scale) scale = 1;
+    hand.style.left = ((t.left + t.width * 0.65) - hr.left) / scale + 'px';
+    hand.style.top = ((t.top + t.height * 0.15) - hr.top) / scale + 'px';
+    return cellEls[best];
+  }
+  function poke() { clearTimeout(G.idleT); G.idleT = null; hideHand(); if (!G.active) return; G.idleT = setTimeout(function () { if (G.active && !blocked()) showIdleHand(); }, IDLE_MS); }
 
   function munch(i) {
     var pl = PL[i || 0];
@@ -648,7 +755,7 @@
         else { title = "It's a tie!"; voice = ['munch_tie']; sub = 'You both did great!'; }
       }
       var html = '<div class="duo">' + res.map(function (r, k) {
-        return '<div class="pcol p' + (k + 1) + (r.win ? ' win' : '') + '"><div class="pa dance">' + A.Blobs.forProfile(r.pl.P, { expr: 'happy' }) + '</div>' + (r.win ? '<span class="crownb">🏆</span>' : '') +
+        return '<div class="pcol p' + (k + 1) + (r.win ? ' win' : '') + '"><div class="pa dance">' + A.Blobs.forProfile(r.pl.P, { expr: 'happy' }) + '</div>' + (r.win ? '<span class="crownb">' + (A.Icons ? A.Icons.html('🏆', { size: 32, decorative: true, cls: 'pp-pic', slot: 'munch:crown' }) : '') + '</span>' : '') +
           '<b class="pn">' + A.esc(r.pl.name) + '</b><span class="pm">' + r.pl.correct + ' of ' + r.pl.nOk + ' munched</span>' + starRow(r.stars, .3 + k * .9) + '</div>';
       }).join('') + '</div>';
       for (var s1 = 0; s1 < res[0].stars + res[1].stars; s1++) setTimeout(SFX.star, 300 + s1 * 300);
@@ -739,13 +846,14 @@
   function cutscene(o) {
     return new Promise(function (resolve) {
       var heroes = (o.heroes || [P1]).map(function (p, k) { return '<div class="cs-hero h' + k + '"><div class="hb">' + A.Blobs.forProfile(p, { expr: 'happy' }) + '</div></div>'; }).join('');
-      var cast = (o.friends || ['strawberry', 'apple', 'corn', 'blueberry', 'mochi']).filter(function (b) { return !(o.heroes || [P1]).some(function (h) { return h.blob === b; }); }).slice(0, 4);
+      var starters = (A.Store && A.Store.STARTER_BLOBS) || ['strawberry', 'apple', 'corn', 'blueberry'];
+      var cast = met(o.friends || starters).filter(function (b) { return !(o.heroes || [P1]).some(function (h) { return h.blob === b; }); }).slice(0, 4);
       var friends = cast.map(function (b, k) { return '<div class="cs-friend" style="animation-delay:' + (k * .12) + 's">' + A.Blobs.svg({ blob: b, expr: 'happy' }) + '</div>'; }).join('');
       var hasStars = o.starsFrom != null && o.starsTo != null;
       var ov = A.el('<div class="cutscene' + (o.finale ? ' finale' : '') + '" role="dialog" aria-label="' + A.esc(o.title) + '">' +
         '<div class="cs-sky"></div><div class="cs-hills"></div>' +
         (hasStars ? '<div class="cs-stars">' + UI.STAR + '<b>' + o.starsFrom + '</b></div>' : '') +
-        '<div class="cs-path"><svg viewBox="0 0 400 120" preserveAspectRatio="none"><path d="M10 100 Q100 10 200 70 T390 40" fill="none" stroke="#fff" stroke-width="6" stroke-dasharray="2 16" stroke-linecap="round"/></svg>' + heroes + '<div class="cs-flag">🏁</div></div>' +
+        '<div class="cs-path"><svg viewBox="0 0 400 120" preserveAspectRatio="none"><path d="M10 100 Q100 10 200 70 T390 40" fill="none" stroke="#fff" stroke-width="6" stroke-dasharray="2 16" stroke-linecap="round"/></svg>' + heroes + '<div class="cs-flag">' + (A.Icons ? A.Icons.html('🏁', { size: 48, decorative: true, cls: 'pp-pic', slot: 'munch:flag' }) : '') + '</div></div>' +
         '<h2 class="cs-title">' + A.esc(o.title) + '</h2>' + (o.sub ? '<div class="cs-sub">' + A.esc(o.sub) + '</div>' : '') +
         '<div class="cs-friends">' + friends + '</div>' +
         '<span class="kh">' + (A.isTouchOnly() ? 'Tap to skip' : 'Press <kbd class="wide">Space</kbd> to skip') + '</span><span class="ph">Press ' + A.Pad.g('a') + ' to skip</span></div>');
@@ -895,7 +1003,7 @@
     else chain = UI.card({ cls: 'celebrate storyres' + (out.won ? '' : ' tryagain'), tag: '⭐ Challenge · ' + c.a.name,
       title: out.won ? 'Challenge won!' : !fin ? (gaveUp ? 'Snack break!' : "Time's up!") : 'So close!',
       art: '<div class="' + (out.won ? 'dance' : '') + '">' + A.Blobs.forProfile(P, { expr: out.won ? 'happy' : 'idle' }) + '</div>',
-      html: '<p class="chgoal">' + (fin ? 'Your time: <b>' + secs + 's</b> (goal ' + cc.target + 's)' : 'You munched <b>' + pl.correct + '</b> of ' + pl.nOk) + (fin && pl.wrong > cc.maxWrong ? '<br>Oops: ' + pl.wrong + ' (1 is OK)' : '') + (out.newBest ? '<br>🏅 New best time!' : '') + '</p>',
+      html: '<p class="chgoal">' + (fin ? 'Your time: <b>' + secs + 's</b> (goal ' + cc.target + 's)' : 'You munched <b>' + pl.correct + '</b> of ' + pl.nOk) + (fin && pl.wrong > cc.maxWrong ? '<br>Oops: ' + pl.wrong + ' (1 is OK)' : '') + (out.newBest ? '<br>' + (A.Icons ? A.Icons.html('🏅', { size: 24, decorative: true, cls: 'pp-pic', slot: 'munch:besttime' }) : '') + ' New best time!' : '') + '</p>',
       sub: out.won ? '' : (A.Rewards.unlocked(P, 'blob', c.blob) ? 'Try again for a faster time!' : 'Good try! You can race again any time.'),
       btn: 'Map ▶', sfx: out.won ? 'win' : 'soft', confetti: out.won, voice: out.won ? (out.wins > 1 ? ['ch_won_again'] : ['fb_great_job']) : fin && pl.wrong > cc.maxWrong ? ['ch_fail_acc'] : ['fb_so_close', 'fb_try_again'], minMs: 800 });   // design1: not ch_fail_time (its clip says "…to meet your new friend")
     chain.then(function () { return A.Rewards.celebrate(P, rewards); }).then(ptGate).then(function () { A.MunchMap.preselect('c' + cc.k); storyMap(); });
@@ -954,7 +1062,7 @@
       '<div class="score"><table>' + rows.map(function (r) { return '<tr><td>' + r[0] + '</td><td class="v" data-v="' + r[1] + '">0</td></tr>'; }).join('') +
       '<tr class="tot"><td>Stop score</td><td class="v" data-v="' + pts.total + '">0</td></tr></table>' +
       (out.runAdded ? '<div class="journey">Journey score <b data-v="' + R.score + '" data-from="' + runBefore + '">' + runBefore + '</b></div>' : SR.practice ? '<div class="journey soft">Practice round · best here ' + (ST.stopInfo(P, SR.i) || {}).best + '</div>' : '') +
-      (out.newBestRun ? '<div class="newbest">🏆 New high score!</div>' : out.newBestStop ? '<div class="newbest">🏅 New best for this stop!</div>' : '') + '</div>';
+      (out.newBestRun ? '<div class="newbest">' + (A.Icons ? A.Icons.html('🏆', { size: 28, decorative: true, cls: 'pp-pic', slot: 'munch:high' }) : '') + ' New high score!</div>' : out.newBestStop ? '<div class="newbest">' + (A.Icons ? A.Icons.html('🏅', { size: 28, decorative: true, cls: 'pp-pic', slot: 'munch:best' }) : '') + ' New best for this stop!</div>' : '') + '</div>';
     var soft = GENTLE && !out.passed;   // design2: a gentle stop with too many oopsies: a calm "Nice try!" and play it again
     var title = soft ? 'Nice try!' : fin ? 'Stop cleared!' : out.passed ? 'You made it!' : gaveUp ? 'Snack break!' : "Time's up!";
     var voice = soft ? [{ id: 'munch_nice_try_stop', text: "Nice try! Let's play this stop again." }] : fin ? ['fb_hooray', 'fb_you_got', stars, stars === 1 ? 'fb_star' : 'fb_stars'] : out.passed ? ['munch_times_up', 'story_next'] : ['story_try_again'];
@@ -1098,7 +1206,13 @@
       .then(nextRound);
   }
 
-  window.__munch = { cutscene: cutscene, gentleStars: gentleStars, withBonus: withBonus, timerFor: timerFor, G: G, PL: PL, T: T, B: B, openBonus: openBonus, gentle: GENTLE, retryRound: retryRound, P: function () { return P1; }, two: TWO, mode: MODE, munch: munch, moveBy: function (a, b, c) { if (c === undefined) return moveBy(0, a, b); return moveBy(a, b, c); },
+  if (wrap && !wrap._munchRO && typeof ResizeObserver === 'function') {
+    var roT = 0;
+    wrap._munchRO = new ResizeObserver(function () { clearTimeout(roT); roT = setTimeout(function () { if (G.active) layout(); }, 50); });
+    wrap._munchRO.observe(wrap);
+  }
+  var clockEl = document.querySelector('#timer .clock'); if (clockEl && A.Icons) clockEl.innerHTML = A.Icons.html('⏱', { size: 28, decorative: true, cls: 'pp-pic', slot: 'munch:timer' });
+  window.__munch = { showIdleHand: showIdleHand, hideHand: hideHand, poke: poke, IDLE_MS: IDLE_MS, nearestGood: nearestGood, renderRule: renderRule, fitRulePic: fitRulePic, fitBubble: fitBubble, layout: layout, cutscene: cutscene, gentleStars: gentleStars, withBonus: withBonus, timerFor: timerFor, G: G, PL: PL, T: T, B: B, openBonus: openBonus, gentle: GENTLE, retryRound: retryRound, P: function () { return P1; }, two: TWO, mode: MODE, munch: munch, moveBy: function (a, b, c) { if (c === undefined) return moveBy(0, a, b); return moveBy(a, b, c); },
     onCellTap: onCellTap, nextRound: nextRound, unlockScene: unlockScene, story: STORY, SR: function () { return SR; }, cutscene: cutscene, endRound: endRound, showStar: showStar, fitCells: fitCells, workedExample: workedExample, coachAfter: coachAfter, celebrateStreak: celebrateStreak, renderBoard: renderBoard, setTimeLeft: function (s) { T.left = s; renderTimer(); }, COLS: COLS,
     goTo: function (i, cell) { if (cell === undefined) { cell = i; i = 0; } var pl = PL[i]; pl.target = null; clearTimeout(pl.walkT); pl.walkT = null; pl.pos = { r: Math.floor(cell / COLS), c: cell % COLS }; place(true); checkStar(pl); }, playStop: playStop };
 })(window.Arcade);

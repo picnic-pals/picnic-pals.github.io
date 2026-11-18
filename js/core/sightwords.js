@@ -134,8 +134,17 @@
       if (!can.length) return r;
       var T = can[Math.floor(Math.random() * can.length)], c = CLOZE_BY[T.toLowerCase()];
       var html = '<span class="cloze">' + c.text.replace('___', '<span class="blank">____</span>') + '</span>';
-      return { text: html, plainText: c.text, listen: false, cloze: true, hint: 'Read the sentence. Which word makes sense in the blank?', say: r.say, target: T,
-        good: function () { return mk(T); }, bad: function () { return mk(c.bad[Math.floor(Math.random() * c.bad.length)]); } };
+      // mk() often closes over the original listen-target; rebuild facts against the cloze word
+      // so a miss never says "Munch the word and" for "A fire truck is ____."
+      function cellFor(w) {
+        var cell = mk(w);
+        cell.fact = (String(w).toLowerCase() === String(T).toLowerCase())
+          ? ['sw_that_says', A.SightWords.lineId(w)]
+          : ['rule_sight', A.SightWords.lineId(T)];
+        return cell;
+      }
+      return { text: html, plainText: c.text, listen: false, cloze: true, hint: 'Read the sentence. Which word makes sense in the blank?', say: [], target: T,
+        good: function () { return cellFor(T); }, bad: function () { return cellFor(c.bad[Math.floor(Math.random() * c.bad.length)]); } };
     },
     cloze: function (w) { return CLOZE_BY[String(w).toLowerCase()] || null; },
     lists: [

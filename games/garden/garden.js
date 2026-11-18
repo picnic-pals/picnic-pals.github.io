@@ -54,8 +54,13 @@
   }
 
   function px(n) { return Math.round(n) + 'px'; }
+  function stageScale() {
+    var s = parseFloat((document.documentElement.style.getPropertyValue('--stage-scale') || window.getComputedStyle(document.documentElement).getPropertyValue('--stage-scale')).trim());
+    return (s && s > 0.05) ? s : 1;
+  }
+  function renderedMin(n) { return Math.ceil(n / stageScale()); }
   function minHit(el, x, y, size) {
-    var hit = Math.max(60, size);
+    var hit = Math.max(renderedMin(60), size);
     el.style.position = 'absolute';
     el.style.left = px(x - hit / 2);
     el.style.top = px(y - hit / 2);
@@ -295,10 +300,31 @@
     return !!K.selectedPlot(G.state);
   }
 
+  function seedTrayHtml() {
+    var st = G.state, html = '<div class="gd-seeds" id="gdSeeds">';
+    K.ids().forEach(function (id) {
+      var open = K.packetOpen(st, id);
+      var held = G.heldPacket === id;
+      var unlocked = !!(st.plants[id] && st.plants[id].unlocked);
+      var growing = K.growingOn(st, id) >= 0;
+      var gone = unlocked || growing;
+      var cls = 'gd-seedbtn' + (open ? ' open' : ' shut') + (held ? ' held' : '') + (gone ? ' gone' : '');
+      var aria = held ? 'Selected seed packet' : (open ? 'Seed packet, tap to plant' : (gone ? 'Seed already planted' : 'Seed packet, still locked'));
+      // Silhouette rule: unmet friends stay unnamed faceless silhouettes.
+      var who = unlocked ? friendSrc(id, 'front', 128) : lockedSrc(id);
+      html += '<button type="button" class="' + cls + '" data-id="' + id + '" aria-label="' + aria + '"' + (open ? '' : ' disabled') + '>';
+      html += '<img class="pkt" src="' + Art.packetSrc(id) + '" alt="">';
+      html += '<img class="who" src="' + who + '" alt="">';
+      html += '</button>';
+    });
+    return html + '</div>';
+  }
   function renderCard(shot) {
     if (!hasPlant() && !(G.band && G.band.toddler && hasPlant())) {
       if (!hasPlant()) {
-        return '<div class="gd-card" id="gdCard"><p class="gd-ask" id="gdAsk">Tap a seed packet, then a patch of soil.</p><p class="gd-nudge" id="gdNudge">' + A.esc(G.nudge || '') + '</p></div>';
+        return '<div class="gd-card" id="gdCard"><p class="gd-ask" id="gdAsk">Tap a seed packet, then a patch of soil.</p>' +
+          seedTrayHtml() +
+          '<p class="gd-nudge" id="gdNudge">' + A.esc(G.nudge || '') + '</p></div>';
       }
     }
     if (G.band && G.band.toddler) {
@@ -307,7 +333,7 @@
         '<button type="button" class="gd-water" id="gdWater">Water</button></div>';
     }
     var q = G.question;
-    if (!q) return '<div class="gd-card" id="gdCard"><p class="gd-ask" id="gdAsk">Tap a seed packet, then a patch of soil.</p><p class="gd-nudge" id="gdNudge">' + A.esc(G.nudge || '') + '</p></div>';
+    if (!q) return '<div class="gd-card" id="gdCard"><p class="gd-ask" id="gdAsk">Tap a seed packet, then a patch of soil.</p>' + seedTrayHtml() + '<p class="gd-nudge" id="gdNudge">' + A.esc(G.nudge || '') + '</p></div>';
     var html = '<div class="gd-card" id="gdCard"><p class="gd-ask" id="gdAsk">' + (q.html || A.esc(q.text)) + '</p>';
     if (q.pic) html += '<div class="gd-pic">' + q.pic + '</div>';
     html += '<p class="gd-nudge" id="gdNudge">' + A.esc(G.nudge || '') + '</p>';
@@ -331,6 +357,12 @@
 
   function bindCard() {
     if ($('#gdWater')) $('#gdWater').onclick = function () { if (!busy) onToddlerTap(); };
+    if ($('#gdSeeds')) {
+      $('#gdSeeds').addEventListener('click', function (e) {
+        var b = e.target.closest('.gd-seedbtn'); if (!b || busy || b.disabled) return;
+        onPacket(b.getAttribute('data-id'));
+      });
+    }
     if ($('#gdChoices')) {
       $('#gdChoices').addEventListener('click', function (e) {
         var b = e.target.closest('.gd-choice'); if (!b || busy) return;
@@ -587,6 +619,7 @@
   }
 
   $('#gdHome').onclick = home;
+  if (A.HowTo) A.HowTo.button('garden', '#gdHome');
   $('#gdSpeak').onclick = function () { say(promptSpeech(), 'tap'); };
 
   if (A.Music && A.Music.play) A.Music.play('cozy');
@@ -619,5 +652,5 @@
     nameOf: K.nameOf
   };
 
-  renderTitle();
+  (A.HowTo && A.HowTo.first ? A.HowTo.first('garden') : Promise.resolve()).then(renderTitle);
 })(window.Arcade);

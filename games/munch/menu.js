@@ -13,9 +13,9 @@
   var GRID = '<svg viewBox="0 0 100 70"><rect width="100" height="70" rx="10" fill="#fff6e6"/>' + [0, 1, 2].map(function (r) { return [0, 1, 2, 3].map(function (c) { var cols = ['#fff6cf', '#d4f7e8', '#ffd6e3', '#dcefff', '#e9e0ff']; return '<rect x="' + (10 + c * 21) + '" y="' + (6 + r * 20) + '" width="18" height="17" rx="4" fill="' + cols[(r * 4 + c) % 5] + '"/><text x="' + (19 + c * 21) + '" y="' + (18 + r * 20) + '" font-size="9" text-anchor="middle" font-weight="700" fill="#4a3b6b" font-family="sans-serif">' + ((r * 4 + c) * 3 % 10) + '</text>'; }).join(''); }).join('') + '</svg>';
 
   function build() {
-    sec = A.el('<section class="screen" id="menu"><div class="mhead"><button class="iconbtn" id="menuHome" aria-label="Back to the arcade" data-nav>⌂</button>' +
+    sec = A.el('<section class="screen" id="menu"><div class="mhead"><button class="iconbtn" id="menuHome" aria-label="Back to the arcade" data-nav>' + (A.Icons ? A.Icons.html('ui.home', { size: 32, decorative: true, cls: 'pp-pic', slot: 'munch:menuhome' }) : '') + '</button>' +
       '<div class="mlogo"><span class="mav" id="menuAv"></span><span><b>' + A.TITLES.munch + '</b><small id="menuHi"></small></span></div>' +
-      '<button class="chipbtn gold" id="menuScores" data-nav>🏆 High scores</button><button class="iconbtn music" id="menuMusic" aria-label="Music on/off (M)">🎵</button></div>' +
+      '<button class="chipbtn gold" id="menuScores" data-nav>' + (A.Icons ? A.Icons.html('🏆', { size: 28, decorative: true, cls: 'pp-pic', slot: 'munch:scores' }) : '') + ' High scores</button><button class="iconbtn music" id="menuMusic" aria-label="Music on/off (M)">' + (A.Icons ? A.Icons.html('ui.music', { size: 32, decorative: true, cls: 'pp-pic', slot: 'munch:menumusic' }) : '') + '</button></div>' +
       '<h2 class="mq" id="menuQ"></h2><div class="mtiles" id="menuTiles"></div><div id="menuSeats"></div><div class="keys mk"><span class="grp"><kbd>←</kbd><kbd>→</kbd> choose</span><span class="grp"><kbd class="wide">Space</kbd> pick</span><span class="grp"><kbd>Esc</kbd> back</span></div><div id="menuPadKeys"></div></section>');
     document.body.insertBefore(sec, document.body.firstChild);
     $('#menuHome').addEventListener('click', function () { SFX.tap(); A.Music.stop(); location.href = A.ROOT + 'index.html#games'; });

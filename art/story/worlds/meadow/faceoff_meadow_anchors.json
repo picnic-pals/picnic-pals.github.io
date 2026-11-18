@@ -1,0 +1,75 @@
+{
+  "world": "meadow",
+  "boss": "Bramble",
+  "notes": "Official Bramble portrait is front-facing and is composited on the right, matching the approved meadow pattern. The left side is reserved for a code-drawn hero (soft ground spot only). No friend characters are painted in. The background is the official meadow locked_scene with any friend silhouette removed; the official boss is left in place and over-composited with the cleaned front-facing portrait. Anchor is the feet-center / ground contact. bbox is [x, y, w, h] in pixels of that orientation's faceoff image.",
+  "portrait": {
+    "file": "faceoff_meadow_portrait.png",
+    "size": [
+      800,
+      1440
+    ],
+    "hero": {
+      "anchor": [
+        165,
+        1150
+      ],
+      "bbox": [
+        35,
+        810,
+        260,
+        340
+      ],
+      "ground_y": 1150,
+      "recommended_height": 340
+    },
+    "boss": {
+      "anchor": [
+        560,
+        1150
+      ],
+      "bbox": [
+        328,
+        674,
+        459,
+        477
+      ],
+      "ground_y": 1150,
+      "height": 477
+    }
+  },
+  "landscape": {
+    "file": "faceoff_meadow_landscape.png",
+    "size": [
+      2048,
+      1280
+    ],
+    "hero": {
+      "anchor": [
+        793,
+        1139
+      ],
+      "bbox": [
+        633,
+        739,
+        320,
+        400
+      ],
+      "ground_y": 1139,
+      "recommended_height": 400
+    },
+    "boss": {
+      "anchor": [
+        1256,
+        1139
+      ],
+      "bbox": [
+        985,
+        581,
+        538,
+        559
+      ],
+      "ground_y": 1139,
+      "height": 559
+    }
+  }
+}

@@ -158,9 +158,252 @@ section.s2 .s2-art-lv.boss, section.s2.s2-tod .s2-art-lv.boss { width: 68px; hei
 html.stage-on .s2-back,
 html.stage-on .s2-book,
 html.stage-on .s2-top .q1help {
-  --s2-hit: max(60px, calc(60px / var(--stage-scale, 1)));
+  --s2-hit: max(60px, calc(61px / var(--stage-scale, 1)));
   width: var(--s2-hit);
   height: var(--s2-hit);
   min-width: var(--s2-hit);
   min-height: var(--s2-hit);
+}
+
+
+/* story1118: world zoom + world-switch beat + boss reveal */
+section.s2 { overflow: hidden; }
+.s2-cam { position: absolute; inset: 0; transform-origin: 0 0; }
+.s2-zoom {
+  position: absolute; z-index: 8; pointer-events: none; overflow: hidden; border-radius: 28px;
+  background: transparent;
+}
+.s2-zoom-map {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  opacity: 0; transform: scale(.55); transform-origin: 50% 50%;
+  transition: opacity .35s ease, transform .4s ease;
+}
+.s2-zoom.on .s2-zoom-map { opacity: 1; transform: scale(1); }
+.s2-zoom-banner {
+  position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%) scale(.86);
+  background: #fff9ed; border: 4px solid #fff; border-radius: 22px;
+  padding: 8px 16px; display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 6px 0 rgba(59,45,85,.16);
+  opacity: 0; z-index: 2; color: #3b2d55; font-weight: 800; font-size: 24px; line-height: 1.1;
+  transition: opacity .25s ease, transform .35s ease;
+  max-width: calc(100% - 20px); box-sizing: border-box;
+}
+.s2-zoom-banner b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.s2-zoom.on .s2-zoom-banner { opacity: 1; transform: translateX(-50%) scale(1); }
+.s2-zoom-thumb { width: 72px; height: 44px; object-fit: cover; border-radius: 10px; flex: none; }
+.s2-zoom-spark {
+  position: absolute; left: 50%; top: 50%; width: 36px; height: 36px; margin: -18px 0 0 -18px;
+  border: 6px solid #fff; border-radius: 50%; opacity: 0;
+  box-shadow: 0 0 0 6px #ff8fb3;
+}
+.s2-zoom.pan .s2-zoom-spark, .s2-zoom.zoom .s2-zoom-spark { animation: s2spark .5s ease-out; }
+@keyframes s2spark { 0% { opacity: .9; transform: scale(.4); } 100% { opacity: 0; transform: scale(3.2); } }
+.s2-place.s2-arrive { outline: 5px solid #ffd86b; outline-offset: 3px; animation: s2pulse 1s ease-in-out infinite; }
+
+.s2-boss-cover { display: grid; place-items: center; width: 100%; height: 100%; overflow: hidden; }
+.s2-lv.s2-boss-hid, .s2-art-lv.s2-boss-hid { background: #efeaf6 !important; border-style: dashed; }
+.s2-art-lv.s2-boss-hid .s2-cloud { transform: scale(.55); }
+.s2-art-lv .rp { width: 22px; height: 22px; font-size: 13px; line-height: 16px; top: -8px; right: -8px; }
+.s2-art-lv.s2-boss-pop { animation: s2BossPop .6s cubic-bezier(.3,1.5,.5,1); }
+@keyframes s2BossPop { 0% { transform: translate(-50%, -50%) scale(.4); } 100% { transform: translate(-50%, -50%) scale(1); } }
+
+.s2-story-actions button.s2-hit { min-width: 60px; min-height: 60px; }
+html.stage-on .s2-story-actions button.s2-hit {
+  --s2-hit: max(60px, calc(61px / var(--stage-scale, 1)));
+  min-width: var(--s2-hit);
+  min-height: var(--s2-hit);
+}
+
+.s2-reveal .s2-story-card { display: flex; flex-direction: column; align-items: center; max-height: 100%; overflow: hidden; }
+.s2-reveal-frame { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; min-height: 0; }
+.s2-reveal-scene { width: 100%; max-height: 28%; object-fit: cover; border-radius: 16px; opacity: 0; height: auto; display: block; }
+.s2-reveal.is-on .s2-reveal-scene { opacity: .4; }
+.s2-vs { display: flex; align-items: flex-end; justify-content: center; gap: 8%; width: 100%; min-height: 0; margin: 4px 0; }
+.s2-reveal-hero, .s2-reveal-boss { width: min(38%, 180px); height: auto; max-height: 200px; object-fit: contain; flex: none; }
+.s2-reveal.is-sil .s2-vs { justify-content: center; }
+.s2-reveal.is-sil .s2-reveal-hero { width: 0; min-width: 0; margin: 0; overflow: hidden; }
+.s2-reveal.is-sil .s2-reveal-boss { filter: brightness(0); width: min(58%, 240px); max-height: 280px; }
+.s2-reveal.is-on .s2-reveal-boss { filter: none; animation: s2pop .45s cubic-bezier(.3,1.5,.5,1) both; }
+.s2-reveal.is-sil .s2-reveal-hero { opacity: 0; transform: translateX(-24px); }
+.s2-reveal.is-on .s2-reveal-hero { opacity: 1; transform: none; transition: opacity .35s ease, transform .35s ease; }
+.s2-reveal.is-sil h2 { letter-spacing: .04em; }
+.s2-reveal.is-sil p, .s2-reveal.is-sil .s2-go { opacity: 0; pointer-events: none; }
+.s2-reveal.is-on p, .s2-reveal.is-on .s2-go { opacity: 1; pointer-events: auto; }
+.s2-reveal.is-on h2 { animation: s2pop .4s ease both; }
+.s2-reveal .s2-skip { background: #fff; color: #3b2d55; box-shadow: 0 4px 0 rgba(59,45,85,.16); }
+@keyframes s2pop { 0% { transform: scale(.6); } 100% { transform: scale(1); } }
+
+.s2-win .s2-scene { animation: s2winGlow .8s ease; border-radius: 16px; box-shadow: 0 0 0 0 #ffe08a; }
+@keyframes s2winGlow { 0% { box-shadow: 0 0 0 0 #ffe08a, 0 0 0 0 #ff8fb388; transform: scale(.96); } 60% { box-shadow: 0 0 0 12px #ffe08a00, 0 0 24px 8px #ff8fb344; transform: scale(1.02); } 100% { box-shadow: none; transform: none; } }
+
+html[data-stage="landscape"] .s2-reveal .s2-story-card { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; }
+html[data-stage="landscape"] .s2-reveal .s2-story-card h2 { width: auto; margin: 0 10px 0 0; }
+html[data-stage="landscape"] .s2-reveal-frame { width: auto; flex: 1 1 48%; max-width: 54%; }
+html[data-stage="landscape"] .s2-reveal-scene { display: none; } /* keep in the DOM as first img, hide visually so the short stage can fit the VS + Go */
+html[data-stage="landscape"] .s2-reveal-hero, html[data-stage="landscape"] .s2-reveal-boss { max-height: 180px; width: min(42%, 150px); }
+html[data-stage="landscape"] .s2-reveal .s2-story-card p { margin: 6px 0; font-size: 16px; max-width: 40%; }
+html[data-stage="landscape"] .s2-reveal .s2-story-actions { width: 100%; }
+html[data-stage="landscape"] .s2-zoom-banner { font-size: 20px; bottom: 10px; padding: 6px 12px; }
+html[data-stage="landscape"] .s2-win .s2-scene { max-height: 42%; }
+
+@media (max-height: 500px) {
+  .s2-reveal-scene { display: none; }
+  .s2-reveal-hero, .s2-reveal-boss { max-height: 140px; }
+  .s2-story-card h2 { font-size: 22px; margin-bottom: 4px; }
+  .s2-zoom-banner { font-size: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s2-zoom, .s2-zoom-map, .s2-zoom-banner, #s2Stage, .s2-reveal-boss, .s2-reveal-hero, .s2-reveal.is-on h2, .s2-win .s2-scene, .s2-art-lv.s2-boss-pop, .s2-zoom-spark {
+    transition: none !important; animation: none !important;
+  }
+  .s2-zoom.on .s2-zoom-map, .s2-zoom.on .s2-zoom-banner, .s2-reveal.is-on .s2-reveal-hero { opacity: 1; transform: none; }
+  .s2-reveal.is-sil .s2-reveal-boss { filter: none; }
+}
+
+html[data-stage="landscape"] .s2-story { padding: 8px; }
+html[data-stage="landscape"] .s2-story-card { max-height: 100%; overflow: hidden; box-sizing: border-box; }
+html[data-stage="landscape"] .s2-win .s2-story-card { padding: 8px 14px; }
+html[data-stage="landscape"] .s2-win .s2-scene { max-height: 260px; width: auto; margin: 0 auto; }
+html[data-stage="landscape"] .s2-win .s2-story-card h2 { font-size: 24px; margin: 0 0 4px; }
+html[data-stage="landscape"] .s2-win .s2-story-card p { margin: 4px auto 6px; font-size: 16px; }
+html[data-stage="landscape"] .s2-story-actions { gap: 8px; }
+
+/* On the fixed portrait stage the layout is 400px wide even when the phone/iPad viewport is wider. */
+html[data-stage="portrait"] .s2-top { gap: 8px; padding: 8px 76px 8px 8px; align-items: center; flex-wrap: wrap; }
+html[data-stage="portrait"] .s2-title { flex: 1 0 100%; order: 5; font-size: 20px; min-width: 0; line-height: 1.15; overflow: visible; text-overflow: unset; white-space: nowrap; text-align: center; display: block; }
+html[data-stage="portrait"] .s2-hero { position: relative; padding: 3px; flex: none; }
+html[data-stage="portrait"] .s2-hero img { width: 44px; height: 44px; }
+html[data-stage="portrait"] .s2-hero .nm { display: none; }
+html[data-stage="portrait"] .s2-hero .sw { position: absolute; right: -5px; bottom: -5px; padding: 0; width: 22px; height: 22px; display: grid; place-items: center; border: 2px solid #fff; }
+html[data-stage="portrait"] .s2-hero .sw i { font-style: normal; font-size: 12px; line-height: 1; }
+html[data-stage="portrait"] .s2-hero .sw b { display: none; }
+
+
+/* storyart1118: Overview B + silhouette + face-off */
+section.s2[data-view="world"] {
+  background: #f3d9b8;
+}
+.s2-overview-wrap {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.s2-overview-board {
+  position: relative;
+  inset: auto; /* beat .s2-cam { inset:0 } */
+  flex: none;
+  overflow: hidden;
+  transform-origin: 0 0;
+  border-radius: 16px;
+}
+.s2-overview {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  display: block;
+}
+.s2-overview-board .s2-place {
+  transform: none;
+  width: auto; min-width: 0; min-height: 0;
+  margin: 0; padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end;
+  gap: 2px;
+  z-index: 2;
+}
+.s2-overview-board .s2-place .nm,
+.s2-overview-board .s2-place .pr {
+  background: rgba(255, 249, 237, .92);
+  border: 3px solid #fff;
+  border-radius: 14px;
+  box-shadow: 0 3px 0 rgba(59,45,85,.14);
+  padding: 3px 8px;
+  line-height: 1.15;
+  overflow: visible;
+  text-overflow: unset;
+}
+.s2-overview-board .s2-place .nm {
+  font-size: 13px; font-weight: 800; text-align: center;
+  white-space: normal; overflow-wrap: normal; hyphens: none;
+  width: max-content; max-width: 100%;
+}
+.s2-overview-board .s2-place .pr {
+  font-size: 11px; margin-bottom: 6px; white-space: nowrap;
+  width: max-content; max-width: none;
+}
+html[data-stage="landscape"] .s2-overview-board .s2-place .nm {
+  font-size: 12px; padding: 2px 6px; line-height: 1.2; max-width: 100%;
+}
+.s2-overview-board .s2-place.cur .nm,
+.s2-overview-board .s2-place.sel .nm { outline: 3px solid #ff8fb3; outline-offset: 1px; }
+.s2-overview-board .s2-place.s2-arrive .nm { outline: 4px solid #ffd86b; }
+.s2-overview-board .s2-fog {
+  transform: none;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 3;
+  background: rgba(255,255,255,.28);
+  border-radius: 18px;
+}
+.s2-overview-board .s2-me { width: 56px; z-index: 4; }
+html[data-stage="portrait"] .s2-overview-board .s2-me { width: 44px; }
+
+/* Face-off and silhouette: the art box keeps its aspect and contain-fits the leftover card space */
+.s2-reveal.s2-story { height: 100%; max-height: 100%; overflow: hidden; box-sizing: border-box; display: flex; align-items: center; justify-content: center; }
+.s2-reveal .s2-story-card { flex: 1 1 auto; max-height: 100%; min-height: 0; width: min(900px, 100%); }
+.s2-reveal-frame { position: relative; width: 100%; flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.s2-sil-wrap { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+.s2-reveal-sil { width: min(58%, 240px); height: auto; max-height: 280px; object-fit: contain; }
+.s2-faceoff {
+  position: relative;
+  flex: none;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 800 / 1440;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 16px;
+}
+html[data-stage="landscape"] .s2-faceoff { aspect-ratio: 2048 / 1280; }
+.s2-faceoff-bg { display: block; width: 100%; height: 100%; object-fit: fill; }
+.s2-faceoff-hero {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  width: auto;
+  max-width: none;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 6px 4px rgba(0,0,0,.2));
+}
+.s2-reveal.is-sil .s2-faceoff { display: none; }
+.s2-reveal.is-on .s2-sil-wrap { display: none; }
+.s2-reveal.is-sil .s2-reveal-hero { display: none; }
+
+/* Landscape reveal: keep the face-off on stage with room for title and Go */
+html[data-stage="landscape"] .s2-reveal .s2-story-card {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+}
+html[data-stage="landscape"] .s2-reveal .s2-reveal-frame { width: auto; flex: 1 1 58%; max-width: 66%; max-height: 100%; }
+html[data-stage="landscape"] .s2-reveal-scene { display: none; }
+html[data-stage="landscape"] .s2-reveal-sil { max-height: 220px; }
+html[data-stage="landscape"] .s2-reveal .s2-story-card h2 { width: auto; margin: 0 10px 0 0; }
+html[data-stage="landscape"] .s2-reveal .s2-story-card p { margin: 6px 0; font-size: 16px; max-width: 36%; }
+html[data-stage="landscape"] .s2-reveal .s2-story-actions { width: 100%; }
+
+@media (max-height: 500px) {
+  html:not(.stage-on) .s2-reveal-sil { max-height: 140px; }
 }

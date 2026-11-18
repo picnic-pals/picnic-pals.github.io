@@ -1,0 +1,75 @@
+{
+  "world": "lagoon",
+  "boss": "Zest",
+  "notes": "Official Zest portrait is front-facing and is composited on the right, matching the approved meadow pattern. The left side is reserved for a code-drawn hero (soft ground spot only). No friend characters are painted in. The background is the official lagoon locked_scene with any friend silhouette removed; the official boss is left in place and over-composited with the cleaned front-facing portrait. Anchor is the feet-center / ground contact. bbox is [x, y, w, h] in pixels of that orientation's faceoff image.",
+  "portrait": {
+    "file": "faceoff_lagoon_portrait.png",
+    "size": [
+      800,
+      1440
+    ],
+    "hero": {
+      "anchor": [
+        240,
+        1150
+      ],
+      "bbox": [
+        110,
+        810,
+        260,
+        340
+      ],
+      "ground_y": 1150,
+      "recommended_height": 340
+    },
+    "boss": {
+      "anchor": [
+        560,
+        1150
+      ],
+      "bbox": [
+        345,
+        658,
+        460,
+        493
+      ],
+      "ground_y": 1150,
+      "height": 493
+    }
+  },
+  "landscape": {
+    "file": "faceoff_lagoon_landscape.png",
+    "size": [
+      2048,
+      1280
+    ],
+    "hero": {
+      "anchor": [
+        400,
+        1122
+      ],
+      "bbox": [
+        240,
+        722,
+        320,
+        400
+      ],
+      "ground_y": 1122,
+      "recommended_height": 400
+    },
+    "boss": {
+      "anchor": [
+        1035,
+        1122
+      ],
+      "bbox": [
+        653,
+        247,
+        817,
+        876
+      ],
+      "ground_y": 1122,
+      "height": 876
+    }
+  }
+}

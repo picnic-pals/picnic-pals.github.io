@@ -658,6 +658,14 @@
     howOpen = true;
     document.body.classList.remove('pc-won');
     renderStand();
+    if (A.HowTo && A.HowTo.show) {
+      A.HowTo.show('pancake').then(function () {
+        howOpen = false;
+        markHowTo();
+        startOrder();
+      });
+      return;
+    }
     var art = (Art.has && Art.has('pancake_gold') ? Art.cake('one', 'gold', 56) : '') +
       (Art.has && Art.has('plate') ? Art.cake('ten', 'gold', 72) : '');
     $('#pcCardHost').innerHTML =
@@ -696,6 +704,7 @@
   }
 
   $('#pcHome').onclick = home;
+  if (A.HowTo) A.HowTo.button('pancake', '#pcHome');
   $('#pcSpeak').onclick = function () { hearTapped += 1; speakOrder('tap', hearTapped === 1); };
   window.addEventListener('resize', function () {
     if (howOpen) { renderHowTo(); return; }

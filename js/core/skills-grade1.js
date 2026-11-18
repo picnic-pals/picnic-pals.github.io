@@ -9,9 +9,17 @@
   var askFrom = ES.askFrom, wl = G.wordLine;
   function em(t) { return '<b class="hl">' + t + '</b>'; }
   function others(arr, x) { return arr.filter(function (v) { return v !== x; }); }
-  function emo(ch) { return '<span class="ea-emo" aria-hidden="true">' + ch + '</span>'; }
+  function emo(ch, word) {
+    if (A.Icons) {
+      var opt = { size: 64, decorative: true, context: 'quiz', cls: 'ea-emo pp-pic' };
+      if (word) opt.word = word;
+      if (word === 'home' && A.Icons.has('object.house')) return A.Icons.html('object.house', opt);
+      return A.Icons.html(ch, opt);
+    }
+    return '<span class="ea-emo" aria-hidden="true">' + ch + '</span>';
+  }
   function wordHtml(w) { return '<span class="ea-word">' + w + '</span>'; }
-  function picWord(ch, w) { return '<span class="ea-pw">' + emo(ch) + '<span class="ea-cap">' + w + '</span></span>'; }
+  function picWord(ch, w) { return '<span class="ea-pw">' + emo(ch, w) + '<span class="ea-cap">' + w + '</span></span>'; }
   var SK = [];
   // audio-only word prompt (sight words, long vowels): the target is NOT printed, only the speaker button + this line
   var LISTEN = '<span class="listen">Listen and find the word</span>';
@@ -20,17 +28,17 @@
   /* ----- CVC words / short vowels ----- L1: picture -> pick the written word (look-alikes differ by one letter); L2: word -> pick its picture */
   SK.push({ id: 'cvc', name: 'Short vowel words', short: 'Read CVC words like cat, dog, sun', strand: 'Phonics', std: '1.RF.2b / 1.RF.3b', grade: '1', subject: 'reading', sayFact: true, secs: [11, 12],
     levels: ['Picture → word (cat · cot · cut)', 'Read the word → picture'],
-    intro: { line: 'skill_cvc', example: emo(E.PICS.cat) + ' ' + wordHtml('cat') + ' · ' + emo(E.PICS.sun) + ' ' + wordHtml('sun') },
+    intro: { line: 'skill_cvc', example: emo(E.PICS.cat, 'cat') + ' ' + wordHtml('cat') + ' · ' + emo(E.PICS.sun, 'sun') + ' ' + wordHtml('sun') },
     gen: function (L) {
       var T = pick(G.CVC_PICS), tl = wl(T);
       if (!L) {
         var like = G.CVC_LIKE[T] || [];
         var mkW = function (w) { return { label: w, html: wordHtml(w), fact: w === T ? ['w_thats', wl(w)] : ['rule_cvc_word', tl], name: [], k: w }; };
-        return { text: 'Munch the word for ' + emo(E.PICS[T]), noPrint: true, hint: 'Say the picture’s name slowly. Which vowel do you hear in the middle?', say: ['rule_cvc_word', tl], target: T, pic: E.PICS[T],
+        return { text: 'Munch the word for ' + emo(E.PICS[T], T), noPrint: true, hint: 'Say the picture’s name slowly. Which vowel do you hear in the middle?', say: ['rule_cvc_word', tl], target: T, pic: E.PICS[T],
           good: function () { return mkW(T); }, bad: function () { return mkW(like.length && Math.random() < .6 ? pick(like) : pick(others(G.CVC_WORDS, T))); } };
       }
       var vow = T.charAt(1);
-      var mkP = function (w) { return { label: w, html: emo(E.PICS[w]), fact: [wl(w)], name: [wl(w)], k: w }; };
+      var mkP = function (w) { return { label: w, html: emo(E.PICS[w], w), fact: [wl(w)], name: [wl(w)], k: w }; };
       return { text: 'Read it, then munch its picture: ' + em(T), hint: 'Say each sound, then blend them.', say: ['rule_cvc_pic'], target: T,
         good: function () { return mkP(T); },
         bad: function () { var same = others(G.CVC[vow], T); return mkP(same.length && Math.random() < .45 ? pick(same) : pick(others(G.CVC_PICS, T))); } };
@@ -40,14 +48,14 @@
   /* ----- Digraphs sh / ch / th ----- L1: pictures; L2: written words. Wrong ones start with s, c, h or t (the look-alikes) */
   SK.push({ id: 'digraph', name: 'sh, ch, th', short: 'Two letters, one sound: sh, ch, th', strand: 'Phonics', std: '1.RF.3a', grade: '1', subject: 'reading', sayFact: true, secs: [11, 12],
     levels: ['Pictures that start with sh / ch / th', 'Words that start with sh / ch / th'],
-    intro: { line: 'skill_digraph', example: emo(E.PICS.ship) + ' <b>sh</b> · ' + emo(E.PICS.chair) + ' <b>ch</b> · ' + emo(E.PICS.thumb) + ' <b>th</b>' },
+    intro: { line: 'skill_digraph', example: emo(E.PICS.ship, 'ship') + ' <b>sh</b> · ' + emo(E.PICS.chair, 'chair') + ' <b>ch</b> · ' + emo(E.PICS.thumb, 'thumb') + ' <b>th</b>' },
     gen: function (L) {
       var T = pick(G.DIG), anc = G.DIG_ANCHOR[T][0], al = wl(anc);
-      function mk(w, ok) { var l = wl(w); return { label: w, html: L ? wordHtml(w) : emo(E.PICS[w]), fact: [l, ok ? 'w_starts_like' : 'w_not_like', al], name: L ? [] : [l], k: ok ? T : 'x' + w.charAt(0) }; }
+      function mk(w, ok) { var l = wl(w); return { label: w, html: L ? wordHtml(w) : emo(E.PICS[w], w), fact: [l, ok ? 'w_starts_like' : 'w_not_like', al], name: L ? [] : [l], k: ok ? T : 'x' + w.charAt(0) }; }
       var goodPool = L ? G.DIG_WORDS[T] : G.DIG_PICS[T], otherDig = [];
       G.DIG.forEach(function (d) { if (d !== T) otherDig = otherDig.concat(L ? G.DIG_WORDS[d] : G.DIG_PICS[d]); });
       var badPool = (L ? G.DIG_BAD_WORDS : G.DIG_BAD_PICS);
-      return { text: 'Munch the ' + (L ? 'words' : 'things') + ' that start with ' + em(T.toUpperCase()), hint: L ? 'Look at the first two letters. Say the sound they make together.' : 'Say each name slowly. Listen for the first sound, like ' + E.PICS[anc] + ' ' + anc + '.', say: [(L ? 'rule_digw_' : 'rule_dig_') + T], target: T,
+      return { text: 'Munch the ' + (L ? 'words' : 'things') + ' that start with ' + em(T.toUpperCase()), hint: L ? 'Look at the first two letters. Say the sound they make together.' : 'Say each name slowly. Listen for the first sound, like ' + anc + '.', say: [(L ? 'rule_digw_' : 'rule_dig_') + T], target: T,
         good: function () { return mk(pick(goodPool), true); },
         bad: function () { var w = Math.random() < .35 ? pick(otherDig) : pick(badPool); var c = mk(w, false); if (otherDig.indexOf(w) >= 0) c.k = w.slice(0, 2); return c; } };
     } });
@@ -66,7 +74,7 @@
       return A.SightWords.mute({ text: LISTEN, listen: true, hint: SIGHT_HINT, say: ['rule_sight', swLine(T)], target: T,
         good: function () { return mk(T); }, bad: function () { return mk(like.length && Math.random() < (L ? .6 : .45) ? pick(like) : pick(ok)); } }, pool, mk);
     } });
-  var SIGHT_HINT = 'Tap 🔊 to hear it again. Listen for the first sound, then look for the letter that makes it.';
+  var SIGHT_HINT = 'Tap Hear again. Listen for the first sound, then look for the letter that makes it.';
   SK[2].ask = askFrom(SK[2].gen, function (r) { return r.cloze ? { text: r.text, say: [] } : { text: LISTEN, listen: true, say: ['sw_find', swLine(r.target)] }; });
 
   /* ----- Opposites ----- L1: picture words; L2: words only, more pairs (and the word itself as a trap) */
@@ -123,7 +131,7 @@
         if (pics.length) {
           var P = pick(pics), not = G.LONG_PIC_NOT[P] || [], plike = bank[P].filter(function (w) { return !alike(w, P) && not.indexOf(w) < 0 && !G.LONG_PIC[w]; });
           var ppool = pool.concat(T).filter(function (w, i, a) { return a.indexOf(w) === i && w !== P && !alike(w, P) && not.indexOf(w) < 0 && !G.LONG_PIC[w]; });
-          return { text: '<span class="lvpic">Which word is this? ' + (A.Icons ? A.Icons.html(G.LONG_PIC[P], { size: 64, decorative: true, cls: 'emo pp-pic', context: 'quiz' }) : '<span class="emo" aria-hidden="true">' + G.LONG_PIC[P] + '</span>') + '</span>', plainText: 'Which word is this?', listen: false, pic: true,
+          return { text: '<span class="lvpic">Which word is this? ' + (A.Icons ? A.Icons.html(P === 'home' && A.Icons.has('object.house') ? 'object.house' : G.LONG_PIC[P], { size: 64, word: P, decorative: true, cls: 'emo pp-pic', context: 'quiz' }) : '<span class="emo" aria-hidden="true">' + G.LONG_PIC[P] + '</span>') + '</span>', plainText: 'Which word is this?', listen: false, pic: true,
             hint: L ? 'Look at the picture. Find the word with two vowels teaming up, like ai, ee, oa or ea.' : 'Look at the picture. Find the word with the magic e.', say: [], target: P,
             good: function () { return wordCell(P, ['w_thats', wl(P)]); }, bad: function () { var w = plike.length && Math.random() < .65 ? pick(plike) : pick(ppool); return wordCell(w, []); } };
         }

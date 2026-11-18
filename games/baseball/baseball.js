@@ -24,6 +24,7 @@
   'use strict';
   var R = A.SluggerRules, $ = A.$, C = A.Curriculum, Q = A.Questions, V = A.Voice, SFX = A.Audio.SFX, UI = A.UI, M = A.Music, B = A.Blobs;
   UI.boot();
+  if (A.HowTo) A.HowTo.button('baseball', '#homeBtn');
   var P1 = A.Store.active();
   if (!P1) { location.replace(A.ROOT + 'index.html#players'); return; }
   C.ensure(P1);
@@ -446,11 +447,21 @@
       q.hint = q.hint2 = 'Count the dots.';
     }
   }
+  function choiceLabel(c) {
+    if (c == null) return '';
+    if (typeof c === 'string' || typeof c === 'number') return String(c);
+    return String(c.label == null ? '' : c.label);
+  }
   function isPhraseChoice(c) {
     if (!c) return false;
     if (c.long || c.html) return true;
-    var s = String(c.label == null ? '' : c.label).replace(/<[^>]*>/g, '').trim();
-    return s.length > 3 || /\s/.test(s);
+    var s = choiceLabel(c).replace(/<[^>]*>/g, '')
+      .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '')
+      .replace(/[\u2600-\u27BF]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    // Short answers like "Home" or "Home" are not phrases — they stay in a compact grid.
+    return s.length > 8 || /\s/.test(s);
   }
   function fitCard(b) {
     var cv = b.querySelector('.cv'); if (!cv || !b.classList.contains('phrase')) return;
@@ -463,12 +474,29 @@
     }
     b.style.fontSize = best + 'px';
   }
-  function fitCards() { A.$$('#cards .bcard.phrase').forEach(fitCard); }
+  function fitLabel(b) {
+    var cv = b.querySelector('.cv'); if (!cv) return;
+    var start = parseFloat(window.getComputedStyle(b).fontSize) || 22;
+    var lo = 14, px, best = lo;
+    for (px = Math.max(lo, Math.round(start)); px >= lo; px--) {
+      b.style.fontSize = px + 'px';
+      if (cv.scrollWidth <= cv.clientWidth + 1 && cv.scrollHeight <= b.clientHeight + 1) { best = px; break; }
+    }
+    b.style.fontSize = best + 'px';
+  }
+  function fitCards() {
+    A.$$('#cards .bcard').forEach(function (b) {
+      if (b.classList.contains('phrase')) fitCard(b);
+      else fitLabel(b);
+    });
+  }
   function renderQuestion(q, opt) {
     opt = opt || {};
     var txt = opt.text != null ? opt.text : q.text;
     var plain = String(txt || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
     if (/^How many\??$/i.test(plain)) txt = 'How many dots?';
+    var parts = (A.CountVisual && A.CountVisual.display) ? A.CountVisual.display({ text: txt, pic: q.pic || '' }) : { text: txt, pic: q.pic || '' };
+    txt = parts.text;
     $('#qTxt').innerHTML = txt;
     var hintRaw = q.retry ? (q.hint || q.hintHtml || '') : '';
     if (hintRaw && /cv-set|cv-frame|cv-dice|st-pic|qcoin/.test(String(hintRaw))) hintRaw = (!/cv-set|cv-frame|cv-dice|st-pic/.test(String(q.hint || ''))) ? (q.hint || 'Count the dots.') : 'Count the dots.';
@@ -480,13 +508,16 @@
       if (sign) sign.appendChild(hintEl);
     }
     if (hintEl) { hintEl.textContent = hintText; hintEl.hidden = !hintText; }
-    $('#qPic').innerHTML = q.pic || '';
-    $('#qPic').classList.toggle('on', !!q.pic);
+    $('#qPic').innerHTML = parts.pic || '';
+    $('#qPic').classList.toggle('on', !!parts.pic);
     var box = $('#cards'); box.innerHTML = '';
     var phrases = !opt.hideCards && q.choices.some(isPhraseChoice);
+    var allPhrases = !!phrases && q.choices.every(isPhraseChoice);
+    var narrow = (document.documentElement.getAttribute('data-stage') === 'portrait') || window.innerWidth <= 500;
     box.classList.toggle('n3', q.choices.length === 3);
     box.classList.toggle('phrases', !!phrases);
-    box.classList.toggle('stack', !!phrases && q.choices.length >= 3 && q.choices.length <= 4 && window.innerWidth <= 500);
+    // Only stack when every choice is a long phrase. "Home" must not force a full-width column.
+    box.classList.toggle('stack', allPhrases && q.choices.length >= 3 && q.choices.length <= 4 && narrow);
     if (opt.hideCards) { G.sel = -1; return; }
     q.choices.forEach(function (c, i) {
       var phrase = isPhraseChoice(c);
@@ -497,9 +528,43 @@
     G.sel = -1; markSel(false);   // no card highlighted until a tap / arrow / number (never looks like a free tip)
     requestAnimationFrame(function () {
       fitCards();
-      if (A.CountVisual && A.CountVisual.fit) A.CountVisual.fit(box);
-      requestAnimationFrame(function () { fitCards(); if (A.CountVisual && A.CountVisual.fit) A.CountVisual.fit(box); });
+      fitQuestion();
+      if (A.CountVisual && A.CountVisual.fit) A.CountVisual.fit(document.getElementById('sign') || box);
+      requestAnimationFrame(function () { fitCards(); fitQuestion(); if (A.CountVisual && A.CountVisual.fit) A.CountVisual.fit(document.getElementById('sign') || box); });
     });
+  }
+  function fitQuestion() {
+    var txt = $('#qTxt'), sign = $('#sign'), cards = $('#cards');
+    if (!txt || !sign) return;
+    var stage = document.getElementById('stage') || document.getElementById('game') || document.documentElement;
+    var start = parseFloat(window.getComputedStyle(txt).fontSize) || 22;
+    function fits() {
+      var sr = stage.getBoundingClientRect();
+      var pic = $('#qPic');
+      if (txt.scrollHeight > txt.clientHeight + 2 && txt.clientHeight > 0) return false;
+      if (pic && pic.classList.contains('on')) {
+        var pr = pic.getBoundingClientRect();
+        if (pr.height > 8 && (pr.bottom > sr.bottom + 2 || (cards && pr.bottom > cards.getBoundingClientRect().top + 6))) return false;
+      }
+      if (cards) {
+        var cr = cards.getBoundingClientRect();
+        if (cr.bottom > sr.bottom + 2) return false;
+        var ok = true;
+        A.$$('#cards .bcard').forEach(function (b) {
+          var r = b.getBoundingClientRect();
+          if (r.height < 8 || r.bottom > sr.bottom + 2 || r.top < sr.top - 2) ok = false;
+        });
+        if (!ok) return false;
+      }
+      return sign.getBoundingClientRect().bottom <= sr.bottom + 2;
+    }
+    txt.style.fontSize = '';
+    var px, lo = 14, hi = Math.min(28, Math.max(lo, Math.round(start)));
+    for (px = hi; px >= lo; px--) {
+      txt.style.fontSize = px + 'px';
+      if (fits()) return;
+    }
+    txt.style.fontSize = lo + 'px';
   }
   function ensurePassUI() {
     var sign = $('#sign'); if (!sign || $('#passActions')) return;
@@ -1026,16 +1091,16 @@
 
     set speed(v) { SPEED = v; }, get speed() { return SPEED; },
     scoreQ: scoreQuestion, sbPic: sbPic, runQ: runQuestion,   // v2p1a test hooks (+ quality1: runQ for the base-running picture)
-    total: totalRuns, endGame: endGame, R: R, RIV: RIV, rival: RIVALON, maxOuts: maxOuts, mercy: mercy, isBonus: function () { return !!(G.q && G.q.bonus); }, whereChoices: function (from) { return whereChoices(from).map(function (x) { return x === 4 ? 'Home 🏠' : BASEN[x]; }); }, story: STORYB ? { stop: SI, cfg: SC, end: endStory } : null, bases: function () { return G.bases.map(Boolean); }
+    total: totalRuns, endGame: endGame, R: R, RIV: RIV, rival: RIVALON, maxOuts: maxOuts, mercy: mercy, isBonus: function () { return !!(G.q && G.q.bonus); }, whereChoices: function (from) { return whereChoices(from).map(function (x) { return x === 4 ? 'Home' : BASEN[x]; }); }, story: STORYB ? { stop: SI, cfg: SC, end: endStory } : null, bases: function () { return G.bases.map(Boolean); }
   };
   if (STORYB) {
     document.body.classList.add('story');
     var sst = ST.STOPS[SI], ssk = C.byId[SC.skill];
-    wait(400).then(function () { return UI.card({ tag: sst.area.emoji + (sst.side ? ' ' + ssk.name : ' Stop ' + sst.n) + ' · ' + sst.area.name, title: A.TITLES.baseball, art: '<div class="dance">' + blobOf(PL[0]) + '</div>',
+    wait(400).then(function () { return A.HowTo && A.HowTo.first ? A.HowTo.first('baseball') : Promise.resolve(); }).then(function () { return UI.card({ tag: sst.area.emoji + (sst.side ? ' ' + ssk.name : ' Stop ' + sst.n) + ' · ' + sst.area.name, title: A.TITLES.baseball, art: '<div class="dance">' + blobOf(PL[0]) + '</div>',
       html: '<p class="howto"><b class="sgoalbig">🎯 ' + A.esc(SC.goalText) + '!</b><br>Answer the pitch to swing. Right answers are hits, misses are outs. ' + (SC.outs || R.outsFor(LITTLE)) + ' outs and the inning is over.</p><p class="small">' + A.esc(ssk.name) + ' · ' + A.esc(ssk.levels[SC.level]) + (SC.helper ? ' · a little easier' : '') + '</p>',
       sub: SC.innings === 1 ? 'One big inning' : SC.innings + ' short innings', btn: 'Play ball! ▶', voice: ['bb_title'], cls: 'bbintro bbstory', minMs: 500 }); }).then(startHalf);
   } else
-  wait(400).then(function () { return UI.card({ tag: TWO ? PL[0].name + ' vs ' + PL[1].name : 'Batter up!', title: A.TITLES.baseball, art: '<div class="dance">' + blobOf(PL[0]) + '</div>',
+  wait(400).then(function () { return A.HowTo && A.HowTo.first ? A.HowTo.first('baseball') : Promise.resolve(); }).then(function () { return UI.card({ tag: TWO ? PL[0].name + ' vs ' + PL[1].name : 'Batter up!', title: A.TITLES.baseball, art: '<div class="dance">' + blobOf(PL[0]) + '</div>',
     html: '<p class="howto">' + (RIVALON ? 'Beat the ' + RIV.icon + ' <b>' + A.esc(RIV.name) + '</b>! They bat first, then you.<br>' : '') + 'Answer the pitch to swing! Get it right and you hit it:<br><span class="zchip sg">⚾ single</span> <span class="zchip db">⚾⚾ double</span> <span class="zchip tr">🔥 triple</span> <span class="zchip hr">💥 home run</span><br>Fast, tricky answers hit farther! A miss is an out.</p>' + (TWO && (A.Pad.seats()[0] || A.Pad.seats()[1]) ? '<p class="small">' + A.esc(PL[0].name) + ': ' + A.Pad.label(0, '⌨ keyboard') + ' · ' + A.esc(PL[1].name) + ': ' + A.Pad.label(1, '⌨ keyboard') + '</p>' : ''),
     sub: INNINGS + ' innings · ' + R.outsFor(LITTLE) + ' outs (or ' + R.mercyFor(LITTLE) + ' runs) each inning', btn: 'Play ball! ▶', voice: ['bb_title'], cls: 'bbintro', minMs: 500 }); }).then(startHalf);
   // design1: keep the friend's speech bubble above the answer cards in landscape (baseball.css uses --bbCardsTop)

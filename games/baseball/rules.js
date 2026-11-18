@@ -99,7 +99,7 @@
     var to = Math.min(4, from + n), B = R.BASEN, who = name || ('the runner on ' + B[from]), ch = R.whereChoices(from);
     var hit = String(hitName || '').toLowerCase(), art = /^[aeiou]/.test(hit) ? 'an ' : 'a ';
     var text = (name ? name + ' is' : 'A runner is') + ' standing on ' + B[from] + ' base. The batter hits ' + art + hit + ', so everyone runs ' + n + (n === 1 ? ' base' : ' bases') + '. Where does ' + who + ' end up?';
-    return { text: text, from: from, to: to, n: n, choices: ch.map(function (x) { return x === 4 ? 'Home 🏠' : B[x]; }), answer: ch.indexOf(to),
+    return { text: text, from: from, to: to, n: n, choices: ch.map(function (x) { return x === 4 ? 'Home' : B[x]; }), answer: ch.indexOf(to),
       explain: to === 4 ? 'Home. That\u2019s a run!' : B[to] + ' base.', run: to === 4 };
   };
   // a small diamond picture: the runner's base, then the bases she runs (dashed arrows, numbered 1, 2, ...)

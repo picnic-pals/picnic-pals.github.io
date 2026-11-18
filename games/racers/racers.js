@@ -10,6 +10,8 @@
   K.garageOf(family);
   var stats = P.games.racers = P.games.racers || { races: 0, wins: 0, best: {}, tier: 0 };
   var G = null, screen = 'menu', busy = false, askedAt = 0;
+  var P2 = null, twoBusy = [false, false], askedAtTwo = [0, 0];
+  var params = new URLSearchParams(location.search || '');
 
   function icon(key, size, cls) {
     return I ? I.html(key, { size: size || 48, decorative: true, cls: 'pp-pic' + (cls ? ' ' + cls : '') }) : '';
@@ -96,6 +98,7 @@
           '<button class="sr-btn" id="srBoss">Race a picnic boss</button>' +
           '<button class="sr-btn sr-secondary" id="srBest">' + (best ? 'Beat your best time' : 'Best-time race') + '</button>' +
           '<button class="sr-btn sr-secondary" id="srGarage">Garage</button>' +
+          '<button class="sr-btn" id="srTwo">Two players</button>' +
         '</div>' +
         '<div class="sr-panel"><p class="sr-sub">Tracks</p><div class="sr-actions">' + tracks + '</div></div>' +
       '</div>';
@@ -103,6 +106,7 @@
     $('#srBoss').onclick = function () { beginRace('boss'); };
     $('#srBest').onclick = function () { beginRace('best'); };
     $('#srGarage').onclick = renderGarage;
+    $('#srTwo').onclick = renderTwoPicker;
     A.$$('[data-act="track"]').forEach(function (el) {
       el.onclick = function () {
         var id = el.getAttribute('data-id');
@@ -293,7 +297,321 @@
     return null;
   }
 
+
+  function makeGuest(kind) {
+    var age = kind === 'easy' ? 4 : kind === 'hard' ? 8 : 6;
+    var blob = kind === 'easy' ? 'carrot' : kind === 'hard' ? 'corn' : 'apple';
+    var g = A.Store.blank('Guest', blob);
+    g.id = 'guest-' + kind;
+    g.guest = true;
+    g.age = age;
+    g.color = 'sky';
+    return g;
+  }
+  function resolveP2(id) {
+    if (!id) return null;
+    var p = /^guest-/.test(id) ? makeGuest(String(id).replace(/^guest-/, '')) : (A.Store.get && A.Store.get(id));
+    if (p && P && p.id === P.id) return null;
+    return p || null;
+  }
+  function p2CarSpec() {
+    var mine = (K.garageOf(family).car || {}).body;
+    var blank = { paint: 'natural', sticker: 'none', trail: 'none' };
+    if (mine === 'watermelon_v1') return Object.assign({ body: 'sandwich_v1', wheels: 'cookie_v1', spoiler: 'broccoli_v1' }, blank);
+    return Object.assign({ body: 'watermelon_v1', wheels: 'cucumber_v1', spoiler: 'candycane_v1' }, blank);
+  }
+  function renderTwoPicker() {
+    screen = 'picker';
+    document.body.className = '';
+    P2 = null;
+    var others = (A.Store.profiles() || []).filter(function (p) { return P && p.id !== P.id; });
+    var tiles = others.map(function (p) {
+      return '<button class="sr-btn sr-pick" data-p2="' + A.esc(p.id) + '">' +
+        '<img class="sr-pick-face" src="' + friendImg(p.blob, 'front') + '" alt="">' +
+        '<span>' + A.esc(p.name) + '</span></button>';
+    }).join('');
+    var guests = [
+      ['easy', 'carrot', 'Guest', 'Counting'],
+      ['medium', 'apple', 'Guest', 'Adding'],
+      ['hard', 'corn', 'Guest', 'Bigger math']
+    ].map(function (g) {
+      return '<button class="sr-btn sr-secondary sr-pick" data-p2="guest-' + g[0] + '">' +
+        '<img class="sr-pick-face" src="' + friendImg(g[1], 'front') + '" alt="">' +
+        '<span>' + g[2] + '<small>' + g[3] + '</small></span></button>';
+    }).join('');
+    $('#srContent').innerHTML =
+      '<div class="sr-picker sr-panel">' +
+        '<p class="sr-lead">Who is player two?</p>' +
+        '<p class="sr-sub">Each of you gets your own questions and your own buttons.</p>' +
+        '<div class="sr-actions sr-pick-list">' + tiles + guests +
+          '<button class="sr-secondary" id="srPickBack">Back</button>' +
+        '</div>' +
+      '</div>';
+    A.$$('[data-p2]').forEach(function (el) {
+      el.onclick = function () { beginTwoRace(resolveP2(el.getAttribute('data-p2'))); };
+    });
+    $('#srPickBack').onclick = renderMenu;
+    coinsEl();
+  }
+  function beginTwoRace(p2) {
+    if (!p2) { renderTwoPicker(); return; }
+    P2 = p2;
+    var track = (family.racers && family.racers._track) || 'picnic';
+    if (!K.garageOf(family).tracks[track]) track = 'picnic';
+    G = K.startRace(P, family, { mode: 'two', track: track, p2: P2, now: Date.now() });
+    if (!G || G.mode !== 'two') { renderTwoPicker(); return; }
+    screen = 'race';
+    twoBusy = [false, false];
+    askedAtTwo = [Date.now(), Date.now()];
+    renderTwoRace();
+  }
+  function twoPips(side) {
+    var html = '', i, cls;
+    for (i = 0; i < side.n; i++) {
+      cls = '';
+      if (side.answers[i]) cls = side.answers[i].correct ? ' ok' : ' no';
+      else if (i === side.i && !side.done && side.phase !== 'done') cls = ' on';
+      html += '<i class="' + cls + '"></i>';
+    }
+    return html;
+  }
+  function qBits(q, who) {
+    if (!q) return '';
+    var pics = '';
+    if (q.kind === 'count' && q.count != null && A.CountVisual) {
+      var food = q.food && K.BY[q.food], item = food ? food.icon : q.food;
+      pics = '<div class="sr-pics">' + A.CountVisual.html(q.count, { item: item, noun: (food && food.plural) || 'foods' }) + '</div>';
+    } else if (q.kind === 'count' && q.pic && q.pic.length) {
+      pics = '<div class="sr-pics">' + q.pic.map(function (id) {
+        var f = K.BY[id]; return icon(f ? f.icon : id, 44, 'pic');
+      }).join('') + '</div>';
+    } else if ((q.kind === 'add' || q.kind === 'sub' || q.kind === 'missing') && A.CountVisual && q.a != null) {
+      var cvOpt = { noun: 'dots', noLabels: true }, factPic;
+      if (q.kind === 'sub') factPic = A.CountVisual.html(q.a, cvOpt) + '<i class="pb-op">-</i>' + A.CountVisual.html(q.b, cvOpt);
+      else if (q.kind === 'missing') factPic = A.CountVisual.html(q.a, cvOpt) + '<i class="pb-op">+</i><b class="sr-qmark">?</b>';
+      else factPic = A.CountVisual.html(q.a, cvOpt) + '<i class="pb-op">+</i>' + A.CountVisual.html(q.b, cvOpt);
+      pics = '<div class="sr-pics sr-fact">' + factPic + '</div>';
+    }
+    var choices = (q.choices || []).map(function (c, idx) {
+      return '<button class="sr-choice" type="button" data-who="' + who + '" data-i="' + idx + '">' +
+        (c.icon ? icon(c.icon, 48, 'ch') : '') +
+        (c.icon ? '<span class="sr-visually-hidden">' + A.esc(c.label) + '</span>' : A.esc(c.label)) +
+      '</button>';
+    }).join('');
+    return '<p class="sr-ask">' + A.esc(q.text) + '</p>' + pics +
+      '<div class="sr-choices">' + choices + '</div>';
+  }
+  function sideCardHtml(who) {
+    var side = G.sides[who];
+    var face = friendImg(side.blob, side.done ? 'happy' : 'front');
+    var body, q;
+    if (side.done) {
+      body = '<p class="sr-ask sr-wait">You finished! Waiting for the other racer.</p>';
+    } else if (side.phase === 'drive') {
+      var last = side.answers[side.answers.length - 1];
+      body = '<p class="sr-ask sr-fx ' + (last && last.correct ? 'boost' : 'slip') + '">' + (last && last.correct ? 'Boost!' : 'Oops! Keep going.') + '</p>';
+    } else {
+      q = K.current(G, who);
+      body = qBits(q, who);
+    }
+    return '<div class="sr-side p' + (who + 1) + '" data-who="' + who + '" id="srSide' + who + '">' +
+      '<div class="sr-who-bar">' +
+        '<img class="sr-who-face" src="' + face + '" alt="">' +
+        '<b class="sr-who-name">' + A.esc(side.name) + '</b>' +
+        '<button type="button" class="sr-side-hear" data-hear="' + who + '" aria-label="Hear ' + A.esc(side.name) + '\'s question">Hear</button>' +
+        '<span class="sr-pips" aria-hidden="true">' + twoPips(side) + '</span>' +
+      '</div>' +
+      '<div class="sr-qcard" data-who="' + who + '">' + body + '</div>' +
+    '</div>';
+  }
+  function bindTwoSide(who) {
+    var root = document.getElementById('srSide' + who);
+    if (!root) return;
+    A.$$('#srSide' + who + ' .sr-choice').forEach(function (el) {
+      var go = function (e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        pickTwoChoice(who, +el.getAttribute('data-i'));
+      };
+      el.addEventListener('pointerdown', go);
+    });
+    var hear = root.querySelector('[data-hear]');
+    if (hear) hear.onclick = function (e) { if (e) e.stopPropagation(); sayTwoQuestion(who); };
+    var ask = root.querySelector('.sr-ask');
+    if (ask) ask.onclick = function () { sayTwoQuestion(who); };
+  }
+  function sayTwoQuestion(who) {
+    var q = G && K.current(G, who);
+    var side = G && G.sides && G.sides[who];
+    if (q) say((q.say || q.text), 'prompt');
+    else if (side && side.done) say(side.name + ' is finished.', 'tap');
+    else say('Answer the questions on your side.', 'tap');
+  }
+  function renderTwoRace() {
+    if (!G || G.mode !== 'two') return;
+    document.body.className = 'sr-two track-' + G.track;
+    var trackLen = K.TRACK_LEN || 1000;
+    var WORLD_SCREENS = 2.5, START_AT = 3.2, FINISH_AT = 92;
+    var view = 100 / WORLD_SCREENS, travel = FINISH_AT - START_AT;
+    var meLeft = START_AT + travel * Math.min(1, G.sides[0].dist / trackLen);
+    var opLeft = START_AT + travel * Math.min(1, G.sides[1].dist / trackLen);
+    var cam = (meLeft + opLeft) / 2 - view * 0.5;
+    if (cam < 0) cam = 0;
+    if (cam > 100 - view) cam = 100 - view;
+    var b0 = G.sides[0].phase === 'drive' && G.sides[0].answers.length && G.sides[0].answers[G.sides[0].answers.length - 1].correct;
+    var s0 = G.sides[0].phase === 'drive' && G.sides[0].answers.length && !G.sides[0].answers[G.sides[0].answers.length - 1].correct;
+    var b1 = G.sides[1].phase === 'drive' && G.sides[1].answers.length && G.sides[1].answers[G.sides[1].answers.length - 1].correct;
+    var s1 = G.sides[1].phase === 'drive' && G.sides[1].answers.length && !G.sides[1].answers[G.sides[1].answers.length - 1].correct;
+    var move0 = b0 ? 'boosting' : (s0 ? 'slipping' : 'rolling');
+    var move1 = b1 ? 'boosting' : (s1 ? 'slipping' : 'rolling');
+    $('#srContent').innerHTML =
+      '<div class="sr-two" id="srTwoPlay">' +
+        sideCardHtml(0) +
+        '<div class="sr-track ' + G.track + ' live' + ((b0 || b1) ? ' boosting' : '') + ((s0 || s1) ? ' slipping' : '') + '" id="srTrack">' +
+          trackStageHtml(G.track, cam, {
+            meLeft: meLeft, opLeft: opLeft, obsLeft: 0,
+            me: carHtml(K.garageOf(family).car, G.sides[0].blob, '', move0),
+            opp: carHtml(p2CarSpec(), G.sides[1].blob, '', move1),
+            obs: '', boss: ''
+          }) +
+        '</div>' +
+        sideCardHtml(1) +
+      '</div>';
+    bindTwoSide(0);
+    bindTwoSide(1);
+    coinsEl();
+    fitTrack();
+    fitTwoPics();
+  }
+  function paintTwoSide(who) {
+    var el = document.getElementById('srSide' + who);
+    if (!el) { renderTwoRace(); return; }
+    var fresh = document.createElement('div');
+    fresh.innerHTML = sideCardHtml(who);
+    el.replaceWith(fresh.firstChild);
+    bindTwoSide(who);
+    /* Keep the shared track in sync without rebuilding the other player's buttons. */
+    var trackHost = document.getElementById('srTrack');
+    if (!trackHost || !G || !G.sides) return;
+    var trackLen = K.TRACK_LEN || 1000;
+    var WORLD_SCREENS = 2.5, START_AT = 3.2, FINISH_AT = 92;
+    var view = 100 / WORLD_SCREENS, travel = FINISH_AT - START_AT;
+    var meLeft = START_AT + travel * Math.min(1, G.sides[0].dist / trackLen);
+    var opLeft = START_AT + travel * Math.min(1, G.sides[1].dist / trackLen);
+    var cam = (meLeft + opLeft) / 2 - view * 0.5;
+    if (cam < 0) cam = 0;
+    if (cam > 100 - view) cam = 100 - view;
+    var b0 = G.sides[0].phase === 'drive' && G.sides[0].answers.length && G.sides[0].answers[G.sides[0].answers.length - 1].correct;
+    var s0 = G.sides[0].phase === 'drive' && G.sides[0].answers.length && !G.sides[0].answers[G.sides[0].answers.length - 1].correct;
+    var b1 = G.sides[1].phase === 'drive' && G.sides[1].answers.length && G.sides[1].answers[G.sides[1].answers.length - 1].correct;
+    var s1 = G.sides[1].phase === 'drive' && G.sides[1].answers.length && !G.sides[1].answers[G.sides[1].answers.length - 1].correct;
+    var move0 = b0 ? 'boosting' : (s0 ? 'slipping' : (G.sides[0].done ? '' : 'rolling'));
+    var move1 = b1 ? 'boosting' : (s1 ? 'slipping' : (G.sides[1].done ? '' : 'rolling'));
+    trackHost.className = 'sr-track ' + G.track + ' live' + ((b0 || b1) ? ' boosting' : '') + ((s0 || s1) ? ' slipping' : '');
+    trackHost.innerHTML = trackStageHtml(G.track, cam, {
+      meLeft: meLeft, opLeft: opLeft, obsLeft: 0,
+      me: carHtml(K.garageOf(family).car, G.sides[0].blob, '', move0),
+      opp: carHtml(p2CarSpec(), G.sides[1].blob, '', move1),
+      obs: '', boss: ''
+    });
+    fitTrack();
+    fitTwoPics();
+  }
+  function pickTwoChoice(who, i) {
+    who = who === 1 || who === '1' ? 1 : 0;
+    if (!G || G.mode !== 'two' || twoBusy[who]) return;
+    var side = G.sides[who];
+    if (!side || side.done || side.phase !== 'question') return;
+    twoBusy[who] = true;
+    var ms = Date.now() - (askedAtTwo[who] || Date.now());
+    var res = K.applyAnswer(G, i, family, P, { ms: ms, now: Date.now(), who: who });
+    persist();
+    if (!res) { twoBusy[who] = false; return; }
+    var root = document.getElementById('srSide' + who);
+    if (root) {
+      A.$$('#srSide' + who + ' .sr-choice').forEach(function (el) {
+        if (+el.getAttribute('data-i') === i) el.classList.add(res.correct ? 'ok' : 'no');
+        if (!res.correct && +el.getAttribute('data-i') === i) el.classList.add('shake');
+      });
+    }
+    if (res.correct) A.Audio.sfx('pop');
+    paintTwoSide(who);
+    if (res.done) {
+      setTimeout(function () { twoBusy = [false, false]; renderTwoPodium(); }, 550);
+      return;
+    }
+    setTimeout(function () {
+      if (!G || G.mode !== 'two' || G.phase === 'podium') { twoBusy[who] = false; return; }
+      K.nextQuestion(G, who);
+      askedAtTwo[who] = Date.now();
+      twoBusy[who] = false;
+      paintTwoSide(who);
+    }, res.correct ? 500 : 700);
+  }
+  function winChrome(on) {
+    if (!on) return { top: '', bot: '' };
+    return {
+      top: '<div class="sr-win-logo" aria-hidden="true"></div>',
+      bot: '<div class="sr-win-friends" aria-hidden="true"></div>'
+    };
+  }
+  function renderTwoPodium() {
+    screen = 'podium';
+    if (!G) return;
+    document.body.className = 'sr-two-over';
+    var s0 = G.sides[0], s1 = G.sides[1];
+    var tie = !!G.tie;
+    var winWho = G.winner;
+    var first = tie ? s0.blob : (winWho === 0 ? s0.blob : s1.blob);
+    var second = tie ? s1.blob : (winWho === 0 ? s1.blob : s0.blob);
+    var firstCar = (tie || winWho === 0) ? K.garageOf(family).car : p2CarSpec();
+    var secondCar = (tie || winWho === 0) ? p2CarSpec() : K.garageOf(family).car;
+    var title = tie ? "It's a tie!" : ((winWho === 0 ? s0.name : s1.name) + ' wins!');
+    var msg = tie ? 'What a race! You finished together.' : 'What a race!';
+    var colors = ['#ff8fa8', '#ffb36b', '#ffe58a', '#8fe3c0', '#9fd2ff', '#c9b2ff'];
+    var bits = '', n;
+    for (n = 0; n < 36; n++) {
+      bits += '<i style="left:' + (2 + (n * 2.7) % 96) + '%;top:' + ((n % 7) * 10) + '%;background:' + colors[n % colors.length] + ';animation-delay:' + (n * 0.03) + 's"></i>';
+    }
+    function onstep(place, car, driver) {
+      return '<div class="sr-onstep ' + place + '">' + carHtml(car, driver, 'pod') + '</div>';
+    }
+    var chrome = winChrome(true);
+    var art;
+    if (tie) {
+      art = '<div class="sr-podium-art tie"><div class="sr-podium-stage"><div class="sr-tie-row">' +
+        '<div class="sr-tie-col">' + onstep('tie-a', firstCar, first) + '<div class="sr-tie-block">1</div></div>' +
+        '<div class="sr-tie-col">' + onstep('tie-b', secondCar, second) + '<div class="sr-tie-block">1</div></div>' +
+      '</div></div></div>';
+    } else {
+      art = '<div class="sr-podium-art two"><div class="sr-podium-stage">' +
+        '<img class="sr-podium-img" src="' + A.ROOT + 'art/racers/env/podium_v1_two.png" alt="">' +
+        onstep('second', secondCar, second) +
+        onstep('first', firstCar, first) +
+      '</div></div>';
+    }
+    $('#srContent').innerHTML =
+      '<div class="sr-podium sr-panel celebrate sr-two-podium" style="position:relative">' +
+        '<div class="sr-confetti" aria-hidden="true">' + bits + '</div>' +
+        chrome.top +
+        '<h2 class="sr-title">' + A.esc(title) + '</h2>' +
+        art +
+        '<div class="sr-coins-won">' + icon('🪙', 110, 'won') + '<b>+' + G.coins + '</b><span>for the family garage</span></div>' +
+        '<p>' + A.esc(msg) + '</p>' +
+        '<div class="sr-actions" style="width:100%">' +
+          '<button class="sr-action" id="srAgain">Try again</button>' +
+          '<button class="sr-secondary" id="srToHome">Home</button>' +
+        '</div>' +
+        chrome.bot +
+      '</div>';
+    A.Audio.sfx('win');
+    say(title + ' ' + msg, 'chatter');
+    $('#srAgain').onclick = function () { beginTwoRace(P2); };
+    $('#srToHome').onclick = home;
+    coinsEl();
+  }
+
   function beginRace(mode) {
+    if (mode === 'two') { if (P2) beginTwoRace(P2); else renderTwoPicker(); return; }
     var track = (family.racers && family.racers._track) || 'picnic';
     if (!K.garageOf(family).tracks[track]) track = 'picnic';
     G = K.startRace(P, family, { mode: mode, track: track, now: Date.now() });
@@ -346,6 +664,7 @@
 
   function renderRace() {
     if (!G) return;
+    if (G.mode === 'two') { renderTwoRace(); return; }
     document.body.className = 'track-' + G.track;
     var q = K.current(G);
     var g = K.garageOf(family);
@@ -449,8 +768,9 @@
   function fitTrack() {
     var el = document.getElementById('srTrack');
     if (!el) return;
-    /* Short landscape keeps its side-panel size. Other viewports scale the 512 canvas to the flex track. */
-    if (window.matchMedia('(orientation: landscape) and (max-height: 500px)').matches) {
+    var two = (el.closest && el.closest('.sr-two')) || document.body.classList.contains('sr-two');
+    /* Short landscape 1P keeps its CSS --box size. 2P has no fixed --box, so always scale. */
+    if (!two && window.matchMedia('(orientation: landscape) and (max-height: 500px)').matches) {
       el.style.removeProperty('--ts');
       el.style.removeProperty('--crop');
       return;
@@ -459,6 +779,22 @@
     if (h < 8) return;
     el.style.setProperty('--ts', String(h / 280));
     el.style.setProperty('--crop', '232');
+  }
+
+  function fitTwoPics() {
+    A.$$('.sr-two .sr-pics').forEach(function (el) {
+      el.style.transform = '';
+      el.style.height = '';
+      var cap = el.clientWidth;
+      if (cap < 8) return;
+      var sw = el.scrollWidth;
+      if (sw > cap + 1) {
+        var s = Math.max(0.55, cap / sw);
+        el.style.transformOrigin = 'top center';
+        el.style.transform = 'scale(' + s + ')';
+        el.style.height = (el.scrollHeight * s) + 'px';
+      }
+    });
   }
 
   function sayQuestion() {
@@ -515,6 +851,7 @@
   function renderPodium() {
     screen = 'podium';
     if (!G) return;
+    if (G.mode === 'two') { renderTwoPodium(); return; }
     var win = !!G.win;
     var me = P.blob;
     var them = G.friend;
@@ -537,10 +874,12 @@
     var msg = win
       ? (G.newBest ? 'New best time! What a race!' : 'You won! What a race!')
       : 'Nice try. You still earned some coins.';
+    var chrome = winChrome(win);
     $('#srContent').innerHTML =
       '<div class="sr-podium sr-panel' + (win ? ' celebrate' : '') + '" style="position:relative">' +
         (win ? '<div class="sr-confetti" aria-hidden="true">' + bits + '</div>' : '') +
-        '<h2>' + (win ? 'First place!' : 'So close!') + '</h2>' +
+        chrome.top +
+        '<h2 class="sr-title">' + (win ? 'First place!' : 'So close!') + '</h2>' +
         '<div class="sr-podium-art' + (third ? '' : ' two') + '">' +
           '<div class="sr-podium-stage">' +
           '<img class="sr-podium-img" src="' + A.ROOT + 'art/racers/env/podium_v1' + (third ? '' : '_two') + '.png" alt="">' +
@@ -556,6 +895,7 @@
           '<button class="sr-secondary" id="srToGarage">Garage</button>' +
           '<button class="sr-secondary" id="srToHome">Home</button>' +
         '</div>' +
+        chrome.bot +
       '</div>';
     if (win) A.Audio.sfx('win');
     say(msg, 'chatter');
@@ -573,10 +913,12 @@
 
   $('#srHome').onclick = home;
   $('#srSpeak').onclick = function () {
-    if (G && G.phase === 'question') sayQuestion();
+    if (G && G.mode === 'two') say('Two players. Each of you answers the questions on your side.', 'tap');
+    else if (G && G.phase === 'question') sayQuestion();
     else say('Snack Racers. Race your food car.', 'tap');
   };
   headerIcons();
+  if (A.HowTo) A.HowTo.button('racers', '#srHome');
 
   window.addEventListener('resize', fitTrack);
 
@@ -584,7 +926,8 @@
     family: family, stats: stats,
     get G() { return G; },
     renderMenu: renderMenu, renderGarage: renderGarage, renderRace: renderRace, renderPodium: renderPodium,
-    beginRace: beginRace, pickChoice: pickChoice,
+    beginRace: beginRace, beginTwoRace: beginTwoRace, pickChoice: pickChoice, pickTwoChoice: pickTwoChoice,
+    renderTwoPicker: renderTwoPicker,
     showQuestion: function () { if (G) { G.phase = 'question'; renderRace(); } },
     setObstacle: function (id) { if (G) { G.obstacle = id || 'tomato'; G.boss = true; G.phase = 'question'; renderRace(); } },
     setPlace: function (player, opp) {
@@ -601,5 +944,13 @@
     buy: function (kind, id) { var r = K.buy(family, kind, id); persist(); coinsEl(); return r; }
   };
 
-  renderMenu();
+  (A.HowTo && A.HowTo.first ? A.HowTo.first('racers') : Promise.resolve()).then(function () {
+    if (params.get('mode') === 'two') {
+      P2 = resolveP2(params.get('p2'));
+      if (P2) beginTwoRace(P2);
+      else renderTwoPicker();
+      return;
+    }
+    renderMenu();
+  });
 })(window.Arcade);

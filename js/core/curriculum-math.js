@@ -148,7 +148,7 @@
     [].forEach.call(root.querySelectorAll ? (root.matches && root.matches('.cv-set') ? [root] : root.querySelectorAll('.cv-set')) : [], cvFitOne);
   }
   function cvFitHost(set) {
-    return set.closest('.cell, .bcard, .pc-opt, .pk-frame, .pk-group');
+    return set.closest('.cell, .bcard, .pc-opt, .pk-frame, .pk-group, #ruleTxt, #rule, .rule, .st-pic, #qPic');
   }
   function cvFitOne(set) {
     if (!set || !set.style) return;
@@ -156,8 +156,11 @@
     set.style.maxWidth = '100%';
     set.classList.remove('cv-tile', 'cv-tall', 'cv-wide');
     var host = cvFitHost(set), tight = !!host;
+    var ruleHost = set.closest('#ruleTxt, #rule, .rule');
+    if (ruleHost) { tight = false; set.style.flexWrap = 'nowrap'; }
     var box = host && host.classList.contains('cell') ? (host.querySelector('.lbl') || host)
       : host && host.classList.contains('bcard') ? (host.querySelector('.cv') || host)
+      : ruleHost ? (set.closest('.top') || ruleHost)
       : (set.parentElement || set);
     if (tight) set.classList.add('cv-tile');
     void set.offsetWidth;
@@ -240,7 +243,25 @@
     }
   }
 
-  A.CountVisual = { layout: cvLayout, html: cvHtml, bindQuickLook: cvBindQuickLook, fit: cvFit, DICE: CV_DICE, itemHtml: cvItemHtml };
+  // If ask() put the same picture in both `text` and `pic`, keep one copy for the picture slot.
+  function cvDisplay(q) {
+    var text = String((q && (q.text != null ? q.text : '')) || '');
+    var raw = q && q.pic;
+    var pic = (typeof raw === 'string' && raw) ? raw : '';
+    if (pic && text && text.indexOf(pic) !== -1) {
+      text = text.split(pic).join('');
+      text = text.replace(/<span class="st-pic">\s*<\/span>/gi, '');
+    }
+    return { text: text, pic: pic };
+  }
+  function cvCountFilled(root) {
+    if (root && root.querySelectorAll) return root.querySelectorAll('.cv-dot.on').length;
+    var html = typeof root === 'string' ? root : (root && root.innerHTML) || '';
+    var m = html.match(/cv-dot on/g);
+    return m ? m.length : 0;
+  }
+
+  A.CountVisual = { layout: cvLayout, html: cvHtml, bindQuickLook: cvBindQuickLook, fit: cvFit, display: cvDisplay, countFilled: cvCountFilled, DICE: CV_DICE, itemHtml: cvItemHtml };
 
   function frame(v) { return cvHtml(v, { pattern: v <= 5 ? 'five_frame' : 'ten_frame' }); }
   function frames2(v) { return cvHtml(v); }

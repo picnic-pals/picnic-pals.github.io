@@ -184,7 +184,7 @@
   function swLine(w) { return A.SightWords.lineId(w); }
   // the strategy hint after a miss: one fixed wording for every word (so it never gives the word away) that uses none of the 40
   // pre-primer words itself (the old '…then look for the letter…' contained the target 'look'; 'the', 'it', 'for', 'to' too)
-  var SIGHT_HINT = 'Tap 🔊 once more. Which letter starts that sound?';
+  var SIGHT_HINT = 'Tap Hear again once more. Which letter starts that sound?';
   SK.push({ id: 'sight', name: 'Sight words', short: 'Dolch pre-primer words', strand: 'Sight words', std: 'K.RF.3c', grade: 'PK–K', subject: 'reading', sayFact: true, listen: true, secs: [10, 11],
     levels: ['First 20 words', 'All 40 pre-primer words'],
     intro: { line: 'skill_sight', example: wordHtml('the') + ' ' + wordHtml('and') + ' ' + wordHtml('see') },

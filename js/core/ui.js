@@ -52,6 +52,11 @@
   };
 
 
+  UI.askHtml = function (q) {
+    var p = (A.CountVisual && A.CountVisual.display) ? A.CountVisual.display(q) : { text: (q && q.text) || '', pic: (q && q.pic) || '' };
+    return '<div class="pc-q">' + p.text + '</div>' + (p.pic ? '<div class="pc-pic">' + p.pic + '</div>' : '');
+  };
+
   /* ---------- effects ---------- */
   function fxAdd(el, ms) { document.body.appendChild(el); setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, ms); }
   UI.sparkle = function (x, y, n) {
@@ -96,7 +101,7 @@
         (o.art ? '<div class="art' + (o.glow ? ' glow' : '') + '">' + (o.glow ? '<div class="rays"></div>' : '') + o.art + '</div>' : '') +
         (o.html || '') + (o.sub ? '<p>' + A.esc(o.sub) + '</p>' : '') +
         '<button class="bigbtn ' + (o.btnCls || 'mint') + '">' + A.esc(o.btn || 'OK') + '</button>' +
-        '<span class="kh">' + (A.isTouchOnly() ? '👆 Tap' : 'Press <kbd class="wide">Space</kbd> or <kbd class="wide">Enter</kbd>') + '</span>' + (A.Pad ? '<span class="ph">Press ' + A.Pad.g('a') + '</span>' : '') + '</div></div>');
+        '<span class="kh">' + (A.isTouchOnly() ? ((A.Icons && A.Icons.has('👆')) ? A.Icons.html('👆', { size: 28, decorative: true, cls: 'pp-pic', slot: 'ui:tap' }) : '<svg class="pp-tap-hand" viewBox="0 0 64 64" width="28" height="28" aria-hidden="true" focusable="false"><path fill="#ffe0b0" stroke="#5a3d1c" stroke-width="2.4" stroke-linejoin="round" d="M28 8c2.4-1 5.4.4 6.2 3.2l3.2 12.2 1.2-6.2c.7-3 4-4.2 6.4-2.6 2 1.3 2.6 4 1.6 6.3l-3.4 8.2 6.4-3c2.6-1.2 5.8.2 6.6 3 .8 2.8-.8 5.6-3.6 6.5L38 40.2l1.2 14.4c.2 2.6-1.8 4.8-4.4 4.8h-8.2c-2.2 0-4-1.6-4.4-3.8L19.6 40.6c-3.6-2.2-5.8-6.2-5.8-10.5V22c0-2.8 2.4-5 5.2-4.8 2.2.2 4 2 4.4 4.2l1.2 6.2V12.4C24.6 10 26.2 8.4 28 8z"/></svg>') + ' Tap' : 'Press <kbd class="wide">Space</kbd> or <kbd class="wide">Enter</kbd>') + '</span>' + (A.Pad ? '<span class="ph">Press ' + A.Pad.g('a') + '</span>' : '') + '</div></div>');
       document.body.appendChild(ov); UI.cardOpen = true;
       var btn = ov.querySelector('.bigbtn'), done = false, lastTap = 0;
       // the beat (js/core/pace.js): celebrations / results hold a moment; presses in the lock are dropped, never queued
@@ -143,7 +148,7 @@
         var q = Q.make(skill, top, { choices: 3, profile: P });
         var ov = A.el('<div class="overlay on placement-card" role="dialog" aria-modal="true" aria-label="Quick check"><div class="card">' +
           '<span class="tag">Warm-up game · ' + (i + 1) + ' of ' + n + '</span><div class="pc-dots">' + Array.apply(null, Array(n)).map(function (_, k) { return '<i class="' + (k < i ? 'done' : k === i ? 'now' : '') + '"></i>'; }).join('') + '</div>' +
-          '<div class="pc-q">' + q.text + '</div>' + (q.pic ? '<div class="pc-pic">' + q.pic + '</div>' : '') +
+          UI.askHtml(q) +
           '<div class="pc-opts">' + q.choices.map(function (c, k) { return '<button class="pc-opt" data-i="' + k + '"><kbd>' + (k + 1) + '</kbd>' + (c.html || A.esc(c.label)) + '</button>'; }).join('') + '</div></div></div>');
         document.body.appendChild(ov); ov.__q = q; UI.cardOpen = true; promptReplay(ov, q);
         var btns = A.$$('.pc-opt', ov), done = false, t0 = Date.now();
@@ -191,7 +196,7 @@
         if (S) S.ctx.p = P; var q = Q.make(it.skill, it.level || 0, { choices: 3, profile: P });
         var ov = A.el('<div class="overlay on placement-card" role="dialog" aria-modal="true" aria-label="Warm-up"><div class="card">' +
           '<span class="tag">Warm-up</span><div class="pc-dots">' + Array.apply(null, Array(n)).map(function (_, k) { return '<i class="' + (k < i ? 'done' : k === i ? 'now' : '') + '"></i>'; }).join('') + '</div>' +
-          '<div class="pc-q">' + q.text + '</div>' + (q.pic ? '<div class="pc-pic">' + q.pic + '</div>' : '') +
+          UI.askHtml(q) +
           '<div class="pc-opts">' + q.choices.map(function (c, k) { return '<button class="pc-opt" data-i="' + k + '"><kbd>' + (k + 1) + '</kbd>' + (c.html || A.esc(c.label)) + '</button>'; }).join('') + '</div></div></div>');
         document.body.appendChild(ov); ov.__q = q; UI.cardOpen = true; promptReplay(ov, q);
         var btns = A.$$('.pc-opt', ov), done = false, t0 = Date.now();
@@ -547,15 +552,38 @@
      Shown once on a player's first play of that game (P.howto[game]) and any time behind the "?" button. Automated browsers
      skip the first-play card (like breaks.js) unless localStorage blobArcade.howto = '1'. */
   var HOWTO = {
-    munch: { e: '😋', title: 'Picnic Munch', steps: [{ e: '👀', t: 'Look at the top' }, { e: '🚶', t: 'Walk to a match' }, { e: '😋', t: 'Munch it!' }], lines: ['Look at the picture or words at the top.', 'Walk your friend to a right answer and munch it!'] },
-    bubble: { e: '🫧', title: 'Bubble Pop',
+    munch: { e: '😋', title: 'Picnic Munch', art: 'munch',
+      caps: ['Look at the picture or words at the top.', 'Walk your friend to a matching square.', 'Munch it!'],
+      steps: [{ e: '👀', t: 'Look at the top' }, { e: '🚶', t: 'Walk to a match' }, { e: '😋', t: 'Munch it!' }],
+      lines: ['Look at the picture or words at the top.', 'Walk your friend to a right answer and munch it!'] },
+    bubble: { e: '🫧', title: 'Bubble Pop', art: 'bubble',
+      caps: ['Listen, or look at the card.', 'Pop the matching bubble.', 'Get stars!'],
       steps: [{ e: '👂', t: 'Listen' }, { e: '👆', t: 'Pop match' }, { e: '⭐', t: 'Stars!' }],
       lines: ['Listen, or look at the card.', 'Pop the matching bubble.', 'Get stars!'] },
-    stand: { e: '🍋', title: 'Lemonade Stand',
+    stand: { e: '🍋', title: 'Lemonade Stand', art: 'lemonade',
+      caps: ['Read the recipe.', 'Tap the ingredients into the pitcher.', 'Serve!'],
       steps: [{ e: '📋', t: 'Recipe' }, { e: '👆', t: 'Tap in' }, { e: '🥤', t: 'Serve!' }],
       lines: ['Read the recipe.', 'Tap ingredients into the pitcher.', 'Serve!'] },
+    baseball: { e: '⚾', title: 'Snack Slugger', art: 'slugger',
+      caps: ['Read the pitch question.', 'Tap your answer to swing.', 'Hits are runs. Misses are outs.'] },
+    racers: { e: '🏎️', title: 'Snack Racers', art: 'racers',
+      caps: ['Pick your snack car.', 'Answer the question to zoom ahead.', 'Race to the finish!'] },
+    packer: { e: '🧺', title: 'Picnic Packer', art: 'packer',
+      caps: ['The ticket shows 3 strawberries.', 'Tap a food on the shelf to put it in the basket.', 'Too many? Tap the extra food to take it out.'] },
+    garden: { e: '🌱', title: 'Garden', art: 'garden',
+      caps: ['Tap a seed packet.', 'Tap a patch of soil to plant it.', 'Answer to water and grow a friend!'] },
+    pancake: { e: '🥞', title: 'Pancake Place', art: 'pancake',
+      caps: ['Look at the order.', 'Tap pancakes onto the plate.', 'Check with syrup when the stack is right.'] },
     tiny: { e: '🧺', title: 'Tiny Picnic', lines: ['Listen for what to find.', 'Tap the picture. Every tap is OK!'] },
     story: { e: '🗺️', title: 'Story', lines: ['Walk the path with your friends.', 'Play each stop to find the missing star-snacks!'] }
+  };
+  // Style A composites are 400×720 / 1024×640. Caption + Go boxes are in those pixels.
+  var HOWTO_BOX = {
+    portrait: { W: 400, H: 720, cap: [30, 606, 340, 27], go: [174, 645, 52, 53] },
+    landscape: {
+      lemonade: [935, 509], munch: [935, 439], slugger: [935, 378], racers: [935, 391],
+      packer: [935, 418], bubble: [935, 393], garden: [935, 396], pancake: [935, 373]
+    }
   };
   function howtoAuto() { try { var v = localStorage.getItem('blobArcade.howto'); if (v === '1') return true; if (v === '0') return false; } catch (e) {} return !(typeof navigator !== 'undefined' && navigator.webdriver); }
   function howtoBody(h) {
@@ -567,9 +595,90 @@
     }
     return '<p class="howto-lines">' + h.lines.map(A.esc).join('<br>') + '</p>';
   }
+  function howtoKind() { return (document.documentElement.getAttribute('data-stage') === 'landscape') ? 'landscape' : 'portrait'; }
+  function howtoStageScale() { var s = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--stage-scale')); return s > 0 ? s : 1; }
+  function howtoPct(box, W, H, minHit) {
+    var x = box[0], y = box[1], w = box[2], h = box[3];
+    if (minHit) {
+      var nw = Math.max(w, minHit), nh = Math.max(h, minHit);
+      x -= (nw - w) / 2; y -= (nh - h) / 2; w = nw; h = nh;
+    }
+    return 'left:' + (x / W * 100).toFixed(3) + '%;top:' + (y / H * 100).toFixed(3) + '%;width:' + (w / W * 100).toFixed(3) + '%;height:' + (h / H * 100).toFixed(3) + '%;';
+  }
+  function howtoBoxes(h, kind) {
+    if (kind === 'portrait') return HOWTO_BOX.portrait;
+    var goXY = HOWTO_BOX.landscape[h.art] || [935, 400];
+    var go = [goXY[0], goXY[1], 58, 59];
+    var capH = 32, capY = go[1] + (go[3] - capH) / 2;
+    return { W: 1024, H: 640, cap: [40, capY, go[0] - 8 - 40, capH], go: go };
+  }
+  function showArt(g, h) {
+    return new Promise(function (resolve) {
+      var host = document.querySelector('html.stage-on .stage-scale') || document.body;
+      var caps = h.caps || h.lines || [];
+      var step = 0, done = false, ov, talkTok = 0;
+      function src(kind) { return A.ROOT + 'art/howto/howto_' + h.art + '_' + kind + '.png'; }
+      function paint() {
+        var kind = howtoKind();
+        var box = howtoBoxes(h, kind);
+        var img = ov.querySelector('.howto-shot');
+        var cap = ov.querySelector('.howto-cap');
+        var go = ov.querySelector('.howto-go');
+        img.src = src(kind);
+        cap.setAttribute('style', howtoPct(box.cap, box.W, box.H));
+        go.setAttribute('style', howtoPct(box.go, box.W, box.H, Math.ceil(60 / howtoStageScale())));
+        cap.textContent = caps[step] || caps[0] || '';
+        var size = kind === 'landscape' ? 22 : 15;
+        cap.style.fontSize = size + 'px';
+        while (size > 12 && (cap.scrollHeight > cap.clientHeight + 1 || cap.scrollWidth > cap.clientWidth + 1)) {
+          size -= 0.5; cap.style.fontSize = size + 'px';
+        }
+      }
+      function waitMs(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+      function sayStep(i) {
+        if (done || i == null || !caps[i]) return Promise.resolve();
+        var my = ++talkTok;
+        if (A.Voice && A.Voice.stop) A.Voice.stop();
+        var spoken = (A.Voice && A.Voice.say) ? A.Voice.say([{ text: caps[i] }], { kind: 'prompt', bubble: false }) : Promise.resolve();
+        /* Hold long enough to read even when voice is off (say() resolves immediately). */
+        return Promise.all([spoken, waitMs(2400)]).then(function () {
+          if (done || my !== talkTok) return;
+          if (i === step && step < caps.length - 1) { step += 1; paint(); return sayStep(step); }
+        });
+      }
+      function close() {
+        if (done) return; done = true;
+        talkTok += 1;
+        if (A.Voice && A.Voice.stop) A.Voice.stop();
+        window.removeEventListener('resize', paint);
+        document.removeEventListener('keydown', onKey, true);
+        if (ov && ov.parentNode) ov.remove();
+        UI.cardOpen = !!document.querySelector('.overlay.on');
+        resolve();
+      }
+      function onKey(e) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape' || e.key === 'f' || e.key === 'F') {
+          e.preventDefault(); e.stopPropagation(); close();
+        }
+      }
+      ov = A.el('<div class="overlay on howto howto-a" role="dialog" aria-modal="true" aria-label="How to play">' +
+        '<img class="howto-shot" alt="">' +
+        '<button type="button" class="howto-cap" aria-label="Hear this step again"></button>' +
+        '<button type="button" class="howto-go" aria-label="Start the game"></button>' +
+        '</div>');
+      host.appendChild(ov); UI.cardOpen = true;
+      paint();
+      ov.querySelector('.howto-go').addEventListener('click', function (e) { e.stopPropagation(); if (A.Audio && A.Audio.sfx) A.Audio.sfx('tap'); close(); });
+      ov.querySelector('.howto-cap').addEventListener('click', function (e) { e.stopPropagation(); sayStep(step); });
+      document.addEventListener('keydown', onKey, true);
+      window.addEventListener('resize', paint);
+      sayStep(0);
+    });
+  }
   var HowTo = A.HowTo = { DATA: HOWTO,
     show: function (g) {
       var h = HOWTO[g]; if (!h || document.querySelector('.overlay.howto')) return Promise.resolve();
+      if (h.art) return showArt(g, h);
       var P = A.Store && A.Store.active && A.Store.active(), friend = P && A.Blobs && A.Blobs.forProfile ? A.Blobs.forProfile(P, { expr: 'happy' }) : '';
       var pic = h.steps ? '' : '<div class="howto-art"><span class="he" aria-hidden="true">' + (A.Icons ? A.Icons.html(h.e, { size: 64, decorative: true, cls: 'pp-pic' }) : h.e) + '</span>' + (friend ? '<span class="hf">' + friend + '</span>' : '') + '</div>';
       return UI.card({ cls: 'howto' + (h.steps ? ' howto-pic' : ''), tag: 'How to play', title: h.title, art: pic,

@@ -391,6 +391,61 @@
     return pace;
   }
 
+
+  function factKey(q) {
+    if (!q) return '';
+    if (q.kind === 'count') return 'c:' + q.food + ':' + q.count;
+    if (q.a != null && q.b != null) return (q.kind || 'f') + ':' + q.a + ':' + q.b + ':' + (q.op || '');
+    return 't:' + String(q.text || '');
+  }
+  function buildQuestions(p, band, tier, rng) {
+    var qs = [], i, recent = [], q, g = 0, key;
+    for (i = 0; i < NQ; i++) {
+      g = 0;
+      do { q = makeQuestion(p, { band: band, tier: tier, rng: rng }); key = factKey(q); } while (recent.indexOf(key) >= 0 && g++ < 24);
+      qs.push(q);
+      recent.push(key);
+      if (recent.length > 3) recent.shift();
+    }
+    return qs;
+  }
+  function makeSide(p, rng) {
+    var band = bandFor(p);
+    var tier = (p && p.games && p.games.racers && p.games.racers.tier) || 0;
+    return {
+      id: p && p.id, name: (p && p.name) || 'Player', blob: p && p.blob, guest: !!(p && p.guest),
+      band: band, tier: tier,
+      i: 0, n: NQ, items: buildQuestions(p, band, tier, rng),
+      answers: [], dist: 0,
+      base: BASE, boost: BOOST,
+      phase: 'question', done: false
+    };
+  }
+  function startTwoRace(p, family, opt, trackId, rng) {
+    var p2 = opt && opt.p2;
+    if (!p2) return null;
+    var s0 = makeSide(p, rng), s1 = makeSide(p2, rng);
+    return {
+      mode: 'two', track: trackId, boss: false,
+      friend: p2.blob,
+      sides: [s0, s1],
+      p2: p2,
+      phase: 'question',
+      i: 0, n: NQ, items: s0.items, answers: s0.answers,
+      playerDist: 0, oppDist: 0,
+      base: BASE, boost: BOOST, oppPace: 0,
+      obstacles: [], obstacle: null,
+      startedAt: (opt && opt.now) || 0,
+      finishedAt: 0, time: 0,
+      win: false, place: 0, coins: 0, newBest: false, tie: false, winner: null,
+      rng: rng
+    };
+  }
+  function sideOf(race, who) {
+    if (!race || race.mode !== 'two' || !race.sides) return null;
+    return race.sides[who === 1 || who === '1' ? 1 : 0] || null;
+  }
+
   function startRace(p, family, opt) {
     opt = opt || {};
     var trackId = opt.track || 'picnic';
@@ -398,10 +453,15 @@
     if (!g.tracks[trackId]) trackId = 'picnic';
     var track = TRACKS[trackId];
     var mode = opt.mode || 'friend';
-    if (mode !== 'boss' && mode !== 'best') mode = 'friend';
+    if (mode !== 'boss' && mode !== 'best' && mode !== 'two') mode = 'friend';
     var band = bandFor(p);
     var tier = (opt.tier != null) ? opt.tier : ((p && p.games && p.games.racers && p.games.racers.tier) || 0);
     var rng = rngOf(opt.rng);
+    if (mode === 'two') {
+      var two = startTwoRace(p, family, opt, trackId, rng);
+      if (two) return two;
+      mode = 'friend';
+    }
     var qs = [], i, used = {}, recent = [];
     function factKey(q) {
       if (!q) return '';
@@ -443,10 +503,17 @@
     return race;
   }
 
-  function current(race) { return race && race.items && race.items[race.i] || null; }
+  function current(race, who) {
+    if (race && race.mode === 'two') {
+      var s = sideOf(race, who == null ? 0 : who);
+      return s && s.items && s.items[s.i] || null;
+    }
+    return race && race.items && race.items[race.i] || null;
+  }
 
   function applyAnswer(race, choice, family, p, opt) {
     opt = opt || {};
+    if (race && race.mode === 'two') return applyTwoAnswer(race, choice, family, p, opt);
     if (!race || race.phase !== 'question') return null;
     var q = current(race);
     if (!q) return null;
@@ -472,12 +539,74 @@
     return { correct: correct, race: race, done: false };
   }
 
-  function nextQuestion(race) {
+  function nextQuestion(race, who) {
     if (!race || race.phase === 'podium') return race;
+    if (race.mode === 'two') {
+      if (who == null) {
+        if (race.sides) race.sides.forEach(function (s) {
+          if (s && !s.done && s.phase === 'drive') s.phase = 'question';
+        });
+      } else {
+        var s = sideOf(race, who);
+        if (s && !s.done && s.phase === 'drive') s.phase = 'question';
+      }
+      return race;
+    }
     if (race.i >= race.n) return race;
     race.phase = 'question';
     return race;
   }
+
+  function applyTwoAnswer(race, choice, family, p, opt) {
+    opt = opt || {};
+    var who = (opt.who === 1 || opt.who === '1') ? 1 : 0;
+    var s = sideOf(race, who);
+    if (!s || s.done || s.phase !== 'question') return null;
+    var q = s.items && s.items[s.i];
+    if (!q) return null;
+    var correct = (+choice === q.answer);
+    var ms = opt.ms == null ? 800 : Math.max(0, opt.ms);
+    s.answers.push({ i: s.i, correct: correct, ms: ms });
+    if (correct) s.dist += s.base + s.boost;
+    else s.dist += s.base;
+    s.i++;
+    if (s.i >= s.n) { s.done = true; s.phase = 'done'; }
+    else s.phase = 'drive';
+    race.playerDist = race.sides[0].dist;
+    race.oppDist = race.sides[1].dist;
+    if (race.sides[0].done && race.sides[1].done) return finishTwoRace(race, family, p, opt);
+    return { correct: correct, race: race, done: false, who: who };
+  }
+
+  function noteTwoStats(pl, race, correct, won) {
+    if (!pl || pl.guest) return;
+    var st = (pl.games = pl.games || {}).racers = pl.games.racers || { races: 0, wins: 0, best: {}, tier: 0 };
+    st.races = (st.races || 0) + 1;
+    if (won) st.wins = (st.wins || 0) + 1;
+    st.right = (st.right || 0) + correct;
+  }
+
+  function finishTwoRace(race, family, p, opt) {
+    opt = opt || {};
+    var s0 = race.sides[0], s1 = race.sides[1];
+    var c0 = s0.answers.filter(function (a) { return a.correct; }).length;
+    var c1 = s1.answers.filter(function (a) { return a.correct; }).length;
+    race.playerDist = s0.dist;
+    race.oppDist = s1.dist;
+    race.tie = s0.dist === s1.dist;
+    race.win = s0.dist > s1.dist;
+    race.winner = race.tie ? null : (race.win ? 0 : 1);
+    race.place = race.tie ? 0 : (race.win ? 1 : 2);
+    race.correct = [c0, c1];
+    race.coins = race.tie ? 4 : 6;
+    race.phase = 'podium';
+    race.finishedAt = opt.now || race.startedAt || 0;
+    if (family) family.coins = (family.coins || 0) + race.coins;
+    noteTwoStats(p, race, c0, race.winner === 0);
+    noteTwoStats(race.p2, race, c1, race.winner === 1);
+    return { correct: s0.answers.length ? s0.answers[s0.answers.length - 1].correct : false, race: race, done: true };
+  }
+
 
   function coinsFor(win, correct) {
     if (win) return 5 + Math.min(3, Math.max(0, correct - 7));
@@ -569,7 +698,7 @@
     defaultGarage: defaultGarage, garageOf: garageOf,
     findPart: findPart, upgradeCost: upgradeCost, buy: buy, equip: equip, owned: owned,
     playerBase: playerBase, playerBoost: playerBoost, oppPace: oppPace,
-    startRace: startRace, current: current, applyAnswer: applyAnswer,
+    startRace: startRace, current: current, applyAnswer: applyAnswer, sideOf: sideOf,
     nextQuestion: nextQuestion, finishRace: finishRace, coinsFor: coinsFor,
     neededToWin: neededToWin
   };

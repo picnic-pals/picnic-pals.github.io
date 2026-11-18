@@ -631,9 +631,9 @@ body.pk-won #pkContent {
 .pk-item.pk-flyin { animation: pkFlyIn .4s cubic-bezier(.2, 1.4, .4, 1) both; }
 .pk-basket.sag .pk-basket-art { animation: pkSag .42s ease-out; transform-origin: 50% 100%; }
 @keyframes pkFlyIn {
-  0% { transform: translateY(-42px) scale(.4); opacity: 0; }
-  70% { transform: translateY(4px) scale(1.08); opacity: 1; }
-  100% { transform: translateY(0) scale(1); opacity: 1; }
+  0% { transform: translate(-50%, -100%) translateY(-42px) scale(.4); opacity: 0; }
+  70% { transform: translate(-50%, -100%) translateY(4px) scale(1.08); opacity: 1; }
+  100% { transform: translate(-50%, -100%) scale(1); opacity: 1; }
 }
 @keyframes pkSag {
   0% { transform: scale(1, 1); }
@@ -684,4 +684,314 @@ html.stage-on #pkSpeak {
 html.stage-on .pk-item::after {
   width: max(62px, calc(62px / var(--stage-scale, 1)));
   height: max(62px, calc(62px / var(--stage-scale, 1)));
+}
+
+
+/* ---- packer1118: tickets, basket, shelf, win, feedback, tap size ---- */
+
+/* Ticket have-vs-need pictures */
+.pk-pics { align-items: flex-start; }
+.pk-group { position: relative; max-width: 100%; }
+.pk-needn { font-size: 0.62em; font-weight: 800; color: #6a4a22; }
+.pk-slot {
+  position: relative;
+  width: 40px; height: 40px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: inset 0 0 0 2px #e4d2a4;
+  flex: 0 0 auto;
+}
+.pk-slot .pp-icon, .pk-slot .pp-emoji { width: 34px; height: 34px; object-fit: contain; }
+.pk-slot.empty { background: #fffaf0; }
+.pk-slot.empty .pp-icon, .pk-slot.empty .pp-emoji { opacity: 0.38; filter: grayscale(0.2); }
+.pk-slot.packed { background: #eef8e6; box-shadow: inset 0 0 0 2px #7aaa5a; }
+.pk-slot.extra { background: #ffe8d4; box-shadow: inset 0 0 0 2px #d07828; }
+.pk-slot-ok {
+  position: absolute; right: -3px; bottom: -3px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #5f9a4a;
+  box-shadow: 0 0 0 2px #fff;
+  pointer-events: none;
+}
+.pk-slot-ok::after {
+  content: "";
+  position: absolute; left: 3px; top: 4px;
+  width: 6px; height: 3px;
+  border-left: 2px solid #fff; border-bottom: 2px solid #fff;
+  transform: rotate(-45deg);
+}
+.pk-group.pk-done { box-shadow: inset 0 0 0 2px #7aaa5a; background: #f3faee; }
+.pk-group.pk-over { box-shadow: inset 0 0 0 2px #d07828; background: #fff1e4; }
+.pk-pips {
+  display: flex; flex-wrap: wrap; gap: 3px; max-width: 120px; align-items: center;
+}
+.pk-pip {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #f3e6c8; box-shadow: inset 0 0 0 1px #c9a24a;
+}
+.pk-pip.on { background: #7aaa5a; box-shadow: inset 0 0 0 1px #5f9a4a; }
+.pk-pics .pp-icon.done, .pk-group .pp-icon.done { width: 28px; height: 28px; }
+
+/* Extras in the basket: clearly marked, take-out is obvious. Pre foods stay quiet. */
+.pk-basket.has-art .pk-item.pre {
+  background: transparent;
+  box-shadow: none;
+}
+.pk-item.extra {
+  background: #fff4e4;
+  box-shadow: 0 0 0 3px #e88a2a, 0 0 10px 2px #f0b060;
+  border-radius: 50%;
+}
+.pk-item.extra::before {
+  content: "";
+  position: absolute;
+  right: -2px; top: -2px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #e88a2a;
+  box-shadow: 0 0 0 2px #fff;
+  z-index: 2;
+  pointer-events: none;
+}
+/* Wrong-answer shake + glow */
+@keyframes pkWrongShake {
+  0%, 100% { transform: translate(-50%, -100%) rotate(0); }
+  20% { transform: translate(-50%, -100%) rotate(-7deg) translateX(-3px); }
+  40% { transform: translate(-50%, -100%) rotate(7deg) translateX(3px); }
+  60% { transform: translate(-50%, -100%) rotate(-5deg); }
+  80% { transform: translate(-50%, -100%) rotate(5deg); }
+}
+@keyframes pkWrongGlow {
+  0%, 100% { box-shadow: 0 0 0 0 #e88a2a00; }
+  40% { box-shadow: 0 0 0 4px #e88a2a, 0 0 16px 4px #f0b060; }
+}
+.pk-item.pk-wrong {
+  animation: pkWrongShake 0.45s ease-in-out, pkWrongGlow 0.45s ease-in-out;
+}
+.pk-bin.pk-wrong, .pk-group.pk-wrong, .pk-basket.pk-wrong {
+  animation: pkWrongGlow 0.45s ease-in-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pk-item.pk-wrong, .pk-bin.pk-wrong, .pk-group.pk-wrong, .pk-basket.pk-wrong, .pk-hand { animation: none !important; }
+}
+
+/* Idle pointing hand */
+.pk-hand {
+  position: absolute;
+  width: 72px; height: 72px;
+  margin-left: -8px; margin-top: -64px;
+  pointer-events: none;
+  z-index: 30;
+  transform-origin: 30% 90%;
+  animation: pkHandBounce 0.9s ease-in-out infinite;
+  filter: drop-shadow(0 2px 3px rgba(60, 30, 8, 0.35));
+}
+.pk-hand-svg { width: 100%; height: 100%; display: block; }
+@keyframes pkHandBounce {
+  0%, 100% { transform: translate(0, 0) rotate(-18deg); }
+  50% { transform: translate(-4px, 10px) rotate(-18deg); }
+}
+
+/* Basket foods fill their laid-out box (beat the 26px portrait rule). */
+html.stage-on[data-stage="portrait"] .pk-basket.has-art .pk-item .pp-icon,
+html.stage-on[data-stage="portrait"] .pk-basket.has-art .pk-item .pp-emoji,
+.pk-basket.has-art .pk-item .pp-icon,
+.pk-basket.has-art .pk-item .pp-emoji {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Win screen: card stays above decorations; buttons always fit on the stage. */
+body.pk-won .pk-festoon { z-index: 0; }
+body.pk-won .pk-festoon .slot-flower-left,
+body.pk-won .pk-festoon .slot-flower-right,
+body.pk-won .pk-festoon .slot-flower-left-2,
+body.pk-won .pk-festoon .slot-flower-right-2,
+body.pk-won .pk-festoon .slot-ground-left,
+body.pk-won .pk-festoon .slot-ground-right,
+body.pk-won .pk-festoon .slot-ground-left-2 { display: none; }
+body.pk-won #packer { z-index: 3; }
+body.pk-won #pkContent {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.pk-win-card {
+  position: relative;
+  left: auto; right: auto; bottom: auto;
+  z-index: 4;
+  flex: 1 1 auto;
+  width: auto;
+  max-width: 100%;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  margin: 4px 0 0;
+  padding: 10px 14px 12px;
+  background: #fffefb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+}
+.pk-win-card::before {
+  flex: 0 0 auto;
+  width: min(160px, 48%);
+  height: 36px;
+}
+.pk-win-card .pk-winart {
+  width: auto;
+  height: auto;
+  max-width: min(42%, 160px);
+  max-height: 28%;
+  flex: 0 1 auto;
+  object-fit: contain;
+}
+.pk-win-card h2, .pk-win-card p { flex: 0 0 auto; }
+.pk-win-card p { font-size: 20px; }
+.pk-winbtns {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 2px;
+}
+.pk-winbtns .pk-action, .pk-winbtns .pk-secondary {
+  min-width: 132px;
+  min-height: 48px;
+  padding: 10px 18px;
+}
+
+/* Portrait: reserve the shelf so every bin stays on the stage. Keep a real-sized basket. */
+html.stage-on[data-stage="portrait"] .pk-play {
+  grid-template-rows: minmax(180px, 1fr) auto;
+  min-height: 0;
+}
+html.stage-on[data-stage="portrait"] .pk-row {
+  min-height: 180px;
+  height: 100%;
+  max-height: 100%;
+  align-items: end;
+  min-width: 0;
+}
+html.stage-on[data-stage="portrait"] .pk-basket.has-art {
+  width: min(100%, 200px);
+  max-width: 100%;
+  height: auto;
+  max-height: min(200px, 100%);
+  min-width: 160px;
+  min-height: 158px;
+  aspect-ratio: 356 / 352;
+}
+html.stage-on[data-stage="portrait"] .pk-friend {
+  height: min(148px, 100%);
+  max-height: 100%;
+}
+html.stage-on[data-stage="portrait"] .pk-shelf {
+  overflow: visible;
+  height: auto;
+  max-height: none;
+  min-height: 0;
+  flex: none;
+  align-content: center;
+  padding: 10px 10px 8px;
+  gap: 8px 8px;
+}
+html.stage-on[data-stage="portrait"] .pk-bin {
+  width: 72px; height: 72px;
+  min-width: 72px; min-height: 72px;
+}
+html.stage-on[data-stage="portrait"] .pk-card.boss .pk-ask,
+html.stage-on[data-stage="portrait"] .pk-card .pk-ask { font-size: 22px; }
+html.stage-on[data-stage="portrait"] .pk-card { padding: 8px 10px 10px; }
+html.stage-on[data-stage="portrait"] .pk-pics { gap: 6px 8px; margin-top: 2px; }
+html.stage-on[data-stage="portrait"] .pk-group { padding: 4px 7px; gap: 4px; }
+html.stage-on[data-stage="portrait"] .pk-num { font-size: 28px; }
+html.stage-on[data-stage="portrait"] .pk-pics .pk-slot { width: 30px; height: 30px; }
+html.stage-on[data-stage="portrait"] .pk-pics .pk-slot .pp-icon,
+html.stage-on[data-stage="portrait"] .pk-pics .pk-slot .pp-emoji { width: 26px; height: 26px; }
+
+/* Landscape: bigger basket and shelf foods, less empty tray. */
+html.stage-on[data-stage="landscape"] .pk-play {
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 46%);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 10px;
+}
+html.stage-on[data-stage="landscape"] .pk-basket.has-art {
+  width: min(100%, 340px, calc(280px * 356 / 352));
+  max-height: 280px;
+  height: auto;
+}
+html.stage-on[data-stage="landscape"] .pk-friend { height: 168px; max-height: 168px; }
+html.stage-on[data-stage="landscape"] .pk-shelf {
+  --pk-shelf-min: 0;
+  min-height: 0;
+  max-height: 100%;
+  overflow: visible;
+  align-content: center;
+  justify-content: center;
+  padding: 12px;
+  gap: 10px 12px;
+}
+html.stage-on[data-stage="landscape"] .pk-bin {
+  width: 100px; height: 100px;
+  min-width: 88px; min-height: 88px;
+}
+html.stage-on[data-stage="landscape"] .pk-ask { font-size: 22px; }
+
+/* Real rendered tap size >= ~44px on a scaled stage (48px with a little slack). */
+html.stage-on .pk-bin {
+  min-width: max(72px, calc(48px / var(--stage-scale, 1)));
+  min-height: max(72px, calc(48px / var(--stage-scale, 1)));
+}
+html.stage-on .pk-cardspeak,
+html.stage-on #pkCardSpeak {
+  min-width: max(48px, calc(48px / var(--stage-scale, 1)));
+  min-height: max(48px, calc(48px / var(--stage-scale, 1)));
+}
+html.stage-on .pk-winbtns .pk-action,
+html.stage-on .pk-winbtns .pk-secondary {
+  min-width: max(132px, calc(48px / var(--stage-scale, 1)));
+  min-height: max(48px, calc(48px / var(--stage-scale, 1)));
+}
+html.stage-on .pk-item::after {
+  width: max(62px, calc(48px / var(--stage-scale, 1)));
+  height: max(62px, calc(48px / var(--stage-scale, 1)));
+}
+
+/* Short real viewports (no stage): tighten a little. Staged layout uses the 1024x640 design size. */
+@media (orientation: landscape) and (max-height: 820px) {
+  html:not(.stage-on) .pk-bin { width: 96px; height: 96px; min-width: 80px; min-height: 80px; }
+  html:not(.stage-on) .pk-basket.has-art {
+    width: min(100%, 320px, calc(240px * 356 / 352));
+    max-height: 240px;
+  }
+  html.stage-on .pk-win-card::before { height: 28px; }
+  html.stage-on .pk-win-card .pk-winart { max-height: 22%; }
+  html.stage-on .pk-win-card p { font-size: 18px; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  html:not(.stage-on) .pk-bin { width: 84px; height: 84px; min-width: 72px; min-height: 72px; }
+  html:not(.stage-on) .pk-basket.has-art {
+    width: min(100%, 260px, calc(200px * 356 / 352));
+    max-height: 200px;
+  }
+  html:not(.stage-on) .pk-friend { height: 120px; max-height: 120px; }
+  html:not(.stage-on) .pk-ask { font-size: 18px; }
+}
+
+/* Unstaged short phone (in case stage is off in a test) still keeps shelf bins on screen. */
+@media (max-width: 400px) {
+  .pk-play { grid-template-rows: minmax(0, 1fr) auto; }
+  .pk-shelf { overflow: visible; height: auto; }
+  .pk-bin { width: 72px; height: 72px; min-width: 72px; min-height: 72px; }
+  .pk-basket.has-art { max-height: 100%; }
 }

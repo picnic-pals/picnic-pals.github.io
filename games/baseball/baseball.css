@@ -569,11 +569,103 @@ html.stage-on .friend-bubble { max-width: min(360px, 90%); }
 html.stage-on body.passage-read .sign .qtxt,
 html.stage-on body.passage-ask .sign .qtxt { font-size: 22px; }
 
-html.stage-on[data-stage="portrait"] .sign .qtxt { font-size: 36px; }
-html.stage-on[data-stage="portrait"] .sign .qpic .cv-set { --cv-d: 22px; }
-html.stage-on[data-stage="portrait"] .cards { flex-wrap: wrap; gap: 8px; padding: 6px 10px 8px; }
-html.stage-on[data-stage="portrait"] .bcard { flex: 1 1 42%; min-width: 140px; min-height: 72px; padding: 16px 8px 8px; }
+/* fix1116: long questions shrink; diamond stays in the sign; answers stay a compact 2×2. */
+html.stage-on[data-stage="portrait"] .sign {
+  max-height: 340px; /* ~47% of the 720 design stage, not a % of the short .top bar */
+  min-height: 0;
+  overflow: hidden;
+}
+html.stage-on[data-stage="portrait"] .sign .qtxt { font-size: 20px; line-height: 1.2; overflow: hidden; max-height: 7.6em; }
+html.stage-on[data-stage="portrait"] .sign .qpic .cv-set { --cv-d: 16px; }
+html.stage-on[data-stage="portrait"] .sign .qpic.on {
+  max-height: 120px;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+html.stage-on[data-stage="portrait"] .sign .qpic.on .bbdiamond,
+html.stage-on[data-stage="portrait"] .bbdiamond { width: 88px; height: 88px; }
+html.stage-on[data-stage="portrait"] .cards { flex-wrap: wrap; flex-direction: row; gap: 8px; padding: 6px 10px 8px; max-height: 42%; min-height: 0; }
+html.stage-on[data-stage="portrait"] .bcard {
+  flex: 1 1 42%;
+  min-width: 0;
+  min-height: max(56px, calc(60px / var(--stage-scale, 1)));
+  max-height: 88px;
+  font-size: 22px;
+  padding: 14px 8px 8px;
+}
+html.stage-on[data-stage="portrait"] .cards.stack {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+html.stage-on[data-stage="portrait"] .cards.stack .bcard,
+html.stage-on[data-stage="portrait"] .cards.n3 .bcard {
+  flex: 1 1 42%;
+  width: auto;
+  max-width: calc(50% - 6px);
+  min-width: 0;
+  font-size: 20px;
+  min-height: max(52px, calc(60px / var(--stage-scale, 1)));
+  max-height: 84px;
+}
+html.stage-on[data-stage="portrait"] .cards.n3 .bcard { max-width: calc(33.33% - 6px); flex-basis: 30%; }
 html.stage-on[data-stage="portrait"] #game .keys { display: none; }
+
+/* Window vh made answer type huge on tall phones; use a stage-relative size. */
+
+html.stage-on[data-stage="portrait"] .bcard.phrase { font-size: 18px; }
+html.stage-on[data-stage="portrait"] .bcard .cv {
+  max-width: 100%;
+  padding: 0 22px 0 28px; /* clears the # badge and the baseball mark */
+  box-sizing: border-box;
+  text-align: center;
+  overflow: visible;
+  line-height: 1.1;
+}
+
+
+/* Keep the rival/bonus tag under the picture, never over the diamond or ten-frame. */
+html.stage-on[data-stage="portrait"] .sign {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+html.stage-on[data-stage="portrait"] .sign .qrow {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  position: relative;
+  min-height: 0;
+  overflow: visible;
+}
+html.stage-on[data-stage="portrait"] .sign .qtxt {
+  flex: 0 1 auto;
+  min-height: 3.2em;
+  width: 100%;
+  padding-right: 52px;
+}
+html.stage-on[data-stage="portrait"] .sign .speak,
+html.stage-on[data-stage="portrait"] .sign .shot {
+  position: absolute;
+  top: 0;
+  right: 4px;
+}
+html.stage-on[data-stage="portrait"] .sign .shot { right: 52px; }
+html.stage-on[data-stage="portrait"] .sign .qpic.on {
+  order: 2;
+  margin: 4px auto 0;
+  max-height: 110px;
+  overflow: visible;
+}
+html.stage-on[data-stage="portrait"] .sign .swingtag,
+html.stage-on[data-stage="portrait"] .sign .swingtag.on {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  margin: 6px auto 0;
+  max-width: 100%;
+  align-self: center;
+}
+
 
 html.stage-on[data-stage="landscape"] .sign .qtxt { font-size: 38px; }
 html.stage-on[data-stage="landscape"] .sign .qpic .cv-set { --cv-d: 24px; }

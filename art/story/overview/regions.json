@@ -1,0 +1,284 @@
+{
+  "notes": "Zoom targets for each world region on the Picnic World overview (style B: seven distinct island-plates on a picnic-cloth field, along one winding sprinkle path). bbox is [x, y, w, h]. center is the suggested zoom focus. Values are in pixels of that PNG. World order is the official PLACES order: meadow, lagoon, hills, woods, peaks, bay, caves. Option A is not included; it lives only under art/story/samples/.",
+  "style": "B",
+  "label": "island plates on picnic cloth",
+  "world_order": [
+    "meadow",
+    "lagoon",
+    "hills",
+    "woods",
+    "peaks",
+    "bay",
+    "caves"
+  ],
+  "portrait": {
+    "file": "overview_portrait.png",
+    "size": [
+      800,
+      1440
+    ],
+    "regions": {
+      "meadow": {
+        "center": [
+          400,
+          1248
+        ],
+        "bbox": [
+          112,
+          1137,
+          576,
+          223
+        ],
+        "bbox_xyxy": [
+          112,
+          1137,
+          688,
+          1360
+        ]
+      },
+      "lagoon": {
+        "center": [
+          400,
+          1047
+        ],
+        "bbox": [
+          112,
+          943,
+          576,
+          209
+        ],
+        "bbox_xyxy": [
+          112,
+          943,
+          688,
+          1152
+        ]
+      },
+      "hills": {
+        "center": [
+          400,
+          863
+        ],
+        "bbox": [
+          112,
+          770,
+          576,
+          187
+        ],
+        "bbox_xyxy": [
+          112,
+          770,
+          688,
+          957
+        ]
+      },
+      "woods": {
+        "center": [
+          400,
+          694
+        ],
+        "bbox": [
+          112,
+          604,
+          576,
+          180
+        ],
+        "bbox_xyxy": [
+          112,
+          604,
+          688,
+          784
+        ]
+      },
+      "peaks": {
+        "center": [
+          400,
+          532
+        ],
+        "bbox": [
+          160,
+          453,
+          480,
+          159
+        ],
+        "bbox_xyxy": [
+          160,
+          453,
+          640,
+          612
+        ]
+      },
+      "bay": {
+        "center": [
+          400,
+          374
+        ],
+        "bbox": [
+          112,
+          280,
+          576,
+          188
+        ],
+        "bbox_xyxy": [
+          112,
+          280,
+          688,
+          468
+        ]
+      },
+      "caves": {
+        "center": [
+          400,
+          183
+        ],
+        "bbox": [
+          128,
+          79,
+          544,
+          209
+        ],
+        "bbox_xyxy": [
+          128,
+          79,
+          672,
+          288
+        ]
+      }
+    }
+  },
+  "landscape": {
+    "file": "overview_landscape.png",
+    "size": [
+      2048,
+      1280
+    ],
+    "regions": {
+      "meadow": {
+        "center": [
+          171,
+          767
+        ],
+        "bbox": [
+          16,
+          537,
+          311,
+          461
+        ],
+        "bbox_xyxy": [
+          16,
+          537,
+          327,
+          998
+        ]
+      },
+      "lagoon": {
+        "center": [
+          460,
+          767
+        ],
+        "bbox": [
+          317,
+          537,
+          287,
+          461
+        ],
+        "bbox_xyxy": [
+          317,
+          537,
+          604,
+          998
+        ]
+      },
+      "hills": {
+        "center": [
+          747,
+          767
+        ],
+        "bbox": [
+          604,
+          537,
+          286,
+          461
+        ],
+        "bbox_xyxy": [
+          604,
+          537,
+          890,
+          998
+        ]
+      },
+      "woods": {
+        "center": [
+          1033,
+          755
+        ],
+        "bbox": [
+          890,
+          512,
+          287,
+          486
+        ],
+        "bbox_xyxy": [
+          890,
+          512,
+          1177,
+          998
+        ]
+      },
+      "peaks": {
+        "center": [
+          1310,
+          767
+        ],
+        "bbox": [
+          1177,
+          537,
+          266,
+          461
+        ],
+        "bbox_xyxy": [
+          1177,
+          537,
+          1443,
+          998
+        ]
+      },
+      "bay": {
+        "center": [
+          1586,
+          767
+        ],
+        "bbox": [
+          1443,
+          537,
+          287,
+          461
+        ],
+        "bbox_xyxy": [
+          1443,
+          537,
+          1730,
+          998
+        ]
+      },
+      "caves": {
+        "center": [
+          1878,
+          755
+        ],
+        "bbox": [
+          1720,
+          512,
+          317,
+          486
+        ],
+        "bbox_xyxy": [
+          1720,
+          512,
+          2037,
+          998
+        ]
+      }
+    }
+  }
+}

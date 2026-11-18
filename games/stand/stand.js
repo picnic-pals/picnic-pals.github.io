@@ -26,8 +26,31 @@
   function fname(id) { return (A.Blobs.byId[id] || { name: id }).name; }
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   /* ---------- art: items, cups, cartoon bills, the tip jar ---------- */
-  function cupSvg(c) { return '<svg viewBox="0 0 100 110" aria-hidden="true"><path d="M62 4 L56 40" stroke="#ff7aa6" stroke-width="6" stroke-linecap="round"/><path d="M18 30 H82 L74 102 Q50 110 26 102 Z" fill="#ffffff" stroke="#e7dcef" stroke-width="3"/><path d="M22 46 H78 L72 98 Q50 106 28 98 Z" fill="' + c + '"/><ellipse cx="50" cy="46" rx="28" ry="5" fill="#ffffff" opacity=".55"/>' +
-    '<circle cx="41" cy="70" r="3" fill="#4a3b6b"/><circle cx="59" cy="70" r="3" fill="#4a3b6b"/><path d="M43 79 Q50 85 57 79" stroke="#4a3b6b" stroke-width="3" fill="none" stroke-linecap="round"/></svg>'; }
+  var SHOP_BERRY = '#ff9fbf', svgUid = 0;
+  function looks() { return S.looks(P); }
+  function cupStyle() {
+    var c = looks().cups;
+    if (c === 'cups-pink') return { body: '#ffd0e4', stroke: '#ef86b0', straw: '#ff7aa6' };
+    if (c === 'cups-rainbow') return { body: '#fffdf7', stroke: '#d7c4f0', straw: '#7a5cff', rainbow: true };
+    return { body: '#ffffff', stroke: '#e7dcef', straw: '#ff7aa6' };
+  }
+  function cupSvg(c) {
+    var sh = cupStyle();
+    var rainbow = sh.rainbow
+      ? '<path d="M20 36 H80" stroke="#ff6b8a" stroke-width="4" stroke-linecap="round"/><path d="M21 40 H79" stroke="#ffd23c" stroke-width="3.2" stroke-linecap="round"/><path d="M22 44 H78" stroke="#7fd6ff" stroke-width="3.2" stroke-linecap="round"/>'
+      : '';
+    return '<svg class="cupsvg" viewBox="0 0 100 110" aria-hidden="true"><path d="M62 4 L56 40" stroke="' + sh.straw + '" stroke-width="6" stroke-linecap="round"/>' +
+      '<path d="M18 30 H82 L74 102 Q50 110 26 102 Z" fill="' + sh.body + '" stroke="' + sh.stroke + '" stroke-width="3"/>' +
+      '<path d="M22 46 H78 L72 98 Q50 106 28 98 Z" fill="' + c + '"/>' + rainbow +
+      '<ellipse cx="50" cy="46" rx="28" ry="5" fill="#ffffff" opacity=".55"/>' +
+      '<circle cx="41" cy="70" r="3" fill="#4a3b6b"/><circle cx="59" cy="70" r="3" fill="#4a3b6b"/><path d="M43 79 Q50 85 57 79" stroke="#4a3b6b" stroke-width="3" fill="none" stroke-linecap="round"/></svg>';
+  }
+  function juiceOf(fl, filled) {
+    if (!filled) return looks().flavor === 'flavor-berry' ? '#ffd0e4' : '#e3f4ff';
+    if (fl === 'silly') return '#c6e58a';
+    if ((!fl || fl === 'plain') && looks().flavor === 'flavor-berry') return SHOP_BERRY;
+    return flv(fl).juice;
+  }
   var SVG = {
     rasp: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 6 Q16 2 12 5 M20 6 Q24 2 28 5" stroke="#4caf50" stroke-width="3" fill="none" stroke-linecap="round"/>' + [[14, 14], [20, 13], [26, 14], [11, 20], [17, 20], [23, 20], [29, 20], [14, 26], [20, 26], [26, 26], [17, 32], [23, 32]].map(function (c) { return '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="4.6" fill="#e8457f" stroke="#c22e66" stroke-width="1"/>'; }).join('') + '</svg>',
     sugar: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 14 L20 8 L32 14 L32 28 L20 34 L8 28 Z" fill="#fff" stroke="#c9bfe0" stroke-width="2.5" stroke-linejoin="round"/><path d="M8 14 L20 20 L32 14 M20 20 L20 34" stroke="#c9bfe0" stroke-width="2.5" fill="none"/><circle cx="14" cy="22" r="1.4" fill="#d8d0ea"/><circle cx="26" cy="24" r="1.4" fill="#d8d0ea"/></svg>'
@@ -37,17 +60,19 @@
   function flIcon(id) { var f = flv(id); return f.e ? '<span class="emo">' + f.e + '</span>' : '<span class="emo svgi">' + SVG.rasp + '</span>'; }
   function cap(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
   // a little glass pitcher; level 0-1, juice color
-  function pitcherSvg(level, juice) { var lv = Math.max(0, Math.min(1, level)), y = 108 - 84 * lv;
-    return '<svg class="psvg" viewBox="0 0 120 120" aria-hidden="true"><defs><clipPath id="pbody"><path d="M22 18 H90 L84 108 Q56 116 28 108 Z"/></clipPath></defs>' +
-      '<path d="M88 34 Q112 36 108 62 Q104 84 84 86" stroke="#c9e6f5" stroke-width="9" fill="none" stroke-linecap="round"/>' +
-      '<path d="M22 18 H90 L84 108 Q56 116 28 108 Z" fill="#f4fbff"/>' +
-      '<g clip-path="url(#pbody)"><g class="jlev" data-level="' + lv.toFixed(3) + '" style="transform:translateY(' + (y - 24).toFixed(1) + 'px)"><rect class="juice" x="0" y="24" width="120" height="120" fill="' + juice + '"/><ellipse cx="56" cy="24" rx="40" ry="4" fill="#fff" opacity=".45"/></g></g>' +
-      '<path d="M22 18 H90 L84 108 Q56 116 28 108 Z" fill="none" stroke="#a9d8f0" stroke-width="4" stroke-linejoin="round"/><path d="M14 14 Q20 18 22 18 H90" stroke="#a9d8f0" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+  function pitcherSvg(level, juice) { var lv = Math.max(0, Math.min(1, level)), y = 108 - 84 * lv, id = 'pbody' + (++svgUid);
+    var glass = looks().flavor === 'flavor-berry' ? '#ffe4f0' : '#f4fbff';
+    var rim = looks().flavor === 'flavor-berry' ? '#f0b0c8' : '#a9d8f0';
+    return '<svg class="psvg" viewBox="0 0 120 120" aria-hidden="true"><defs><clipPath id="' + id + '"><path d="M22 18 H90 L84 108 Q56 116 28 108 Z"/></clipPath></defs>' +
+      '<path d="M88 34 Q112 36 108 62 Q104 84 84 86" stroke="' + (looks().flavor === 'flavor-berry' ? '#f3c0d4' : '#c9e6f5') + '" stroke-width="9" fill="none" stroke-linecap="round"/>' +
+      '<path d="M22 18 H90 L84 108 Q56 116 28 108 Z" fill="' + glass + '"/>' +
+      '<g clip-path="url(#' + id + ')"><g class="jlev" data-level="' + lv.toFixed(3) + '" style="transform:translateY(' + (y - 24).toFixed(1) + 'px)"><rect class="juice" x="0" y="24" width="120" height="120" fill="' + juice + '"/><ellipse cx="56" cy="24" rx="40" ry="4" fill="#fff" opacity=".45"/></g></g>' +
+      '<path d="M22 18 H90 L84 108 Q56 116 28 108 Z" fill="none" stroke="' + rim + '" stroke-width="4" stroke-linejoin="round"/><path d="M14 14 Q20 18 22 18 H90" stroke="' + rim + '" stroke-width="4" fill="none" stroke-linecap="round"/>' +
       '<path d="M32 30 L30 92" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/></svg>'; }
-  function jarSvg(fill) { var y = 104 - 70 * Math.max(0, Math.min(1, fill));
+  function jarSvg(fill) { var y = 104 - 70 * Math.max(0, Math.min(1, fill)), id = 'jbody' + (++svgUid);
     return '<svg class="jsvg" viewBox="0 0 100 110" aria-hidden="true"><rect x="22" y="6" width="56" height="16" rx="6" fill="#ffb347" stroke="#e08a1e" stroke-width="3"/>' +
-      '<defs><clipPath id="jbody"><rect x="14" y="22" width="72" height="84" rx="20"/></clipPath></defs><rect x="14" y="22" width="72" height="84" rx="20" fill="#eefaff"/>' +
-      '<g clip-path="url(#jbody)"><rect x="0" y="' + y.toFixed(1) + '" width="100" height="110" fill="#9fe3a8"/></g>' +
+      '<defs><clipPath id="' + id + '"><rect x="14" y="22" width="72" height="84" rx="20"/></clipPath></defs><rect x="14" y="22" width="72" height="84" rx="20" fill="#eefaff"/>' +
+      '<g clip-path="url(#' + id + ')"><rect x="0" y="' + y.toFixed(1) + '" width="100" height="110" fill="#9fe3a8"/></g>' +
       '<rect x="14" y="22" width="72" height="84" rx="20" fill="none" stroke="#8fcfe8" stroke-width="4"/><path d="M26 34 L26 88" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".85"/>' +
       '<text x="50" y="76" text-anchor="middle" font-size="26" font-weight="800" fill="#2f7a3b" font-family="sans-serif">TIPS</text></svg>'; }
   var BILLC = {
@@ -166,6 +191,7 @@
   // C2: the ask is always written in the speech bubble too (works with the sound off)
   function ask(parts) { var b = $('#bubble'), l = b.querySelector('.ask'); if (!l) { l = A.el('<p class="ask"></p>'); b.insertBefore(l, b.firstChild); } var x = String(V.text(parts || []) || '').trim(); l.textContent = tidy(x); }
   function renderOrder() {
+    hideReady();
     var o = G.o, hint = G.miss > 0;
     renderBubble(); ask(o.say);
     var bins = $('#bins'); bins.innerHTML = ''; bins.className = 'bins n' + o.bins.length + (o.kind === 'pick' ? ' pick' : '');
@@ -219,9 +245,9 @@
     // batch1: on counting orders the count stays hidden until she serves once (she counts what she put in)
     var hideCnt = o.kind === 'pick' || (!o.ticket && G.miss === 0), loose = n - cupN, sz = loose > 10 ? ' n3' : loose > 5 ? ' n2' : '';
     // stand-r1: the pitcher fills as she taps (level grows with each tap, never reaching full at "the answer") and takes the flavor color
-    var juice = o.silly ? '#c6e58a' : flv(G.c && G.c.flavor).juice, lvl = lvlOf(n);
+    var juice = o.silly ? '#c6e58a' : juiceOf(G.c && G.c.flavor, true), lvl = lvlOf(n);
     var old = {}, oldJ = A.$('#tray .jlev'), oldT = oldJ ? oldJ.style.transform : null; A.$$('#tray .ti.fl').forEach(function (e) { old[e.getAttribute('data-k')] = e.style.top; });
-    t.innerHTML = '<div class="cupspot' + (hideCnt ? ' nocnt' : '') + '">' + cupH + '<div class="pitcher' + (n ? ' full' : '') + '" style="--juice:' + juice + '">' + pitcherSvg(lvl, n ? juice : '#e3f4ff') + '<div class="pile tf' + sz + '">' + h + ghosts + '</div></div>' + (hideCnt ? '' : '<span class="cnt' + (multi ? ' multi' : '') + '" aria-live="polite">' + cnt + '</span>') + '</div>';
+    t.innerHTML = '<div class="cupspot' + (hideCnt ? ' nocnt' : '') + '">' + cupH + '<div class="pitcher' + (n ? ' full' : '') + '" style="--juice:' + juice + '">' + pitcherSvg(lvl, n ? juice : juiceOf(G.c && G.c.flavor, false)) + '<div class="pile tf' + sz + '">' + h + ghosts + '</div></div>' + (hideCnt ? '' : '<span class="cnt' + (multi ? ' multi' : '') + '" aria-live="polite">' + cnt + '</span>') + '</div>';
     var moved = A.$$('#tray .ti.fl').filter(function (e) { var k = e.getAttribute('data-k'); if (old[k] == null || old[k] === e.style.top) return false; e.dataset.top = e.style.top; e.style.transition = 'none'; e.style.top = old[k]; return true; });
     A.$$('#tray .ti.fl').forEach(function (e) { if (old[e.getAttribute('data-k')] == null) e.classList.add('new'); });
     var nj = A.$('#tray .jlev'); if (nj && oldT && oldT !== nj.style.transform) { var nt = nj.style.transform; nj.style.transition = 'none'; nj.style.transform = oldT; moved.push({ style: {}, dataset: {} }); void t.offsetWidth; nj.style.transition = ''; nj.style.transform = nt; }
@@ -287,7 +313,56 @@
     if (n > 1) h += '<small class="run">x' + n + '</small>';
     return h;
   }
+  function bindPayOnce() {
+    if (G.payBound) return;
+    G.payBound = true;
+    var bins = $('#bins'), tray = $('#tray');
+    if (!bins || !tray) return;
+    function addBill(v) {
+      if (G.busy || G.phase !== 'pay' || !G.m || G.m.kind === 'enough') return;
+      v = +v; if (!v) return;
+      G.taken.push(v);
+      A.Audio.sfx('pop');
+      renderPay();
+      V.say([sum(G.taken)], { kind: 'tap' });
+    }
+    function takeBack(v) {
+      if (G.busy || G.phase !== 'pay') return;
+      v = +v;
+      var i = G.taken.lastIndexOf(v);
+      if (i >= 0) G.taken.splice(i, 1);
+      A.Audio.sfx('tap');
+      renderPay();
+    }
+    function undoPay() {
+      if (G.busy || !G.taken.length) return;
+      G.taken.pop();
+      A.Audio.sfx('tap');
+      renderPay();
+    }
+    function onBins(e) {
+      var t = e.target && e.target.closest ? e.target.closest('.billbtn.denom') : null;
+      if (!t || !bins.contains(t)) return;
+      addBill(t.getAttribute('data-v'));
+    }
+    function onTray(e) {
+      var t = e.target;
+      if (!t || !t.closest) return;
+      if (t.closest('#payUndo')) return undoPay();
+      var back = t.closest('.billbtn.in');
+      if (back) return takeBack(back.getAttribute('data-v'));
+      var speak = t.closest('#tray .billbtn');
+      if (speak && G.m && G.m.kind === 'enough') {
+        var v = +speak.getAttribute('data-v');
+        V.say([v, v === 1 ? 'ls_dollar' : 'ls_dollars'], { kind: 'tap' });
+      }
+    }
+    if (A.UI && A.UI.onTap) { A.UI.onTap(bins, onBins); A.UI.onTap(tray, onTray); }
+    else { bins.addEventListener('click', onBins); tray.addEventListener('click', onTray); }
+  }
   function renderPay() {
+    hideReady();
+    bindPayOnce();
     var m = G.m, hint = G.miss > 0;
     var tags = m.change ? '<span class="tag">Costs $' + m.change.cost + '</span><span class="tag paid">Paid $' + m.change.paid + '</span><span class="q">Change?</span>'
       : m.prices.map(function (v, k) { var c = m.items && m.items[k]; return (k ? '<span class="plus">+</span>' : '') + '<span class="tag">' + (c ? '<span class="cups">' + flIcon(c.fl) + (c.n > 1 ? '<sub>' + c.n + '</sub>' : '') + '</span>' : '') + '$' + v + '</span>'; }).join('');
@@ -312,19 +387,12 @@
         bills += '<button type="button" class="billbtn" data-v="' + v + '" aria-label="' + v + ' dollar bill">' + billSvg(v) + (hint ? '<small class="run">$' + run + '</small>' : '') + '</button>';
       });
       t.innerHTML = '<div class="cashbox wal"><span class="lbl">' + A.esc(fname(G.c.friend)) + '\'s bills</span><div class="pile">' + bills + '</div></div>';
-      A.$$('#tray .billbtn').forEach(function (b) {
-        b.addEventListener('click', function () {
-          var v = +b.getAttribute('data-v');
-          V.say([v, v === 1 ? 'ls_dollar' : 'ls_dollars'], { kind: 'tap' });
-        });
-      });
+      /* taps: delegated on #tray in bindPayOnce */
     } else {
       var denoms = (S.payDenoms && S.payDenoms(P, m)) || [20, 10, 5, 1];
       denoms.forEach(function (v) {
         var n = G.taken.filter(function (x) { return x === v; }).length;
         var b = A.el('<button class="billbtn denom" data-v="' + v + '" aria-label="Add a ' + v + ' dollar bill">' + billSvg(v) + (n ? '<small class="run">x' + n + '</small>' : '') + '</button>');
-        if (A.UI && A.UI.onTap) A.UI.onTap(b, function () { if (G.busy) return; G.taken.push(v); A.Audio.sfx('pop'); renderPay(); V.say([sum(G.taken)], { kind: 'tap' }); });
-        else b.addEventListener('click', function () { if (G.busy) return; G.taken.push(v); A.Audio.sfx('pop'); renderPay(); V.say([sum(G.taken)], { kind: 'tap' }); });
         bins.appendChild(b);
       });
       var groups = takenGroups(G.taken);
@@ -336,20 +404,7 @@
       var undoBtn = G.taken.length ? '<button type="button" class="sbtn undo" id="payUndo" aria-label="Undo last bill">Undo</button>' : '';
       t.innerHTML = '<div class="cashbox compact"><span class="lbl">' + (m.change ? 'Change' : 'Cash box') + '</span><div class="pile">' +
         pile + '</div><span class="pay-tally box-tally">' + A.esc(tally) + '</span>' + undoBtn + '</div>';
-      A.$$('#tray .billbtn.in').forEach(function (b) {
-        var fn = function () {
-          if (G.busy) return;
-          var v = +b.getAttribute('data-v'), i = G.taken.lastIndexOf(v);
-          if (i >= 0) G.taken.splice(i, 1);
-          A.Audio.sfx('tap'); renderPay();
-        };
-        if (A.UI && A.UI.onTap) A.UI.onTap(b, fn); else b.addEventListener('click', fn);
-      });
-      var u = $('#payUndo');
-      if (u) {
-        var undoFn = function () { if (G.busy || !G.taken.length) return; G.taken.pop(); A.Audio.sfx('tap'); renderPay(); };
-        if (A.UI && A.UI.onTap) A.UI.onTap(u, undoFn); else u.addEventListener('click', undoFn);
-      }
+      /* take-back and Undo: delegated on #tray in bindPayOnce */
     }
     var acts = $('#acts'); acts.innerHTML = '';
     if (m.kind === 'enough') { acts.appendChild(bigBtn('Yes, enough ✓', 'yes', function () { payAnswer(true); })); acts.appendChild(bigBtn('Not enough', 'no', function () { payAnswer(false); })); }
@@ -454,7 +509,7 @@
   var hb = $('#homeBtn');
   if (A.UI && A.UI.bindHome) A.UI.bindHome(hb, goHome);
   else hb.addEventListener('click', function () { A.Audio.sfx('tap'); goHome(); });
-  function sayAgain() { if (G.phase === 'order' && G.o) say(G.o.ticket ? G.o.ticketSay : G.o.say, 'tap'); else if (G.phase === 'pay' && G.m) say(G.m.say, 'tap'); else if (G.phase === 'tip') say(['ls_jar_tap'], 'tap'); }
+  function sayAgain() { if (G.phase === 'order' && G.o) say(G.o.ticket ? G.o.ticketSay : G.o.say, 'tap'); else if (G.phase === 'pay' && G.m) say(G.m.say, 'tap'); else if (G.phase === 'tip') say(['ls_jar_tap'], 'tap'); else if (G.phase === 'ready' || G.phase === 'shop') say(['ls_hello'], 'tap'); }
   $('#sayBtn').addEventListener('click', sayAgain);
   $('#bubble').addEventListener('click', function (e) { if (!e.target.closest('.ticket')) sayAgain(); });
   document.addEventListener('keydown', function (e) {
@@ -467,13 +522,169 @@
   UI.arrowNav && UI.arrowNav(function () { return A.$$('#stand button'); });
   UI.gear({ onClose: function () { if (A.Music) A.Music.apply(); } });
   if (A.Music) A.Music.play('stand');
+
+  /* ---------- tip shop + ready screen (visual first; Voice.say is a help label only) ---------- */
+  function moneyShop() { return !S.toddler(P); }
+  function pricePics(n, money) {
+    n = Math.max(0, n || 0);
+    if (!money) {
+      return '<span class="pricepics">' + heart() + '<b>' + n + '</b></span>';
+    }
+    var v = n >= 20 ? 20 : n >= 10 ? 10 : n >= 5 ? 5 : 1;
+    return '<span class="pricepics">' + billSvg(v) + '<b>' + n + '</b></span>';
+  }
+  function signSvg() {
+    return '<svg class="signsvg" viewBox="0 0 140 110" aria-hidden="true">' +
+      '<rect x="66" y="2" width="8" height="18" rx="3" fill="#c98a4b"/>' +
+      '<circle cx="70" cy="22" r="5" fill="#e8a400"/>' +
+      '<rect x="8" y="26" width="124" height="78" rx="14" fill="#ffe46b" stroke="#e0b000" stroke-width="4"/>' +
+      '<rect x="16" y="34" width="108" height="62" rx="10" fill="#fff8c8" stroke="#f0c84a" stroke-width="2"/>' +
+      '<circle cx="28" cy="48" r="8" fill="#ffd23c" stroke="#f0b400" stroke-width="2"/>' +
+      '<path d="M28 36 L28 38 M28 58 L28 60 M16 48 L18 48 M38 48 L40 48 M19 39 L21 41 M35 55 L37 57 M19 57 L21 55 M35 41 L37 39" stroke="#f0b400" stroke-width="2" stroke-linecap="round"/>' +
+      '<text x="78" y="62" text-anchor="middle" font-size="15" font-weight="800" fill="#4a3b6b" font-family="system-ui,sans-serif">LEMONADE</text>' +
+      '<text x="78" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#8a6d3b" font-family="system-ui,sans-serif">STAND</text></svg>';
+  }
+  function awningArt(kind) {
+    var a = kind === 'mint' ? '#7ed9a8' : '#7ec8ff', b = '#fff';
+    return '<svg class="awnart" viewBox="0 0 160 54" aria-hidden="true">' +
+      '<path d="M4 8 H156 V32" fill="none"/>' +
+      '<rect x="4" y="8" width="38" height="24" fill="' + a + '"/>' +
+      '<rect x="42" y="8" width="38" height="24" fill="' + b + '"/>' +
+      '<rect x="80" y="8" width="38" height="24" fill="' + a + '"/>' +
+      '<rect x="118" y="8" width="38" height="24" fill="' + b + '"/>' +
+      '<path d="M4 8 H156 V32 H4 Z" fill="none" stroke="#4a3b6b" stroke-width="3"/>' +
+      '<ellipse cx="23" cy="40" rx="16" ry="10" fill="' + a + '" stroke="#4a3b6b" stroke-width="2"/>' +
+      '<ellipse cx="61" cy="40" rx="16" ry="10" fill="' + b + '" stroke="#4a3b6b" stroke-width="2"/>' +
+      '<ellipse cx="99" cy="40" rx="16" ry="10" fill="' + a + '" stroke="#4a3b6b" stroke-width="2"/>' +
+      '<ellipse cx="137" cy="40" rx="16" ry="10" fill="' + b + '" stroke="#4a3b6b" stroke-width="2"/></svg>';
+  }
+  function shopArt(id) {
+    if (id === 'awning-blue') return awningArt('blue');
+    if (id === 'awning-mint') return awningArt('mint');
+    if (id === 'cups-pink') { var keep = looks().cups; S.data(P).eq.cups = 'cups-pink'; var h = cupSvg(SHOP_BERRY); S.data(P).eq.cups = keep; return h; }
+    if (id === 'cups-rainbow') { var keep2 = looks().cups; S.data(P).eq.cups = 'cups-rainbow'; var h2 = cupSvg('#ffe46b'); S.data(P).eq.cups = keep2; return h2; }
+    if (id === 'sign-sunny') return signSvg();
+    if (id === 'flavor-berry') return pitcherSvg(.75, SHOP_BERRY);
+    return '';
+  }
+  function applyLooks() {
+    var L = looks(), el = $('#stand'); if (!el) return L;
+    ['up-awning-blue', 'up-awning-mint', 'up-cups-pink', 'up-cups-rainbow', 'up-sign-sunny', 'up-flavor-berry'].forEach(function (c) { el.classList.remove(c); });
+    if (L.awning) el.classList.add('up-' + L.awning);
+    if (L.cups) el.classList.add('up-' + L.cups);
+    if (L.sign) el.classList.add('up-' + L.sign);
+    if (L.flavor) el.classList.add('up-' + L.flavor);
+    var sign = $('#standSign');
+    if (!sign) { sign = A.el('<div class="stand-sign" id="standSign" aria-hidden="true"></div>'); el.appendChild(sign); }
+    sign.innerHTML = L.sign === 'sign-sunny' ? signSvg() : '';
+    sign.classList.toggle('on', L.sign === 'sign-sunny');
+    return L;
+  }
+  function ensurePanes() {
+    if (!$('#readyPane')) $('#stand').appendChild(A.el('<div class="ready" id="readyPane" hidden></div>'));
+    if (!$('#tipShop')) $('#stand').appendChild(A.el('<div class="tipshop" id="tipShop" hidden></div>'));
+  }
+  function showReady() {
+    ensurePanes();
+    G.phase = 'ready';
+    G.busy = false;
+    document.body.classList.add('stand-ready');
+    document.body.classList.remove('tipq', 'rush');
+    applyLooks();
+    $('#tipShop').hidden = true;
+    $('#readyPane').hidden = false;
+    renderReady();
+    say(['ls_hello']);
+  }
+  function renderReady() {
+    var money = moneyShop(), n = S.jar(P), L = looks(), juice = juiceOf('plain', true);
+    $('#readyPane').innerHTML =
+      '<div class="ready-preview" aria-hidden="true">' +
+        '<div class="awning stand-awn"></div>' +
+        (L.sign === 'sign-sunny' ? '<div class="r-sign">' + signSvg() + '</div>' : '') +
+        '<div class="ready-wares">' + pitcherSvg(.7, juice) + cupSvg(juice) + '</div>' +
+      '</div>' +
+      '<div class="ready-jar" id="readyJar">' + jarSvg(Math.min(1, n / 30)) + '<span class="ready-total">' + pricePics(n, money) + '</span></div>' +
+      '<div class="ready-acts">' +
+        '<button type="button" class="ready-btn shop" id="shopBtn" aria-label="Tip shop"><span class="rb-art">' + jarSvg(.7) + '</span><span class="rb-lab">Tip shop</span></button>' +
+        '<button type="button" class="ready-btn open" id="openStand" aria-label="Open the stand"><span class="rb-lab">Open the stand</span></button>' +
+      '</div>';
+    $('#shopBtn').addEventListener('click', function () { A.Audio.sfx('tap'); showShop(); });
+    $('#openStand').addEventListener('click', function () { A.Audio.sfx('pop'); openDay(); });
+  }
+  function showShop() {
+    ensurePanes();
+    G.phase = 'shop';
+    $('#readyPane').hidden = false;
+    $('#tipShop').hidden = false;
+    renderShop();
+  }
+  function closeShop() {
+    var shop = $('#tipShop'); if (shop) shop.hidden = true;
+    G.phase = 'ready';
+    renderReady();
+  }
+  function renderShop() {
+    var money = moneyShop(), n = S.jar(P), L = looks(), items = '';
+    S.SHOP.forEach(function (it) {
+      var have = S.owned(P, it.id), on = L[it.slot] === it.id, need = !have && n < it.price;
+      items += '<button type="button" class="shop-item' + (have ? ' owned' : '') + (on ? ' on' : '') + (need ? ' need' : '') + '" data-id="' + it.id + '" aria-label="' + A.esc(it.name) + ', ' + it.price + '">' +
+        '<span class="si-art">' + shopArt(it.id) + '</span>' +
+        '<span class="si-name">' + A.esc(it.name) + '</span>' +
+        '<span class="si-price">' + (have ? (on ? '<span class="si-got on-stand">On the stand</span>' : '<span class="si-got">Yours</span>') : pricePics(it.price, money)) + '</span></button>';
+    });
+    $('#tipShop').innerHTML =
+      '<div class="shop-top">' +
+        '<button type="button" class="shop-back" id="shopBack" aria-label="Back">Back</button>' +
+        '<div class="shop-jar" id="shopJar">' + jarSvg(Math.min(1, n / 30)) + '<span class="ready-total">' + pricePics(n, money) + '</span></div>' +
+      '</div>' +
+      '<div class="shop-grid" id="shopGrid">' + items + '</div>';
+    $('#shopBack').addEventListener('click', function () { A.Audio.sfx('tap'); closeShop(); });
+    A.$$('#shopGrid .shop-item').forEach(function (btn) {
+      btn.addEventListener('click', function () { tapShop(btn.getAttribute('data-id'), btn); });
+    });
+  }
+  function tapShop(id, btn) {
+    var it = S.shopItem(id); if (!it) return;
+    V.say([{ text: it.name }], { kind: 'prompt', bubble: false });
+    if (S.owned(P, id)) {
+      S.equip(P, id);
+      A.Store.save();
+      A.Audio.sfx('pop');
+      applyLooks();
+      renderShop();
+      return;
+    }
+    var r = S.buy(P, id);
+    if (!r.ok) {
+      btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake');
+      A.Audio.sfx('boing');
+      return;
+    }
+    A.Store.save();
+    A.Audio.sfx('star');
+    applyLooks();
+    renderShop();
+  }
+  function hideReady() {
+    var shop = $('#tipShop'); if (shop) shop.hidden = true;
+    var ready = $('#readyPane'); if (ready) ready.hidden = true;
+    document.body.classList.remove('stand-ready');
+  }
+  function openDay() {
+    hideReady();
+    start();
+  }
+
   function start() {
+    bindPayOnce();
+    applyLooks();
     G.plan = S.planDay(P, STORY ? { n: 4, rush: false } : {}); G.i = 0; G.tst = Date.now();
     $('#sunny').innerHTML = G.plan.sunny ? '☀️' : '⛅'; document.body.classList.toggle('sunnyday', !!G.plan.sunny); document.body.classList.toggle('tod', G.tod);
     A.Store.save();
     say(['ls_hello']).then(function () { nextCustomer(); });
   }
   A.HowTo.button('stand', '#sayBtn');   // quality1 (C3)
-  (A.PlayTime ? A.PlayTime.checkpoint() : Promise.resolve(true)).then(function (ok) { if (ok) A.HowTo.first('stand').then(start); });
-  window.__stand = { payRender: function () { renderPay(); }, walkOff: walkOff, undo: undo, tidy: tidy, G: G, P: function () { return P; }, S: S, next: nextCustomer, serve: serve, tapBin: function (id) { var b = A.$('#bins .bin[data-id="' + id + '"]'); if (b) tapBin(id, b); }, payAnswer: payAnswer, tipJar: tipJar, endDay: endDay, offerRush: offerRush, RUSH_MS: RUSH_MS, render: renderOrder, peek: peek };
+  (A.PlayTime ? A.PlayTime.checkpoint() : Promise.resolve(true)).then(function (ok) { if (ok) A.HowTo.first('stand').then(showReady); });
+  window.__stand = { payRender: function () { renderPay(); }, walkOff: walkOff, undo: undo, tidy: tidy, G: G, P: function () { return P; }, S: S, next: nextCustomer, serve: serve, tapBin: function (id) { var b = A.$('#bins .bin[data-id="' + id + '"]'); if (b) tapBin(id, b); }, payAnswer: payAnswer, tipJar: tipJar, endDay: endDay, offerRush: offerRush, RUSH_MS: RUSH_MS, render: renderOrder, peek: peek, showReady: showReady, showShop: showShop, closeShop: closeShop, openDay: openDay, applyLooks: applyLooks, looks: looks };
 })(window.Arcade);

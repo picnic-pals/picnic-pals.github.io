@@ -496,6 +496,35 @@ body.touchui .keys:not(.touch):not(.padkeys) { display: none !important; }
   .overlay.howto .howto-step { padding: 10px 6px 8px; }
   .overlay.howto.howto-pic .howto-art .he { font-size: 48px; }
 }
+/* Style A how-to: full-stage comic, caption in the empty strip, red Go starts the game. */
+html.stage-on .stage-scale > .overlay.howto-a {
+  position: absolute; inset: 0; z-index: 80;
+  margin: 0; padding: 0; background: transparent;
+  display: block; overflow: hidden;
+}
+.overlay.howto-a .howto-shot {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: fill; pointer-events: none; display: block;
+}
+.overlay.howto-a .howto-cap {
+  position: absolute; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0; padding: 0 14px; border: 0; background: transparent;
+  text-align: center; font: 800 15px/1.15 system-ui, sans-serif;
+  color: #382c52; overflow: hidden; cursor: pointer;
+}
+html[data-stage="landscape"] .overlay.howto-a .howto-cap { font-size: 22px; }
+.overlay.howto-a .howto-go {
+  position: absolute; z-index: 3;
+  border: 0; padding: 0; background: transparent; cursor: pointer;
+  border-radius: 50%;
+  /* 60px rendered, not 60 design-px, so phone stage-scale < 1 stays tappable. */
+  min-width: calc(60px / var(--stage-scale, 1));
+  min-height: calc(60px / var(--stage-scale, 1));
+}
+.overlay.howto-a .howto-go:focus-visible,
+.overlay.howto-a .howto-cap:focus-visible { outline: 3px solid #2a7a4a; outline-offset: 2px; }
+
 /* quality1 polish: game top bars style their buttons' font; the "?" keeps its own size */
 #howtoBtn.q1help, #s2Help.q1help { font-size: 34px; font-weight: 800; }
 @media (max-width: 600px) { #howtoBtn.q1help, #s2Help.q1help { font-size: 27px; } }
@@ -701,6 +730,13 @@ button, [role="button"], a, .tile, .opt, .kid, [data-nav], [data-game] {
 #howtoBtn.q1help, #s2Help.q1help, .q1help { width: 60px; height: 60px; }
 .iconbtn, #homeBtn.iconbtn { width: 60px; height: 60px; }
 
+html.stage-on .q1help, html.stage-on #howtoBtn, html.stage-on #s2Help {
+  width: max(60px, calc(60px / var(--stage-scale, 1)));
+  height: max(60px, calc(60px / var(--stage-scale, 1)));
+  min-width: max(60px, calc(60px / var(--stage-scale, 1)));
+  min-height: max(60px, calc(60px / var(--stage-scale, 1)));
+}
+
 /* v0.4 visual counting: dots stay large (12% of a frame's inner width), more frames not smaller dots. */
 .cv-set {
   --cv-d: clamp(22px, 4.4vw, 36px);
@@ -840,3 +876,8 @@ button, [role="button"], a, .tile, .opt, .kid, [data-nav], [data-game] {
 .g2-array i { width: 14px; height: 14px; border-radius: 50%; background: #b71c1c; }
 .g2-coins { display: inline-block; padding: 8px 12px; background: #fff8f0; border: 2px solid #5a3d8a; border-radius: 12px; font-weight: 700; color: #3b2d55; }
 .cv-arrive { display: inline-block; margin-left: 8px; padding: 6px 10px; border-radius: 12px; background: #e3f2fd; color: #0d47a1; font-weight: 700; }
+
+/* munch1118: card "Tap" cue uses Packer's pointing-hand art when no icon exists */
+.kh .pp-tap-hand, .kh .pp-icon, .kh .pp-emoji {
+  width: 28px; height: 28px; vertical-align: middle; display: inline-block; margin-right: 4px;
+}
