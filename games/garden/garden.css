@@ -11,7 +11,7 @@ html, body { margin: 0; height: 100%; background: #7ec6ea; color: #2d4a28; font:
 }
 .gd-header {
   display: flex; align-items: center; gap: 8px;
-  min-height: 60px; flex: none;
+  min-height: var(--tap, 60px); flex: none;
   position: relative; z-index: 3;
 }
 .gd-header h1 {
@@ -40,7 +40,7 @@ html, body { margin: 0; height: 100%; background: #7ec6ea; color: #2d4a28; font:
 .gd-header .speak:active, .gd-header .iconbtn:active { transform: translateY(3px); box-shadow: 0 1px 0 #3a6a3266; }
 
 .gd-action, .gd-choice, .gd-water, .gd-packet, .gd-spot {
-  min-width: 60px; min-height: 60px;
+  min-width: var(--tap, 60px); min-height: var(--tap, 60px);
   border: 3px solid #3a6a32; border-radius: 16px;
   background: #fffdf6; color: #2d4a28;
   font: 800 16px/1 system-ui, sans-serif;

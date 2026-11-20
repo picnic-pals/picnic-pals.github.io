@@ -74,7 +74,7 @@
           if (typeof ltrHtml === 'function') c.html = ltrHtml(c.label);
         });
       }
-      return { text: Q.text, pic: Q.pic || null, say: Q.say, listen: !!(Q.listen || r.listen), fact: good.fact, answer: arr.indexOf(good), target: r.target,
+      return { text: Q.text, pic: Q.pic || r.pic || null, say: Q.say, listen: !!(Q.listen || r.listen), cloze: !!(r.cloze || Q.cloze), fact: good.fact, answer: arr.indexOf(good), target: r.target,
         choices: arr.map(function (c) { return { label: c.label, html: c.html, say: c.name, k: c.k }; }) };
     };
   }
@@ -198,7 +198,7 @@
       return A.SightWords.mute({ text: '<span class="listen">Listen and find the word</span>', listen: true, hint: SIGHT_HINT, say: ['rule_sight', swLine(T)], target: T,
         good: function () { return mk(T); }, bad: function () { return mk(like.length && Math.random() < (L ? .55 : .3) ? pick(like) : pick(ok)); } }, pool, mk);
     } });
-  SK[5].ask = askFrom(SK[5].gen, function (r) { return r.cloze ? { text: r.text, say: [] } : { text: '<span class="listen">Listen and find the word</span>', listen: true, say: ['sw_find', swLine(r.target)] }; });
+  SK[5].ask = askFrom(SK[5].gen, function (r) { return r.cloze ? { text: r.text, listen: false, say: r.say || [] } : { text: '<span class="listen">Listen and find the word</span>', listen: true, say: ['sw_find', swLine(r.target)] }; });
 
   // concepts first (colors, shapes), then reading (letters, beginning sounds, rhymes, sight words); math order is unchanged
   SK.forEach(function (s) { C.register(s); });
@@ -231,7 +231,7 @@
     var at = atLevel(p, subj), s = at.skill, st = { level: at.level }, b = p.bonus || (p.bonus = { asked: 0, right: 0, recent: [] }), recent = b.recent || (b.recent = []), q, id, g = 0;
     do { q = A.Questions.make(s, st.level, { choices: A.Age.choices(p) }); id = 'skill:' + s.id + ':' + q.target + ':' + q.choices[q.answer].label; } while (recent.indexOf(id) >= 0 && g++ < 40);   // v2p1a: 40 tries (was 12): a kid's own-level skill can have a small pool
     recent.push(id); while (recent.length > 60) recent.shift();   // not the same question again soon
-    return { id: id, skill: s.id, level: st.level, cat: 'skill', d: 1, q: plain(q.text), line: null, parts: A.ReadAloud ? A.ReadAloud.auto(p, q) : q.say, partsAll: q.say, fact: q.fact || [], listen: !!q.listen, answer: q.answer,
+    return { id: id, skill: s.id, level: st.level, cat: 'skill', d: 1, q: plain(q.text), line: null, parts: A.ReadAloud ? A.ReadAloud.auto(p, q) : q.say, partsAll: q.say, fact: q.fact || [], listen: !!q.listen, cloze: !!q.cloze, pic: !!q.pic, answer: q.answer,
       choices: q.choices.map(function (c) { return { emoji: c.html || A.esc(c.label), text: c.label, hideText: true, parts: c.say || [c.label] }; }) };
   }
   BQ.pick = function (p, opt) {

@@ -96,7 +96,7 @@ body::before, body::after { display: none !important; content: none !important; 
   cursor: pointer;
 }
 .sr-secondary { background: #fff1cd; border-color: #dfc68f; box-shadow: 0 3px #dfc68f; color: #3a2714; }
-.sr-menu .sr-btn, .sr-menu .sr-secondary { min-height: 60px; }
+.sr-menu .sr-btn, .sr-menu .sr-secondary { min-height: var(--tap, 60px); }
 .sr-btn.lock, .sr-btn:disabled { opacity: 0.7; cursor: default; }
 .sr-btn .pp-icon { width: 32px; height: 32px; flex-shrink: 0; }
 
@@ -693,8 +693,8 @@ body::before, body::after { display: none !important; content: none !important; 
   overflow-wrap: anywhere;
   word-break: break-word;
 }
-.sr-fact { max-height: 56px; overflow: hidden; align-items: center; }
-.sr-fact .cv-set { --cv-d: 8px; }
+.sr-fact { max-height: none; overflow: visible; align-items: center; }
+.sr-fact .cv-set { --cv-d: 30px; }
 .sr-fact .pb-op, .sr-fact .sr-qmark { font-size: 22px; margin: 0 4px; }
 .sr-pics {
   grid-column: 1 / -1;
@@ -1196,7 +1196,7 @@ html:not(.stage-on) .sr-stands { min-height: 340px; }
 
 /* r10: portrait menu targets are at least 60px; phone qcard stays compact so the track can grow. */
 @media (orientation: portrait) {
-  .sr-menu .sr-btn, .sr-menu .sr-secondary { min-height: 60px; }
+  .sr-menu .sr-btn, .sr-menu .sr-secondary { min-height: var(--tap, 60px); }
   .sr-qcard { max-height: 34%; padding: 8px 10px 10px; }
   .sr-ask { font-size: 28px; }
   .sr-choices { margin-top: 0; }
@@ -1359,8 +1359,9 @@ html:not(.stage-on) .sr-stands { min-height: 340px; }
 
 /* stage2: keep the question card readable when viewport media queries would shrink it */
 html.stage-on .sr-ask { font-size: 32px; }
-html.stage-on .sr-fact { max-height: none; }
-html.stage-on .sr-fact .cv-set { --cv-d: 16px; }
+html.stage-on .sr-fact { max-height: none; overflow: visible; }
+html.stage-on .sr-fact .cv-set { --cv-d: 30px; }
+html.stage-on .sr-hintpic .cv-set { --cv-d: 30px; }
 html.stage-on .sr-hint, html.stage-on .sr-nudge { font-size: 20px; }
 
 
@@ -1379,9 +1380,9 @@ html.stage-on .sr-choice {
 /* Let the 1024x640 design track keep its default flex/min-height so --ts
    stays aligned with the road art (kartOnRoad). */
 html.stage-on[data-stage="landscape"] .sr-qcard {
-  padding: 4px 8px 4px;
+  padding: 2px 8px 0;
   max-height: none;
-  margin-top: -52px;
+  margin-top: -148px;
   position: relative;
   z-index: 3;
 }
@@ -1397,7 +1398,7 @@ html.stage-on[data-stage="landscape"] #racers {
   max-width: 100%;
   max-height: 100%;
   box-sizing: border-box;
-  padding-bottom: 16px;
+  padding-bottom: 4px;
 }
 
 html.stage-on[data-stage="landscape"] .sr-pics { margin: 0; gap: 2px; }
@@ -1406,7 +1407,35 @@ html.stage-on[data-stage="landscape"] .sr-pics .pp-emoji { width: 22px; height: 
 html.stage-on[data-stage="landscape"] .sr-pics .cv-set,
 html.stage-on[data-stage="landscape"] .sr-pics .cv-frame { height: 24px; --cv-d: 14px; transform: none; }
 html.stage-on[data-stage="landscape"] .sr-pics { max-height: 26px; overflow: hidden; }
-html.stage-on[data-stage="landscape"] .sr-choices { margin-top: 2px; margin-bottom: 0; }
+html.stage-on[data-stage="landscape"] .sr-fact,
+html.stage-on[data-stage="landscape"] .sr-pics.sr-fact,
+html.stage-on[data-stage="landscape"] .sr-hintpic {
+  max-height: none;
+  overflow: visible;
+  height: auto;
+}
+html.stage-on[data-stage="landscape"] .sr-fact .cv-set,
+html.stage-on[data-stage="landscape"] .sr-fact .cv-frame,
+html.stage-on[data-stage="landscape"] .sr-hintpic .cv-set {
+  height: auto;
+  --cv-d: 22px;
+  transform: none;
+}
+html.stage-on[data-stage="portrait"] .sr-qcard {
+  max-height: 48%;
+  overflow: hidden;
+}
+html.stage-on .sr-qcard.hinting { max-height: 48%; overflow: hidden; }
+html.stage-on[data-stage="landscape"] #racers { position: relative; overflow: hidden; }
+html.stage-on[data-stage="landscape"] .sr-qcard { padding-bottom: 110px; }
+html.stage-on[data-stage="landscape"] .sr-choices {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 16px;
+  margin: 0;
+  z-index: 4;
+}
 html.stage-on[data-stage="landscape"] .sr-qcard { gap: 2px; }
 html.stage-on[data-stage="landscape"] .sr-who, html.stage-on[data-stage="landscape"] .sr-qwho { margin: 0; }
 
@@ -1507,7 +1536,7 @@ html.stage-on[data-stage="landscape"] .sr-menu {
   grid-template-rows: auto 1fr auto;
   align-items: stretch;
   overflow: auto;
-  gap: 8px;
+  gap: 4px;
 }
 html.stage-on[data-stage="landscape"] .sr-menu .sr-preview {
   grid-column: 1;
@@ -1525,17 +1554,17 @@ html.stage-on[data-stage="landscape"] .sr-menu > .sr-panel:not(.sr-preview):not(
   grid-column: 2;
   grid-row: 1;
   min-width: 0;
-  padding: 8px 12px;
+  padding: 4px 10px;
 }
-html.stage-on[data-stage="landscape"] .sr-menu .sr-lead { font-size: 22px; margin: 0; }
-html.stage-on[data-stage="landscape"] .sr-menu .sr-sub { font-size: 16px; margin: 2px 0 0; }
+html.stage-on[data-stage="landscape"] .sr-menu .sr-lead { font-size: 20px; margin: 0; }
+html.stage-on[data-stage="landscape"] .sr-menu .sr-sub { font-size: 14px; margin: 0; }
 html.stage-on[data-stage="landscape"] .sr-menu > .sr-actions {
   grid-column: 2;
   grid-row: 2;
   flex-direction: row;
   flex-wrap: wrap;
   align-content: start;
-  gap: 8px;
+  gap: 4px;
   min-width: 0;
 }
 html.stage-on[data-stage="landscape"] .sr-menu > .sr-actions .sr-btn,
@@ -1549,12 +1578,12 @@ html.stage-on[data-stage="landscape"] .sr-menu > .sr-actions .sr-secondary {
 html.stage-on[data-stage="landscape"] .sr-menu > .sr-panel:last-child {
   grid-column: 1 / -1;
   grid-row: 3;
-  padding: 8px 12px;
+  padding: 4px 10px;
 }
 html.stage-on[data-stage="landscape"] .sr-menu > .sr-panel:last-child .sr-actions {
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 4px;
 }
 html.stage-on[data-stage="landscape"] .sr-menu > .sr-panel:last-child .sr-btn,
 html.stage-on[data-stage="landscape"] .sr-menu > .sr-panel:last-child .sr-secondary {

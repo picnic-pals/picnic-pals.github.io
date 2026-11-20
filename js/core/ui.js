@@ -145,7 +145,7 @@
     var C = A.Curriculum, K = A.Coach, Q = A.Questions, top = skill.levels.length - 1, n = K.PLACE_N, score = 0, i = 0;
     function one() {
       return new Promise(function (resolve) {
-        var q = Q.make(skill, top, { choices: 3, profile: P });
+        var q = Q.make(skill, top, { choices: A.Age && A.Age.choices ? A.Age.choices(P) : 4, profile: P });
         var ov = A.el('<div class="overlay on placement-card" role="dialog" aria-modal="true" aria-label="Quick check"><div class="card">' +
           '<span class="tag">Warm-up game · ' + (i + 1) + ' of ' + n + '</span><div class="pc-dots">' + Array.apply(null, Array(n)).map(function (_, k) { return '<i class="' + (k < i ? 'done' : k === i ? 'now' : '') + '"></i>'; }).join('') + '</div>' +
           UI.askHtml(q) +
@@ -193,7 +193,7 @@
     var n = api.n;
     function one(it) {
       return new Promise(function (resolve) {
-        if (S) S.ctx.p = P; var q = Q.make(it.skill, it.level || 0, { choices: 3, profile: P });
+        if (S) S.ctx.p = P; var q = Q.make(it.skill, it.level || 0, { choices: A.Age && A.Age.choices ? A.Age.choices(P) : 4, profile: P });
         var ov = A.el('<div class="overlay on placement-card" role="dialog" aria-modal="true" aria-label="Warm-up"><div class="card">' +
           '<span class="tag">Warm-up</span><div class="pc-dots">' + Array.apply(null, Array(n)).map(function (_, k) { return '<i class="' + (k < i ? 'done' : k === i ? 'now' : '') + '"></i>'; }).join('') + '</div>' +
           UI.askHtml(q) +

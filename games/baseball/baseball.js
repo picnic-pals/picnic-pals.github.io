@@ -396,6 +396,7 @@
   $('#starCount').textContent = P1.stars;
 
   /* ---------- the pitch: question + answer cards ---------- */
+  function wordFact(q) { return !!(q && q.fact && q.fact.length && (q.listen || q.cloze || q.pic || q.fact[0] === "sw_that_says" || q.fact[0] === "w_thats")); }
   function newQuestion() {
     // her coached level; now and then (never right after a miss) a STRETCH pitch. Stretch odds follow her recent at-level
     // answers (R.stretchRate: more when cruising, fewer when it's hard). A stretch is the coach's idea of "tricky": the
@@ -779,10 +780,10 @@
     // v2p1a: every scoreboard question shows the score as a picture (a dot per run, in rows of 5 next to the number) and uses short words
     if (A.Age.preReader(P1)) return Promise.resolve();   // lc1115: pre-K stays off the scoreboard (no runner/score questions)
     if (them === me && A.Learn && A.Learn.sluggerKinds && A.Learn.sluggerKinds(P1).indexOf('bb_tied') < 0) return Promise.resolve();   // quality1: below her band
-    if (them === me) { var add = A.rnd(1, 3), c1 = choiceSet(me + add, n, 0, 30); return ask({ kind: 'tied', text: 'You have ' + me + '. You get ' + add + ' more. How many now?', pic: sbPic([['me', me, false, add]]), spoken: 'You have ' + me + '. You get ' + add + ' more. How many now?', choices: c1, answer: c1.indexOf(me + add), explain: me + ' + ' + add + ' = ' + (me + add) + '.', tag: tag }); }
+    if (them === me) { var add = A.rnd(1, 3), c1 = choiceSet(me + add, n, 0, 30); return ask({ kind: 'tied', text: 'You have ' + me + ' runs. You get ' + add + ' more. How many runs now?', pic: sbPic([['me', me, false, add]]), spoken: 'You have ' + me + ' runs. You get ' + add + ' more. How many runs now?', choices: c1, answer: c1.indexOf(me + add), explain: me + ' + ' + add + ' = ' + (me + add) + '.', tag: tag }); }
     var win = Math.random() < .5, need = them - me + (win ? 1 : 0), c2 = choiceSet(need, n, 1, 30);
-    var toWinTxt = 'How many more runs to ' + (win ? '<b>win</b>' : '<b>tie</b>') + '?';
-    var toWinSay = 'The Sprouts have ' + them + '. You have ' + me + '. How many more runs to ' + (win ? 'win' : 'tie') + '?';
+    var toWinTxt = 'How many more runs do you need to ' + (win ? '<b>win</b>' : '<b>tie</b>') + '?';
+    var toWinSay = 'The Sprouts have ' + them + ' runs. You have ' + me + ' runs. How many more runs do you need to ' + (win ? 'win' : 'tie') + '?';
     return ask({ kind: win ? 'towin' : 'totie', text: toWinTxt, pic: sbPic([['riv', them], ['me', me]]), spoken: toWinSay, choices: c2, answer: c2.indexOf(need), explain: win ? (them - me) + ' more ties it. 1 more wins: ' + need + '.' : me + ' + ' + need + ' = ' + them + '. A tie!', tag: tag });
   }
   // v2p1a: a little scoreboard picture. rows: [who ('riv' | 'me'), runs, hideNumber, extra runs drawn as new dots]
@@ -829,7 +830,7 @@
         var voice = [HITLINE[z.k]];
         if (z.k === 'hr' && loaded) voice = ['bb_grand_slam'];
         if (ad.runs === 1 && z.k !== 'hr') voice.push('bb_run_scores'); else if (ad.runs >= 2) voice.push(ad.runs, 'bb_runs_score');
-        var vp = bq === 'where' ? Promise.resolve() : sayWaitMix([[q && q.listen && q.fact ? q.fact : [], 'listen'], [voice, 'chatter']], 4500, { bubble: false });
+        var vp = bq === 'where' ? Promise.resolve() : sayWaitMix([[wordFact(q) ? q.fact : [], 'listen'], [voice, 'chatter']], 4500, { bubble: false });
         if (z.k === 'hr') { crowd(true, true); fireworks(6); M.charge(); UI.rain(40); A.Pad.rumble(G.half, 'big'); } else if (z.k !== 'sg' || ad.runs) crowd(true, false);
         return Promise.all([flight, ad.done, vp]).then(function () { return wait(250); }).then(function () {
           if (bq === 'after' && !G.over) return runQuestion(z, ad.plan, false, pre);

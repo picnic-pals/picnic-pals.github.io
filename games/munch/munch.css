@@ -8,7 +8,7 @@
 .rule .txt .hint { font-size: 16px; }
 .rule.pop { animation: rpop .4s; }
 @keyframes rpop { 40% { transform: scale(1.02); } }
-.speak { width: 56px; height: 56px; flex: none; border-radius: 50%; background: var(--sky2); display: grid; place-items: center; box-shadow: 0 4px 0 #b6d8f5; }
+.speak { width: var(--tap, 60px); height: var(--tap, 60px); min-width: var(--tap, 60px); min-height: var(--tap, 60px); flex: none; border-radius: 50%; background: var(--sky2); display: grid; place-items: center; box-shadow: 0 4px 0 #b6d8f5; }
 .speak:active { transform: translateY(3px); box-shadow: 0 1px 0 #b6d8f5; }
 .speak svg { width: 32px; height: 32px; }
 .speak.talking svg { animation: pulse .5s ease-in-out infinite alternate; }
@@ -100,7 +100,7 @@ body.touchui .keys.touch { display: flex !important; } body.touchui #munchBtn .k
 .card .modes { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 4px 0 12px; }
 .ready .card .art { width: clamp(150px, 30vmin, 240px); height: clamp(150px, 30vmin, 240px); }
 
-@media (max-height: 560px) { .top { min-height: 52px; } .rule { min-height: 52px; padding: 4px 8px 4px 14px; } .speak { width: 46px; height: 46px; } .bottom { min-height: 60px; } .hearts svg { width: 28px; height: 28px; } .keys { min-height: 24px; font-size: 14px; } }
+@media (max-height: 560px) { .top { min-height: 52px; } .rule { min-height: 52px; padding: 4px 8px 4px 14px; } .speak { width: var(--tap, 60px); height: var(--tap, 60px); min-width: var(--tap, 60px); min-height: var(--tap, 60px); } .bottom { min-height: 60px; } .hearts svg { width: 28px; height: 28px; } .keys { min-height: 24px; font-size: 14px; } }
 @media (max-width: 700px) { .keys .grp:last-child { display: none; } }
 
 /* ================= v3: timer, music button, bonus, two players, story, cutscenes ================= */
@@ -148,7 +148,7 @@ body.notimer .timer { display: none !important; }
 .bonusq .card { max-width: 860px; position: relative; }
 .bonusq .tag { background: #fff0b3; }
 .bonusq .qq { font-size: clamp(26px, 5.4vmin, 46px); color: var(--ink); text-shadow: none; margin: 10px 0 14px; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
-.speak.sm { width: 46px; height: 46px; font-size: 22px; }
+.speak.sm { width: var(--tap, 60px); height: var(--tap, 60px); min-width: var(--tap, 60px); min-height: var(--tap, 60px); font-size: 22px; }
 .bonusq .mini.who { position: absolute; left: 16px; top: 12px; width: 60px; height: 60px; }
 .choices { display: grid; gap: 14px; grid-template-columns: repeat(4, 1fr); }
 .choices.n3 { grid-template-columns: repeat(3, 1fr); }
@@ -544,7 +544,7 @@ html.stage-on[data-stage="portrait"] .bubble .msg { white-space: normal; overflo
 html.stage-on[data-stage="portrait"] .keys { min-height: 24px; font-size: 14px; }
 html.stage-on[data-stage="portrait"] .keys .grp:last-child { display: none; }
 html.stage-on[data-stage="portrait"] body.two .keys .grp:last-child { display: flex; }
-html.stage-on[data-stage="portrait"] .speak { width: 46px; height: 46px; }
+html.stage-on[data-stage="portrait"] .speak { width: var(--tap, 60px); height: var(--tap, 60px); min-width: var(--tap, 60px); min-height: var(--tap, 60px); }
 html.stage-on[data-stage="portrait"] .hearts svg { width: 28px; height: 28px; }
 html.stage-on[data-stage="portrait"] #munchBtn { font-size: 24px; }
 

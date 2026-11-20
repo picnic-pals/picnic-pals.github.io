@@ -72,7 +72,7 @@ body::before, body::after { display: none !important; content: none !important; 
 .ff-footer { display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;text-align:center;min-height:0; }
 .ff-footer p { margin:0;font-size:clamp(15px,2.7vw,20px);line-height:1.15; }
 .ff-progress { font-size:14px;font-weight:700;color:#2a1b0c; }
-.ff-action,.ff-secondary { display:block;border-radius:17px;padding:9px 26px;min-height:48px;min-width:48px;max-width:100%;font-size:clamp(19px,3.5vw,25px);font-weight:600;background:#b9ded1;color:#3c594e;border:2px solid #87b9a6;box-shadow:0 3px #87b9a6; }
+.ff-action,.ff-secondary { display:block;border-radius:17px;padding:9px 26px;min-height:max(60px, var(--tap, 60px));min-width:max(60px, var(--tap, 60px));max-width:100%;font-size:clamp(19px,3.5vw,25px);font-weight:600;background:#b9ded1;color:#3c594e;border:2px solid #87b9a6;box-shadow:0 3px #87b9a6;box-sizing:border-box; }
 .ff-secondary { background:#fff1cd;border-color:#dfc68f;box-shadow:0 3px #dfc68f; }
 .ff-picker { display:flex;justify-content:center;gap:12px; }
 .ff-pick { min-width:58px;min-height:48px;touch-action:manipulation;background:#fff8e6;border:2px solid #bd9566;border-radius:13px;font-size:26px; }

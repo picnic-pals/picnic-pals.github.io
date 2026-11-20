@@ -64,7 +64,7 @@
       <div class="nkl">3. Pick a backdrop color</div><div class="opts" id="nkColor"></div>
       <button type="button" class="chipbtn" id="nkGrownup">Grown-up options</button>
       <div id="nkGrownupPanel" hidden>
-        <div class="nkl small">Age (optional, for grown-ups: age 2 gets Tiny Picnic, a no-fail toddler game; 4 and under get Gentle Munch, with no hearts and no timer)</div><div class="ages" id="nkAge"></div>
+        <div class="nkl small">Age (optional, for grown-ups: age 2 gets Tiny Picnic, a no-fail toddler game; under 5 get Gentle Munch, with no hearts and no timer)</div><div class="ages" id="nkAge"></div>
         <div class="nkl small">Levels (optional, for grown-ups: where each subject starts; Auto = by age)</div><div class="nklv" id="nkLv"></div><div class="nkl small nkstart" id="nkStart" aria-live="polite"></div>
       </div>
       <button class="bigbtn mint" id="nkGo" data-nav>✓ Make my player</button>
@@ -76,7 +76,7 @@
 <section class="screen hub" id="mode">
   <div class="topbar modetop">
     <button class="backbtn" data-nav id="modeBack" aria-label="Back to who's playing">◀ Back</button>
-    <button class="me" id="modeMe" data-nav aria-label="Switch player"><span class="av" id="modeAv"></span><span><span class="hi" id="modeHi"></span><small>Tap to switch player</small></span></button>
+    <button class="me" id="modeMe" data-nav aria-label="Switch player"><span class="av" id="modeAv"></span><span><span class="hi" id="modeHi"><span class="hi-pre">Hi, </span><span class="hi-name"></span></span><small>Tap to switch player</small></span></button>
     <div class="starchip" aria-label="Stars"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg><span id="modeStars">0</span></div>
   </div>
   <h2 class="modeq">What do you want to play?</h2>
@@ -90,7 +90,7 @@
 <section class="screen hub scroll" id="games">
   <div class="topbar">
     <button class="backbtn" data-nav id="gamesBack" aria-label="Back to Story or Free Play">◀ Back</button>
-    <button class="me" id="meBtn" data-nav aria-label="Switch player"><span class="av" id="meAv"></span><span><span class="hi" id="meHi"></span><small>Tap to switch player</small></span></button>
+    <button class="me" id="meBtn" data-nav aria-label="Switch player"><span class="av" id="meAv"></span><span><span class="hi" id="meHi"><span class="hi-pre">Hi, </span><span class="hi-name"></span></span><small>Tap to switch player</small></span></button>
     <div class="starchip" aria-label="Stars"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg><span id="meStars">0</span></div>
     <div class="goal" id="goal"></div>
     <div class="nextgoal" id="nextGoal"></div>
@@ -119,7 +119,7 @@
 <section class="screen hub scroll" id="closet">
   <div class="topbar"><button class="backbtn" data-back data-nav>◀ Done</button></div>
   <div class="closet">
-    <div class="preview"><div class="big jump" id="prevBig"></div><div class="bn" id="prevName"></div><div class="bl" id="prevLooks"></div></div>
+    <div class="preview"><div class="big jump" id="prevBig"></div><div class="bn" id="prevName"></div><div class="closet-hi" id="closetHi" hidden></div><div class="bl" id="prevLooks"></div></div>
     <div class="racks scroll">
       <div class="rack"><h3>Pick your friend</h3><div class="opts" id="optBlob"></div></div>
       <div class="rack"><h3>Backdrop color</h3><div class="opts" id="optColor"></div></div>

@@ -36,6 +36,12 @@
     root.style.setProperty('--stage-scale', String(scale));
     root.style.setProperty('--stage-ox', ox + 'px');
     root.style.setProperty('--stage-oy', oy + 'px');
+    // Keep tappable chrome at ~60px on the real screen after the stage scales down (phone landscape).
+    var tap = (scale > 0 && scale < 1) ? Math.ceil(60 / scale) : 60;
+    if (tap > 100) tap = 100;
+    if (tap < 60) tap = 60;
+    root.style.setProperty('--tap', tap + 'px');
+    root.style.setProperty('--tap-screen', (tap * scale) + 'px');
     var size = { w: d.w, h: d.h, scale: scale, ox: ox, oy: oy, vw: vp.w, vh: vp.h, orient: root.dataset.stage };
     try { window.dispatchEvent(new Event('resize')); } catch (err) {}
     fitting = false;

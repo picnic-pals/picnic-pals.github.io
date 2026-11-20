@@ -312,7 +312,7 @@
   }
   function friendPanel() {
     busy = true; var list = S2.heroes(P);
-    var ov = A.el('<div class="overlay on s2-friends" role="dialog" aria-modal="true" aria-label="Pick your friend"><div class="card"><h2>Who is the hero?</h2><p class="sub">Each friend keeps their own story.</p><div class="s2-fl"></div><button class="bigbtn" data-keep>Keep going ▶</button></div></div>');
+    var ov = A.el('<div class="overlay on s2-friends" role="dialog" aria-modal="true" aria-label="Pick your friend"><div class="card"><h2>Who is the hero?</h2><p class="sub">Your story stays with you. This is who you play as.</p><div class="s2-fl"></div><button class="bigbtn" data-keep>Keep going ▶</button></div></div>');
     list.forEach(function (h) { var b = A.el('<button class="s2-fr' + (h.active ? ' on' : '') + '" data-id="' + h.id + '"><img alt="" src="' + img(h.id, 'happy') + '"><span>' + A.esc(h.name) + '</span>' + (h.active ? '<i>playing</i>' : '') + '</button>');
       b.addEventListener('click', function () { pick(h.id); }); ov.querySelector('.s2-fl').appendChild(b); });
     var shut = function () { ov.remove(); busy = false; if (A.UI) A.UI.cardOpen = !!document.querySelector('.overlay.on'); };

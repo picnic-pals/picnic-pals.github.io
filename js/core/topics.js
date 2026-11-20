@@ -16,15 +16,47 @@
   var BN = { T: 0, P: 1, E: 2 }, THEMES = [], RULE = { min: 8, acc: .8, days: 1 };
   function rnd(n) { return Math.floor(Math.random() * n); }
   function esc(s) { return A.esc ? A.esc(s) : String(s); }
-  function pic(e, word) {
+  function pic(e, word, size) {
     if (!e) return '';
-    if (A.Icons) return A.Icons.html(e, { word: word || '', size: 64, decorative: true, cls: 'tp-pic', context: 'quiz' });
+    if (A.Icons) return A.Icons.html(e, { word: word || '', size: size || 64, decorative: true, cls: 'tp-pic', context: 'quiz' });
     return e;
   }
+  var WORD_PIC = {
+    mammal: '🐬', reptile: '🦎', insect: '🐛', amphibian: '🐸', rainforest: '🌳', antarctica: '🐧',
+    hummingbird: '🐦', penguin: '🐧', cheetah: '🐆', turtle: '🐢', elephant: '🐘', dolphin: '🐬',
+    whale: '🐋', shark: '🦈', goldfish: '🐟', salmon: '🐟', eagle: '🦅', owl: '🦉',
+    sphere: '⚪', cube: '🎲', cone: '🍦', cylinder: '🥫', pyramid: '🔺',
+    octagon: 'octagon', hexagon: 'hexagon', pentagon: 'pentagon', triangle: 'triangle',
+    winter: '❄️', summer: '☀️', spring: '🌸', autumn: '🍂', fall: '🍂',
+    january: '❄️', february: '❄️', december: '❄️', july: '☀️',
+    lightning: '⚡', temperature: '🌡️'
+  };
+  function picKey(c) {
+    if (c && c.e) return c.e;
+    var w = String((c && (c.w || c.raw)) || '').trim(), low = w.toLowerCase();
+    if (WORD_PIC[low]) return WORD_PIC[low];
+    if (A.Icons && ((A.Icons.has && A.Icons.has(w)) || (A.Icons.resolve && A.Icons.resolve(w, { context: 'quiz' })))) return w;
+    return '';
+  }
   function cellHtml(c, b) {
-    if (b === 'T') return '<span class="tp-emo">' + pic(c.e, c.w) + '</span>';
-    if (b === 'P') return c.e ? '<span class="tp-emo">' + pic(c.e, c.w) + '</span>' + (c.w && c.w !== c.e ? '<span class="tp-w">' + esc(c.w) + '</span>' : '') : '<span class="tp-w only">' + esc(c.w) + '</span>';
+    var e = picKey(c);
+    if (b === 'T') return '<span class="tp-emo">' + pic(e || c.e, c.w) + '</span>';
+    if (b === 'P') return (e || c.e) ? '<span class="tp-emo">' + pic(e || c.e, c.w) + '</span>' + (c.w && c.w !== (e || c.e) ? '<span class="tp-w">' + esc(c.w) + '</span>' : '') : '<span class="tp-w only">' + esc(c.w) + '</span>';
+    // E-band: word tile plus a small picture when one exists (F62, e.g. dolphin beside "mammal")
+    if (e) return '<span class="tp-wordtile">' + '<span class="tp-emo tp-e">' + pic(e, c.w, 36) + '</span>' + '<span class="tp-w">' + esc(c.w || c.raw) + '</span></span>';
     return '<span class="tp-w only">' + esc(c.w || c.raw) + '</span>';
+  }
+  var SOUND_CUE = {
+    b: { word: 'bee', e: '🐝' }, s: { word: 'snake', e: '🐍' }, m: { word: 'muffin', e: '🧁' },
+    k: { word: 'cookie', e: '🍪' }, d: { word: 'duck', e: '🦆' }, f: { word: 'frog', e: '🐸' },
+    p: { word: 'pretzel', e: '🥨' }, t: { word: 'taco', e: '🌮' }, h: { word: 'heart', e: '❤️' },
+    r: { word: 'rabbit', e: '🐰' }
+  };
+  function slashCue(q) {
+    var m = String(q || '').match(/Which starts with \/([a-z])\/?\??/i);
+    if (!m) return null;
+    var ch = m[1].toLowerCase(), cue = SOUND_CUE[ch];
+    return cue ? { ch: ch, word: cue.word, e: cue.e } : null;
   }
   function say(c) { return c.say ? [c.say] : c.w ? [c.w] : []; }
   function topicItem(stepDef) {
@@ -34,8 +66,15 @@
       if (st) { last.push(i); st.tpLast = last.slice(-Math.min(5, items.length - 2)); }
       var it = items[i], b = stepDef.band, map = { a: it.ans }; it.wrong.forEach(function (w, k) { map['w' + k] = w; });
       var qWord = /\brobin\b/i.test(it.q) ? 'robin' : /\bcheetah\b/i.test(it.q) ? 'cheetah' : '';
-      var qtxt = esc(it.q) + (it.qe && b !== 'E' ? '<span class="tp-qe">' + pic(it.qe, qWord) + '</span>' : it.qe ? ' <span class="tp-qe">' + pic(it.qe, qWord) + '</span>' : '');
-      return { key: stepDef.id + '#' + i, ans: 'a', wrong: Object.keys(map).filter(function (k) { return k !== 'a'; }), text: '<span class="tp-q">' + qtxt + '</span>', say: [it.say], pictures: b !== 'E',
+      var slash = slashCue(it.q), qtxt;
+      if (slash) {
+        // F38: never show /b/ slash prompts. A cue picture (not the answer) plus its letter does the work with sound off.
+        var cueAsk = 'Which picture starts like ' + slash.word + '?';
+        qtxt = esc(cueAsk) + '<span class="tp-qe tp-cue">' + pic(slash.e, slash.word) + '<span class="tp-cue-letter">' + esc(slash.ch.toUpperCase()) + '</span></span>';
+      } else {
+        qtxt = esc(it.q) + (it.qe && b !== 'E' ? '<span class="tp-qe">' + pic(it.qe, qWord) + '</span>' : it.qe ? ' <span class="tp-qe">' + pic(it.qe, qWord) + '</span>' : '');
+      }
+      return { key: stepDef.id + '#' + i, ans: 'a', wrong: Object.keys(map).filter(function (k) { return k !== 'a'; }), text: '<span class="tp-q">' + qtxt + '</span>', say: slash ? [{ id: it.say, text: 'Which picture starts like ' + slash.word + '?' }] : [it.say], pictures: b !== 'E' || !!slash,
         cell: function (v) { var c = map[v]; return { label: c.w || c.raw, html: cellHtml(c, b), fact: v === 'a' ? say(c).concat(it.factSay && b !== 'E' ? [it.factSay] : []) : say(c) }; },
         // hints after a miss: 1 = look again (the question's picture, the fact if there is one), 2 = the answer shown
         hint: function (l) { var a = it.ans;

@@ -10,7 +10,7 @@ body { background: linear-gradient(#fff8ef, #ffeaf3); margin: 0; overflow: hidde
 .homebtn .holdtip { position: absolute; left: 56px; top: 10px; white-space: nowrap; font-size: 14px; background: #fff; color: #4a3b6b; padding: 4px 10px; border-radius: 12px; opacity: 0; transition: opacity .3s; pointer-events: none; }
 .homebtn.hint .holdtip { opacity: 1; }
 .ctitle { font-size: clamp(20px, 3.6vmin, 34px); font-weight: 800; color: #3b2d55; }
-.cbtn { min-height: 52px; padding: 0 16px; border: 0; border-radius: 28px; background: #fff; color: #3b2d55; font: inherit; font-size: 18px; font-weight: 800; box-shadow: 0 4px 0 #f0d9e4; cursor: pointer; }
+.cbtn { min-height: max(60px, var(--tap, 60px)); min-width: max(60px, var(--tap, 60px)); padding: 0 16px; border: 0; border-radius: 28px; background: #fff; color: #3b2d55; font: inherit; font-size: 18px; font-weight: 800; box-shadow: 0 4px 0 #f0d9e4; cursor: pointer; box-sizing: border-box; }
 .cbtn.big { min-height: 56px; font-size: 22px; background: linear-gradient(#7be38f, #3ec46a); color: #fff; box-shadow: 0 5px 0 #2a9a4f; }
 .cbtn.done { animation: cSaved .9s ease; } @keyframes cSaved { 30% { transform: scale(1.12) rotate(-4deg); } 60% { transform: scale(.96); } }
 .cview { display: none; flex: 1; min-height: 0; min-width: 0; } .cview.on { display: flex; }
@@ -50,7 +50,7 @@ body { background: linear-gradient(#fff8ef, #ffeaf3); margin: 0; overflow: hidde
 
 @media (max-width: 760px), (max-height: 500px) {
   .cbtn span { display: none; }
-  .cbtn { min-height: 48px; min-width: 48px; padding: 0 12px; }
+  .cbtn { min-height: max(60px, var(--tap, 60px)); min-width: max(60px, var(--tap, 60px)); padding: 0 12px; }
   .cbtn.big { min-height: 52px; min-width: 56px; }
   .garr { width: 64px; height: 64px; }
   .tbar { min-height: 44px; }

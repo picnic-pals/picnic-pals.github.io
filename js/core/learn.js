@@ -419,7 +419,9 @@
           // batch1: she is finding this subject hard lately (under 60% first try): the stop uses a skill she has earned in her band
           else if (fitOf(p, subj) === 'ease' && !(ast && ast.status === 'mastered')) { var er = earnedTop(p, subj); if (er.length) { var e0 = er[(i || 0) % er.length]; c.skill = e0.id; c.level = lowestLevelInBand(e0, floor(p, subj)); c.lowered = true; c.eased = true; } } }
       }
-      return capStorySkill(p, c, i);
+      c = capStorySkill(p, c, i);
+      if (A.Story2 && A.Story2.applyBossHarder) c = A.Story2.applyBossHarder(p, i, c);
+      return c;
     };
   }
   // lc1115b: Story first stops follow the child's in-band skill and never open pre-K on count-to-30

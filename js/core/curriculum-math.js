@@ -94,7 +94,7 @@
       var filled = 0;
       inner = L.frames.map(function (fr, i) {
         filled += fr.filled || 0;
-        var cap = (fr.filled === (fr.cells || 10) && (fr.cells || 10) === 10) ? String(filled) : ('+' + (fr.filled || 0));
+        var cap = (fr.filled === (fr.cells || 10) && (fr.cells || 10) === 10) ? String(filled) : ('+ ' + (fr.filled || 0));
         return '<span class="cv-framewrap">' + cvFrame(fr, opt) + '<span class="cv-flab">' + cap + '</span></span>';
       }).join('');
     }
@@ -289,8 +289,8 @@
     var food = f.id;
     if (op === '+' && kind === 0) { text = P.name + ' found ' + a + ' ' + food + ' in the picnic basket and ' + b + ' more under the blanket. How many ' + food + '?';
       say = [P.part, 'wp_found', a, 'wp_f_' + food, 'wp_in_basket_and', b, 'wp_more_blanket', 'wp_how_many', 'wp_f_' + food]; }
-    else if (op === '+') { text = a + ' food friends sat on the picnic blanket. ' + b + ' more came to the picnic. How many food friends are there now?'; f = { id: 'friends', em: '🍓' };
-      say = [a, 'wp_friends_sat', b, 'wp_more_came', 'wp_how_many_friends']; }
+    else if (op === '+') { text = a + ' ' + food + ' sat on the picnic blanket. ' + b + ' more came to the picnic. How many ' + food + ' are there now?';
+      say = [a, 'wp_f_' + food, { id: 'wp_friends_sat_named', text: 'sat on the picnic blanket.' }, b, 'wp_more_came', 'wp_how_many', 'wp_f_' + food]; }
     else if (kind === 0) { text = P.name + ' had ' + a + ' ' + food + ' in the picnic basket. ' + P.name + ' ate ' + b + '. How many ' + food + ' are left?';
       say = [P.part, 'wp_had', a, 'wp_f_' + food, 'wp_in_basket', P.part, 'wp_ate', b, 'wp_how_many', 'wp_f_' + food, 'wp_left']; }
     else { text = 'There were ' + a + ' ' + food + ' on the blanket. ' + P.name + ' took ' + b + ' away. How many ' + food + ' are left?';
@@ -301,7 +301,7 @@
     function foodsOf(n) { return A.CountVisual ? A.CountVisual.html(n, foodOpt) : Array(Math.min(n, 20) + 1).join(f.em); }
     var pic = '<span class="wp-pic" aria-hidden="true">' + (petIcon ? '<span class="pet">' + petIcon + '</span>' : '') +
       (op === '+' ? foodsOf(a) + '<i class="pb-op">+</i>' + foodsOf(b) : foodsOf(a)) + '</span>';
-    return { text: '<span class="wp-text">' + A.esc(text) + '</span>', plain: text, pic: pic, hint: 'Draw the story: make a dot for each one, then ' + (op === '+' ? 'put them together.' : 'cross out the ones that go away.'), say: say, story: true,
+    return { text: '<span class="wp-text">' + A.esc(text) + '</span>', plain: text, pic: pic, hint: (op === '+' && ans > 10 ? ('Make 10, then add the rest. ' + a + ' + ' + b + '.') : (op === '+' ? ('Start at ' + a + ' and count on ' + b + ' more.') : ('Start at ' + a + ' and take away ' + b + '.'))), say: say, story: true,
       wp: { a: a, b: b, op: op, ans: ans, food: f.id, em: f.em, text: text, pet: P.name },
       good: function () { return mk(ans); },
       bad: function () { var r = Math.random(), v; if (r < .3 && wrongOp !== ans && wrongOp <= max + 10 && wrongOp >= 0) return mk(wrongOp); do { v = ans + pick([-2, -1, 1, 2, 3]); } while (v < 0 || v === ans); return mk(v); } };
@@ -315,13 +315,20 @@
       intro: { line: 'skill_count10', example: '<b>7</b> &nbsp;=&nbsp; ' + frame(7) },
       gen: function (L) {
         var N = L ? rnd(4, 10) : rnd(1, 5), max = L ? 10 : 6;
+        function littleP() {
+          var p = null;
+          try { p = (A.Steps && A.Steps.ctx && A.Steps.ctx.p) || (A.Store && A.Store.active && A.Store.active()); } catch (e) {}
+          if (!p || p.age == null || p.age === '' || isNaN(+p.age)) return true;   // no / unknown age stays pre-K: no written sums
+          return +p.age < 5;
+        }
+        var sums = !!(L && !littleP());   // written a + b tiles are for kindergarten and up
         function mk(v) { var dots = v > 0 && Math.random() < (L ? .35 : .5); return { label: String(v), html: dots ? frame(v) : null, fact: v !== N ? ['w_thats', v, 'w_not', N] : ['w_thats', v] }; }
-        // qbatch-1107: same value, different look (numeral, ten-frame, and at level 1 a + b), so targets are not all copies of one numeral
+        // qbatch-1107: same value, different look (numeral, ten-frame, and at K+ a + b), so targets are not all copies of one numeral
         var gi = 0;
-        function goodN() { var k = gi++ % (L ? 3 : 2); if (k === 0) return { label: String(N), fact: ['w_thats', N] }; if (k === 1) return { label: String(N), html: frame(N), fact: ['w_thats', N] };
+        function goodN() { var k = gi++ % (sums ? 3 : 2); if (k === 0) return { label: String(N), fact: ['w_thats', N] }; if (k === 1) return { label: String(N), html: frame(N), fact: ['w_thats', N] };
           var a = rnd(0, N); return { label: a + ' + ' + (N - a), fact: [a, 'w_plus', N - a, 'w_is', N] }; }
-        return { text: 'Munch the number ' + em(N), hint: 'Look for ' + N + '!', say: ['munch_rule_number', N],
-          good: goodN, bad: function () { var v; do { v = rnd(0, max); } while (v === N); if (L && Math.random() < .3) { var a = rnd(0, v); return { label: a + ' + ' + (v - a), fact: [a, 'w_plus', v - a, 'w_is', v, 'w_not', N] }; } return mk(v); } };
+        return { text: 'Munch the number ' + em(N), hint: (N > 5 ? 'A full row in a ten-frame is 5. Count the dots in the frame to find ' + N + '.' : 'Touch each dot and count to find ' + N + '.'), say: ['munch_rule_number', N],
+          good: goodN, bad: function () { var v; do { v = rnd(0, max); } while (v === N); if (sums && Math.random() < .3) { var a = rnd(0, v); return { label: a + ' + ' + (v - a), fact: [a, 'w_plus', v - a, 'w_is', v, 'w_not', N] }; } return mk(v); } };
       } },
     { id: 'compare', name: 'Bigger & smaller', short: 'Compare numbers to 20', strand: 'Counting', std: 'K.CC.7 / 1.NBT.3', grade: '1', sayFact: true,
       levels: ['Numbers to 10', 'Numbers to 20'],

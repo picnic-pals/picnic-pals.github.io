@@ -375,6 +375,19 @@
     }
     return html;
   }
+  function racerFact(q) {
+    var S = A.Steps;
+    if (!q || !S || !S.F || q.a == null || q.b == null) return null;
+    if (q.kind === 'add') return S.F(q.a, '+', q.b);
+    if (q.kind === 'sub') return S.F(q.a, '-', q.b);
+    if (q.kind === 'missing') return S.F(q.a, '+', Math.max(0, q.b - q.a));
+    return null;
+  }
+  function racerFactHint(q, lvl) {
+    var f = racerFact(q);
+    if (f && A.Steps.factHint) return A.Steps.factHint(f, lvl, q.kind === 'sub' ? 's_mix' : 'a_mix');
+    return '';
+  }
   function qBits(q, who) {
     if (!q) return '';
     var pics = '';
@@ -386,7 +399,7 @@
         var f = K.BY[id]; return icon(f ? f.icon : id, 44, 'pic');
       }).join('') + '</div>';
     } else if ((q.kind === 'add' || q.kind === 'sub' || q.kind === 'missing') && A.CountVisual && q.a != null) {
-      var cvOpt = { noun: 'dots', noLabels: true }, factPic;
+      var cvOpt = { noun: 'dots' }, factPic;
       if (q.kind === 'sub') factPic = A.CountVisual.html(q.a, cvOpt) + '<i class="pb-op">-</i>' + A.CountVisual.html(q.b, cvOpt);
       else if (q.kind === 'missing') factPic = A.CountVisual.html(q.a, cvOpt) + '<i class="pb-op">+</i><b class="sr-qmark">?</b>';
       else factPic = A.CountVisual.html(q.a, cvOpt) + '<i class="pb-op">+</i>' + A.CountVisual.html(q.b, cvOpt);
@@ -717,14 +730,15 @@
           var f = K.BY[id]; return icon(f ? f.icon : id, 56, 'pic');
         }).join('') + '</div>';
       } else if ((q.kind === 'add' || q.kind === 'sub' || q.kind === 'missing') && A.CountVisual && q.a != null) {
-        var cvOpt = { noun: 'dots', noLabels: true };
+        var cvOpt = { noun: 'dots' };
         var factPic;
         if (q.kind === 'sub') factPic = A.CountVisual.html(q.a, cvOpt) + '<i class="pb-op">−</i>' + A.CountVisual.html(q.b, cvOpt);
         else if (q.kind === 'missing') factPic = A.CountVisual.html(q.a, cvOpt) + '<i class="pb-op">+</i><b class="sr-qmark">?</b>';
         else factPic = A.CountVisual.html(q.a, cvOpt) + '<i class="pb-op">+</i>' + A.CountVisual.html(q.b, cvOpt);
         pics = '<div class="sr-pics sr-fact" id="srPics">' + factPic + '</div>';
       }
-      if (G.missHint) pics += '<p class="sr-hint">' + A.esc(G.missHint) + '</p>';
+      if (G.missHintHtml) pics = '<div class="sr-pics sr-hintpic" id="srPics">' + G.missHintHtml + '</div>';
+      else if (G.missHint) pics += '<p class="sr-hint">' + A.esc(G.missHint) + '</p>';
       var choices = q.choices.map(function (c, idx) {
         return '<button class="sr-choice" data-i="' + idx + '">' +
           (c.icon ? icon(c.icon, 64, 'ch') : '') +
@@ -827,19 +841,26 @@
     if (!res.correct) {
       var food = missed && missed.food && K.BY[missed.food];
       G.missQ = missed;
-      if (missed && missed.kind === 'count') G.missHint = 'Count the ' + ((food && food.plural) || 'foods') + '.';
-      else if (missed && missed.kind === 'add') G.missHint = (missed.a + missed.b > 10) ? ('Make 10, then add the rest. ' + missed.a + ' + ' + missed.b + '.') : ('Count the dots: ' + missed.a + ' + ' + missed.b + '.');
-      else if (missed && missed.kind === 'sub') G.missHint = 'Start at ' + missed.a + ' and take away ' + missed.b + '.';
-      else if (missed && missed.kind === 'missing') G.missHint = 'How many more to get from ' + missed.a + ' to ' + missed.b + '?';
-      else G.missHint = 'Look again, then try the next one.';
-      wait = 1400;
+      G.missHintHtml = '';
+      if (missed && missed.kind === 'count') { G.missHint = 'Count the ' + ((food && food.plural) || 'foods') + '.'; wait = 1400; }
+      else if (missed && (missed.kind === 'add' || missed.kind === 'sub' || missed.kind === 'missing')) {
+        var html = racerFactHint(missed, 2);
+        if (html) {
+          G.missHintHtml = html;
+          G.missHint = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        } else if (missed.kind === 'add') G.missHint = (missed.a + missed.b > 10) ? ('Make 10, then add the rest. ' + missed.a + ' + ' + missed.b + '.') : ('Count the dots: ' + missed.a + ' + ' + missed.b + '.');
+        else if (missed.kind === 'sub') G.missHint = 'Start at ' + missed.a + ' and take away ' + missed.b + '.';
+        else G.missHint = 'How many more to get from ' + missed.a + ' to ' + missed.b + '?';
+        wait = 3000;
+      } else { G.missHint = 'Look again, then try the next one.'; wait = 1400; }
     } else {
       G.missHint = '';
+      G.missHintHtml = '';
       G.missQ = null;
     }
     renderRace();
     setTimeout(function () {
-      G.missHint = ''; G.missQ = null;
+      G.missHint = ''; G.missHintHtml = ''; G.missQ = null;
       K.nextQuestion(G);
       askedAt = Date.now();
       busy = false;

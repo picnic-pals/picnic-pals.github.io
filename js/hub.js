@@ -3,7 +3,22 @@
   'use strict';
   var $ = A.$, B = A.Blobs, R = A.Rewards;
   A.UI.boot();
-  var me = null, editing = false;
+  var me = null, editing = false, closetHiName = null;
+  function setHi(el, name) {
+    if (!el) return;
+    var pre = el.querySelector('.hi-pre'), nm = el.querySelector('.hi-name');
+    if (!pre || !nm) {
+      el.innerHTML = '<span class="hi-pre">Hi, </span><span class="hi-name"></span>';
+      pre = el.querySelector('.hi-pre'); nm = el.querySelector('.hi-name');
+    }
+    nm.textContent = name + '!';
+  }
+  function showClosetHi(name) {
+    var el = $('#closetHi'); if (!el) return;
+    if (name) { el.hidden = false; el.textContent = "Hi, I'm " + name + '!'; }
+    else { el.hidden = true; el.textContent = ''; }
+  }
+
 
   // games registry: future games plug in here
   var GAMES = [
@@ -272,7 +287,7 @@
 
   function renderGames() {
     me = A.Store.active(); if (!me) return go('players');
-    $('#meAv').innerHTML = B.forProfile(me); $('#meAv').setAttribute('style', B.backdrop(me.color)); $('#meAv').classList.add('bd'); $('#meHi').textContent = 'Hi, ' + me.name + '!'; $('#meStars').textContent = me.stars;
+    $('#meAv').innerHTML = B.forProfile(me); $('#meAv').setAttribute('style', B.backdrop(me.color)); $('#meAv').classList.add('bd'); setHi($('#meHi'), me.name); $('#meStars').textContent = me.stars;
     // design1 (2026-10-22): no "Next friend" / "Next prize" bars (unlocks are a surprise). Only the weekly play-days goal stays.
     // batch1 (plan P1): the weekly play-days bar is gone too (a days-per-week target is pressure); no goal bars at all
     var gl = $('#goal'), lg = weekGoal(me), ng = $('#nextGoal');
@@ -329,6 +344,7 @@
     if ((B.outfitById[me.outfit] || {}).held) { me.held = me.outfit; me.outfit = 'none'; A.Store.save(); } // the bow/sweatband became held items
     var c = B.byId[me.blob] || B.CAST[0];
     $('#prevBig').innerHTML = B.forProfile(me, { hi: true }); $('#prevBig').setAttribute('style', B.backdrop(me.color)); $('#prevBig').classList.add('bd'); $('#prevName').textContent = c.name; $('#prevLooks').textContent = c.personality;
+    showClosetHi(closetHiName);
     function opt(box, items, kind) {
       box.innerHTML = '';
       items.forEach(function (it) {
@@ -350,7 +366,8 @@
           if (locked) { b.classList.remove('nudge'); void b.offsetWidth; b.classList.add('nudge'); A.Audio.sfx('locked');
             var short = Math.max(1, (cost || 0) - me.stars);   // how many more stars (stars are never spent; the prize opens at that total)
             A.Voice.say(cost ? ['hub_you_need', short, short === 1 ? 'hub_more_star' : 'hub_more_stars'] : ['hub_locked']); if (cost) A.UI.toast('⭐ ' + short + ' more star' + (short === 1 ? '' : 's') + ' to go!'); return; }
-          if (kind === 'blob') me.blob = it.id; else if (kind === 'color') me.color = it.id; else if (kind === 'held') me.held = it.id; else me.outfit = it.id;
+          if (kind === 'blob') { me.blob = it.id; closetHiName = it.name; if (A.Story2 && A.Story2.switchHero) A.Story2.switchHero(me, it.id); }
+          else if (kind === 'color') me.color = it.id; else if (kind === 'held') me.held = it.id; else me.outfit = it.id;
           me.flags.dressed = true; A.Store.save(); A.Audio.sfx('pop');
           renderCloset(); A.Blobs.anim($('#prevBig'), 'jump', 600);
           A.Voice.say(kind === 'blob' ? ['hub_im', 'blob_' + it.id] : (kind === 'outfit' || kind === 'held') && it.id !== 'none' ? ['ow_' + it.id] : ['hub_looking_good']);
@@ -414,7 +431,7 @@
   function renderMode() {
     me = A.Store.active(); if (!me) return go('players');
     if (!wantsMode(me)) return go('games');
-    $('#modeAv').innerHTML = B.forProfile(me); $('#modeAv').setAttribute('style', B.backdrop(me.color)); $('#modeAv').classList.add('bd'); $('#modeHi').textContent = 'Hi, ' + me.name + '!'; $('#modeStars').textContent = me.stars;
+    $('#modeAv').innerHTML = B.forProfile(me); $('#modeAv').setAttribute('style', B.backdrop(me.color)); $('#modeAv').classList.add('bd'); setHi($('#modeHi'), me.name); $('#modeStars').textContent = me.stars;
     var ST = A.Story, R = ST.run(me), sd = ST.data(me), sub = $('#modeStorySub');
     sub.textContent = sd.finished ? 'You finished it! Play again' : (R.stop ? 'Stop ' + (Math.min(R.stop, ST.mainCount() - 1) + 1) + ' on ' + ST.WORLD : ST.WORLD + ' adventure');
   }
@@ -429,6 +446,7 @@
   $('#modeBack')._say = [{ text: 'Back' }]; $('#gamesBack')._say = [{ text: 'Back' }]; $('#modeMe')._say = [{ text: 'Switch player' }];
 
   function go(id) {
+    if (id !== 'closet') closetHiName = null;
     if (id !== 'players') editing = false;
     if (id === 'friends') renderFriends();
     if (id === 'players') renderPlayers();

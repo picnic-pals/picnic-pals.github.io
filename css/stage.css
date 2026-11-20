@@ -44,3 +44,66 @@ html.stage-on .stage-scale #boot {
   width: 100%;
   height: 100%;
 }
+
+
+/* r13fix1120: after the stage scales down (phone landscape), --tap keeps
+   chrome at about 60px on the real screen. Portrait with scale >= 1 stays at 60px. */
+html.stage-on {
+  --tap: 60px;
+}
+html.stage-on .iconbtn,
+html.stage-on .gear,
+html.stage-on .speak,
+html.stage-on .speak.sm,
+html.stage-on .pc-replay,
+html.stage-on .q1help,
+html.stage-on #howtoBtn,
+html.stage-on #s2Help,
+html.stage-on #s2Back,
+html.stage-on #s2Hero,
+html.stage-on #homeBtn,
+html.stage-on .homebtn,
+html.stage-on #hubMusic,
+html.stage-on[data-stage="portrait"] .iconbtn,
+html.stage-on[data-stage="portrait"] .speak,
+html.stage-on[data-stage="portrait"] .speak.sm,
+html.stage-on[data-stage="landscape"] .iconbtn,
+html.stage-on[data-stage="landscape"] .speak,
+html.stage-on[data-stage="landscape"] .speak.sm,
+html.stage-on[data-stage="portrait"] #hubMusic,
+html.stage-on[data-stage="landscape"] #hubMusic {
+  min-width: var(--tap, 60px) !important;
+  min-height: var(--tap, 60px) !important;
+  width: var(--tap, 60px);
+  height: var(--tap, 60px);
+  box-sizing: border-box;
+}
+html.stage-on .bigbtn,
+html.stage-on .pc-opt,
+html.stage-on .me,
+html.stage-on .s2-fr,
+html.stage-on .sr-menu .sr-btn,
+html.stage-on .sr-menu .sr-secondary,
+html.stage-on .sr-btn,
+html.stage-on .sr-secondary,
+html.stage-on .sr-choice,
+html.stage-on .backbtn,
+html.stage-on .chipbtn,
+html.stage-on .sayagain,
+html.stage-on .pk-cardspeak,
+html.stage-on #pkCardSpeak,
+html.stage-on .ff-action,
+html.stage-on .ff-secondary,
+html.stage-on #galBtn,
+html.stage-on .cbtn,
+html.stage-on #jarBtn,
+html.stage-on .jar,
+html.stage-on[data-stage="portrait"] .me,
+html.stage-on[data-stage="landscape"] .me,
+html.stage-on[data-stage="landscape"] .backbtn,
+html.stage-on[data-stage="landscape"] .chipbtn,
+html.stage-on[data-stage="landscape"] .sayagain {
+  min-width: var(--tap, 60px) !important;
+  min-height: var(--tap, 60px) !important;
+  box-sizing: border-box;
+}

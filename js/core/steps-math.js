@@ -37,14 +37,39 @@
   }
   var FOODS = ['🍎', '🍓', '🫐', '🥕', '🍪', '🧁', '🍌', '🍇'];
   function iconOf(e, sz) { return (A.Icons && A.Icons.html) ? A.Icons.html(e, { size: sz || 48, decorative: true, cls: 'pp-pic', context: 'question' }) : e; }
+  var NOUNS = {
+    soccer: ['soccer ball', 'soccer balls'], ball: ['ball', 'balls'], 'soccer ball': ['soccer ball', 'soccer balls'],
+    'red apple': ['apple', 'apples'], apple: ['apple', 'apples'],
+    blueberry: ['blueberry', 'blueberries'], strawberry: ['strawberry', 'strawberries'],
+    cherry: ['cherry', 'cherries'], cherries: ['cherry', 'cherries'],
+    grape: ['grape', 'grapes'], grapes: ['grape', 'grapes'],
+    tomato: ['tomato', 'tomatoes'], potato: ['potato', 'potatoes'], peach: ['peach', 'peaches'],
+    sandwich: ['sandwich', 'sandwiches'], box: ['box', 'boxes'], bus: ['bus', 'buses'],
+    fish: ['fish', 'fish'], sheep: ['sheep', 'sheep'], mouse: ['mouse', 'mice'], leaf: ['leaf', 'leaves'],
+    blossom: ['flower', 'flowers'], flower: ['flower', 'flowers'], shortcake: ['cake', 'cakes'], cake: ['cake', 'cakes'],
+    honey: ['honey pot', 'honey pots'], 'honey pot': ['honey pot', 'honey pots'], star: ['star', 'stars'],
+    carrot: ['carrot', 'carrots'], cookie: ['cookie', 'cookies'], muffin: ['muffin', 'muffins'],
+    banana: ['banana', 'bananas'], dog: ['dog', 'dogs'], cat: ['cat', 'cats'], duck: ['duck', 'ducks'],
+    car: ['car', 'cars'],
+    '🍎': ['apple', 'apples'], '🍓': ['strawberry', 'strawberries'], '🫐': ['blueberry', 'blueberries'],
+    '🥕': ['carrot', 'carrots'], '🍪': ['cookie', 'cookies'], '🧁': ['muffin', 'muffins'],
+    '🍌': ['banana', 'bananas'], '🍇': ['grape', 'grapes'], '🐶': ['dog', 'dogs'], '🐱': ['cat', 'cats'],
+    '🦆': ['duck', 'ducks'], '🚗': ['car', 'cars'], '⚽': ['soccer ball', 'soccer balls'], '🌼': ['flower', 'flowers'],
+    '🍑': ['peach', 'peaches'], '🍅': ['tomato', 'tomatoes'], '🐟': ['fish', 'fish'], '🍯': ['honey pot', 'honey pots'],
+    '🍰': ['cake', 'cakes']
+  };
   function foodNoun(e) {
-    var r = A.Icons && A.Icons.resolve && A.Icons.resolve(e, { context: 'question' }), word = (r && r.entry && r.entry.label) || 'foods';
-    var plural = /s$/.test(word) && !/us$/.test(word) ? word : (/y$/.test(word) && !/[aeiou]y$/.test(word) ? word.slice(0, -1) + 'ies' : word + 's');
-    if (word === 'red apple') { word = 'apple'; plural = 'apples'; }
-    if (word === 'blueberry') plural = 'blueberries';
-    if (word === 'tomato') plural = 'tomatoes';
-    if (word === 'potato') plural = 'potatoes';
-    if (word === 'sandwich') plural = 'sandwiches';
+    var r = A.Icons && A.Icons.resolve && A.Icons.resolve(e, { context: 'question' });
+    var word = (r && r.entry && r.entry.label) || e || 'food';
+    word = String(word).toLowerCase();
+    var pair = NOUNS[word] || NOUNS[e] || NOUNS[String(e)];
+    var plural;
+    if (pair) { word = pair[0]; plural = pair[1]; }
+    else {
+      // last resort: do not invent "soccers" / "foods" from an unknown glyph
+      if (!/[a-z]/.test(word) || word === 'food' || word === 'foods') { word = 'snack'; plural = 'snacks'; }
+      else plural = /s$/.test(word) && !/us$/.test(word) ? word : (/y$/.test(word) && !/[aeiou]y$/.test(word) ? word.slice(0, -1) + 'ies' : word + 's');
+    }
     return { word: word, plural: plural, key: e, icon: iconOf(e, 32) };
   }
   function askNoun(text, iconHtml) { return (iconHtml ? '<span class="ask-noun">' + iconHtml + '</span> ' : '') + text; }
@@ -134,14 +159,24 @@
     return w.slice(0, 5);
   }
   function cntItem(lo, hi, how) {
-    var n = rnd(lo, hi), pic;
-    if (A.CountVisual) pic = A.CountVisual.html(n, { pattern: n <= 5 && how !== 'tens' && Math.random() < .5 ? 'dice' : (n <= 5 ? 'five_frame' : null) });
-    else pic = how === 'tens' ? tens(n) : objs(n, pick(FOODS));
+    var n = rnd(lo, hi), pic, e = pick(FOODS), useFood = Math.random() < .5, noun, ask, opt;
+    opt = { pattern: n <= 5 && how !== 'tens' && Math.random() < .5 ? 'dice' : (n <= 5 ? 'five_frame' : null) };
+    if (useFood) { opt.item = e; opt.noun = foodNoun(e).plural; }
+    if (A.CountVisual) pic = A.CountVisual.html(n, opt);
+    else pic = how === 'tens' ? tens(n) : objs(n, useFood ? e : null);
+    noun = useFood ? foodNoun(e) : { singular: 'dot', plural: 'dots' };
+    ask = 'How many ' + (n === 1 ? noun.singular : noun.plural) + '?';
     return { key: 'cnt' + n, ans: n, wrong: cntWrong(n, lo, hi),
-      text: 'How many dots?', pic: pic, say: [sayText('st_how_many_dots', 'How many dots?')],
+      text: ask, pic: pic, say: [sayText('st_how_many_n', ask)],
       // Numeral only: the count picture lives on the question card. html is set so A7 picturizeCell will not add tile dots.
       cell: function (v) { return { label: String(v), html: '<span class="st-ansnum">' + (A.esc ? A.esc(String(v)) : String(v)) + '</span>', fact: ['w_thats', v] }; },
-      hint: function (l) { return how === 'tens' || n > 5 ? box(tens(n), l >= 2 ? Math.floor(n / 10) * 10 + ' and ' + (n % 10) + ' more is <b>' + n + '</b>.' : 'Count the full tens, then the rest.') : box(A.CountVisual ? A.CountVisual.html(n) : tf({ on: n }), l >= 2 ? 'Count them: … <b>' + n + '</b>!' : 'Touch each one and count.'); } };
+      hint: function (l) {
+        var hp = A.CountVisual ? A.CountVisual.html(n, useFood ? { item: e, noun: noun.plural } : {}) : (how === 'tens' || n > 5 ? tens(n) : tf({ on: n }));
+        var tip = l >= 2
+          ? (n > 10 ? '10 and ' + (n % 10) + ' more is <b>' + n + '</b>.' : 'Count them: … <b>' + n + '</b>!')
+          : (n > 10 ? 'A full ten-frame is 10. Then count the extras.' : 'Touch each one and count.');
+        return box(hp, tip);
+      } };
   }
   var LOOK = { 12: [21], 21: [12], 13: [31], 6: [9], 9: [6], 16: [19, 61], 19: [16], 17: [71], 15: [51], 14: [41], 18: [81], 11: [17], 10: [1] };
   function findItem(lo, hi) {
@@ -179,10 +214,11 @@
     var nums = (st && (st.attempts || 0) >= 12 && Math.random() < .5), a, b, same = !nums && Math.random() < .2;
     if (nums) { a = rnd(1, 20); do { b = rnd(1, 20); } while (b === a); }
     else { a = rnd(1, 10); b = same ? a : rnd(1, 10); if (!same && a === b) b = a < 10 ? a + 1 : a - 1; }
-    var e = pick(FOODS), ans = a === b ? 'same' : a > b ? 'L' : 'R';
-    function cell(k) { if (k === 'same') return { label: 'the same', html: '<span class="st-same">= same</span>', fact: ['st_same'] }; var v = k === 'L' ? a : b; return nums ? { label: String(v), fact: ['w_thats', v] } : { label: v + ' ' + (k === 'L' ? 'left' : 'right'), html: (A.CountVisual && v > 5) ? A.CountVisual.html(v) : (v <= 5 && A.CountVisual ? A.CountVisual.html(v, { pattern: 'dice' }) : objs(v, e)), fact: ['w_thats', v] }; }
+    var e = pick(FOODS), fn = foodNoun(e), ans = a === b ? 'same' : a > b ? 'L' : 'R';
+    var moreAsk = 'Which side has more ' + fn.plural + '?';
+    function cell(k) { if (k === 'same') return { label: 'the same', html: '<span class="st-same">= same</span>', fact: ['st_same'] }; var v = k === 'L' ? a : b; return nums ? { label: String(v), fact: ['w_thats', v] } : { label: v + ' ' + (k === 'L' ? 'left' : 'right'), html: (A.CountVisual && v > 5) ? A.CountVisual.html(v, { item: e, noun: fn.plural }) : (v <= 5 && A.CountVisual ? A.CountVisual.html(v, { pattern: 'dice', item: e, noun: fn.plural }) : objs(v, e)), fact: ['w_thats', v] }; }
     return { key: (nums ? 'big' : 'more') + Math.min(a, b) + 'v' + Math.max(a, b), ans: ans, wrong: ans === 'same' ? ['L', 'R'] : [ans === 'L' ? 'R' : 'L'].concat(nums ? [] : ['same']),
-      text: nums ? 'Which number is bigger?' : 'Which has more?', say: [nums ? 'st_bigger' : 'st_which_more'], cell: cell, two: true,
+      text: nums ? 'Which number is bigger?' : askNoun(moreAsk, fn.icon), say: nums ? ['st_bigger'] : [sayText('st_which_more', moreAsk)], cell: cell, two: true,
       hint: function (l) { return nums ? box(nline(Math.max(0, Math.min(a, b) - 1), Math.max(a, b) + 1, { mark: [a, b], ans: Math.max(a, b), end: l >= 2 }), l >= 2 ? '<b>' + Math.max(a, b) + '</b> is further along the line.' : 'The bigger number is further along the number line.')
         : box('<span class="st-rows">' + tf({ on: a }) + tf({ on: 0, b: b }) + '</span>', l >= 2 ? (a === b ? 'They are the <b>same</b>!' : 'The row with more dots: <b>' + Math.max(a, b) + '</b>.') : 'Put them in rows and look which row is longer.'); } };
   }
@@ -206,7 +242,7 @@
   // T band (2-3): count 1-3, then 1-5. Big objects the kid can tap to count (each tap says the number); the choices are plates
   // of dots with the numeral, so no reading is needed. 2 choices, no timer (Gentle Munch at these ages), no fast-skip.
   var BIG = ['🍎', '🍓', '🍌', '🥕', '🐶', '🐱', '🦆', '🚗', '⚽', '🌼'];
-  function bigPic(e) { return A.Icons ? A.Icons.html(e, { size: 64, decorative: true, cls: 'pp-pic' }) : e; }
+  function bigPic(e) { return A.Icons ? A.Icons.html(e, { size: 90, decorative: true, cls: 'pp-pic' }) : e; }
   function tinyItem(hi) {
     var n = rnd(1, hi), e = pick(BIG), w = within([n - 1, n + 1, n + 2], 1, hi + 1, n);
     var tn = foodNoun(e), tAsk = 'How many ' + tn.plural + '?';
@@ -347,7 +383,16 @@
           if (N == null) f = null; else { var gc = null; for (var gi = 0; gi < 12 && r.good; gi++) { var c0 = r.good(), g0 = c0 && parseFact(String(c0.label).replace(/^(\d+) - (\d+)$/, '$1 − $2')); if (g0 && g0.v === N) { gc = g0; if (modeOf(g0, s.id) === modeOf(f, s.id)) break; } }
             f = gc || (f.op === '+' && N > 10 && N <= 20 ? F(10, '+', N - 10) : null); } }
         if (f && !r.wp) return factHint(f, lvl, s.id);
-        if (N != null && !r.wp && /^(count10|teen)$/.test(s.id)) return box(tens(N), lvl >= 2 ? 'This is <b>' + N + '</b>.' : 'Look for ' + N + ' dots. Count them!');
+        if (r.wp && r.wp.a != null && r.wp.b != null) {
+          var wf = F(r.wp.a, r.wp.op || '+', r.wp.b);
+          if (wf) return factHint(wf, lvl, r.wp.op === '-' ? 's_mix' : 'a_mix');
+        }
+        if (N != null && !r.wp && /^(count10|teen)$/.test(s.id)) {
+          var ctip = lvl >= 2
+            ? (N > 10 ? 'A full ten-frame is 10. Count the rest: this is <b>' + N + '</b>.' : 'Count them: this is <b>' + N + '</b>.')
+            : (N > 10 ? 'A full ten-frame is 10. Then count the extras: 10 and ' + (N - 10) + ' more.' : 'A full row in a ten-frame is 5. Count the dots in the frame.');
+          return box(tens(N), ctip);
+        }
         return tip ? box('', tip) : ''; };
       r.hint = ''; return r;
     };
@@ -544,10 +589,18 @@
   function tmFace(h, m, small) { return A.Clock.face(h, m, { small: !!small }); }
   function tmUniq(ans, list) { var out = []; list.forEach(function (x) { if (x && x !== ans && out.indexOf(x) < 0) out.push(x); }); return out; }
   function tmParse(s) { var m = String(s).match(/^(\d{1,2}):(\d{2})$/); return m ? { h: +m[1], m: +m[2] } : null; }
-  function tmDistractors(h, m) {
+  function tmIsHourHalf(s) { var p = tmParse(s); return !!(p && (p.m === 0 || p.m === 30)); }
+  function tmDistractors(h, m, kind) {
     var minNum = m / 5, swapH = minNum === 0 ? 12 : minNum, swapM = Math.round((h % 12) * 5); if (swapM >= 60) swapM = 0;
-    var nextH = h === 12 ? 1 : h + 1, prevH = h === 1 ? 12 : h - 1;
-    return tmUniq(tmFmt(h, m), [
+    var nextH = h === 12 ? 1 : h + 1, prevH = h === 1 ? 12 : h - 1, ans = tmFmt(h, m);
+    if (kind === 'hour_half') {
+      var list = [tmFmt(nextH, m), tmFmt(prevH, m), tmFmt(h, m === 0 ? 30 : 0), tmFmt(nextH, m === 0 ? 30 : 0), tmFmt(prevH, m === 0 ? 30 : 0)];
+      var swap = tmFmt(swapH, swapM);
+      if (tmIsHourHalf(swap)) list.unshift(swap);
+      list.push(tmFmt(12, m === 0 ? 30 : 0), tmFmt(6, m === 0 ? 30 : 0), tmFmt(3, m), tmFmt(9, m));
+      return tmUniq(ans, list.filter(tmIsHourHalf));
+    }
+    return tmUniq(ans, [
       tmFmt(nextH, m), tmFmt(prevH, m),
       tmFmt(swapH, swapM),
       m > 0 ? tmFmt(h, minNum) : tmFmt(h, 5),           // minute-number-as-minutes (hand on 4 → :04)
@@ -567,7 +620,7 @@
   }
   function tmHero() { var ids = ['strawberry', 'blueberry', 'lemon', 'grape', 'pretzel', 'muffin']; return pick(ids); }
   function tmItem(kind) {
-    var h = tmPickH(), m = tmPickM(kind), t = tmFmt(h, m), wrong = tmDistractors(h, m).slice(0, 3), r = Math.random();
+    var h = tmPickH(), m = tmPickM(kind), t = tmFmt(h, m), wrong = tmDistractors(h, m, kind).slice(0, 3), r = Math.random();
     var hint = function (l) {
       var face = tmFace(h, m);
       if (m === 0) return box(face, l >= 2 ? 'The minute hand points at 12, so it is <b>' + t + '</b> on the hour.' : 'When the long hand is on 12, say the hour and “o’clock.”');

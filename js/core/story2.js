@@ -4,11 +4,11 @@
      nothing about later places is ever shown or named.
    · Levels ARE the existing Story stops (saves stay by stop index + path, so Munch / Slugger / Stand / Bubble stops all keep working).
      Main-place bosses are extra side-style stops appended after every other stop (old indices never move).
-   · Your friend is the hero: p.story.hero (default: the friend the kid picked, p.blob). Each hero keeps its own story progress:
-     p.story is the active hero's progress and p.storyHeroes[id] holds the others (switching swaps them, so every older piece of code
-     that reads p.story keeps working). Shared bits (intro seen, book mode) carry over.
-   · Old saves: migrate() (idempotent, s.v2 = 1) gives the current progress to the current friend and marks the bosses of every place
-     before the furthest place already played as passed (migrated, no stars), so nothing played is ever hidden.
+   · Your friend is the hero: the friend the kid picked (p.blob). Story progress belongs to the player, not to each friend
+     (switching friends never hides stops already beaten). p.story is the shared journey; older per-friend saves in
+     p.storyHeroes are merged in (union / max) so nothing is lost.
+   · Old saves: migrate() (idempotent, s.v2 = 1) keeps every played stop, marks the bosses of every place before the
+     furthest place already played as passed (migrated, no stars), and folds any per-friend progress into the shared story.
    · Skill cap: every stop asks at most one step above the kid's current step (math: Story.fitStop; reading/early side stops: capV2).
    · Toddlers / age 3 and under get the simple version: each place is 2 stops + the boss, with 5 snacks. */
 (function (A) {
@@ -90,33 +90,83 @@
   function foodName(id) { if (FOOD[id]) return FOOD[id]; var c = A.Blobs && A.Blobs.byId[id]; return c ? String(c.food || '').toLowerCase().replace(/ \(.*\)$/, '') : 'friend'; }
   function met(p) { var b = (p.unlocks && p.unlocks.blobs) || {}, out = STARTERS.slice(); Object.keys(b).forEach(function (id) { if (out.indexOf(id) < 0 && A.Blobs && A.Blobs.byId[id]) out.push(id); });
     if (A.Rewards && A.Rewards.unlocked) out = out.filter(function (id) { return STARTERS.indexOf(id) >= 0 || A.Rewards.unlocked(p, 'blob', id); }); return out; }
-  function hero(p) { var s = p.story || {}; var h = s.hero || p.blob || 'strawberry'; return met(p).indexOf(h) >= 0 ? h : (STARTERS.indexOf(p.blob) >= 0 ? p.blob : 'strawberry'); }
+  function hero(p) {
+    var picked = p && p.blob, s = (p && p.story) || {}, h = (picked && met(p).indexOf(picked) >= 0) ? picked : (s.hero || picked || 'strawberry');
+    return met(p).indexOf(h) >= 0 ? h : (STARTERS.indexOf(picked) >= 0 ? picked : 'strawberry');
+  }
   function pals(p) { var h = hero(p), o = STARTERS.filter(function (x) { return x !== h; }).map(heroName); if (STARTERS.indexOf(h) < 0) return 'the picnic pals'; return o.slice(0, -1).join(', ') + ' and ' + o[o.length - 1]; }
   function fill(t, p) { return String(t).replace(/\{hero\}/g, heroName(hero(p))).replace(/\{food\}/g, foodName(hero(p))).replace(/\{pals\}/g, pals(p)); }
   function flavor(p) { return FLAVOR[hero(p)] || FLAVOR.other; }
   var SHARED = ['introSeen', 'bookMode', 'path'];
+  function copyObj(s) { var o = {}; if (!s) return o; Object.keys(s).forEach(function (k) { o[k] = s[k]; }); return o; }
+  function mergeStop(a, b) {
+    if (!b) return a; if (!a) return copyObj(b);
+    var out = copyObj(a);
+    out.best = Math.max(a.best || 0, b.best || 0);
+    out.stars = Math.max(a.stars || 0, b.stars || 0);
+    out.passed = !!(a.passed || b.passed);
+    out.plays = Math.max(a.plays || 0, b.plays || 0);
+    out.fails = out.passed ? 0 : Math.max(a.fails || 0, b.fails || 0);
+    if (a.migrated || b.migrated) out.migrated = true;
+    var fa = a.firstPassAt, fb = b.firstPassAt;
+    if (fa && fb) out.firstPassAt = Math.min(fa, fb);
+    else if (fa || fb) out.firstPassAt = fa || fb;
+    return out;
+  }
+  function mergeStory(into, from) {
+    if (!into || !from) return into;
+    SHARED.forEach(function (f) { if (into[f] == null && from[f] != null) into[f] = from[f]; });
+    into.stops = into.stops || {};
+    Object.keys(from.stops || {}).forEach(function (key) { into.stops[key] = mergeStop(into.stops[key], from.stops[key]); });
+    into.seen = into.seen || {};
+    Object.keys(from.seen || {}).forEach(function (k) { if (into.seen[k] == null) into.seen[k] = from.seen[k]; });
+    into.challenges = into.challenges || {};
+    Object.keys(from.challenges || {}).forEach(function (k) {
+      var a = into.challenges[k], b = from.challenges[k];
+      if (!b) return;
+      if (!a) { into.challenges[k] = copyObj(b); return; }
+      into.challenges[k] = {
+        tries: Math.max(a.tries || 0, b.tries || 0),
+        wins: Math.max(a.wins || 0, b.wins || 0),
+        best: a.best && b.best ? Math.min(a.best, b.best) : (a.best || b.best || 0),
+        perfect: Math.max(a.perfect || 0, b.perfect || 0)
+      };
+    });
+    return into;
+  }
+  function mergeHeroes(p) {
+    var s = ST.data(p), H = p.storyHeroes;
+    if (H) Object.keys(H).forEach(function (id) { mergeStory(s, H[id]); });
+    p.storyHeroes = {};
+    return s;
+  }
+  function syncHero(p) { var s = ST.data(p); s.hero = hero(p); return s.hero; }
   function switchHero(p, id) {
-    migrate(p); if (met(p).indexOf(id) < 0) return false; var cur = hero(p); if (cur === id) return true;
-    var H = p.storyHeroes || (p.storyHeroes = {}); H[cur] = p.story;
-    var nx = H[id] || { stops: {}, seen: {}, challenges: {}, v2: 1, placeV: 2, mixV: 1, hero: id }; delete H[id];
-    SHARED.forEach(function (f) { if (p.story && p.story[f] != null && nx[f] == null) nx[f] = p.story[f]; });
-    nx.seen = nx.seen || {}; nx.seen.prologue = nx.seen.prologue || Date.now();   // the picture book is the prologue now
-    nx.hero = id; p.story = nx; var m = meta(p); m.heroAt = Date.now(); m.asked[id] = 1; return true;
+    migrate(p); if (met(p).indexOf(id) < 0) return false;
+    p.blob = id;
+    var s = ST.data(p);
+    s.hero = id;
+    var m = meta(p); m.heroAt = Date.now(); m.asked[id] = 1;
+    return true;
   }
   function meta(p) { var m = p.storyMeta || (p.storyMeta = {}); m.asked = m.asked || {}; return m; }
   // after an unlock: a friend the kid has met but never been asked about → "play as … or keep going?" (once per friend)
   function askHero(p) { var m = meta(p), h = hero(p), list = met(p).filter(function (id) { return STARTERS.indexOf(id) < 0 && id !== h && !m.asked[id] && !(p.storyHeroes || {})[id]; }); return list[0] || null; }
-  function heroes(p) { var H = p.storyHeroes || {}, h = hero(p); return met(p).map(function (id) { var s = id === h ? p.story : H[id]; return { id: id, name: heroName(id), active: id === h, started: !!(s && Object.keys(s.stops || {}).length) }; }); }
+  function heroes(p) { var started = !!(p.story && Object.keys(p.story.stops || {}).length), h = hero(p); return met(p).map(function (id) { return { id: id, name: heroName(id), active: id === h, started: started }; }); }
 
   /* ---------- migration (old saves never lose progress) ---------- */
   function migrate(p) {
-    if (!p) return; var s = ST.data(p); if (s.v2) return;
-    s.v2 = 1; if (!s.hero) s.hero = STARTERS.indexOf(p.blob) >= 0 || (p.blob && A.Blobs && A.Blobs.byId[p.blob]) ? p.blob : 'strawberry';
-    if (s.introSeen) { s.seen = s.seen || {}; }
-    ['big', 'little'].forEach(function (pa) {
-      var far = -1; Object.keys(s.stops).forEach(function (key) { if (key.indexOf(pa + ':') !== 0) return; var r = s.stops[key]; if (!(r.passed || r.plays > 0)) return; var k = placeOfStop(+key.split(':')[1]); if (k > far) far = k; });
-      for (var k = 0; k < far; k++) { var b = LEVELS[k][LEVELS[k].length - 1], kk = pa + ':' + b; if (!(s.stops[kk] && s.stops[kk].passed)) s.stops[kk] = { best: 0, stars: 0, passed: true, fails: 0, plays: 0, migrated: true }; }
-    });
+    if (!p) return; var s = ST.data(p);
+    if (!s.v2) {
+      s.v2 = 1; if (!s.hero) s.hero = STARTERS.indexOf(p.blob) >= 0 || (p.blob && A.Blobs && A.Blobs.byId[p.blob]) ? p.blob : 'strawberry';
+      if (s.introSeen) { s.seen = s.seen || {}; }
+      ['big', 'little'].forEach(function (pa) {
+        var far = -1; Object.keys(s.stops).forEach(function (key) { if (key.indexOf(pa + ':') !== 0) return; var r = s.stops[key]; if (!(r.passed || r.plays > 0)) return; var k = placeOfStop(+key.split(':')[1]); if (k > far) far = k; });
+        for (var k = 0; k < far; k++) { var b = LEVELS[k][LEVELS[k].length - 1], kk = pa + ':' + b; if (!(s.stops[kk] && s.stops[kk].passed)) s.stops[kk] = { best: 0, stars: 0, passed: true, fails: 0, plays: 0, migrated: true }; }
+      });
+    }
+    mergeHeroes(p);
+    syncHero(p);
   }
   /* ---------- stop config: skill cap + gentle boss ---------- */
   function curOf(p, subj) { var C = A.Curriculum; try { var list = C.list(subj).map(function (k) { return k.id; }), cur = C.current(p, subj); return cur ? { id: cur.id, ix: list.indexOf(cur.id), list: list } : null; } catch (e) { return null; } }
@@ -127,6 +177,35 @@
     var nx = cm.list[cm.ix + 1], ns = null; try { ns = A.Curriculum.state(p, nx); } catch (e) {}
     return { skill: ns && ns.status !== 'locked' ? nx : cm.id, capped: true };
   }
+  // Big Steps boss snacks: 10, 10, 11, 11, 11, 12, 12 across the 7 places (~80% wins at p=.82 on the first, ~72% on the last).
+  function bigBossSnacks(k) { return 10 + Math.round((k || 0) * 2 / 6); }
+  function bumpFit(p, fit) {
+    fit = fit || {};
+    var out = { skill: fit.skill, level: fit.level || 0, capped: !!fit.capped, bumped: false, hard: false };
+    var subj = 'math';
+    try { if (fit.skill && A.Curriculum && A.Curriculum.subjectOf && A.Curriculum.byId && A.Curriculum.byId[fit.skill]) subj = A.Curriculum.subjectOf(A.Curriculum.byId[fit.skill]) || 'math'; } catch (e) {}
+    var cm = curOf(p, subj);
+    if (!cm) { out.hard = true; return out; }
+    var L = []; cm.list.forEach(function (id) { var sk = A.Curriculum.byId && A.Curriculum.byId[id], n = sk && sk.levels ? sk.levels.length : 2; for (var l = 0; l < n; l++) L.push({ id: id, lv: l }); });
+    var at = -1, k, want = fit.level || 0;
+    for (k = 0; k < L.length; k++) if (L[k].id === fit.skill && L[k].lv === want) { at = k; break; }
+    if (at >= 0 && at < L.length - 1) {
+      var nx = L[at + 1];
+      if (nx.id === fit.skill) return { skill: nx.id, level: nx.lv, capped: !!fit.capped, bumped: true, hard: false };
+      var ns = null; try { ns = A.Curriculum.state(p, nx.id); } catch (e) {}
+      if (ns && ns.status !== 'locked') return { skill: nx.id, level: nx.lv, capped: !!fit.capped, bumped: true, hard: false };
+    }
+    // Next skill is locked, or this is already the last step: harder tier of the SAME skill (no new skill, no spoiler).
+    out.hard = true;
+    return out;
+  }
+  function applyBossHarder(p, i, c) {
+    if (!c || !isBoss(i) || simple(p) || ST.path(p) === 'little') return c;
+    c.bossFree = 1; c.bossNoRegen = true;
+    var harder = bumpFit(p, { skill: c.skill, level: c.level, capped: c.capped });
+    c.skill = harder.skill; c.level = harder.level; c.hard = !!harder.hard; c.bossHarder = true;
+    return c;
+  }
   var baseConfig = ST.config;
   ST.config = function (p, i) {
     var c = baseConfig(p, i), st = ST.STOPS[i];
@@ -135,8 +214,12 @@
       var kk = placeOfStop(i), Lk = LEVELS[kk], last = ST.STOPS[Lk[Lk.length - 3]], f2 = ST.fitStop(p, last.area.skill, 1, ST.path(p) === 'little');
       c.skill = f2.skill; c.level = f2.level; c.capped = !!f2.capped;
     }
-    if (isBoss(i)) { c.boss = true; c.nOk = simple(p) ? 5 : ST.path(p) === 'little' ? 7 : 10; c.timeX = (c.timeX || 1) * 1.5; c.bossName = PLACES[BOSS[i]].boss; if (PLACES[BOSS[i]].art && bossBeaten(p, BOSS[i]) && !simple(p)) c.nOk += 2; }
-    else if (simple(p)) c.nOk = Math.min(c.nOk, 5);
+    if (isBoss(i)) { c.boss = true; c.nOk = simple(p) ? 5 : ST.path(p) === 'little' ? 7 : bigBossSnacks(BOSS[i]); c.timeX = (c.timeX || 1) * 1.5; c.bossName = PLACES[BOSS[i]].boss; if (PLACES[BOSS[i]].art && bossBeaten(p, BOSS[i]) && !simple(p)) c.nOk += 2; }
+    // Every world's boss on the older / Big Steps path: one free miss, no heart regen, and harder questions.
+    // If the next skill is open, step into it; otherwise stay on this skill with a harder tier (bigger numbers,
+    // tougher distractors). Never unlocks or names a locked skill. Snack count ramps 10→12. Little path unchanged.
+    applyBossHarder(p, i, c);
+    if (simple(p)) c.nOk = Math.min(c.nOk, 5);
     return c;
   };
   var baseRecord = ST.record;
@@ -158,7 +241,7 @@
   ST.playable = function (p, i) { var k = placeOfStop(i); if (k >= 0 && ST.ON2) return playable(p, i) || (i < FIRST_NEW && basePlayable(p, i)); return basePlayable(p, i); };   // the maps use Story2.playable; game pages also accept the old trail rule for the original stops (the stand/bubble/slugger stop pages)
   A.Story2 = { artURL: artURL, bossBeaten: bossBeaten, PLACES: PLACES, LEVELS: LEVELS, BOSS: BOSS, FLAVOR: FLAVOR, STARTERS: STARTERS, placeOfStop: placeOfStop, levels: levels, isBoss: isBoss, simple: simple,
     reached: reached, reachedList: reachedList, done: done, finished: finished, playable: playable, current: current, currentPlace: currentPlace, progress: progress,
-    hero: hero, heroName: heroName, foodName: foodName, pals: pals, fill: fill, flavor: flavor, met: met, switchHero: switchHero, askHero: askHero, heroes: heroes, meta: meta,
+    hero: hero, heroName: heroName, foodName: foodName, pals: pals, fill: fill, flavor: flavor, met: met, switchHero: switchHero, syncHero: syncHero, mergeHeroes: mergeHeroes, askHero: askHero, heroes: heroes, meta: meta, bigBossSnacks: bigBossSnacks, bumpFit: bumpFit, applyBossHarder: applyBossHarder,
     migrate: migrate, capV2: capV2, passed: passed, waiting: waiting, setClock: function (f) { NOWF = f || function () { return Date.now(); }; } };
   /* intro picture book v2 text (Learning Coach's 2026-10-25 revision as recorded in the notes: page 4 names no friends, pages 1 and 5
      follow the hero; pages 2-3 unchanged and keep their recorded clips). null = keep the page as it is. */

@@ -1,3 +1,4 @@
+:root { --tap: 60px; }
 /* Blob Arcade — shared styles */
 @font-face { font-family: "Fredoka Arcade"; src: url("../fonts/Fredoka.ttf") format("truetype"); font-weight: 300 700; font-display: swap; }
 :root {
@@ -22,7 +23,9 @@ input, select { font-family: inherit; color: inherit; -webkit-user-select: text;
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
 /* ---------- buttons ---------- */
-.bigbtn { font-size: clamp(26px, 6vmin, 52px); font-weight: 700; padding: .32em 1.3em; border-radius: 999px; color: #fff; letter-spacing: .5px;
+.bigbtn { font-size: clamp(26px, 6vmin, 52px); font-weight: 700; padding: .4em 1.3em; border-radius: 999px; color: #fff; letter-spacing: .5px;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: max(60px, var(--tap, 60px)); box-sizing: border-box;
   background: linear-gradient(#ff9fc0, #ff7aa6); box-shadow: 0 8px 0 #d85c88, 0 14px 24px #d85c8850; transition: transform .08s, box-shadow .08s; }
 .bigbtn:active, .bigbtn.pressed { transform: translateY(6px); box-shadow: 0 2px 0 #d85c88; }
 .bigbtn.mint { background: linear-gradient(#8ff0c9, #4fd3a1); box-shadow: 0 8px 0 #2fae80, 0 14px 24px #2fae8050; }
@@ -233,7 +236,7 @@ kbd.hit { transform: translateY(.14em); box-shadow: 0 .04em 0 #cbbfe0, inset 0 0
 .bigbtn.danger:active { box-shadow: 0 2px 0 #c94850; }
 .bigbtn.plain { background: #fff; color: var(--ink); box-shadow: 0 8px 0 var(--line), inset 0 0 0 3px var(--line); }
 .bigbtn.plain:active { box-shadow: 0 2px 0 var(--line), inset 0 0 0 3px var(--line); }
-.chipbtn { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 8px 16px; font-weight: 700; font-size: 17px; background: #fff; box-shadow: 0 4px 0 var(--line); white-space: nowrap; }
+.chipbtn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 999px; padding: 8px 16px; font-weight: 700; font-size: 17px; background: #fff; box-shadow: 0 4px 0 var(--line); white-space: nowrap; min-width: var(--tap, 60px); min-height: max(60px, var(--tap, 60px)); box-sizing: border-box; }
 .chipbtn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--line); }
 .chipbtn.gold { background: #fff4cc; box-shadow: 0 4px 0 #f0d27a; }
 .chipbtn kbd { font-size: .75em; }
@@ -309,13 +312,14 @@ section.subj h3 small { font-weight: 500; font-size: .7em; }
 .ea-blank { display: inline-block; min-width: 2.2em; border-bottom: 3px solid #b39ddb; color: transparent; }
 
 /* ---------- coach v2: placement check, mistake mini-lessons, picnic story problems ---------- */
-.placement-card .card { max-width: 640px; }
+.placement-card .card { max-width: 640px; max-height: 100%; overflow: auto; box-sizing: border-box; }
+html.stage-on[data-stage="landscape"] .placement-card .card { max-width: min(900px, 96%); }
 body:has(.overlay.placement-card.on) .friend-bubble { display: none !important; }
 .pc-sub { font-size: clamp(18px, 3vmin, 24px); }
 .pc-dots { display: flex; gap: 8px; justify-content: center; margin: 4px 0 8px; } .pc-dots i { width: 14px; height: 14px; border-radius: 50%; background: #eee6f5; } .pc-dots i.done { background: #9fe0b5; } .pc-dots i.now { background: var(--pink); }
 .pc-q { font-size: clamp(24px, 4.6vmin, 40px); font-weight: 700; margin: 6px 0 10px; } .pc-pic { margin-bottom: 8px; }
 .pc-opts { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin: 8px 0 4px; }
-.pc-opt { min-width: 110px; min-height: 84px; padding: 10px 18px; border-radius: 22px; background: #fff; box-shadow: 0 5px 0 var(--line); font-size: clamp(24px, 4.4vmin, 38px); font-weight: 700; display: flex; align-items: center; gap: 10px; justify-content: center; }
+.pc-opt { min-width: 110px; min-height: max(84px, var(--tap, 60px)); padding: 10px 18px; border-radius: 22px; background: #fff; box-shadow: 0 5px 0 var(--line); font-size: clamp(24px, 4.4vmin, 38px); font-weight: 700; display: flex; align-items: center; gap: 10px; justify-content: center; box-sizing: border-box; }
 .pc-opt kbd { font-size: 13px; color: var(--ink3); background: #f3eefa; border-radius: 8px; padding: 1px 6px; }
 .pc-opt:focus-visible { outline: 4px solid #7fc8ff; } .pc-opt.right { background: #e3f9ea; box-shadow: 0 5px 0 #9fe0b5; } .pc-opt.picked { opacity: .55; }
 .diag-hint { position: fixed; left: 50%; bottom: 150px; transform: translateX(-50%); z-index: 65; background: #fffdf3; border-radius: 22px; padding: 10px 18px 12px; box-shadow: 0 6px 0 #f1dca0, 0 10px 30px #0002; max-width: min(560px, 94vw); text-align: center; pointer-events: none; animation: dhin .35s ease-out; }
@@ -433,7 +437,7 @@ body.touchui .keys:not(.touch):not(.padkeys) { display: none !important; }
 @keyframes stwig { 25% { transform: translateX(-.15em); } 75% { transform: translateX(.15em); } }
 /* v2p2b: Baseball picture hint on the retry pitch after a miss; tiny counting steps (big tappable objects) */
 .bb-hint { margin: 6px auto 0; max-width: 520px; transform: scale(.9); animation: stin .35s ease-out; }
-.st-objs.big i { font-size: 64px; margin: 4px 8px; font-style: normal; position: relative; display: inline-block; }
+.st-objs.big i { font-size: 90px; margin: 4px 8px; font-style: normal; position: relative; display: inline-block; }
 .st-objs.big i sub { position: absolute; bottom: -6px; right: -6px; font-size: 22px; background: #fff; border-radius: 50%; padding: 0 6px; color: #3a6; font-weight: 800; }
 .st-objs.tap i { cursor: pointer; transition: transform .15s; }
 .st-objs.tap i.tapped { transform: scale(1.15); filter: drop-shadow(0 0 6px #fc3); }
@@ -444,6 +448,11 @@ body.touchui .keys:not(.touch):not(.padkeys) { display: none !important; }
 .tp-emo + .tp-w { display: block; font-size: 16px; margin-top: 2px; }
 .tp-w.only { font-size: 22px; font-weight: 700; }
 .tp-q .tp-qe { font-size: 40px; vertical-align: middle; margin-left: 6px; }
+.tp-q .tp-cue { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin-left: 8px; line-height: 1.1; }
+.tp-cue-letter { display: block; font-size: 22px; font-weight: 800; letter-spacing: .04em; margin-top: 2px; }
+.tp-wordtile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.tp-wordtile .tp-e { display: block; line-height: 1; }
+.tp-wordtile .tp-w { display: block; font-size: 20px; font-weight: 700; margin-top: 0; line-height: 1.15; }
 
 /* ---------- quality1 ---------- */
 /* A7: a picture beside every number for 4-5-year-olds (js/core/learn.js eqPic / numPic / dotsFor) */
@@ -560,8 +569,8 @@ html[data-stage="landscape"] .overlay.howto-a .howto-cap { font-size: 22px; }
 @media (max-width: 480px), (max-height: 560px) {
   .placement-card .card { padding: 14px 12px; }
   .pc-q { font-size: 20px; margin: 4px 0 6px; }
-  .pc-opts { flex-wrap: nowrap; gap: 8px; }
-  .pc-opt { min-width: 0; flex: 1 1 0; min-height: 58px; padding: 6px 6px; border-radius: 16px; font-size: 20px; gap: 4px; flex-direction: column; }
+  .pc-opts { flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .pc-opt { min-width: 88px; flex: 1 1 calc(50% - 8px); min-height: var(--tap, 60px); padding: 6px 6px; border-radius: 16px; font-size: 20px; gap: 4px; flex-direction: column; }
   .pc-opt kbd { display: none; }
   .pc-opt .frame, .pc-opt .pb-frames .frame { font-size: 15px; }
   .pc-opt .pbpic > b { font-size: 22px; }
@@ -719,8 +728,8 @@ html[data-stage="landscape"] .overlay.howto-a .howto-cap { font-size: 22px; }
 
 /* ---- PT6: 60px floor on shared Home / How-to / gear ---- */
 .gear, .iconbtn, .q1help, #howtoBtn, #homeBtn, .homebtn {
-  min-width: 60px;
-  min-height: 60px;
+  min-width: var(--tap, 60px);
+  min-height: var(--tap, 60px);
   touch-action: manipulation;
 }
 button, [role="button"], a, .tile, .opt, .kid, [data-nav], [data-game] {
@@ -761,7 +770,7 @@ html.stage-on .q1help, html.stage-on #howtoBtn, html.stage-on #s2Help {
 .cv-dice { grid-template-columns: repeat(3, var(--cv-d)); grid-template-rows: repeat(3, var(--cv-d)); border-radius: 12px; }
 .cv-dice .cv-pip-empty { background: transparent; box-shadow: none; border: none; }
 .cv-framewrap { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }
-.cv-flab { font-size: 12px; font-weight: 800; color: #5a4a78; line-height: 1; }
+.cv-flab { font-size: 16px; font-weight: 800; color: #5a4a78; line-height: 1; }
 .cv-scatter { display: inline-flex; flex-wrap: wrap; gap: calc(var(--cv-d) * 0.35); padding: calc(var(--cv-d) * 0.25); max-width: calc(var(--cv-d) * 4.2); }
 .cv-dot {
   width: var(--cv-d);

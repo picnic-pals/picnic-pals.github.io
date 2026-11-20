@@ -294,14 +294,14 @@ body.touchui #room .keys { display: none !important; }
   .rtitle { flex: 0 0 auto; min-width: 0; gap: 0; }
   .rtitle b, .rtitle small { display: none; }
   .rav { width: 36px; height: 36px; }
-  #room .rtop .iconbtn { width: 48px; height: 48px; min-width: 48px; min-height: 48px; flex: none; }
+  #room .rtop .iconbtn { width: 60px; height: 60px; min-width: 60px; min-height: 60px; flex: none; }
   .iconbtn.help { font-size: 26px; }
-  .iconbtn.music { width: 40px; height: 40px; font-size: 18px; flex: none; }
+  .iconbtn.music { width: 60px; height: 60px; min-width: 60px; min-height: 60px; font-size: 22px; flex: none; }
   .bits { padding: 3px 8px 3px 4px; gap: 3px; flex: none; }
   .bits small { display: none; }
   .bits b { font-size: 18px; }
   .bits .bi { width: 26px; height: 26px; font-size: 14px; }
-  .jar { min-height: 48px; min-width: 48px; padding: 1px 8px 1px 2px; flex: none; }
+  .jar { min-height: max(60px, var(--tap, 60px)); min-width: max(60px, var(--tap, 60px)); padding: 1px 8px 1px 2px; flex: none; box-sizing: border-box; }
   .jar .jarsvg { width: 28px; height: 34px; }
   .jar .jt { font-size: 12px; }
   .saved {

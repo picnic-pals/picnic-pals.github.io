@@ -300,8 +300,8 @@
       b = num(rng, 1, band.id === 'pre' ? 5 : (band.id === 'g2' ? 8 : 6));
       T = a + b;
       return numQ(
-        'You planted ' + a + ' ' + (a === 1 ? food.name : food.plural) + ', then ' + b + ' more. How many now?',
-        'You planted ' + a + ' ' + (a === 1 ? food.name : food.plural) + ', then ' + b + ' more. How many now?',
+        'You planted ' + a + ' ' + (a === 1 ? food.name : food.plural) + ', then ' + b + ' more. How many ' + food.plural + ' now?',
+        'You planted ' + a + ' ' + (a === 1 ? food.name : food.plural) + ', then ' + b + ' more. How many ' + food.plural + ' now?',
         T, shuffle(rng, near(T, nChoices, 1, Math.max(hi, T + 3), rng)),
         a + ' plus ' + b + ' is ' + T + '.',
         T <= 10 ? 'add10' : 'add20',
@@ -315,8 +315,8 @@
       b = num(rng, band.id === 'g1' ? 2 : 1, Math.min(band.id === 'g1' ? 5 : 6, a - (band.id === 'g1' ? 3 : 1)));
       T = a - b;
       return numQ(
-        'There are ' + a + ' ' + food.plural + '. You pick ' + b + '. How many are left?',
-        'There are ' + a + ' ' + food.plural + '. You pick ' + b + '. How many are left?',
+        'There are ' + a + ' ' + food.plural + '. You pick ' + b + '. How many ' + food.plural + ' are left?',
+        'There are ' + a + ' ' + food.plural + '. You pick ' + b + '. How many ' + food.plural + ' are left?',
         T, shuffle(rng, near(T, nChoices, 0, Math.max(hi, a), rng)),
         a + ' minus ' + b + ' is ' + T + '.',
         a <= 10 ? 'sub10' : 'sub20',

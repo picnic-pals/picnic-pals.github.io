@@ -91,11 +91,49 @@
   function addTime(s) { T.left += s; T.limit = Math.max(T.limit, T.left); renderTimer(); var tm = $('#timer'), r = tm.getBoundingClientRect(); UI.plusText(r.right - 50, r.top + 6, '+' + s + 's'); tm.classList.remove('boost'); void tm.offsetWidth; tm.classList.add('boost'); }
 
   /* ---------- level building ---------- */
+  // Boss harder tier: stay on the same skill, but prefer bigger numbers and closer distractors.
+  function ruleSize(R) {
+    var s = (R && (R.plain || R.text) || '').replace(/<[^>]+>/g, ' '), n = 0, m;
+    var re = /-?\d+/g; while ((m = re.exec(s))) n = Math.max(n, Math.abs(+m[0]));
+    if (R && R.target != null && isFinite(+R.target)) n = Math.max(n, Math.abs(+R.target));
+    return n;
+  }
+  function cellNum(c) {
+    if (!c) return null;
+    if (typeof c.value === 'number' && isFinite(c.value)) return c.value;
+    if (c.f && typeof c.f.v === 'number') return c.f.v;
+    var m = String(c.k || c.label || '').match(/-?\d+/);
+    return m ? +m[0] : null;
+  }
+  function harderRule(skill, level) {
+    if (!skill || !skill.gen) return skill && skill.gen ? skill.gen(level) : null;
+    var best = null, bestN = -1, t;
+    for (t = 0; t < 8; t++) {
+      var r = skill.gen(level), n = ruleSize(r);
+      if (!best || n > bestN) { best = r; bestN = n; }
+    }
+    if (best && best.bad) {
+      var orig = best.bad, tgt = best.target;
+      best.bad = function () {
+        var i, c, n, d, pick = orig(), bestC = pick, bestD = 99;
+        if (tgt == null || !isFinite(+tgt)) return pick;
+        n = cellNum(pick); if (n != null) bestD = Math.abs(n - tgt);
+        for (i = 0; i < 5; i++) {
+          c = orig(); n = cellNum(c);
+          if (n == null) continue;
+          d = Math.abs(n - tgt);
+          if (d > 0 && d < bestD) { bestC = c; bestD = d; }
+        }
+        return bestC;
+      };
+    }
+    return best;
+  }
   function buildLevel(cont) {
     var cells = [];
     PL.forEach(function (pl) {
       if (A.Steps) A.Steps.ctx.p = pl.P;
-      var R = pl.round.skill.gen(pl.round.level), mine = TWO ? N / 2 : N, cpb = A.Age.cellsPerBoard(pl.P), nOk = TWO ? A.rnd(5, 6) : pl.round.nOk || A.rnd(cpb[0], cpb[1]), i;
+      var hard = !!(pl.round.hard || (SR && SR.cfg && SR.cfg.bossHarder)), R = hard ? harderRule(pl.round.skill, pl.round.level) : pl.round.skill.gen(pl.round.level), mine = TWO ? N / 2 : N, cpb = A.Age.cellsPerBoard(pl.P), nOk = TWO ? A.rnd(5, 6) : pl.round.nOk || A.rnd(cpb[0], cpb[1]), i;
       var pickable = A.Coach && A.Coach.pickItem && !R.rc && R.hom == null && typeof R.target !== 'string' && !pl.P.guest;
       var seen = {}, ck = function (c) { return c.label + '|' + (c.html || ''); };   // qbatch-1107: distinct targets and distractors when the rule allows it
       var fresh = function (fn) { var c, t = 0; do { c = fn(); } while (seen[ck(c)] && ++t < 12); seen[ck(c)] = 1; return c; };
@@ -112,7 +150,12 @@
     A.shuffle(cells);
     G.cells = cells; if (!cont) { G.hearts = 3; G.t0 = Date.now(); } G.team = { done: false };
     var fsj = null; try { fsj = A.Curriculum.subjectOf(PL[0].round.skill); } catch (e) { fsj = null; }
-    G.freeMax = TWO ? 0 : A.munchFreeMisses(P1, PL[0].nOk, fsj); G.free = G.freeMax; G.run = 0;   // after9 hint-before-heart; batch1: 1 per 4 snacks, fresh on every board
+    G.freeMax = TWO ? 0 : A.munchFreeMisses(P1, PL[0].nOk, fsj); G.noRegen = false; G.lastFact = [];
+    if (!TWO && STORY && SR && SR.cfg && SR.cfg.boss) {
+      if (SR.cfg.bossFree != null) G.freeMax = SR.cfg.bossFree;
+      if (SR.cfg.bossNoRegen) G.noRegen = true;
+    }
+    G.free = G.freeMax; G.run = 0;   // after9 hint-before-heart; batch1: 1 per 4 snacks, fresh on every board. Bramble: 1 free, no regen.
     PL[0].pos = TWO ? { r: ROWS - 1, c: COLS - 1 } : { r: 0, c: 0 };   // P1 (arrow keys, right hand) starts on the right
     if (TWO) PL[1].pos = { r: 0, c: 0 };                                 // P2 (WASD, left hand) starts on the left
     B.cell = -1; B.shown = false; B.used = false;
@@ -270,9 +313,14 @@
   }
   // Make every tile label fit inside its tile: first shrink on one line (a little), then wrap at spaces and shrink again,
   // never below MIN_FONT px for the label's text. Shrinking sets the label's own --cs, so pictures/frames scale with the text.
-  var MIN_FONT = 13;
+  var MIN_FONT = 13, MIN_WORD = 20;
   function over(l) { return l.scrollWidth > l.clientWidth || l.scrollHeight > l.clientHeight; }
-  function textPx(l) { var t = l.querySelector('.ea-word,.ea-cap') || l; return parseFloat(getComputedStyle(t).fontSize) || 16; }
+  function textPx(l) { var t = l.querySelector('.ea-word,.ea-cap,.tp-w') || l; return parseFloat(getComputedStyle(t).fontSize) || 16; }
+  function minFontFor(l) {
+    var el = l.querySelector('.tp-w, .ea-word, .ea-cap') || l;
+    var letters = String((el.innerText || el.textContent || '')).replace(/[^A-Za-z]/g, '');
+    return letters.length >= 6 ? MIN_WORD : MIN_FONT;
+  }
   function fitCell(d) {
     var l = d.querySelector('.lbl'); if (!l) return;
     l.style.removeProperty('--cs'); d.classList.remove('wrap', 'tight');
@@ -284,11 +332,19 @@
     }
     if (A.CountVisual && A.CountVisual.fit && l.querySelector('.cv-set')) A.CountVisual.fit(d);
     if (!over(l)) return;
-    var k = 1, f0 = textPx(l);
-    while (over(l) && k > .72 && f0 * k * .92 >= MIN_FONT) { k *= .92; l.style.setProperty('--cs', (CS * k) + 'px'); }
+    var k = 1, f0 = textPx(l), minF = minFontFor(l);
+    while (over(l) && k > .72 && f0 * k * .92 >= minF) { k *= .92; l.style.setProperty('--cs', (CS * k) + 'px'); }
     if (!over(l)) return;
     d.classList.add('wrap'); k = 1; l.style.removeProperty('--cs');
-    while (over(l) && f0 * k * .94 >= MIN_FONT) { k *= .94; l.style.setProperty('--cs', (CS * k) + 'px'); }
+    while (over(l) && f0 * k * .94 >= minF) { k *= .94; l.style.setProperty('--cs', (CS * k) + 'px'); }
+    if (over(l)) {
+      d.classList.add('wrap');
+      l.style.overflowWrap = 'anywhere';
+    }
+    if (over(l) && minF > MIN_FONT) {
+      minF = MIN_FONT;
+      while (over(l) && f0 * k * .94 >= minF) { k *= .94; l.style.setProperty('--cs', (CS * k) + 'px'); }
+    }
     if (over(l)) d.classList.add('tight');   // still too big at the minimum size (caller can test for .tight)
     // Subpixel / line-box can report 1–2px of scroll overflow even when the
     // phrase fits in the tile. Grow the label box (capped to the cell) so
@@ -423,19 +479,23 @@
     if (cell.ok) {
       cell.eaten = true; pl.correct++; pl.remaining--; var sig = C.recordAnswer(P, sid, true, ansOpt(pl, cell)); A.Pad.rumble(pl.i, 'light');
       // batch1: 3 right munches in a row give a lost heart back (max 3)
-      if (!TWO && !GENTLE) { G.run = (G.run || 0) + 1; if (G.run >= (A.MUNCH_REGEN || 3)) { G.run = 0; if (G.hearts < 3) { G.hearts++; renderHearts(false, true); } } }
+      if (!TWO && !GENTLE && !G.noRegen) { G.run = (G.run || 0) + 1; if (G.run >= (A.MUNCH_REGEN || 3)) { G.run = 0; if (G.hearts < 3) { G.hearts++; renderHearts(false, true); } } }
       setTimeout(function () { el.classList.add('eaten'); }, 160);
       setTimeout(function () { anim(pl, 'happy', 1000); }, 200); SFX.yay();
       var rc = el.getBoundingClientRect(); UI.sparkle(rc.left + rc.width / 2, rc.top + rc.height / 2); UI.plusText(rc.left + rc.width / 2, rc.top + rc.height * .3, '+1');
       // 2026-10-22 voice: no spoken praise after a right answer (the chomp + yay sounds and a short text bubble instead).
       // Word-reading skills still say the word: sight-word "listen" rounds in every mode but Off, other word skills where a pre-reader needs it.
-      var fact = (pl.round.skill.sayFact || pl.rule.listen) ? cell.fact || [] : [], praise = YUM_TEXT[(pl.correct + pl.i) % YUM_TEXT.length];
+      var praise = YUM_TEXT[(pl.correct + pl.i) % YUM_TEXT.length];
+      G.lastFact = cell.fact || [];   // the number fact stays behind the Hear button (not spoken mid-choice)
+      // Word-reading (cloze, picture, or listen): say the word after a right munch. Speech is optional; the prompt stays visual.
+      if (cell.fact && cell.fact.length && (pl.rule.listen || pl.rule.cloze || pl.rule.pic)) {
+        V.say(cell.fact, { kind: 'listen', bubble: false });
+      }
       if (pl.remaining <= 0) {
         pl.done = true; pl.doneAt = Date.now();
-        if (TWO) { if (MODE === 'versus' && !PL.some(function (o) { return o !== pl && o.done; })) G.winner = pl.i; fact = []; praise = V.text(['munch_all_done']); setTimeout(function () { anim(pl, 'dance', 1600); }, 500); }
+        if (TWO) { if (MODE === 'versus' && !PL.some(function (o) { return o !== pl && o.done; })) G.winner = pl.i; praise = V.text(['munch_all_done']); setTimeout(function () { anim(pl, 'dance', 1600); }, 500); }
       }
-      bubble(fact.length ? praise + ' ' + V.text(fact) : praise);
-      if (fact.length) V.say(fact, { kind: pl.rule.listen ? 'listen' : 'target' });
+      bubble(praise);
       renderRule(); renderSide(); coachAfter(pl, sig, cell);
       if (PL.every(function (p) { return p.done; })) { endRound('done'); } else maybeBonus();
     } else {
@@ -446,8 +506,9 @@
       setTimeout(function () { pl.el.classList.remove('chomp'); anim(pl, 'wobble', 800); }, 140); SFX.oops();
       // word-reading rules: say the re-prompt, but don't print it (the bubble would show the answer's spelling)
       // the oops sound + bubble always; the fact / right word is spoken where the setting allows it ("listen" rounds: every mode but Off)
-      if (pl.rule.listen || pl.rule.noPrint) { V.sayMix([[['fb_oops'], 'chatter'], [cell.fact, pl.rule.listen ? 'listen' : 'answer']]); bubble('Oops! Listen again, then try another one.'); }
-      else { var oo = [nearMiss(pl, cell) ? 'fb_so_close' : 'fb_oops']; bubble(V.text(oo.concat(cell.fact))); V.sayMix([[oo, 'chatter'], [cell.fact, 'answer']]); }
+      G.lastFact = cell.fact || [];   // fact is available on Hear only, so it does not talk while the kid is still choosing
+      if (pl.rule.listen || pl.rule.noPrint) { V.sayMix([[['fb_oops'], 'chatter']]); bubble('Oops! Listen again, then try another one.'); }
+      else { var oo = [nearMiss(pl, cell) ? 'fb_so_close' : 'fb_oops']; bubble(V.text(oo)); V.sayMix([[oo, 'chatter']]); }
       if (!TWO && !GENTLE && G.hearts <= 0) { G.active = false; stopTimer(); stopGrumbly(); setTimeout(function () { (wsig && wsig.worked ? workedExample(pl) : Promise.resolve()).then(outOfHearts); }, 2400); }
       else coachAfter(pl, wsig, cell);
     }
@@ -650,7 +711,7 @@
       if (T.on) { res.textContent = 'You got it! +15 seconds!'; voice = ['bonus_right']; B.bonusTime = 15; }
       else { res.textContent = 'You got it! A bonus star!'; voice = ['bonus_right_star']; B.bonusTime = 0; if (!pl.P.guest) pl.bonusStar = true; }   // design2: added to the round's stars at the end (capped at 3, needs 1+ earned star)
       voice = [[voice, 'chatter']];   // no spoken praise unless Full (the card shows it)
-      if (q.listen && q.fact && q.fact.length) voice.unshift([q.fact, 'listen']);   // a word-reading question: say the word after a right answer
+      if (q.fact && q.fact.length && (q.listen || q.cloze || q.pic || q.fact[0] === 'sw_that_says' || q.fact[0] === 'w_thats')) voice.unshift([q.fact, 'listen']);
       res.className = 'res good';
     } else {
       SFX.soft(); btns[k].classList.add('nope'); B.bonusTime = 0;
@@ -838,7 +899,13 @@
   }
   function ruleKind() { return PL.some(function (pl) { return pl.rule && pl.rule.listen; }) ? 'listen' : 'prompt'; }
   // 🔊 button, R key, tapping the rule or the friend's bubble: the kid asked, so it plays at every setting but Off
-  function speakRule() { if (!PL[0].rule) return; if (A.Talk.mode() === 'off' || !S.voice) { bubble(S.voice ? 'Talking is off. Read the question at the top!' : 'Voice is off (grown-up settings).'); return; } V.say(ruleParts(), { kind: 'tap' }); }
+  function speakRule() {
+    if (!PL[0].rule) return;
+    if (A.Talk.mode() === 'off' || !S.voice) { bubble(S.voice ? 'Talking is off. Read the question at the top!' : 'Voice is off (grown-up settings).'); return; }
+    var parts = ruleParts() || [];
+    if (G.lastFact && G.lastFact.length) parts = parts.concat(G.lastFact);
+    V.say(parts, { kind: 'tap' });
+  }
 
 
   /* ---------- level transitions: a short, skippable cutscene ----------
@@ -928,7 +995,7 @@
     {
       var cfg = ST.config(P1, i), R = ST.run(P1), stop = ST.STOPS[i], practice = !stop.side && (R.done || i !== R.stop);
       SR = { i: i, cfg: cfg, practice: practice };
-      PL[0].round = { skill: C.byId[cfg.skill], level: cfg.level, nOk: cfg.nOk, timeX: cfg.timeX, story: true, stop: stop, review: false };
+      PL[0].round = { skill: C.byId[cfg.skill], level: cfg.level, nOk: cfg.nOk, timeX: cfg.timeX, story: true, stop: stop, review: false, hard: !!(cfg.hard || cfg.bossHarder) };
       var artBoss = cfg.boss && A.Story2 && A.Story2.PLACES[A.Story2.placeOfStop(i)].art;
       var oldBanner = document.querySelector('.s2-fight-banner'); if (oldBanner) oldBanner.remove(); document.body.classList.toggle('s2-fighting', !!artBoss);
       if (artBoss) { var place = A.Story2.PLACES[A.Story2.placeOfStop(i)];
@@ -961,7 +1028,7 @@
         var sk0 = C.byId[cfg.skill], subj0 = sk0 && C.subjectOf(sk0), cur0 = subj0 && C.current(P1, subj0);
         if (!cur0 || !A.Coach.wantsPlacement(P1, cur0.id)) return;
         return UI.placement(P1, cur0).then(function () { A.Store.save(); cfg = ST.config(P1, i); SR.cfg = cfg;
-          PL[0].round = { skill: C.byId[cfg.skill], level: cfg.level, nOk: cfg.nOk, timeX: cfg.timeX, story: true, stop: stop, review: false }; });
+          PL[0].round = { skill: C.byId[cfg.skill], level: cfg.level, nOk: cfg.nOk, timeX: cfg.timeX, story: true, stop: stop, review: false, hard: !!(cfg.hard || cfg.bossHarder) }; });
       });
       return chain.then(function () {
         if (artBoss) return;
@@ -1025,7 +1092,7 @@
         if (done || !unLock.ready()) { if (!done) unLock.dropped++; return; } done = true; timers.forEach(clearTimeout); document.removeEventListener('keydown', onKey, true); V.stop();
         ov.remove(); UI.cardOpen = !!document.querySelector('.overlay.on');
         UI.confirm({ title: 'Be ' + b.name + ' now?', sub: 'You can switch any time in Dress Up.', art: A.Blobs.svg({ blob: c.blob, color: P1.color, outfit: P1.outfit, expr: 'happy' }), yes: 'Yes!', no: 'Not now' })
-          .then(function (yes) { if (yes) { P1.blob = c.blob; A.Store.save(); PL[0].el = null; } resolve(); });
+          .then(function (yes) { if (yes) { P1.blob = c.blob; if (A.Story2 && A.Story2.switchHero) A.Story2.switchHero(P1, c.blob); A.Store.save(); PL[0].el = null; } resolve(); });
       }
       function onKey(e) { if (/^( |Enter|f|F|Escape)$/.test(e.key)) { e.preventDefault(); e.stopPropagation(); if (!e.repeat) close(); } }
       document.addEventListener('keydown', onKey, true); ov.addEventListener('pointerdown', close);

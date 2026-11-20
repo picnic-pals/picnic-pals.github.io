@@ -86,9 +86,10 @@ body::before, body::after { display: none !important; content: none !important; 
 .pk-card #pkCardSpeak, .pk-cardspeak {
   grid-column: 2; grid-row: 1 / span 2;
   align-self: center; justify-self: end;
-  min-width: 48px; min-height: 48px; border-radius: 14px;
+  min-width: max(60px, var(--tap, 60px)); min-height: max(60px, var(--tap, 60px)); border-radius: 14px;
   background: #ffe9a8; border: 2px solid #c9a24a;
   display: flex; align-items: center; justify-content: center;
+  box-sizing: border-box;
 }
 .pk-cardspeak .pp-icon, .pk-cardspeak .pp-emoji { width: 32px; height: 32px; }
 .pk-ask {
@@ -954,8 +955,8 @@ html.stage-on .pk-bin {
 }
 html.stage-on .pk-cardspeak,
 html.stage-on #pkCardSpeak {
-  min-width: max(48px, calc(48px / var(--stage-scale, 1)));
-  min-height: max(48px, calc(48px / var(--stage-scale, 1)));
+  min-width: max(60px, var(--tap, 60px));
+  min-height: max(60px, var(--tap, 60px));
 }
 html.stage-on .pk-winbtns .pk-action,
 html.stage-on .pk-winbtns .pk-secondary {
