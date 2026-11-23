@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" aria-hidden="true">
+  <g stroke="#3b2d55" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- heavy-lidded ovals -->
+    <path d="M14 70
+             Q 14 48 38 48
+             Q 62 48 62 70
+             Q 62 86 38 86
+             Q 14 86 14 70 Z" fill="#ffffff"/>
+    <path d="M66 70
+             Q 66 48 90 48
+             Q 114 48 114 70
+             Q 114 86 90 86
+             Q 66 86 66 70 Z" fill="#ffffff"/>
+    <!-- pupils sitting low -->
+    <circle cx="40" cy="74" r="9" fill="#3b2d55" stroke="none"/>
+    <circle cx="92" cy="74" r="9" fill="#3b2d55" stroke="none"/>
+    <circle cx="36" cy="70" r="3.2" fill="#ffffff" stroke="none"/>
+    <circle cx="88" cy="70" r="3.2" fill="#ffffff" stroke="none"/>
+    <!-- heavy lids -->
+    <path d="M16 62 Q38 52 60 62" fill="none" stroke-width="7"/>
+    <path d="M68 62 Q90 52 112 62" fill="none" stroke-width="7"/>
+  </g>
+
+</svg>

@@ -319,6 +319,98 @@
     });
     return html + '</div>';
   }
+  function layoutCard(pass) {
+    var card = $('#gdCard'), play = document.querySelector('.gd-play'), stage;
+    if (!card) return;
+    stage = document.querySelector('.stage-scale') || document.getElementById('garden');
+    var land = isLand();
+    var nItems = card.querySelectorAll('.gd-food, .gd-array img, .gd-pic img').length;
+    var few = nItems > 0 && nItems <= 5;
+    var many = nItems >= 12;
+    var icon = land ? (few ? 64 : many ? 36 : 48) : (few ? 44 : many ? 26 : 34);
+    var ask = land ? 32 : 26;
+    var choiceH = land ? (few ? 96 : 80) : (few ? 72 : 64);
+    var choicePic = land ? 48 : 40;
+    var cv = land ? 20 : 16;
+    var iconMax = land ? (few ? 72 : many ? 44 : 56) : (few ? 56 : many ? 32 : 44);
+    var askMax = land ? 36 : 32;
+    var choiceMax = land ? 112 : 96;
+    card.style.justifyContent = 'flex-start';
+    card.style.setProperty('--gd-icon', icon + 'px');
+    card.style.setProperty('--gd-ask', ask + 'px');
+    card.style.setProperty('--gd-choice-h', choiceH + 'px');
+    card.style.setProperty('--gd-choice-pic', choicePic + 'px');
+    card.style.setProperty('--gd-cv', cv + 'px');
+    if (play) play.classList.remove('gd-tight');
+    function fitVisuals() {
+      if (A.CountVisual && A.CountVisual.fit) A.CountVisual.fit(card);
+    }
+    function apply() {
+      card.style.setProperty('--gd-icon', icon + 'px');
+      card.style.setProperty('--gd-ask', ask + 'px');
+      card.style.setProperty('--gd-choice-h', choiceH + 'px');
+      card.style.setProperty('--gd-choice-pic', choicePic + 'px');
+      card.style.setProperty('--gd-cv', cv + 'px');
+      fitVisuals();
+    }
+    apply();
+    function overflowing() {
+      var sh = card.scrollHeight > card.clientHeight + 2 || card.scrollWidth > card.clientWidth + 2;
+      var box = (stage || play || card).getBoundingClientRect();
+      var off = false;
+      card.querySelectorAll('.gd-choice, .gd-ask, .gd-pic, .gd-water, .gd-seedbtn').forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        if (r.bottom > box.bottom + 3 || r.top < box.top - 3 || r.right > box.right + 3 || r.left < box.left - 3) off = true;
+      });
+      return sh || off;
+    }
+    function leftover() {
+      var used = card.scrollHeight;
+      var have = card.clientHeight;
+      if (play && !land) {
+        var scene = document.querySelector('.gd-scene');
+        var sceneMin = scene ? (parseFloat(getComputedStyle(scene).minHeight) || 200) : 200;
+        var gap = parseFloat(getComputedStyle(play).gap) || 6;
+        have = Math.max(have, play.clientHeight - sceneMin - gap);
+      }
+      return have - used;
+    }
+    var guard = 0;
+    while (overflowing() && guard++ < 12) {
+      if (icon > 16) { icon -= 2; apply(); continue; }
+      if (cv > 10) { cv -= 2; apply(); continue; }
+      if (choiceH > 60) { choiceH -= 4; apply(); continue; }
+      if (choicePic > 28) { choicePic -= 4; apply(); continue; }
+      if (ask > 20) { ask -= 2; apply(); continue; }
+      if (play && !play.classList.contains('gd-tight')) { play.classList.add('gd-tight'); apply(); continue; }
+      break;
+    }
+    guard = 0;
+    while (!overflowing() && leftover() > 28 && guard++ < 12) {
+      var grew = false;
+      if (nItems && icon < iconMax) { icon += 2; grew = true; }
+      else if (choiceH < choiceMax) { choiceH += 4; grew = true; }
+      else if (ask < askMax) { ask += 1; grew = true; }
+      else if (cv < (land ? 28 : 22)) { cv += 1; grew = true; }
+      if (!grew) break;
+      apply();
+      if (overflowing()) {
+        if (icon > 16 && nItems) icon -= 2;
+        else if (choiceH > 60) choiceH -= 4;
+        else if (ask > 20) ask -= 1;
+        apply();
+        break;
+      }
+    }
+    if (card.classList.contains('gd-card-q')) {
+      card.style.justifyContent = 'space-evenly';
+    } else {
+      card.style.justifyContent = '';
+    }
+    if ((pass || 0) < 1) {
+      requestAnimationFrame(function () { layoutCard(1); });
+    }
+  }
   function renderCard(shot) {
     if (!hasPlant() && !(G.band && G.band.toddler && hasPlant())) {
       if (!hasPlant()) {
@@ -334,11 +426,14 @@
     }
     var q = G.question;
     if (!q) return '<div class="gd-card" id="gdCard"><p class="gd-ask" id="gdAsk">Tap a seed packet, then a patch of soil.</p>' + seedTrayHtml() + '<p class="gd-nudge" id="gdNudge">' + A.esc(G.nudge || '') + '</p></div>';
-    var html = '<div class="gd-card" id="gdCard"><p class="gd-ask" id="gdAsk">' + (q.html || A.esc(q.text)) + '</p>';
+    var html = '<div class="gd-card gd-card-q" id="gdCard"><p class="gd-ask" id="gdAsk">' + (q.html || A.esc(q.text)) + '</p>';
     if (q.pic) html += '<div class="gd-pic">' + q.pic + '</div>';
-    html += '<p class="gd-nudge" id="gdNudge">' + A.esc(G.nudge || '') + '</p>';
+    if (G.nudge && !(K.revealsAnswer && K.revealsAnswer(q, G.nudge))) {
+      html += '<p class="gd-nudge" id="gdNudge">' + A.esc(G.nudge) + '</p>';
+    }
     var n = (q.choices || []).length;
-    html += '<div class="gd-choices n' + n + '" id="gdChoices">';
+    var picAns = (q.choices || []).some(function (c) { return !!(c.html); });
+    html += '<div class="gd-choices n' + n + (picAns ? ' has-pic' : '') + '" id="gdChoices">';
     (q.choices || []).forEach(function (c, i) {
       html += '<button type="button" class="gd-choice" data-i="' + i + '">' + (c.html || A.esc(c.label)) + '</button>';
     });
@@ -382,6 +477,7 @@
     bindWorld();
     bindCard();
     layoutWorld();
+    layoutCard();
   }
 
   function renderPop(res) {
@@ -462,7 +558,8 @@
       say(promptSpeech(), 'prompt');
       return;
     }
-    G.question = (G.band && G.band.toddler) ? null : K.makeQuestion(P, { band: G.band });
+    G.recent = G.recent || [];
+    G.question = (G.band && G.band.toddler) ? null : K.makeQuestion(P, { band: G.band, recent: G.recent });
     renderPlay('');
     say(promptSpeech(), 'prompt');
   }
@@ -577,6 +674,7 @@
         A.Curriculum.recordAnswer(P, q.skill, false, {});
       }
       G.nudge = K.hintFor(q);
+      if (K.revealsAnswer && K.revealsAnswer(q, G.nudge)) G.nudge = '';
       if (el) { el.classList.add('wrong'); setTimeout(function () { el.classList.remove('wrong'); }, 400); }
       if (A.Audio && A.Audio.sfx) A.Audio.sfx('locked');
       say(G.nudge, 'chatter');
@@ -626,6 +724,7 @@
 
   window.addEventListener('resize', function () {
     if ($('#gdScene')) layoutWorld();
+    if ($('#gdCard')) layoutCard();
   });
 
   window.__garden = {
@@ -647,7 +746,7 @@
     },
     tapWater: onToddlerTap,
     render: render,
-    layout: layoutWorld,
+    layout: function () { layoutWorld(); layoutCard(); },
     setCheerMs: function (ms) { cheerMs = ms; hopMs = ms; },
     nameOf: K.nameOf
   };

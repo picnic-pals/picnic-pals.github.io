@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="btBody" x1="30%" y1="15%" x2="80%" y2="95%">
+      <stop offset="0%" stop-color="#d4a078"/>
+      <stop offset="100%" stop-color="#b07a4f"/>
+    </linearGradient>
+    <linearGradient id="btSole" x1="30%" y1="15%" x2="80%" y2="95%">
+      <stop offset="0%" stop-color="#7a5a3a"/>
+      <stop offset="100%" stop-color="#5a3e28"/>
+    </linearGradient>
+    <linearGradient id="btCuff" x1="30%" y1="15%" x2="80%" y2="95%">
+      <stop offset="0%" stop-color="#efe0d0"/>
+      <stop offset="100%" stop-color="#dcc4a8"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#3b2d55" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+    <g transform="translate(2 4) rotate(-8 32 70)">
+      <path d="M14 96
+               Q 12 108 28 110
+               H 56
+               Q 70 108 66 96
+               L 62 52
+               Q 62 36 44 34
+               Q 24 34 22 52 Z" fill="url(#btBody)"/>
+      <path d="M14 96 Q 12 110 28 112 H 56 Q 72 110 66 96 Q 40 104 14 96 Z" fill="url(#btSole)"/>
+      <rect x="20" y="30" width="44" height="18" rx="7" fill="url(#btCuff)"/>
+      <!-- buckle -->
+      <rect x="36" y="62" width="16" height="12" rx="3" fill="#ffd36a"/>
+      <ellipse cx="30" cy="56" rx="7" ry="5" fill="#ffc49a" fill-opacity=".35" stroke="none"/>
+    </g>
+    <g transform="translate(58 4) rotate(8 32 70)">
+      <path d="M14 96
+               Q 12 108 28 110
+               H 56
+               Q 70 108 66 96
+               L 62 52
+               Q 62 36 44 34
+               Q 24 34 22 52 Z" fill="url(#btBody)"/>
+      <path d="M14 96 Q 12 110 28 112 H 56 Q 72 110 66 96 Q 40 104 14 96 Z" fill="url(#btSole)"/>
+      <rect x="20" y="30" width="44" height="18" rx="7" fill="url(#btCuff)"/>
+      <!-- buckle -->
+      <rect x="36" y="62" width="16" height="12" rx="3" fill="#ffd36a"/>
+      <ellipse cx="30" cy="56" rx="7" ry="5" fill="#ffc49a" fill-opacity=".35" stroke="none"/>
+    </g>
+  </g>
+
+</svg>

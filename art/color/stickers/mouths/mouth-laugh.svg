@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="mhOpen" x1="30%" y1="15%" x2="80%" y2="95%">
+      <stop offset="0%" stop-color="#e45a72"/>
+      <stop offset="55%" stop-color="#ff6b84"/>
+      <stop offset="100%" stop-color="#e45a72"/>
+    </linearGradient>
+<clipPath id="mhClip"><path d="M16 52 Q 64 16 112 52 Q 108 64 100 72 Q 64 118 28 72 Q 20 64 16 52 Z"/></clipPath>
+  </defs>
+  <g stroke="#3b2d55" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 52
+             Q 64 16 112 52
+             Q 108 64 100 72
+             Q 64 118 28 72
+             Q 20 64 16 52 Z" fill="url(#mhOpen)"/>
+    <!-- teeth hang from the upper lip, clipped to the mouth -->
+    <g clip-path="url(#mhClip)" stroke="#3b2d55" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="46" y="30" width="14" height="22" rx="4" fill="#ffffff"/>
+      <rect x="68" y="30" width="14" height="22" rx="4" fill="#ffffff"/>
+    </g>
+    <!-- tongue at the bottom -->
+    <path d="M46 90 Q 64 116 82 90 Q 64 102 46 90 Z" fill="#ff8fc7" stroke="#3b2d55" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+</svg>

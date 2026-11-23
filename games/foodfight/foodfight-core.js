@@ -1,6 +1,7 @@
 /* Food Fight: pure match rules. rng injection supports reproducible decks; no storage or DOM here. */
 (function (A) {
   'use strict';
+  var METER = 5;
   function bandFor(p) {
     var age = A.Age.band(p), explicit = p.levels && p.levels.math, floor = A.Learn ? A.Learn.floor(p, 'math') : 0;
     var id = age === 'toddler' || age === 'pre' ? 'toddler' : age === 'g1' ? 'g1' : age === 'g2' || age === 'g3' ? 'g2' : 'pk';
@@ -12,7 +13,8 @@
   }
   function num(g, lo, hi) { return lo + Math.floor(g.rng() * (hi - lo + 1)); }
   function newMatch(p, rng) {
-    var g = { band: bandFor(p), rng: rng || Math.random, flips: 0, score: [0, 0], judged: 0, correctN: 0, streak: 0, wildUsed: 0, wild: false, phase: 'ready', cards: [], rule: 'more', pot: 2, recent: [] };
+    var g = { band: bandFor(p), rng: rng || Math.random, flips: 0, score: [0, 0], judged: 0, correctN: 0, streak: 0, wildUsed: 0, wild: false, phase: 'ready', cards: [], rule: 'more', pot: 2, recent: [],
+      splats: 0, splatTotal: 0, parties: 0, giant: false };
     g.wildAt = g.rng() < .25 ? num(g, 3, 8) : -1; return g;
   }
   function card(v, suit, label) { return { value: v, suit: suit, label: label || String(v) }; }
@@ -64,17 +66,38 @@
     if (!g.band.toddler && !(g.rule === 'more' ? n > g.cards[0].value : n < g.cards[0].value)) return false;
     g.cards[1] = card(n, 'strawberry'); g.phase = 'choose'; return true;
   }
-  function splatOff(g) { if (g.phase !== 'tie') return false; g.cards = pair(g, false); g.pot = 10; g.phase = 'choose'; return true; }
+  /* A tie is a short pause, then a fresh non-tie pair for a giant splat. Same flip number. */
+  function tieNext(g) {
+    if (g.phase !== 'tie') return false;
+    g.cards = pair(g, false);
+    g.giant = true;
+    g.pot = 2;
+    g.phase = 'choose';
+    return true;
+  }
   function choose(g, side) {
     if (g.phase !== 'choose' || (side !== 0 && side !== 1)) return null;
     var w = winner(g), ok = g.band.toddler || side === w;
     if (w < 0) { g.phase = 'tie'; return null; }
     g.judged = (g.judged || 0) + 1;
-    /* A correct call always wins the pot for the player; a miss gives the pot to the other side. */
-    if (ok) { g.score[1] += g.pot; g.streak++; g.correctN = (g.correctN || 0) + 1; }
-    else { g.score[0] += g.pot; g.streak = 0; }
+    var add = 0, parties = 0, wasGiant = !!g.giant;
+    if (ok) {
+      add = wasGiant ? 2 : 1;
+      g.splatTotal = (g.splatTotal || 0) + add;
+      g.splats = (g.splats || 0) + add;
+      while (g.splats >= METER) { g.splats -= METER; parties++; }
+      g.parties = (g.parties || 0) + parties;
+      g.streak++;
+      g.correctN = (g.correctN || 0) + 1;
+      g.score[1] = g.splatTotal;
+    } else {
+      g.streak = 0;
+    }
+    g.giant = false;
     var a = g.cards[w].value, b = g.cards[1 - w].value;
-    g.result = { correct: ok, winner: w, taker: ok ? 1 : 0, pot: g.pot, message: g.band.toddler ? 'Splat! What a picnic!' : a + ' is ' + g.rule + ' than ' + b + (ok ? '!' : '. Take a look!') };
+    var message = g.band.toddler ? (ok ? (wasGiant ? 'Double splat! What a picnic!' : 'Splat! What a picnic!') : 'Splat! What a picnic!')
+      : a + ' is ' + g.rule + ' than ' + b + (ok ? '!' : '. Take a look!') + (ok && wasGiant ? ' Double splat!' : '');
+    g.result = { correct: ok, winner: w, taker: ok ? 1 : 0, pot: add, splatAdd: add, giant: wasGiant, party: parties > 0, parties: parties, meter: g.splats || 0, message: message };
     g.phase = g.flips === 10 ? 'done' : 'feedback'; return g.result;
   }
   function matchStars(g) {
@@ -85,5 +108,5 @@
     if (n >= 4) return 1;
     return 0;
   }
-  A.FoodFight = { bandFor: bandFor, newMatch: newMatch, deal: deal, winner: winner, choose: choose, splatOff: splatOff, wildOptions: wildOptions, wildPick: wildPick, matchStars: matchStars };
+  A.FoodFight = { bandFor: bandFor, newMatch: newMatch, deal: deal, winner: winner, choose: choose, tieNext: tieNext, splatOff: tieNext, wildOptions: wildOptions, wildPick: wildPick, matchStars: matchStars, METER: METER };
 })(window.Arcade);

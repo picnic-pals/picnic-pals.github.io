@@ -11,6 +11,7 @@
   var stats = P.games.racers = P.games.racers || { races: 0, wins: 0, best: {}, tier: 0 };
   var G = null, screen = 'menu', busy = false, askedAt = 0;
   var P2 = null, twoBusy = [false, false], askedAtTwo = [0, 0];
+  var garageTab = 'body';
   var params = new URLSearchParams(location.search || '');
 
   function icon(key, size, cls) {
@@ -21,7 +22,8 @@
     return (c && c.name) || (A.Blobs && A.Blobs.byId && A.Blobs.byId[id] && A.Blobs.byId[id].name) || 'Friend';
   }
   function friendImg(id, ex) {
-    return A.ROOT + 'assets/picnic/friends/' + id + '/' + (ex || 'front') + '_256.webp';
+    if (A.Blobs && A.Blobs.art) return A.Blobs.art(id, ex || 'front', 256);
+    return A.ROOT + 'assets/picnic/friends/strawberry/' + (ex || 'front') + '_256.webp';
   }
   function say(text, kind) {
     if (!text) return;
@@ -123,8 +125,16 @@
     screen = 'garage';
     document.body.className = 'sr-on-garage';
     var g = K.garageOf(family);
+    var tabs = [
+      { id: 'body', label: 'Body', kinds: ['body'] },
+      { id: 'wheels', label: 'Wheels', kinds: ['wheels'] },
+      { id: 'spoiler', label: 'Spoiler', kinds: ['spoiler'] },
+      { id: 'paint', label: 'Paint', kinds: ['paint'] },
+      { id: 'more', label: 'More', kinds: ['sticker', 'horn', 'trail'], upgrades: true }
+    ];
+    var titles = { body: 'Body', wheels: 'Wheels', spoiler: 'Spoiler', paint: 'Paint', sticker: 'Stickers', horn: 'Horns', trail: 'Trails' };
     function section(kind, title) {
-      var h = '<div class="sr-sec"><h2>' + title + '</h2><div class="sr-row">';
+      var h = '<div class="sr-sec" data-sec="' + kind + '"><h2>' + title + '</h2><div class="sr-row">';
       (K.PARTS[kind] || []).forEach(function (item) {
         var have = K.owned(g, kind, item.id);
         var on = g.car[kind] === item.id;
@@ -137,25 +147,36 @@
       });
       return h + '</div></div>';
     }
-    var up = '<div class="sr-sec"><h2>Little upgrades</h2><div class="sr-row">';
+    var up = '<div class="sr-sec" data-sec="upgrade"><h2>Little upgrades</h2><div class="sr-row">';
     [['speed', 'Speed', g.car.speedLv], ['handling', 'Handling', g.car.handleLv]].forEach(function (u) {
       up += '<button class="sr-part' + (u[2] >= 3 ? ' on' : '') + '" data-kind="upgrade" data-id="' + u[0] + '">' +
         '<span>' + u[1] + '</span><span>' + u[2] + ' / 3</span>' +
         (u[2] >= 3 ? '<span>Max</span>' : '<span class="sr-cost">' + K.upgradeCost(u[2]) + ' coins</span>') + '</button>';
     });
     up += '</div></div>';
+    var tab = tabs.filter(function (t) { return t.id === garageTab; })[0] || tabs[0];
+    garageTab = tab.id;
+    var shop = '';
+    tab.kinds.forEach(function (kind) { shop += section(kind, titles[kind] || kind); });
+    if (tab.upgrades) shop += up;
+    var tabBtns = tabs.map(function (t) {
+      return '<button type="button" class="sr-g-tab' + (t.id === tab.id ? ' on' : '') + '" data-tab="' + t.id + '">' + t.label + '</button>';
+    }).join('');
     $('#srContent').innerHTML =
       '<div class="sr-garage">' +
         '<div class="sr-panel sr-preview">' + carHtml(g.car, P.blob) + '</div>' +
-        '<div class="sr-panel"><p class="sr-lead">Family garage</p>' +
+        '<div class="sr-panel sr-g-lead"><p class="sr-lead">Family garage</p>' +
           '<p class="sr-sub">Everyone shares these coins and parts. Upgrades only help a little.</p></div>' +
-        '<div class="sr-shop">' +
-          section('body', 'Body') + section('wheels', 'Wheels') + section('spoiler', 'Spoiler') +
-          section('paint', 'Paint') + section('sticker', 'Stickers') +
-          section('horn', 'Horns') + section('trail', 'Trails') + up +
-        '</div>' +
+        '<div class="sr-g-tabs" role="tablist">' + tabBtns + '</div>' +
+        '<div class="sr-shop-wrap"><div class="sr-shop" id="srShop">' + shop + '</div></div>' +
         '<button class="sr-action" id="srBack">Back</button>' +
       '</div>';
+    A.$$('.sr-g-tab').forEach(function (el) {
+      el.onclick = function () {
+        garageTab = el.getAttribute('data-tab') || 'body';
+        renderGarage();
+      };
+    });
     A.$$('.sr-part').forEach(function (el) {
       el.onclick = function () {
         var kind = el.getAttribute('data-kind'), id = el.getAttribute('data-id');
@@ -178,6 +199,99 @@
     });
     $('#srBack').onclick = renderMenu;
     coinsEl();
+    bindShopScroll();
+  }
+
+  /* iOS/Safari often cannot natively scroll overflow inside a CSS-transformed
+     stage, so the parts grid is scrolled here by wheel, pointer drag, and touch. */
+  function bindShopScroll() {
+    var shop = document.getElementById('srShop');
+    var wrap = shop && shop.parentElement;
+    if (!shop || !wrap || !wrap.classList.contains('sr-shop-wrap')) return;
+    function scale() {
+      var v = parseFloat(document.documentElement.style.getPropertyValue('--stage-scale') || '1');
+      return (v && isFinite(v) && v > 0) ? v : 1;
+    }
+    function syncHint() {
+      var more = shop.scrollHeight - shop.clientHeight - shop.scrollTop > 4;
+      wrap.classList.toggle('sr-shop-more', more);
+    }
+    shop.addEventListener('scroll', syncHint, { passive: true });
+    syncHint();
+    requestAnimationFrame(syncHint);
+    setTimeout(syncHint, 80);
+
+    shop.addEventListener('wheel', function (e) {
+      if (shop.scrollHeight <= shop.clientHeight + 1) return;
+      var dy = e.deltaY;
+      if (e.deltaMode === 1) dy *= 16;
+      if (e.deltaMode === 2) dy *= shop.clientHeight;
+      var max = Math.max(0, shop.scrollHeight - shop.clientHeight);
+      var next = shop.scrollTop + dy / scale();
+      if (next < 0) next = 0;
+      if (next > max) next = max;
+      if (next !== shop.scrollTop) {
+        shop.scrollTop = next;
+        if (e.cancelable) e.preventDefault();
+      }
+    }, { passive: false });
+
+    var pid = null, startY = 0, startScroll = 0, moved = false, vel = 0, lastY = 0, lastT = 0, coasting = 0;
+    function eatClick(ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      shop.removeEventListener('click', eatClick, true);
+    }
+    shop.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      pid = e.pointerId;
+      startY = lastY = e.clientY;
+      startScroll = shop.scrollTop;
+      moved = false;
+      vel = 0;
+      lastT = Date.now();
+      coasting += 1;
+    });
+    shop.addEventListener('pointermove', function (e) {
+      if (pid == null || e.pointerId !== pid) return;
+      var sc = scale();
+      var now = Date.now();
+      if (!moved && Math.abs(e.clientY - startY) < 8) return;
+      if (!moved) {
+        moved = true;
+        try { shop.setPointerCapture(e.pointerId); } catch (err) {}
+      }
+      var next = startScroll - ((e.clientY - startY) / sc);
+      var max = Math.max(0, shop.scrollHeight - shop.clientHeight);
+      if (next < 0) next = 0;
+      if (next > max) next = max;
+      var dt = Math.max(8, now - lastT);
+      vel = ((lastY - e.clientY) / sc) / dt;
+      lastY = e.clientY;
+      lastT = now;
+      shop.scrollTop = next;
+      if (e.cancelable) e.preventDefault();
+    }, { passive: false });
+    function endPtr(e) {
+      if (pid == null || (e && e.pointerId !== pid)) return;
+      pid = null;
+      if (moved) {
+        shop.addEventListener('click', eatClick, true);
+        var v = vel, token = coasting;
+        (function coast() {
+          if (token !== coasting || pid != null) return;
+          v *= 0.92;
+          if (Math.abs(v) < 0.02) return;
+          shop.scrollTop += v * 16;
+          requestAnimationFrame(coast);
+        })();
+      }
+    }
+    shop.addEventListener('pointerup', endPtr);
+    shop.addEventListener('pointercancel', endPtr);
+    shop.addEventListener('touchmove', function (e) {
+      if (moved && e.cancelable) e.preventDefault();
+    }, { passive: false });
   }
 
 
@@ -494,6 +608,7 @@
     coinsEl();
     fitTrack();
     fitTwoPics();
+    fitQuestionCard();
   }
   function paintTwoSide(who) {
     var el = document.getElementById('srSide' + who);
@@ -528,6 +643,7 @@
     });
     fitTrack();
     fitTwoPics();
+    fitQuestionCard();
   }
   function pickTwoChoice(who, i) {
     who = who === 1 || who === '1' ? 1 : 0;
@@ -777,6 +893,55 @@
     });
     coinsEl();
     fitTrack();
+    fitQuestionCard();
+  }
+
+  function fitRacePics() {
+    A.$$('.sr-race .sr-pics, .sr-qcard .sr-pics').forEach(function (pics) {
+      if (pics.closest && pics.closest('.sr-two')) return;
+      var sets = pics.querySelectorAll('.cv-set');
+      if (!sets.length) return;
+      var i;
+      for (i = 0; i < sets.length; i++) {
+        sets[i].style.removeProperty('--cv-d');
+        sets[i].style.maxWidth = '';
+        sets[i].style.transform = '';
+      }
+      pics.style.transform = '';
+      pics.style.height = '';
+      var cap = pics.clientWidth;
+      if (cap < 8) return;
+      var guard = 0, d, j, cs, cur;
+      while (guard++ < 24 && pics.scrollWidth > cap + 1) {
+        for (j = 0; j < sets.length; j++) {
+          cs = window.getComputedStyle(sets[j]);
+          cur = parseFloat(cs.getPropertyValue('--cv-d')) || 30;
+          d = Math.max(8, Math.floor(cur * 0.88));
+          if (d >= cur) d = cur - 1;
+          if (d < 8) d = 8;
+          sets[j].style.setProperty('--cv-d', d + 'px');
+        }
+        void pics.offsetWidth;
+      }
+    });
+  }
+  function fitQuestionCard() {
+    fitRacePics();
+    A.$$('.sr-qcard .sr-ask').forEach(function (ask) {
+      if (!ask || !ask.textContent) return;
+      ask.style.fontSize = '';
+      var start = parseFloat(window.getComputedStyle(ask).fontSize) || 28;
+      var size = start, i, card = ask.closest && ask.closest('.sr-qcard');
+      function fits() {
+        return ask.scrollHeight <= ask.clientHeight + 1 && (!card || card.scrollHeight <= card.clientHeight + 1);
+      }
+      if (fits()) return;
+      for (i = 0; i < 12 && size > 22; i++) {
+        size -= 1;
+        ask.style.fontSize = size + 'px';
+        if (fits()) return;
+      }
+    });
   }
 
   function fitTrack() {
@@ -941,7 +1106,7 @@
   headerIcons();
   if (A.HowTo) A.HowTo.button('racers', '#srHome');
 
-  window.addEventListener('resize', fitTrack);
+  window.addEventListener('resize', function () { fitTrack(); fitQuestionCard(); });
 
   window.__racers = {
     family: family, stats: stats,

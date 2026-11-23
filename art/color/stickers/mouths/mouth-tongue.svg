@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="mhTong" x1="30%" y1="15%" x2="80%" y2="95%">
+      <stop offset="0%" stop-color="#ffc4d8"/>
+      <stop offset="100%" stop-color="#ff8fc7"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#3b2d55" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M22 44 Q64 86 106 44" stroke-width="7.5"/>
+    <path d="M50 62
+             Q 50 52 64 52
+             Q 78 52 78 62
+             V 86
+             Q 78 108 64 108
+             Q 50 108 50 86 Z" fill="url(#mhTong)" stroke="#3b2d55" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M64 64 V 90" fill="none" stroke-width="3.4"/>
+  </g>
+
+</svg>

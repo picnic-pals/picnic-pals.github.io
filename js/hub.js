@@ -366,7 +366,7 @@
           if (locked) { b.classList.remove('nudge'); void b.offsetWidth; b.classList.add('nudge'); A.Audio.sfx('locked');
             var short = Math.max(1, (cost || 0) - me.stars);   // how many more stars (stars are never spent; the prize opens at that total)
             A.Voice.say(cost ? ['hub_you_need', short, short === 1 ? 'hub_more_star' : 'hub_more_stars'] : ['hub_locked']); if (cost) A.UI.toast('⭐ ' + short + ' more star' + (short === 1 ? '' : 's') + ' to go!'); return; }
-          if (kind === 'blob') { me.blob = it.id; closetHiName = it.name; if (A.Story2 && A.Story2.switchHero) A.Story2.switchHero(me, it.id); }
+          if (kind === 'blob') { var wasBlob = me.blob; me.blob = it.id; closetHiName = it.name; if (A.Story2 && A.Story2.switchHero) A.Story2.switchHero(me, it.id); if (A.Friends && A.Friends.dropSelfNews) A.Friends.dropSelfNews(me, wasBlob); }
           else if (kind === 'color') me.color = it.id; else if (kind === 'held') me.held = it.id; else me.outfit = it.id;
           me.flags.dressed = true; A.Store.save(); A.Audio.sfx('pop');
           renderCloset(); A.Blobs.anim($('#prevBig'), 'jump', 600);

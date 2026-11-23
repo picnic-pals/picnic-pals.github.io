@@ -28,7 +28,7 @@ body { background: linear-gradient(#fff8ef, #ffeaf3); margin: 0; overflow: hidde
 #vDraw { flex-direction: column; gap: 4px; overflow: hidden; }
 #vDraw .cside { order: 0; display: flex; flex-direction: row; gap: 10px; justify-content: flex-end; align-items: center; flex-shrink: 0; z-index: 4; padding-right: 68px; } /* clear fixed .gear */
 #vDraw .cdraw { order: 1; flex: 1; min-height: 0; min-width: 0; position: relative; overflow: hidden; display: flex; }
-#vDraw .cdraw .cl { flex: 1; min-height: 0; }
+#vDraw .cdraw .cl { flex: 1; min-height: 0; min-width: 0; width: 100%; }
 
 #vGal { position: relative; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; align-content: center; }
 .gframe { flex: 0 1 auto; display: flex; justify-content: center; touch-action: pan-y; }

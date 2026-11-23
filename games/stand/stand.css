@@ -947,3 +947,181 @@ html.stage-on[data-stage="portrait"] .ready { padding-top: 78px; }
 html.stage-on[data-stage="portrait"] .shop-item { min-height: 0; }
 html.stage-on[data-stage="portrait"] .shop-item .si-art { width: 74px; height: 54px; }
 html.stage-on[data-stage="portrait"] .shop-item .si-name { font-size: 15px; }
+
+/* ===== lemon1122 (2026-11-22): drag in / drag out, a half-full cup that fills and tints, stir to serve, tip-total choices.
+   Laid out for the fixed stage only (400x720 portrait, 1024x640 landscape); every target is 60px+ in stage pixels. ===== */
+/* top bar: the progress dots and tip chip fit between the round buttons */
+html.stage-on[data-stage="portrait"] #stand .tbar { gap: 6px; padding-left: 142px; padding-right: 92px; }
+html.stage-on[data-stage="portrait"] .dots { gap: 5px; padding: 6px 8px; }
+html.stage-on[data-stage="portrait"] .dots i { width: 13px; height: 13px; box-shadow: inset 0 0 0 2.5px #ffd98a; }
+html.stage-on[data-stage="portrait"] .dots i.on { box-shadow: inset 0 0 0 2.5px #f0b400; } html.stage-on[data-stage="portrait"] .dots i.now { box-shadow: inset 0 0 0 3px #ff8ab3; }
+html.stage-on[data-stage="portrait"] .jarchip { padding: 2px 8px; font-size: 18px; display: inline-flex; align-items: center; gap: 2px; }
+html.stage-on[data-stage="portrait"] .jarchip svg { width: 22px; height: 24px; }
+html.stage-on[data-stage="portrait"] #stand .sayagain { right: 76px; top: 8px; width: 60px; height: 60px; }
+.pat .face { display: inline-flex; width: 30px; height: 30px; } .pat .face svg { width: 100%; height: 100%; display: block; }
+.want .shape .rsvg { width: 1em; height: 1em; display: block; }
+.byeb { font-size: 28px; font-weight: 800; color: #4a3b6b; }
+
+/* the floating copy that follows a finger while dragging */
+.dghost { position: absolute; z-index: 60; pointer-events: none; display: flex; align-items: center; justify-content: center; transform: scale(1.12);
+  filter: drop-shadow(0 8px 6px #0003); transition: transform .15s; }
+.dghost .emo { font-size: 54px; line-height: 1; } .dghost .emo img, .dghost .svgi svg { width: 1em; height: 1em; }
+.dghost .bill, .dghost svg.bill { width: 100%; height: auto; display: block; }
+.dghost .billstack { position: relative; display: block; width: 100%; } .dghost .billstack .layer:not(.l1) { display: none; }
+.dghost.back { transition: left .25s ease, top .25s ease, transform .25s, opacity .25s; transform: scale(1); opacity: .4; }
+.dghost.gone { transition: transform .22s ease-in, opacity .22s; transform: scale(.4); opacity: 0; }
+.lifted { opacity: .15 !important; }
+.pitcher.dropok::before, .cashbox.dropok::before { content: ''; position: absolute; inset: -6px; border-radius: 28px; box-shadow: 0 0 0 5px #7ed9a8, 0 0 22px #7ed9a8; pointer-events: none; z-index: 3; }
+.cashbox { position: relative; }
+.pitcher.dragout { filter: saturate(.8); }
+
+/* the cup: half full of plain lemonade at the start; pieces are big enough to see and grab */
+.pitcher { touch-action: none; cursor: grab; }
+.pitcher .pile .ti.fl, .pitcher .pile.n2 .ti.fl, .pitcher .pile.n3 .ti.fl { width: 17cqw; height: 17cqw; }
+.pitcher .pile .ti.fl .emo { font-size: 15cqw; }
+.pitcher .pile.n3 .ti.fl { width: 14cqw; height: 14cqw; } .pitcher .pile.n3 .ti.fl .emo { font-size: 12cqw; }
+.pitcher .pile .ti .emo img { width: 1em; height: 1em; display: block; }
+.pitcher.splash .psvg { animation: lsplash .4s ease-out; }
+@keyframes lsplash { 30% { transform: scale(1.04, .97); } 60% { transform: scale(.98, 1.02); } }
+.pitcher.stirring .pile { animation: lswirl .9s ease-in-out infinite; transform-origin: 45% 60%; }
+@keyframes lswirl { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(6deg) translateX(2%); } 75% { transform: rotate(-6deg) translateX(-2%); } }
+.pitcher .fizz { position: absolute; left: 20%; right: 26%; top: 14%; bottom: 10%; pointer-events: none; overflow: visible; }
+.pitcher .fizz i { position: absolute; left: var(--fx); bottom: 0; width: var(--fs); height: var(--fs); border-radius: 50%; background: #fff; opacity: 0; box-shadow: 0 0 6px #fff; }
+.pitcher.sparkle .fizz i { animation: lfizz 1s ease-out var(--fdl) 2 both; }
+@keyframes lfizz { 0% { opacity: 0; transform: translateY(0) scale(.6); } 20% { opacity: .95; } 100% { opacity: 0; transform: translateY(-120%) scale(1.1); } }
+.pitcher.sparkle .psvg { animation: lglow 1s ease-in-out 1; }
+@keyframes lglow { 50% { filter: drop-shadow(0 0 14px #fff6a8) brightness(1.12); } }
+@keyframes lstar { 0% { opacity: 0; transform: scale(.3) rotate(0); } 40% { opacity: 1; transform: scale(1.2) rotate(40deg); } 100% { opacity: 0; transform: scale(.8) rotate(90deg); } }
+
+/* the stirring spoon (drag it around in the cup, or tap it) */
+.spoon { position: absolute; z-index: 4; border: 0; background: #fff; border-radius: 22px; box-shadow: 0 5px 0 #f0c98a; padding: 6px 4px 4px; display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end; gap: 2px; touch-action: none; cursor: grab; transition: transform .3s ease; min-width: 64px; min-height: 64px; }
+.spoon .sp-art { display: block; flex: 1 1 auto; min-height: 0; } .spoon .sp-art svg { height: 100%; width: auto; display: block; }
+.spoon .sp-lab { font-size: 17px; font-weight: 800; color: #4a3b6b; line-height: 1; }
+.spoon.held { transition: none; z-index: 20; background: transparent; box-shadow: none; cursor: grabbing; }
+.spoon.held .sp-lab { visibility: hidden; }
+.spoon.auto { z-index: 20; background: transparent; box-shadow: none; animation: lstirauto 1.5s ease-in-out forwards; }
+.spoon.auto .sp-lab { visibility: hidden; }
+@keyframes lstirauto { 0% { transform: translate(0, 0); } 18% { transform: translate(var(--sx), var(--sy)) rotate(-14deg); }
+  32% { transform: translate(calc(var(--sx) + 18px), calc(var(--sy) + 8px)) rotate(-8deg); } 46% { transform: translate(var(--sx), calc(var(--sy) + 16px)) rotate(-14deg); }
+  60% { transform: translate(calc(var(--sx) - 18px), calc(var(--sy) + 8px)) rotate(-20deg); } 74% { transform: translate(var(--sx), var(--sy)) rotate(-14deg); }
+  86% { transform: translate(calc(var(--sx) + 18px), calc(var(--sy) + 8px)) rotate(-8deg); } 100% { transform: translate(0, 0); } }
+@media (prefers-reduced-motion: reduce) { .spoon.auto { animation: none; } .pitcher.stirring .pile, .pitcher.sparkle .fizz i, .pitcher.splash .psvg { animation: none; } }
+
+/* build orders: no buttons row (stir to serve); the cup gets the room */
+.counter.buildmode .acts { display: none !important; }
+html.stage-on[data-stage="portrait"] .counter.buildmode { display: flex !important; flex-direction: column; gap: 8px; }
+html.stage-on[data-stage="portrait"] .counter.buildmode .tray { flex: 1 1 auto; min-height: 0; }
+html.stage-on[data-stage="portrait"] .counter.buildmode .cupspot { position: relative; height: 100%; padding: 4px 96px 4px 4px !important; justify-content: center; }
+html.stage-on[data-stage="portrait"] .counter.buildmode .pitcher { width: min(100cqh, 230px) !important; height: min(100cqh, 230px) !important; }
+html.stage-on[data-stage="portrait"] .counter.buildmode .cupspot:has(.precup) .pitcher { width: min(100cqh, 170px) !important; height: min(100cqh, 170px) !important; }
+html.stage-on[data-stage="portrait"] .counter.buildmode .cupspot .cnt { top: 6px !important; right: 6px !important; left: auto; transform: none !important; min-width: 52px; height: auto; min-height: 52px; font-size: 26px; }
+html.stage-on[data-stage="portrait"] .counter.buildmode .cupspot .cnt.multi { font-size: 20px; padding: 4px 8px; }
+html.stage-on[data-stage="portrait"] .counter.buildmode .spoon { right: 12px; bottom: 6px; width: 70px; height: 132px; }
+html.stage-on[data-stage="portrait"] .counter.buildmode .cupspot.nocnt .spoon { height: 170px; }
+html.stage-on[data-stage="portrait"] .counter.buildmode .bins { flex: 0 0 auto; display: flex; flex-wrap: nowrap; justify-content: center; gap: 6px; }
+html.stage-on[data-stage="portrait"] .counter.buildmode .bin { width: 72px !important; height: 80px !important; min-width: 60px; min-height: 60px; }
+html.stage-on[data-stage="portrait"] .counter.buildmode .bins.n5 .bin { width: 66px !important; height: 76px !important; }
+html.stage-on[data-stage="portrait"] .counter.buildmode .bin .emo { font-size: 44px; }
+html.stage-on[data-stage="portrait"] .counter.buildmode .bin small { font-size: 11px; }
+html.stage-on[data-stage="landscape"] .counter.buildmode { display: grid !important; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: 1fr; grid-template-areas: 'tray bins'; gap: 12px; align-items: stretch; }
+html.stage-on[data-stage="landscape"] .counter.buildmode .tray { grid-area: tray; height: 100%; min-height: 0; }
+html.stage-on[data-stage="landscape"] .counter.buildmode .cupspot { position: relative; height: 100%; padding: 8px 120px 8px 8px !important; justify-content: center; }
+html.stage-on[data-stage="landscape"] .counter.buildmode .pitcher { width: min(96cqh, 330px) !important; height: min(96cqh, 330px) !important; }
+html.stage-on[data-stage="landscape"] .counter.buildmode .cupspot:has(.precup) .pitcher { width: min(96cqh, 260px) !important; height: min(96cqh, 260px) !important; }
+html.stage-on[data-stage="landscape"] .counter.buildmode .cupspot .cnt { top: 10px !important; right: 10px !important; left: auto; transform: none !important; }
+html.stage-on[data-stage="landscape"] .counter.buildmode .spoon { right: 18px; bottom: 14px; width: 86px; height: 200px; }
+html.stage-on[data-stage="landscape"] .counter.buildmode .bins { grid-area: bins; display: grid !important; grid-template-columns: repeat(2, 104px); gap: 10px; align-content: center; }
+html.stage-on[data-stage="landscape"] .counter.buildmode .bin { width: 104px !important; height: 104px !important; }
+
+/* paying: wallet bills are big enough to grab; the cash box is the drop spot; the right amount glows green, too much turns pink */
+.cashbox .pile-empty { font-size: 18px; font-weight: 800; color: #b8a07a; border: 3px dashed #e8d2a6; border-radius: 16px; padding: 14px 18px; text-align: center; flex: 1 1 auto; }
+.pay-tally.match, .cashbox.match .pay-tally { background: #d8f7e2 !important; border-color: #4fbf7a !important; color: #1d6b3a !important; }
+.pay-tally.over, .cashbox.over .pay-tally { background: #ffe3ec !important; border-color: #ff8ab3 !important; }
+.pay-tally em { font-style: normal; font-size: .7em; margin-left: 8px; color: #c2185b; }
+.cashbox.paid { box-shadow: 0 0 0 5px #7ed9a8; }
+.billbtn { touch-action: none; }
+html.stage-on[data-stage="portrait"] .counter.paying.take { display: flex !important; flex-direction: column; gap: 8px; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .tray { flex: 1 1 auto; min-height: 0; display: flex; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .cashbox { flex: 1 1 auto; display: flex; flex-direction: column; gap: 6px; height: auto; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .cashbox .pile { flex: 1 1 auto; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 6px; min-height: 70px; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .billbtn.in .bill, html.stage-on[data-stage="portrait"] .counter.paying.take .billstack .bill { width: 104px !important; min-width: 0 !important; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .pay-tally { font-size: 22px; padding: 4px 10px; align-self: stretch; text-align: center; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .bins.wallet { flex: 0 0 auto; display: grid !important; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .bins.wallet .billbtn { min-height: 64px; width: 100%; padding: 2px; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .bins.wallet .bill { width: 100% !important; max-width: 160px; height: auto; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .acts { flex: 0 0 auto; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .acts .sbtn { min-height: 62px; min-width: 180px; }
+html.stage-on[data-stage="landscape"] .counter.paying.take { display: grid !important; grid-template-columns: minmax(0, 1fr) 300px; grid-template-rows: 1fr auto; grid-template-areas: 'cash bills' 'cash acts'; gap: 12px; align-items: stretch; }
+html.stage-on[data-stage="landscape"] .counter.paying.take .tray { grid-area: cash !important; height: 100% !important; align-self: stretch !important; display: flex; }
+html.stage-on[data-stage="landscape"] .counter.paying.take .cashbox { flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; height: auto; }
+html.stage-on[data-stage="landscape"] .counter.paying.take .cashbox .pile { flex: 1 1 auto; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 10px; }
+html.stage-on[data-stage="landscape"] .counter.paying.take .billbtn.in .bill, html.stage-on[data-stage="landscape"] .counter.paying.take .billstack .bill { width: 150px !important; min-width: 0 !important; }
+html.stage-on[data-stage="landscape"] .counter.paying.take .pay-tally { font-size: 26px; text-align: center; }
+html.stage-on[data-stage="landscape"] .counter.paying.take .bins.wallet { grid-area: bills; display: grid !important; grid-template-columns: 1fr; gap: 10px; align-content: center; height: auto; }
+html.stage-on[data-stage="landscape"] .counter.paying.take .bins.wallet .billbtn { width: 100%; min-height: 72px; padding: 2px; }
+html.stage-on[data-stage="landscape"] .counter.paying.take .bins.wallet .bill { width: 100% !important; max-width: 220px; height: auto; }
+html.stage-on[data-stage="landscape"] .counter.paying.take .acts { grid-area: acts; align-self: end; }
+html.stage-on[data-stage="landscape"] .counter.paying.take .acts .sbtn { width: 100%; min-height: 66px; }
+
+/* end of day: bigger dollars to tap and count; the total choices sit under the jar */
+.jar .jt { min-width: 60px; min-height: 44px; }
+html.stage-on[data-stage="portrait"] .counter.jarmode .jar .jarglass { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 8px; align-content: center; justify-items: center; }
+html.stage-on[data-stage="portrait"] .counter.jarmode .jar .jt .bill { width: 84px !important; }
+html.stage-on[data-stage="portrait"] .counter.jarmode .jar.many .jt .bill { width: 70px !important; }
+html.stage-on[data-stage="portrait"] .counter.jarmode .acts { gap: 8px; }
+html.stage-on[data-stage="portrait"] .counter.jarmode .acts .sbtn { min-width: 0; flex: 1 1 0; min-height: 64px; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .jar .jarglass { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px 10px; align-content: center; justify-items: center; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .jar .jt .bill { width: 96px !important; }
+.pitcher .fizz b { position: absolute; width: var(--ss); height: var(--ss); opacity: 0; background: #ffe14a; filter: drop-shadow(0 0 4px #fff7b0);
+  clip-path: polygon(50% 0, 61% 38%, 100% 50%, 61% 62%, 50% 100%, 39% 62%, 0 50%, 39% 38%); }
+.pitcher.sparkle .fizz b { animation: lstar .9s ease-out var(--sdl) 2 both; }
+.cashbox.compact { padding: 30px 12px 12px !important; }
+.counter.paying.take .pay-tally { width: 100%; box-sizing: border-box; max-width: 100%; white-space: normal; }
+.dghost .bill { transform: scale(.9); }
+html.stage-on[data-stage="landscape"] .counter.jarmode { display: grid !important; grid-template-columns: minmax(0, 1fr) 230px; grid-template-rows: 1fr; grid-template-areas: 'tray acts'; gap: 14px; align-items: stretch; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .tray { grid-area: tray; height: auto; min-height: 0; display: flex; padding-top: 18px; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .jar { flex: 1 1 auto; margin-top: 4px; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .acts { grid-area: acts; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .acts .sbtn { width: 100%; min-height: 84px; font-size: 34px; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .bins { display: none; }
+/* lemon1122: firm pay layout on the stage (the older viewport media rules sized the tally and wallet by the real screen) */
+html.stage-on .counter.paying.take .tray { flex: 1 1 auto !important; min-height: 0 !important; height: auto !important; display: flex; }
+html.stage-on .counter.paying.take .cashbox.compact { flex: 1 1 auto !important; flex-direction: column !important; flex-wrap: nowrap !important; align-items: stretch !important; padding: 26px 10px 10px !important; gap: 6px !important; min-height: 0 !important; }
+html.stage-on .counter.paying.take .cashbox .lbl { position: absolute !important; left: 14px !important; top: 6px !important; font-size: 14px; }
+html.stage-on .counter.paying.take .cashbox .pile { flex: 1 1 auto !important; min-height: 0; align-items: center !important; align-content: center; justify-content: center !important; }
+html.stage-on .counter.paying.take .cashbox .pay-tally.box-tally { min-width: 0 !important; width: 100% !important; font-size: 22px !important; padding: 4px 8px !important; text-align: center !important; }
+html.stage-on .counter.paying.take .bins.wallet { background: transparent !important; box-shadow: none !important; padding: 0 !important; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .billbtn.in .bill, html.stage-on[data-stage="portrait"] .counter.paying.take .billstack .bill { width: 96px !important; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .bins.wallet .bill { max-width: 150px !important; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .bins.wallet .billbtn { min-height: 60px; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .acts .sbtn { min-height: 60px !important; font-size: 24px; }
+/* top bar (portrait): dots between "?" and the speaker; the tip chip tucks under the gear */
+html.stage-on[data-stage="portrait"] #stand .tbar { padding-right: 140px !important; }
+html.stage-on[data-stage="portrait"] .jarchip { position: absolute; right: 8px; top: 70px; z-index: 3; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .jar { padding-right: 70px; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .jar .jarglass { grid-template-columns: repeat(3, 96px) !important; width: auto; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .jar .jt .bill { width: 92px !important; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .jar.many .jarglass { grid-template-columns: repeat(4, 74px) !important; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .jar.many .jt .bill { width: 72px !important; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .bins.wallet .bill { max-width: 128px !important; }
+html.stage-on[data-stage="portrait"] .counter.paying.take { gap: 6px !important; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .cashbox.compact { overflow: hidden; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .jar { padding-right: 84px !important; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .jar .jarglass { grid-template-columns: repeat(3, 88px) !important; gap: 8px !important; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .jar .jt { min-width: 60px; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .jar .jt .bill { width: 86px !important; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .jar.many .jarglass { grid-template-columns: repeat(4, 66px) !important; }
+html.stage-on[data-stage="landscape"] .counter.jarmode .jar.many .jt .bill { width: 64px !important; }
+/* lemon1122: "enough?" answers fit the portrait stage; the friend's bills are 60px+ to tap (they say their value) */
+html.stage-on[data-stage="portrait"] .counter.paying.enough .acts { gap: 8px; }
+html.stage-on[data-stage="portrait"] .counter.paying.enough .acts .sbtn { flex: 1 1 0; min-width: 0 !important; width: auto; min-height: 64px; font-size: 22px; }
+html.stage-on .counter.paying.enough .cashbox.wal .billbtn .bill { width: 128px !important; max-width: none !important; }
+html.stage-on .counter.paying.enough .cashbox.wal .billbtn { min-height: 60px; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .cashbox.compact { padding: 8px 10px 8px !important; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .cashbox .lbl { display: none; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .cashbox .pile-empty { padding: 6px 10px; font-size: 16px; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .cashbox .pile { min-height: 50px !important; }
+html.stage-on[data-stage="portrait"] .counter.paying.take .bins.wallet { gap: 6px !important; }
+/* lemon1122: on the landscape stage the "?" sits in the top bar beside Home (it covered the first word of the order bubble) */
+html.stage-on[data-stage="landscape"] #howtoBtn.q1help { top: 8px; left: 76px; }

@@ -1814,6 +1814,10 @@ html.stage-on[data-stage="landscape"] .sr-two .sr-choices,
 html.stage-on[data-stage="portrait"] .sr-two .sr-choices {
   grid-column: auto;
   grid-row: auto;
+  position: relative;
+  left: auto;
+  right: auto;
+  bottom: auto;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -2307,4 +2311,197 @@ html.stage-on[data-stage="portrait"] .sr-two .sr-track .sr-kart.sm {
   --sz: 70px;
   width: var(--sz);
   height: var(--sz);
+}
+
+
+/* racers1122: iPad portrait garage was a long list — only Body fit on
+   screen, so wheels, other parts, and Back sat below the fold with no
+   peek that more was there. Tabs plus a pinned Back keep every control
+   on the 400x720 stage. Portrait question cards use overflow:hidden and
+   could clip answers; keep the choice row on screen and let the prompt
+   shrink or scroll. */
+.sr-garage {
+  overflow: hidden;
+  gap: 8px;
+}
+.sr-g-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.sr-g-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 44px;
+  padding: 4px 4px;
+  border-radius: 14px;
+  border: 2px solid #dfc68f;
+  background: #fff1cd;
+  box-shadow: 0 2px #dfc68f;
+  color: #3a2714;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.1;
+  cursor: pointer;
+}
+.sr-g-tab.on {
+  background: #b9ded1;
+  border-color: #87b9a6;
+  box-shadow: 0 2px #87b9a6;
+  color: #244038;
+}
+.sr-g-tab:focus-visible { outline: 3px solid #328497; outline-offset: 2px; }
+.sr-shop-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.sr-garage .sr-shop {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: none;
+  padding-bottom: 20px;
+  scrollbar-width: thin;
+}
+.sr-shop-wrap::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  background: linear-gradient(to bottom, rgba(255, 246, 220, 0), rgba(255, 246, 220, 0.9));
+}
+.sr-shop-wrap.sr-shop-more::after {
+  opacity: 1;
+}
+.sr-garage > #srBack {
+  flex-shrink: 0;
+  margin-top: 0;
+}
+
+html.stage-on .sr-garage .sr-preview {
+  flex: 0 0 auto;
+  min-height: 0 !important;
+  max-height: 148px;
+  padding: 4px 6px 0;
+}
+html.stage-on .sr-garage .sr-preview .sr-kart {
+  --sz: 148px;
+  width: var(--sz);
+  height: var(--sz);
+  margin-bottom: calc(var(--sz) * -0.08);
+}
+html.stage-on .sr-garage .sr-g-lead {
+  flex-shrink: 0;
+  padding: 6px 10px;
+}
+html.stage-on .sr-garage .sr-g-lead .sr-lead { font-size: 22px; margin: 0; }
+html.stage-on .sr-garage .sr-g-lead .sr-sub { display: none; }
+html.stage-on .sr-garage .sr-sec h2 { margin: 0 0 4px; font-size: 16px; }
+html.stage-on .sr-garage .sr-part { min-height: 72px; }
+html.stage-on .sr-garage .sr-thumb { width: 52px; height: 52px; }
+html.stage-on .sr-garage .sr-thumb-wheels { width: 44px; height: 44px; }
+
+html.stage-on[data-stage="portrait"] #srContent {
+  overflow: hidden;
+  min-height: 0;
+}
+html.stage-on[data-stage="portrait"] .sr-race {
+  overflow: hidden;
+  min-height: 0;
+  height: 100%;
+}
+html.stage-on[data-stage="portrait"] .sr-track {
+  flex: 1 1 0;
+  min-height: 180px;
+}
+html.stage-on[data-stage="portrait"] .sr-qcard {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: 54%;
+  overflow: hidden;
+  position: relative;
+  padding: 8px 10px 8px;
+  gap: 4px;
+  grid-template-columns: none;
+  grid-template-rows: none;
+}
+html.stage-on[data-stage="portrait"] .sr-qwho {
+  flex: 0 0 auto;
+  padding-right: 52px;
+  grid-column: auto;
+  grid-row: auto;
+}
+html.stage-on[data-stage="portrait"] .sr-qcard #srCardSpeak {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  grid-column: auto;
+  grid-row: auto;
+  z-index: 2;
+}
+html.stage-on[data-stage="portrait"] .sr-ask {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  font-size: 28px;
+  padding-right: 52px;
+  grid-column: auto;
+  grid-row: auto;
+}
+html.stage-on[data-stage="portrait"] .sr-pics,
+html.stage-on[data-stage="portrait"] .sr-fact,
+html.stage-on[data-stage="portrait"] .sr-hintpic {
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: 72px;
+  overflow: auto;
+  grid-column: auto;
+  grid-row: auto;
+  margin-top: 0;
+}
+html.stage-on[data-stage="portrait"] .sr-choices {
+  flex: 0 0 auto;
+  position: relative;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  margin: 2px 0 0;
+  z-index: 2;
+  grid-column: auto;
+  grid-row: auto;
+}
+html.stage-on[data-stage="portrait"] .sr-qcard.hinting {
+  max-height: 54%;
+  overflow: hidden;
+}
+
+html.stage-on .sr-qcard .sr-pics,
+html.stage-on .sr-qcard .sr-fact,
+html.stage-on .sr-qcard .sr-hintpic {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+html.stage-on[data-stage="portrait"] .sr-race .sr-qcard .cv-set,
+html.stage-on[data-stage="portrait"] .sr-race .sr-fact .cv-set,
+html.stage-on[data-stage="portrait"] .sr-race .sr-qcard .cv-set.cv-foods {
+  --cv-d: 22px;
 }

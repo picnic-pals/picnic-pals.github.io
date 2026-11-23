@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="thSkin" x1="30%" y1="15%" x2="80%" y2="95%">
+      <stop offset="0%" stop-color="#ffe0c8"/>
+      <stop offset="100%" stop-color="#ffc49a"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#3b2d55" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+    <g transform="translate(-4 6) rotate(-10 28 70) scale(1 1)">
+      <!-- fist, slightly clenched -->
+      <path d="M10 62
+               Q 8 54 20 54
+               H 50
+               Q 60 54 60 68
+               V 94
+               Q 60 106 44 106
+               H 22
+               Q 10 106 10 94 Z" fill="url(#thSkin)"/>
+      <path d="M18 70 H50" fill="none" stroke-width="3.2"/>
+      <path d="M18 82 H50" fill="none" stroke-width="3.2"/>
+      <!-- thumb rises from the inner (right, before flip) side of the fist -->
+      <path d="M38 58
+               C 40 32 54 16 62 24
+               C 72 34 66 52 54 60
+               L 40 62 Z" fill="url(#thSkin)"/>
+      <ellipse cx="56" cy="34" rx="5" ry="4.5" fill="#ffffff" fill-opacity=".55" stroke="none"/>
+    </g>
+    <g transform="translate(132 6) rotate(10 28 70) scale(-1 1)">
+      <!-- fist, slightly clenched -->
+      <path d="M10 62
+               Q 8 54 20 54
+               H 50
+               Q 60 54 60 68
+               V 94
+               Q 60 106 44 106
+               H 22
+               Q 10 106 10 94 Z" fill="url(#thSkin)"/>
+      <path d="M18 70 H50" fill="none" stroke-width="3.2"/>
+      <path d="M18 82 H50" fill="none" stroke-width="3.2"/>
+      <!-- thumb rises from the inner (right, before flip) side of the fist -->
+      <path d="M38 58
+               C 40 32 54 16 62 24
+               C 72 34 66 52 54 60
+               L 40 62 Z" fill="url(#thSkin)"/>
+      <ellipse cx="56" cy="34" rx="5" ry="4.5" fill="#ffffff" fill-opacity=".55" stroke="none"/>
+    </g>
+  </g>
+
+</svg>

@@ -656,3 +656,7 @@ html.stage-on[data-stage="portrait"] #menu #menuScores { grid-area: scores; just
 @media (prefers-reduced-motion: reduce) {
   .mm-hand { animation: none !important; }
 }
+
+/* ladder1121: the climb meter under the round's skill name */
+.cutscene .cs-climb { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: .78em; margin-top: 6px; }
+.cutscene .cs-climb img { width: 1.3em; height: 1.3em; filter: drop-shadow(0 2px 0 #7d6bd8); }

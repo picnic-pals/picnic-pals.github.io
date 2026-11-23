@@ -279,8 +279,10 @@
   var newsBusy = false;
   function showNews() {
     if (newsBusy || UI.cardOpen) return Promise.resolve();
-    var news = F.takeNews(P); if (!news.length) return Promise.resolve();
-    newsBusy = true; save();
+    var news = F.takeNews(P); save();
+    news = news.filter(function (n) { return n.blob && n.blob !== P.blob; });
+    if (!news.length) return Promise.resolve();
+    newsBusy = true;
     var chain = Promise.resolve();
     news.forEach(function (n) {
       chain = chain.then(function () {
@@ -290,8 +292,9 @@
         if (n.lvl === 4) { extra = 'Now you know all about ' + nm + '!'; voice.push('fr_unlock_more'); }
         if (n.lvl === 5) { extra = nm + ' made you a present: ' + CAT.byId[bio.fav].name + '! It\'s in your things.'; voice.push('fr_unlock_gift'); if (!RM.gifts[b]) { RM.gifts[b] = Date.now(); own(bio.fav); save(); } }
         var face = n.lvl >= 3 ? bio.face : 'love';
-        return UI.card({ tag: F.NAMES[n.lvl - 1] + '!', title: nm + ' is now your ' + F.NAMES[n.lvl - 1] + '!', art: '<div class="dance">' + friendSvg(b, face) + '</div>' + (n.lvl === 5 ? '<div class="giftart">' + ART.svg(bio.fav) + '</div>' : ''), glow: true,
-          html: '<div class="hearts big">' + heartsHTML(n.lvl) + '</div>', sub: extra, voice: voice, sfx: 'unlock', confetti: true, btn: 'Yay!', cls: 'reward friendup' });
+        var gift = (n.lvl === 5) ? '<div class="giftart" aria-hidden="true">' + ART.svg(bio.fav) + '</div>' : '';
+        return UI.card({ tag: F.NAMES[n.lvl - 1] + '!', title: nm + ' is now your ' + F.NAMES[n.lvl - 1] + '!', art: '<div class="dance">' + friendSvg(b, face) + '</div>', glow: true,
+          html: '<div class="hearts big">' + heartsHTML(n.lvl) + '</div>' + gift, sub: extra, voice: voice, sfx: 'unlock', confetti: true, btn: 'Yay!', cls: 'reward friendup' });
       });
     });
     return chain.then(function () { newsBusy = false; renderTray(); });
@@ -329,7 +332,7 @@
     panel = A.el('<div class="rpanel on" id="' + id + '" role="dialog" aria-modal="true"><div class="pbox">' + html + '</div></div>');
     panel._close = onClose; document.body.appendChild(panel);
     panel.querySelector('[data-x]').addEventListener('click', function () { closePanel(); });
-    panel.addEventListener('click', function (e) { if (e.target === panel) closePanel(); });
+    UI.onBackdrop(panel, function () { closePanel(); }, { inside: '.pbox' });
     return panel;
   }
   function closePanel(quiet) {
@@ -731,7 +734,7 @@
       function key(e) { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); if (Date.now() - t0 > 300) close(); } }
       document.addEventListener('keydown', key, true);
       ov.querySelector('[data-go]').addEventListener('click', close);
-      ov.addEventListener('click', function (e) { if (e.target === ov && Date.now() - t0 > 1500) close(); });
+      UI.onBackdrop(ov, close, { minMs: 1500 });
       A.Audio.sfx('pop'); setTimeout(function () { if (ov.parentNode) V.say(['rm_demo'], { kind: 'prompt' }); }, 350);
       setTimeout(function () { var g = ov.querySelector('[data-go]'); if (g) g.focus({ preventScroll: true }); }, 60);
     });

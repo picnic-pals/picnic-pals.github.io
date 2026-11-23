@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" sizes="16x16" href="../../assets/picnic/logo/icon_16.png">
 <link rel="apple-touch-icon" href="../../assets/picnic/logo/icon_180.png">
 <link rel="manifest" href="../../manifest.webmanifest">
-<link rel="stylesheet" href="../../css/core.css"><link rel="stylesheet" href="bakeshop.css"></head>
+<link rel="stylesheet" href="../../css/core.css"><link rel="stylesheet" href="../../css/stage.css"><link rel="stylesheet" href="bakeshop.css"></head>
 <body>
 <main id="bakeshop">
   <header class="bs-header">
@@ -17,10 +17,20 @@
     <h1 data-title="bakeshop">Bake Shop Clock</h1>
     <button type="button" id="bsSpeak" aria-label="Read the order aloud">Hear</button>
   </header>
-  <div class="bs-play">
-    <div class="bs-shop" id="bsShop"></div>
-    <div id="bsCardHost"></div>
-  </div>
+  <section class="bs-ticket" id="bsTicket" aria-live="polite"></section>
+  <section class="bs-panel" id="bsPanel">
+    <button type="button" class="bs-pill bs-level" id="bsLevel"></button>
+    <button type="button" class="bs-pill bs-show" id="bsShow" aria-label="Show me how">Show me</button>
+    <div class="bs-clockwrap" id="bsClockWrap"></div>
+    <p class="bs-tip" id="bsTip"></p>
+    <div class="bs-steps" id="bsSteps"></div>
+  </section>
+  <button type="button" class="bs-ready" id="bsReady">It's ready!</button>
+  <section class="bs-board" id="bsBoard">
+    <div class="bs-board-main" id="bsBoardMain"></div>
+    <button type="button" class="bs-cakebtn" id="bsCake"></button>
+  </section>
+  <div class="bs-overlay" id="bsOverlay" hidden></div>
 </main>
 <script src="../../audio/voice/manifest.js"></script>
 <script src="../../audio/voice-tts/manifest.js"></script>
@@ -54,6 +64,7 @@
 <script src="../../js/core/topics-data.js"></script>
 <script src="../../js/core/topics.js"></script>
 <script src="../../js/core/learn.js"></script>
+<script src="../../js/core/ladder.js"></script>
 <script src="../../js/core/blobs.js"></script>
 <script src="../../js/core/audio.js"></script>
 <script src="../../js/core/music.js"></script>
@@ -66,4 +77,5 @@
 <script src="../../js/core/parent.js"></script>
 <script src="../../js/core/coloring.js"></script>
 <script src="../../js/core/breaks.js"></script>
+<script src="../../js/core/stage.js"></script>
 <script src="bakeshop-core.js"></script><script src="bakeshop-art.js"></script><script src="bakeshop.js"></script></body></html>

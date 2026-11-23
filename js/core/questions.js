@@ -232,12 +232,35 @@
   }
   // how "big" a question is: its largest number (text, choices). Used for {hard: true}: bigger numbers within the same level.
   function size(q) { var m = 0, t = String(q.text || '') + ' ' + q.choices.map(function (c) { return c.label; }).join(' '); (t.match(/\d+/g) || []).forEach(function (x) { m = Math.max(m, +x); }); return m; }
-  /* opt: {choices: 3|4, hard: true (pick the biggest-number question of a few — the top of the level)} */
+  /* ladder1121 within-skill easy tiers (the small steps into a new skill): of 8 questions of the same level,
+     tier 1 = the smallest (smallest numbers / shortest words), tier 2 = of the 3 smallest, the one whose wrong choices are
+     furthest from the answer, tier 3 = tier 2 + the picture hint shown up front (q.tierHint; the game shows its hint). */
+  function ansLabel(q) { var c = q.choices[q.answer]; return c ? String(c.label) : ''; }
+  function easySize(q) { var n = size(q); return n > 0 ? n : ansLabel(q).length; }
+  function letters(w) { var o = {}; String(w).toLowerCase().replace(/[^a-z]/g, '').split('').forEach(function (ch) { o[ch] = 1; }); return o; }
+  function spread(q) {   // how far the wrong choices are from the answer (bigger = easier to tell apart)
+    var a = ansLabel(q), an = +a, best = 99;
+    q.choices.forEach(function (c, i) { if (i === q.answer) return; var l = String(c.label), v;
+      if (a !== '' && isFinite(an) && l !== '' && isFinite(+l)) v = Math.abs(+l - an);
+      else { var A1 = letters(a), B1 = letters(l), ka = Object.keys(A1), kb = Object.keys(B1), sh = ka.filter(function (x) { return B1[x]; }).length; v = 10 * (1 - sh / Math.max(1, Math.max(ka.length, kb.length))); }
+      if (v < best) best = v; });
+    return best;
+  }
+  function easyTier(q, one, tier) {
+    var all = [q]; for (var i = 0; i < 7; i++) { try { all.push(one()); } catch (e) {} }
+    all.sort(function (a, b) { return easySize(a) - easySize(b); });
+    var out = all[0];
+    if (tier >= 2) { var few = all.slice(0, 3); few.sort(function (a, b) { return spread(b) - spread(a) || easySize(a) - easySize(b); }); out = few[0]; }
+    out.tier = tier; if (tier >= 3) out.tierHint = true;
+    return out;
+  }
+  /* opt: {choices: 3|4, hard: true (pick the biggest-number question of a few — the top of the level), tier: 1-3 (an easy tier)} */
   function make(skill, level, opt) {
     var s = typeof skill === 'string' ? C.byId[skill] : skill, n = (opt && opt.choices) || 4;
     function one() { return s.ask ? s.ask(level, n) : fromGen(s, level, n); }
     var q = one();
     if (opt && opt.hard) { var best = q, bs = size(q); for (var i = 0; i < 7; i++) { var c = one(), cs = size(c); if (cs > bs) { best = c; bs = cs; } } q = best; q.hard = true; }
+    else if (opt && opt.tier) q = easyTier(q, one, opt.tier);
     q.skill = s.id; q.level = level; q.key = q.text + '|' + q.choices.map(function (c) { return c.label; }).join(',');
     return q;
   }
@@ -263,5 +286,5 @@
     if (nx && (!little || nx.skill.id === sid)) return { skill: nx.skill, level: nx.level, atLevel: false, offset: 1, hard: nx.skill.id !== sid ? false : false };
     return { skill: here.skill, level: here.level, hard: true, atLevel: true, offset: 1 };
   }
-  A.Questions = { make: make, ASK: ASK, fromGen: fromGen, ladder: ladder, step: step, size: size };
+  A.Questions = { make: make, ASK: ASK, fromGen: fromGen, ladder: ladder, step: step, size: size, spread: spread, easySize: easySize };
 })(window.Arcade);

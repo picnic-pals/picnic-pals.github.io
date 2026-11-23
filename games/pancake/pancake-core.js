@@ -58,6 +58,28 @@
   function num(rng, lo, hi) { return lo + Math.floor(rngOf(rng)() * (hi - lo + 1)); }
   function pick(rng, arr) { return arr[Math.floor(rngOf(rng)() * arr.length)]; }
 
+  /* Canonical tens/hundreds/ones taps to build n. Keep place-value "Make N" orders at or under this. */
+  var MAX_BUILD_TAPS = 12;
+  function placeTaps(n) {
+    n = Math.abs(n) | 0;
+    var t = 0;
+    while (n > 0) {
+      t += n % 10;
+      n = Math.floor(n / 10);
+    }
+    return t;
+  }
+  function numTaps(rng, lo, hi, maxTaps) {
+    maxTaps = maxTaps == null ? MAX_BUILD_TAPS : maxTaps;
+    var n, i;
+    for (i = 0; i < 40; i++) {
+      n = num(rng, lo, hi);
+      if (placeTaps(n) <= maxTaps) return n;
+    }
+    for (n = lo; n <= hi; n++) if (placeTaps(n) <= maxTaps) return n;
+    return lo;
+  }
+
   function rank(id) {
     return id === 'toddler' ? 0 : id === 'count' ? 1 : id === 'g1' ? 2 : 3;
   }
@@ -166,8 +188,7 @@
       if (plate.length !== order.n) return false;
       return plate.every(function (c) { return c.kind === 'one'; });
     }
-    /* Two-way prompt still says "with K tens", but a plate with the right amount
-       (canonical tens+ones, or the requested tens, or any equivalent) is correct.
+    /* Any equivalent amount is correct (canonical tens+ones or another mix).
        Marking a correct total wrong was the age 6-7 "right amount" miss. */
     if (order.kind === 'twoway') {
       return valueOf(plate) === order.target;
@@ -260,31 +281,26 @@
       say = text;
     } else if (kind === 'build') {
       if (opt.target != null) target = opt.target;
-      else if (band.g2) target = boss ? num(rng, 60, 99) : num(rng, 21, 79);
-      else target = boss ? num(rng, 40, 69) : num(rng, 11, 39);
+      else if (band.g2) target = boss ? numTaps(rng, 60, 99) : numTaps(rng, 21, 79);
+      else target = boss ? numTaps(rng, 40, 69) : numTaps(rng, 11, 39);
       n = target;
       text = 'Make ' + target + '.';
       say = text;
     } else if (kind === 'hundreds') {
       if (opt.target != null) target = opt.target;
-      else if (band.g2) target = boss ? num(rng, 180, 249) : num(rng, 101, 219);
-      else target = boss ? num(rng, 140, 199) : num(rng, 101, 139);
+      else if (band.g2) target = boss ? numTaps(rng, 180, 249) : numTaps(rng, 101, 219);
+      else target = boss ? numTaps(rng, 140, 199) : numTaps(rng, 101, 139);
       n = target;
       text = 'Make ' + target + '.';
       say = text;
     } else if (kind === 'twoway') {
-      if (opt.target != null) {
-        target = opt.target;
-        needTens = opt.needTens != null ? opt.needTens : (Math.floor(target / 10) - 1);
-      } else {
-        target = boss ? num(rng, 37, 68) : num(rng, 23, 58);
-        var canon = Math.floor(target / 10);
-        var drop = canon >= 3 && rng() < 0.4 ? 2 : 1;
-        needTens = Math.max(1, canon - drop);
-      }
-      if (needTens < 1) needTens = 1;
+      /* Same ladder step as before, but a plain "Make N" with tens and ones.
+         "Make N with K tens" needed a regrouping explanation and too many taps. */
+      if (opt.target != null) target = opt.target;
+      else target = boss ? numTaps(rng, 37, 68) : numTaps(rng, 23, 58);
       n = target;
-      text = 'Make ' + target + ' with ' + needTens + ' tens.';
+      needTens = Math.floor(target / 10);
+      text = 'Make ' + target + '.';
       say = text;
     } else {
       kind = 'shift10';
@@ -405,6 +421,7 @@
 
   A.Pancake = {
     COLORS: COLORS, COLOR_BY: COLOR_BY, TOPPINGS: TOPPINGS, DECOS: DECOS, N_ORDERS: N_ORDERS,
+    MAX_BUILD_TAPS: MAX_BUILD_TAPS, placeTaps: placeTaps,
     bandFor: bandFor, ready20: ready20, raceParams: raceParams, winsRace: winsRace, friendGain: friendGain, raceVisual: raceVisual,
     makeOrder: makeOrder, checkPlate: checkPlate, startPlate: startPlate,
     addCake: addCake, takeCake: takeCake, valueOf: valueOf, countKind: countKind, cakesForValue: cakesForValue,

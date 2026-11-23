@@ -101,7 +101,7 @@
         (o.art ? '<div class="art' + (o.glow ? ' glow' : '') + '">' + (o.glow ? '<div class="rays"></div>' : '') + o.art + '</div>' : '') +
         (o.html || '') + (o.sub ? '<p>' + A.esc(o.sub) + '</p>' : '') +
         '<button class="bigbtn ' + (o.btnCls || 'mint') + '">' + A.esc(o.btn || 'OK') + '</button>' +
-        '<span class="kh">' + (A.isTouchOnly() ? ((A.Icons && A.Icons.has('👆')) ? A.Icons.html('👆', { size: 28, decorative: true, cls: 'pp-pic', slot: 'ui:tap' }) : '<svg class="pp-tap-hand" viewBox="0 0 64 64" width="28" height="28" aria-hidden="true" focusable="false"><path fill="#ffe0b0" stroke="#5a3d1c" stroke-width="2.4" stroke-linejoin="round" d="M28 8c2.4-1 5.4.4 6.2 3.2l3.2 12.2 1.2-6.2c.7-3 4-4.2 6.4-2.6 2 1.3 2.6 4 1.6 6.3l-3.4 8.2 6.4-3c2.6-1.2 5.8.2 6.6 3 .8 2.8-.8 5.6-3.6 6.5L38 40.2l1.2 14.4c.2 2.6-1.8 4.8-4.4 4.8h-8.2c-2.2 0-4-1.6-4.4-3.8L19.6 40.6c-3.6-2.2-5.8-6.2-5.8-10.5V22c0-2.8 2.4-5 5.2-4.8 2.2.2 4 2 4.4 4.2l1.2 6.2V12.4C24.6 10 26.2 8.4 28 8z"/></svg>') + ' Tap' : 'Press <kbd class="wide">Space</kbd> or <kbd class="wide">Enter</kbd>') + '</span>' + (A.Pad ? '<span class="ph">Press ' + A.Pad.g('a') + '</span>' : '') + '</div></div>');
+        '<span class="kh">' + (A.isTouchOnly() ? '<svg class="pp-tap-hand" viewBox="0 0 64 64" width="28" height="28" aria-hidden="true" focusable="false"><path fill="#ffe0b0" stroke="#5a3d1c" stroke-width="2.4" stroke-linejoin="round" d="M28 8c2.4-1 5.4.4 6.2 3.2l3.2 12.2 1.2-6.2c.7-3 4-4.2 6.4-2.6 2 1.3 2.6 4 1.6 6.3l-3.4 8.2 6.4-3c2.6-1.2 5.8.2 6.6 3 .8 2.8-.8 5.6-3.6 6.5L38 40.2l1.2 14.4c.2 2.6-1.8 4.8-4.4 4.8h-8.2c-2.2 0-4-1.6-4.4-3.8L19.6 40.6c-3.6-2.2-5.8-6.2-5.8-10.5V22c0-2.8 2.4-5 5.2-4.8 2.2.2 4 2 4.4 4.2l1.2 6.2V12.4C24.6 10 26.2 8.4 28 8z"/></svg>' : 'Press <kbd class="wide">Space</kbd> or <kbd class="wide">Enter</kbd>') + '</span>' + (A.Pad ? '<span class="ph">Press ' + A.Pad.g('a') + '</span>' : '') + '</div></div>');
       document.body.appendChild(ov); UI.cardOpen = true;
       var btn = ov.querySelector('.bigbtn'), done = false, lastTap = 0;
       // the beat (js/core/pace.js): celebrations / results hold a moment; presses in the lock are dropped, never queued
@@ -133,10 +133,68 @@
     button.addEventListener('click', function () { if (q.say) A.Voice.say(q.say, { kind: 'tap' }); });
     ov.appendChild(button);
   }
-  // batch-1107c: tap outside a question card to skip it; a small note says so
+  /* Close or skip when the kid taps the dim area around a card.
+     iOS Safari often never fires click on a plain div (and UI.boot's touchmove
+     preventDefault can cancel a click if the finger moves a little), so we
+     listen for pointerdown+pointerup on the backdrop, and keep cursor:pointer
+     as a Safari click fallback. A visible Skip/close control is also required. */
+  UI.onBackdrop = function (ov, fn, opt) {
+    opt = opt || {};
+    if (!ov || typeof fn !== 'function') return ov;
+    var insideSel = opt.inside || '.card, .pbox, .panel';
+    var ignoreSel = opt.ignore || '.pc-replay';
+    var minMs = opt.minMs || 0;
+    var t0 = Date.now();
+    var down = null, last = 0;
+    function ignored(t) { return !!(t && t.closest && ignoreSel && t.closest(ignoreSel)); }
+    function isOutside(t) {
+      if (!t || ignored(t)) return false;
+      if (ov.contains && !ov.contains(t) && t !== ov) return false;
+      var boxes = ov.querySelectorAll(insideSel), i;
+      for (i = 0; i < boxes.length; i++) if (boxes[i].contains(t)) return false;
+      return true;
+    }
+    function fire() {
+      if (Date.now() - t0 < minMs) return;
+      var now = Date.now();
+      if (now - last < 280) return;
+      last = now;
+      fn();
+    }
+    ov.addEventListener('pointerdown', function (e) {
+      if (e.isPrimary === false) return;
+      if (e.button != null && e.button !== 0) return;
+      down = { id: e.pointerId, outside: isOutside(e.target), x: e.clientX, y: e.clientY };
+    });
+    ov.addEventListener('pointerup', function (e) {
+      if (!down || down.id !== e.pointerId) return;
+      var moved = Math.abs(e.clientX - down.x) + Math.abs(e.clientY - down.y) > 16;
+      var ok = down.outside && isOutside(e.target) && !moved;
+      down = null;
+      if (ok) {
+        try { e.preventDefault(); } catch (err) {}
+        fire();
+      }
+    });
+    ov.addEventListener('pointercancel', function () { down = null; });
+    // click fallback (desktop, and Safari once cursor:pointer is set)
+    ov.addEventListener('click', function (e) {
+      if (isOutside(e.target)) fire();
+    });
+    try { if (!ov.style.cursor) ov.style.cursor = 'pointer'; } catch (err) {}
+    if (!ov.getAttribute('data-backdrop')) ov.setAttribute('data-backdrop', '1');
+    return ov;
+  };
+  // batch-1107c: tap outside a question card to skip it; a small note says so, plus a Skip button
   function skipOutside(ov, fn) {
-    var card = ov.querySelector('.card'); if (card) card.appendChild(A.el('<span class="pc-skipnote">Tap outside to skip</span>'));
-    ov.addEventListener('click', function (e) { if (card && !card.contains(e.target) && !e.target.closest('.pc-replay')) fn(); });
+    var card = ov.querySelector('.card'), going = false;
+    function go() { if (going) return; going = true; fn(); }
+    if (card && !card.querySelector('.pc-skiprow')) {
+      card.appendChild(A.el('<div class="pc-skiprow"><button type="button" class="pc-skipbtn">Skip</button><span class="pc-skipnote">Tap outside to skip</span></div>'));
+    }
+    var btn = ov.querySelector('.pc-skipbtn');
+    if (btn) btn.addEventListener('click', function (e) { e.stopPropagation(); go(); });
+    UI.onBackdrop(ov, go, { ignore: '.pc-replay, .pc-skipbtn' });
   }
   UI.skipOutside = skipOutside;
   UI.placement = function (P, skill) {
@@ -373,7 +431,7 @@
     document.addEventListener('dblclick', function (e) { if (!inPanel(e)) e.preventDefault(); }, { passive: false });
     document.addEventListener('gesturestart', function (e) { e.preventDefault(); }, { passive: false });
     document.addEventListener('contextmenu', function (e) { if (!inPanel(e)) e.preventDefault(); });
-    document.addEventListener('touchmove', function (e) { if (!(e.target.closest && e.target.closest('.scroll, #parent'))) e.preventDefault(); }, { passive: false });
+    document.addEventListener('touchmove', function (e) { if (!(e.target.closest && e.target.closest('.scroll, #parent, .overlay, .rpanel'))) e.preventDefault(); }, { passive: false });
     document.addEventListener('visibilitychange', function () { if (document.hidden) A.Voice.stop(); });
     // keyboard / controller focus speaks the focused tile, card or menu button (pre-readers), debounced so fast arrowing doesn't stack
     var lastKey = 0;

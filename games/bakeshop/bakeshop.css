@@ -1,330 +1,285 @@
-/* Bake Shop Clock layout. High-contrast question cards. 60px+ targets. Portrait + short landscape. */
-html, body { margin: 0; height: 100%; background: #f6e3c4; color: #3a2714; font: 700 18px/1.25 system-ui, sans-serif; }
+/* Bake Shop Clock v2 (rework 1122). One fixed stage (js/core/stage.js): portrait 400x720, landscape 1024x640, scaled to fit.
+   Everything is placed in design pixels, so nothing reflows between devices.
+   Tap chrome uses var(--tap) so Home, Hear, +/-, pills, It's ready! and card buttons stay at least 60 screen px after the stage scales down. */
+html, body { margin: 0; height: 100%; background: #f6e3c4; color: #3a2714; }
 #bakeshop {
-  box-sizing: border-box;
-  height: 100%; height: 100dvh;
-  max-width: 1100px; margin: 0 auto;
-  display: flex; flex-direction: column;
-  padding: 6px 10px 8px;
-  gap: 6px;
-  min-height: 0;
+  position: relative; width: 400px; height: 720px; margin: 0 auto; overflow: hidden;
+  font: 600 16px/1.2 var(--font, system-ui), system-ui, sans-serif; color: #3a2714;
+  background: #f6e3c4;
 }
-.bs-header {
-  display: flex; align-items: center; gap: 8px;
-  min-height: 60px; flex: none;
-}
-.bs-header h1 {
-  flex: 1; margin: 0; text-align: center;
-  font-size: clamp(18px, 4.4vw, 28px); color: #6b3a22;
-  text-shadow: 0 2px 0 #f3d7a0;
-}
+html.stage-on .stage-scale #bakeshop { width: 100%; height: 100%; }
+#bakeshop button { font-family: inherit; color: #3a2714; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+#bakeshop [hidden] { display: none !important; }
+
+/* ---------- header ---------- */
+.bs-header { position: absolute; top: 4px; left: 8px; right: 8px; height: var(--tap, 60px); display: flex; align-items: center; gap: 8px; }
+.bs-header h1 { flex: 1; margin: 0; text-align: center; font-size: 24px; font-weight: 700; color: #6b3a22; white-space: nowrap; }
 .bs-header button {
-  min-width: 60px; min-height: 60px;
-  border: 3px solid #5a3d1c; border-radius: 16px;
-  background: #fffdf6; color: #3a2714;
-  font: 800 16px/1 system-ui, sans-serif;
-  cursor: pointer;
-}
-.bs-header button:focus-visible { outline: 3px solid #2a7a4a; outline-offset: 2px; }
-
-.bs-play {
-  flex: 1; min-height: 0;
-  display: flex; flex-direction: column; gap: 8px;
-  position: relative;
-}
-#bsCardHost {
-  flex: 0 1 auto;
-  min-width: 0;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
+  width: 72px; height: var(--tap, 60px); min-width: var(--tap, 60px); min-height: var(--tap, 60px);
+  flex: none; box-sizing: border-box; border: 3px solid #5a3d1c; border-radius: 16px; background: #fffdf6;
+  font-size: 17px; font-weight: 700; box-shadow: 0 3px 0 #c9a36a;
 }
 
-.bs-shop {
-  flex: 1 1 38%;
-  min-height: 0;
-  position: relative;
-  background-color: #f3d7b0;
-  background-image: url("../../art/bakeshop/shop_bg_landscape.webp");
-  background-size: cover;
-  background-position: center 62%;
-  background-repeat: no-repeat;
-  border: 3px solid #5a3d1c;
-  border-radius: 22px;
-  overflow: hidden;
+/* ---------- order ticket ---------- */
+.bs-ticket {
+  position: absolute; top: calc(10px + var(--tap, 60px)); left: 8px; right: 8px; height: 68px; box-sizing: border-box;
+  display: flex; align-items: center; gap: 6px; padding: 0 8px;
+  background: #fffdf6; border: 3px solid #5a3d1c; border-radius: 18px; box-shadow: 0 4px 0 #c9a36a;
 }
-@media (orientation: portrait) {
-  .bs-shop {
-    background-image: url("../../art/bakeshop/shop_bg_portrait.webp");
-    background-position: center 58%;
-  }
+.bs-tk-friend, .bs-tk-treat { width: 56px; height: 56px; object-fit: contain; flex: none; }
+.bs-tk-text { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.bs-tk-small { font-size: 16px; font-weight: 600; }
+.bs-tk-big { font-size: 25px; font-weight: 700; line-height: 1.05; white-space: nowrap; }
+.bs-tk-big em { font-style: normal; font-size: 17px; color: #8a5a22; }
+.bs-tk-clock svg { width: 44px; height: 44px; display: block; }
+body.bs-right .bs-tk-friend { animation: bsHop .5s ease 2; }
+
+/* ---------- clock panel ---------- */
+.bs-panel {
+  position: absolute; top: calc(84px + var(--tap, 60px)); left: 8px; width: 384px; height: calc(550px - 2 * var(--tap, 60px)); box-sizing: border-box;
+  border: 3px solid #5a3d1c; border-radius: 22px; overflow: hidden;
+  background: #f3d7b0 url("../../art/bakeshop/shop_bg_portrait.webp") center 55% / cover no-repeat;
 }
-.bs-shop-window { display: none; }
-.bs-oven { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); width: min(54%, 280px); }
-/* Locked oven: clock sits in the door cutout (cx 510.5, cy 536.5, scale 0.4253) behind the oven. */
-.bs-oven:has(.bs-oven-art) {
-  --bs-clock-scale: 0.4253;
-  width: max(541px, min(92%, 68vh, 720px));
-  height: auto;
-  aspect-ratio: 1 / 1;
-  bottom: auto;
-  top: 50%;
-  transform: translate(-50%, -52.4%);
+.bs-panel::before { content: ""; position: absolute; inset: 0; background: rgba(255, 246, 228, .55); pointer-events: none; }
+.bs-pill {
+  position: absolute; top: 5px; z-index: 2; width: 96px; height: var(--tap, 60px);
+  min-width: var(--tap, 60px); min-height: var(--tap, 60px); box-sizing: border-box;
+  border: 3px solid #5a3d1c; border-radius: 16px; background: #fffdf6; padding: 2px 4px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  font-size: 15px; font-weight: 700; line-height: 1.05;
 }
-.bs-oven-art {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  z-index: 3;
-  pointer-events: none;
-  display: block;
-}
-.bs-oven:has(.bs-oven-art) .bs-oven-clock {
-  position: absolute;
-  left: 49.853515625%; /* 510.5 / 1024 */
-  top: 52.392578125%;  /* 536.5 / 1024 */
-  width: calc(var(--bs-clock-scale) * 100%);
-  height: calc(var(--bs-clock-scale) * 100%);
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  padding: 0;
-}
-.bs-oven-body {
-  background: #7a4550;
-  border: 3px solid #3a2714;
-  border-radius: 16px 16px 10px 10px;
-  padding: 8px 10px 10px;
-  box-shadow: 0 6px 0 #5a2a32;
-}
-.bs-oven-top { height: 10px; background: #5a2a32; border-radius: 8px 8px 0 0; margin: -8px -10px 8px; }
-.bs-oven-door {
-  background: #3a2714;
-  border-radius: 50%;
-  padding: 6%;
+.bs-level { left: 5px; }
+.bs-show { right: 5px; }
+.bs-dots { display: flex; gap: 3px; }
+.bs-dots i { width: 9px; height: 9px; border-radius: 50%; border: 2px solid #b9a27e; box-sizing: border-box; }
+.bs-dots i.on { background: #e0a43a; border-color: #8a5a22; }
+.bs-clockwrap { position: absolute; z-index: 1; top: 38px; left: 45px; width: 288px; height: 288px; }   /* 1122b: 288 (was 290) leaves room for a two-line hint */
+.bs-big { display: block; width: 100%; height: 100%; touch-action: none; user-select: none; -webkit-user-select: none; }
+#bsClock { cursor: grab; filter: drop-shadow(0 5px 0 rgba(90, 61, 28, .35)); }
+.bs-pad { fill: #000; fill-opacity: 0; }
+.bs-knob { stroke: #fff8e7; stroke-width: 2; }
+.bs-knob-hour { fill: #6b3a22; }
+.bs-knob-min { fill: #b03a4a; }
+.bs-knob.on { stroke: #ffcf3f; stroke-width: 2.4; }
+.bs-glow { fill: rgba(255, 214, 79, .42); stroke: #f0a020; stroke-width: 2.6; animation: bsGlow 1.1s ease-in-out infinite alternate; }
+@keyframes bsGlow { from { stroke-opacity: .55; } to { stroke-opacity: 1; } }
+.bs-tip {
+  position: absolute; z-index: 1; top: auto; bottom: calc(6px + max(62px, var(--tap, 60px))); left: 0; right: 0; height: 26px; margin: 0;
   display: flex; align-items: center; justify-content: center;
 }
-.bs-oven-clock { width: 100%; }
-.bs-oven-clock .bs-clock { width: 100%; height: auto; display: block; }
-.bs-clock.interactive, #bsOvenClock, .bs-oven-clock .bs-clock.interactive {
-  touch-action: none;
-  cursor: grab;
+.bs-tip { font-size: 15px; font-weight: 700; color: #3a2714; text-shadow: 0 0 6px #fff8e7, 0 0 2px #fff8e7; }
+.bs-tip.hint { color: #7a3a00; }
+.bs-tip.yay { color: #137a4f; font-size: 19px; }
+html[data-stage="landscape"] .bs-tip.yay { font-size: 22px; }
+.bs-steps { position: absolute; z-index: 1; top: auto; bottom: 4px; left: 0; right: 0; height: max(62px, var(--tap, 60px)); display: flex; justify-content: center; gap: 12px; }
+.bs-pair { display: flex; align-items: center; gap: 4px; border-radius: 34px; padding: 0 1px; }
+.bs-pair.on .bs-lab { color: #8a3a00; text-decoration: underline 3px #ffcf3f; }
+.bs-lab { font-size: 15px; font-weight: 700; min-width: 36px; text-align: center; }
+.bs-step {
+  width: var(--tap, 60px); height: var(--tap, 60px); min-width: var(--tap, 60px); min-height: var(--tap, 60px);
+  box-sizing: border-box; border-radius: 50%; border: 3px solid #5a3d1c; background: #fffdf6;
+  font-size: 30px; font-weight: 700; line-height: 1; box-shadow: 0 3px 0 #c9a36a; padding: 0;
 }
-.bs-clock.interactive:active { cursor: grabbing; }
-.bs-oven-knobs { display: flex; justify-content: center; gap: 10px; margin-top: 8px; }
-.bs-oven-knobs span { width: 14px; height: 14px; border-radius: 50%; background: #c9a36a; border: 2px solid #3a2714; }
+.bs-step:active, .bs-pill:active, .bs-ready:active, .bs-header button:active { transform: translateY(2px); box-shadow: none; }
 
-.bs-deco { position: absolute; pointer-events: none; z-index: 5; }
-.bs-deco.pop { animation: bsPop .45s ease-out; }
-@keyframes bsPop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.bs-deco[data-id="string_lights"] { left: 6%; right: 6%; top: 2%; width: auto; }
-.bs-deco[data-id="bunting"] { left: 8%; right: 8%; top: 1%; width: auto; z-index: 2; }
-.bs-deco[data-id="chalkboard"] { left: 4%; top: 40%; width: 18%; }
-.bs-deco[data-id="window_pie"] { right: 10%; top: 8%; width: 16%; }
-@media (orientation: landscape) {
-  .bs-deco[data-id="window_pie"] { left: 6%; right: auto; top: 10%; width: 14%; }
-}
-.bs-deco[data-id="plant"] { left: 3%; bottom: 22%; width: 14%; }
-.bs-deco[data-id="cake_stand"] { right: 10%; bottom: 6%; width: 18%; }
-.bs-deco[data-id="cookie_jar"] { left: 22%; bottom: 6%; width: 14%; }
-.bs-deco[data-id="flower_pot"] { right: 26%; bottom: 6%; width: 14%; }
-.bs-deco[data-id="shelf_clock"] { right: 4%; top: 38%; width: 16%; }
-.bs-deco[data-id="mixing_bowl"] { left: 36%; bottom: 3%; width: 14%; }
-.bs-deco .bs-art { width: 100%; height: auto; display: block; }
-
-.bs-friend {
-  position: absolute; left: 4%; bottom: 6%; width: 22%; max-width: 120px;
-  z-index: 6;
-}
-.bs-friend img { width: 100%; height: auto; display: block; filter: drop-shadow(0 4px 0 #0002); }
-.bs-friend.boss .bs-hat {
-  position: absolute; left: 4%; top: -36%; width: 92%;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.bs-card {
-  flex: 0 1 auto;
-  background: #fffef8;
-  border: 3px solid #3a2714;
-  border-radius: 22px;
-  padding: 10px 14px 12px;
-  box-shadow: 0 5px 0 #c9a36a;
-  color: #2a1b0c;
-  min-height: 0;
-  display: flex; flex-direction: column; gap: 8px;
-}
-.bs-card.boss { border-color: #8a2a3a; box-shadow: 0 5px 0 #e8a0a8; }
-.bs-ask {
-  margin: 0;
-  font-size: clamp(20px, 4.6vw, 30px);
-  line-height: 1.25;
-  text-align: center;
-}
-.bs-card.picture .bs-ask { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
-.bs-tag {
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  background: #fff3c8; border: 2px dashed #8a5a22; border-radius: 16px;
-  padding: 6px 10px;
-}
-.bs-tag.has-art {
-  background: transparent; border: 0; padding: 0; gap: 8px;
-  position: relative;
-}
-.bs-tag-board {
-  position: relative;
-  width: min(190px, 46vw);
-  flex: none;
-}
-.bs-tag-bg { width: 100%; height: auto; display: block; pointer-events: none; }
-.bs-tag-face {
-  position: absolute;
-  left: 20.65%;
-  top: 28.17%;
-  width: 58.59%;
-  height: 58.59%;
-  display: flex; align-items: center; justify-content: center;
-}
-.bs-tag-face .bs-clock { width: 100%; height: 100%; display: block; }
-.bs-tag.has-art .bs-time-prompt { transform: scale(.92); }
-.bs-tag.has-art .bs-time-num { font-size: clamp(28px, 7vw, 44px); }
-.bs-tag.has-art .bs-time-words { font-size: clamp(14px, 3.6vw, 20px); }
-.bs-tag-treat { width: 64px; height: auto; flex: none; }
-.bs-tag-treat .bs-art { width: 64px; height: auto; display: block; }
-.bs-time-prompt {
-  display: flex; align-items: baseline; justify-content: center; gap: 8px;
-  line-height: 1;
-}
-.bs-time-num {
-  font-size: clamp(44px, 12vw, 72px);
-  font-weight: 800;
-  color: #3a2714;
-}
-.bs-time-words {
-  font-size: clamp(22px, 6vw, 32px);
-  font-weight: 800;
-  color: #3a2714;
-}
-.bs-choices {
-  display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
-}
-.bs-choice {
-  min-width: 108px; min-height: 108px;
-  background: #fff; border: 3px solid #5a3d1c; border-radius: 18px;
-  padding: 6px; cursor: pointer;
-}
-.bs-choice.sel { box-shadow: 0 0 0 4px #2a7a4a; border-color: #2a7a4a; }
+/* toddler: two big picture clocks to match the ticket */
+.bs-choices { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 10px; }
+body.bs-toddler .bs-clockwrap { top: 20px; left: 0; right: auto; margin: 0; width: 378px; height: 384px; }
+.bs-choice { width: 176px; height: 176px; padding: 4px; border: 3px solid #5a3d1c; border-radius: 24px; background: #fffdf6; }
 .bs-choice.wrong { animation: bsShake .4s; }
-@keyframes bsShake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
-.bs-choice .bs-clock { width: 88px; height: 88px; pointer-events: none; }
 
-.bs-set {
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-}
-.bs-set .bs-clock.interactive { width: min(52vw, 260px); height: auto; touch-action: none; cursor: grab; }
-.bs-set .bs-clock.interactive:active { cursor: grabbing; }
+/* ---------- ready + board ---------- */
 .bs-ready {
-  min-width: 160px; min-height: 60px;
-  border: 0; border-radius: 999px;
-  background: linear-gradient(#6ad39a, #2fc07e);
-  color: #fff; font: 800 clamp(18px, 4vw, 24px)/1 system-ui, sans-serif;
-  box-shadow: 0 5px 0 #1f9a62; cursor: pointer;
-  padding: 0 22px;
+  position: absolute; top: calc(640px - var(--tap, 60px)); left: 70px; width: 260px;
+  height: var(--tap, 60px); min-width: var(--tap, 60px); min-height: var(--tap, 60px);
+  box-sizing: border-box; border: 0; border-radius: calc(var(--tap, 60px) / 2);
+  background: linear-gradient(#45d39a, #22b37a); color: #fff !important; font-size: 26px; font-weight: 700;
+  box-shadow: 0 5px 0 #188a5c; text-shadow: 0 1px 0 #188a5c;
 }
-.bs-ready:disabled { opacity: .5; cursor: default; box-shadow: none; }
-.bs-ready:focus-visible { outline: 3px solid #2a1b0c; outline-offset: 2px; }
+.bs-board {
+  position: absolute; top: 646px; left: 8px; right: 8px; height: 70px; box-sizing: border-box;
+  background: #fffdf6; border: 3px solid #5a3d1c; border-radius: 18px; display: flex; align-items: center; padding: 0 4px 0 8px; gap: 4px;
+}
+.bs-board-main { flex: 1; min-width: 0; }
+.bs-board h2 { margin: 0 0 2px; font-size: 14px; font-weight: 700; text-align: center; }
+.bs-plates { display: flex; justify-content: center; gap: 6px; }
+.bs-plate {
+  width: 46px; height: 46px; border-radius: 50%; border: 2px dashed #c9a36a; background: #f8efe0; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center; flex: none;
+}
+.bs-plate.filled { border: 2px solid #5a3d1c; background: #fff; }
+.bs-plate img { width: 86%; height: 86%; object-fit: contain; }
+.bs-plate.pop { animation: bsPop .6s ease; }
+.bs-cakebtn { width: 62px; height: 62px; min-width: var(--tap, 60px); min-height: var(--tap, 60px); border: 0; background: none; padding: 0; flex: none; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
+.bs-cakecap { display: none; }
+.bs-legend { display: flex; justify-content: center; gap: 8px; margin-top: 6px; font-size: 16px; font-weight: 700; }
+.bs-legend span { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 14px; background: #f8efe0; }
+.bs-legend i { display: inline-block; height: 7px; border-radius: 4px; }
+.bs-lg-h i { width: 18px; background: #c8501e; }
+.bs-lg-m i { width: 30px; background: #1f2a44; }
 
-.bs-win-card {
-  position: relative;
-  z-index: 4;
-  flex: 0 0 auto;
-  max-height: none;
-  overflow: visible;
-  box-sizing: border-box;
-  animation: none;
-  width: auto;
-  max-width: none;
-  background: #fffef8;
-  color: #2a1b0c;
-  border: 3px solid #5a3d1c; border-radius: 20px;
-  padding: 10px 12px 12px;
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  text-align: center;
+/* ---------- overlays ---------- */
+.bs-overlay { position: absolute; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; }
+.bs-ov-back { position: absolute; inset: 0; background: rgba(58, 39, 20, .45); }
+.bs-card {
+  position: relative; width: 372px; max-height: 704px; box-sizing: border-box; overflow: hidden;
+  background: #fffdf6; border: 4px solid #5a3d1c; border-radius: 26px; padding: 14px 14px 12px; text-align: center;
+  box-shadow: 0 8px 0 rgba(90, 61, 28, .45); animation: bsIn .25s ease;
 }
-.bs-win-card::before {
-  content: ""; display: block;
-  width: min(200px, 56%); height: 48px;
-  background: url("../../assets/picnic/logo/logo_b_wordmark_500.png") center / contain no-repeat;
-  background-image: image-set(url("../../assets/picnic/logo/logo_b_wordmark_500.webp") type("image/webp"), url("../../assets/picnic/logo/logo_b_wordmark_500.png") type("image/png"));
-  flex: none;
+.bs-card h2 { margin: 0 0 8px; font-size: 26px; font-weight: 700; color: #6b3a22; line-height: 1.1; }
+.bs-ls-one { width: 230px; height: 230px; margin: 0 auto; }
+.bs-ls-two { display: flex; justify-content: center; gap: 10px; }
+.bs-ls-two figure { margin: 0; width: 160px; }
+.bs-ls-two svg { width: 160px; height: 160px; }
+.bs-ls-two figcaption { font-size: 17px; font-weight: 700; margin-top: 4px; }
+.bs-ls-text { margin: 10px 4px 12px; font-size: 19px; font-weight: 600; line-height: 1.3; }
+.bs-cardbtns { display: flex; justify-content: center; gap: 8px; }
+.bs-btn1, .bs-btn2 { height: var(--tap, 60px); min-width: max(96px, var(--tap, 60px)); min-height: var(--tap, 60px); padding: 0 14px; border-radius: 30px; font-size: 20px; font-weight: 700; box-sizing: border-box; }
+.bs-btn1 { background: linear-gradient(#45d39a, #22b37a); color: #fff !important; border: 0; box-shadow: 0 4px 0 #188a5c; min-width: 120px; }
+.bs-btn2 { background: #fffdf6; border: 3px solid #5a3d1c; box-shadow: 0 3px 0 #c9a36a; }
+.bs-mst-cake { display: flex; justify-content: center; }
+.bs-mst-cake svg.bs-big { width: 200px; height: 200px; }
+.bs-newtreat { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 0 12px; font-size: 19px; font-weight: 700; }
+.bs-newtreat img { width: 56px; height: 56px; object-fit: contain; }
+.bs-lvlist { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.bs-lvrow {
+  min-height: 68px; border: 3px solid #5a3d1c; border-radius: 16px; background: #fffdf6; padding: 4px 12px;
+  display: grid; grid-template-columns: 1fr auto; grid-template-areas: "n d" "s d"; align-items: center; text-align: left;
 }
-.bs-win-card h2 { margin: 0; font-size: clamp(20px, 4.4vw, 28px); color: #2a1b0c; }
-.bs-win-card p { margin: 0; font-size: 18px; font-weight: 700; color: #2a1b0c; }
-.bs-winart { width: min(28%, 96px); height: auto; flex: none; }
-.bs-winbtns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; flex: none; }
-.bs-winbtns button {
-  box-sizing: border-box;
-  flex: none;
-  min-height: 60px; min-width: 120px;
-  padding: 0 16px;
-  border-radius: 16px; border: 3px solid #5a3d1c;
-  font: 800 18px/1 system-ui, sans-serif; cursor: pointer;
-  background: #2fc07e; color: #08301a;
-}
-.bs-winbtns .bs-secondary { background: #3a2714; color: #fffef8; }
+.bs-lvrow.cur { background: #fff1c9; border-color: #8a5a22; }
+.bs-lvrow:disabled { opacity: .55; border-style: dashed; }
+.bs-lvname { grid-area: n; font-size: 19px; font-weight: 700; }
+.bs-lvsub { grid-area: s; font-size: 14px; font-weight: 600; color: #6b4a2a; }
+.bs-lvrow .bs-dots { grid-area: d; }
+.bs-win .bs-plates { margin: 6px 0 4px; }
+.bs-win .bs-plate { width: 58px; height: 58px; }
+.bs-win-friend { width: 110px; height: 110px; object-fit: contain; display: block; margin: 0 auto 2px; }
 
-body.bs-won #bakeshop { background: #e8d6f3; }
-body.bs-won .bs-shop { flex: 1 1 55%; min-height: 42%; }
-body.bs-won #bsCardHost { flex: 0 0 auto; }
+@keyframes bsPop { 0% { transform: scale(.3); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } }
+@keyframes bsHop { 50% { transform: translateY(-8px); } }
+@keyframes bsShake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+@keyframes bsIn { from { transform: scale(.92); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .bs-glow, .bs-plate.pop, .bs-card, body.bs-right .bs-tk-friend { animation: none; } }
 
-@media (orientation: landscape) {
-  .bs-oven { width: min(60%, 300px); }
-  .bs-oven-clock, .bs-oven-clock .bs-clock { min-width: 230px; }
+/* ---------- landscape stage (1024x640) ---------- */
+html[data-stage="landscape"] #bakeshop { width: 1024px; height: 640px; }
+html.stage-on[data-stage="landscape"] .stage-scale #bakeshop { width: 100%; height: 100%; }
+html[data-stage="landscape"] .bs-header { left: 12px; right: 12px; }
+html[data-stage="landscape"] .bs-header h1 { font-size: 30px; }
+html[data-stage="landscape"] .bs-panel {
+  top: calc(10px + var(--tap, 60px)); left: 12px; width: 560px; height: calc(622px - var(--tap, 60px));
+  background-image: url("../../art/bakeshop/shop_bg_landscape.webp");
 }
-@media (orientation: landscape) and (max-height: 500px) {
-  #bakeshop { padding: 4px 8px; gap: 4px; }
-  .bs-header { min-height: 60px; }
-  .bs-play { flex-direction: row; align-items: stretch; }
-  .bs-shop { flex: 1 1 48%; min-width: 280px; }
-  #bsCardHost { flex: 1 1 40%; min-width: 0; max-height: 100%; overflow: auto; }
-  .bs-card { flex: 1 1 auto; min-width: 0; max-height: 100%; overflow: auto; }
-  .bs-set { flex-direction: row; justify-content: center; }
-  .bs-set .bs-clock.interactive { width: min(36vh, 200px); }
-  .bs-choice { min-width: 72px; min-height: 72px; }
-  .bs-choice .bs-clock { width: 60px; height: 60px; }
-  .bs-ask { font-size: clamp(18px, 4.2vh, 24px); }
-  .bs-oven { width: min(70%, 280px); min-width: 250px; }
-  .bs-oven-body { padding: 4px 6px 6px; }
-  .bs-oven-top { height: 6px; margin: -4px -6px 4px; }
-  .bs-oven-door { padding: 4%; }
-  .bs-oven-knobs { margin-top: 4px; }
-  .bs-oven-clock, .bs-oven-clock .bs-clock { min-width: 230px; }
-  .bs-win-card {
-    max-height: none;
-    overflow: visible;
-    padding: 6px 10px 8px;
-    gap: 4px;
-  }
-  .bs-win-card::before { display: none; }
-  .bs-winart { width: 44px; max-height: 44px; }
-  .bs-win-card h2 { font-size: 20px; }
-  .bs-win-card p { display: none; }
-  .bs-winbtns { flex-wrap: nowrap; gap: 8px; }
-  body.bs-won .bs-shop { flex: 1 1 48%; min-width: 280px; }
-  body.bs-won #bsCardHost { flex: 1 1 40%; overflow: visible; }
-  .bs-tag-board { width: min(112px, 26vw); }
-  .bs-tag-treat { width: 40px; }
-  .bs-tag-treat .bs-art { width: 40px; }
-  .bs-tag.has-art .bs-time-num { font-size: 26px; }
-  .bs-tag.has-art .bs-time-words { font-size: 14px; }
+html[data-stage="landscape"] .bs-pill { width: 112px; font-size: 17px; }
+html[data-stage="landscape"] .bs-clockwrap { top: 38px; left: 67px; right: auto; margin: 0; width: 420px; height: 420px; }
+html[data-stage="landscape"] .bs-tip { top: 462px; bottom: auto; height: 30px; font-size: 18px; }
+html[data-stage="landscape"] .bs-steps { top: 492px; bottom: auto; gap: 28px; }
+html[data-stage="landscape"] .bs-lab { font-size: 18px; min-width: 56px; }
+html[data-stage="landscape"] body.bs-toddler .bs-clockwrap { left: 0; right: auto; margin: 0; width: 554px; height: 530px; }
+html[data-stage="landscape"] .bs-choice { width: 240px; height: 240px; }
+html[data-stage="landscape"] .bs-ticket {
+  top: calc(10px + var(--tap, 60px)); left: 586px; right: 12px; height: 150px; flex-wrap: nowrap; padding: 0 10px;
 }
-@media (min-width: 700px) and (min-height: 700px) {
-  .bs-set .bs-clock.interactive { width: min(48vw, 320px); }
-  .bs-choice .bs-clock { width: 96px; height: 96px; }
-  .bs-choice { min-width: 110px; min-height: 110px; }
+html[data-stage="landscape"] .bs-tk-friend { width: 92px; height: 92px; }
+html[data-stage="landscape"] .bs-tk-treat { width: 84px; height: 84px; }
+html[data-stage="landscape"] .bs-tk-small { font-size: 19px; }
+html[data-stage="landscape"] .bs-tk-big { font-size: 30px; white-space: normal; }
+html[data-stage="landscape"] .bs-tk-big em { display: block; font-size: 20px; }
+html[data-stage="landscape"] .bs-tk-clock svg { width: 84px; height: 84px; }
+html[data-stage="landscape"] .bs-ready { top: calc(178px + var(--tap, 60px)); left: 586px; width: 426px; height: 80px; min-height: var(--tap, 60px); border-radius: 40px; font-size: 34px; }
+html[data-stage="landscape"] .bs-board {
+  top: 338px; left: 586px; right: 12px; height: 294px; flex-direction: column; padding: 12px 10px; gap: 8px;
 }
-@media (max-width: 420px) {
-  .bs-ask { font-size: clamp(18px, 5.2vw, 24px); }
-  .bs-friend { width: 26%; }
+html[data-stage="landscape"] .bs-board-main { flex: none; width: 100%; }
+html[data-stage="landscape"] .bs-board h2 { font-size: 20px; margin-bottom: 10px; }
+html[data-stage="landscape"] .bs-plates { gap: 8px; }
+html[data-stage="landscape"] .bs-plate { width: 72px; height: 72px; }
+html[data-stage="landscape"] .bs-cakebtn { width: 180px; height: 170px; margin-top: 6px; }
+html[data-stage="landscape"] .bs-cakecap { display: block; font-size: 18px; font-weight: 700; }
+html[data-stage="landscape"] .bs-cakebtn svg { width: 132px; height: 132px; }
+html[data-stage="landscape"] .bs-card { width: 640px; max-height: 624px; padding: 14px 18px 12px; }
+html[data-stage="landscape"] .bs-lesson .bs-ls-one { width: 250px; height: 250px; }
+html[data-stage="landscape"] .bs-ls-two svg { width: 200px; height: 200px; }
+html[data-stage="landscape"] .bs-ls-two figure { width: 200px; }
+html[data-stage="landscape"] .bs-ls-text { font-size: 21px; }
+html[data-stage="landscape"] .bs-lvlist { display: grid; grid-template-columns: 1fr 1fr; }
+
+/* When the stage scales down (phone landscape), --tap grows past 72px. Shift the layout so the larger
+   Home / Hear / pills / +/− / It's ready! still fit, stay at least 60 screen px, and keep off the clock rim. */
+html.bs-tap-lg[data-stage="landscape"] .bs-ticket { height: 118px; }
+html.bs-tap-lg[data-stage="landscape"] .bs-tk-friend { width: 84px; height: 84px; }
+html.bs-tap-lg[data-stage="landscape"] .bs-tk-treat { width: 76px; height: 76px; }
+html.bs-tap-lg[data-stage="landscape"] .bs-tk-clock svg { width: 72px; height: 72px; }
+html.bs-tap-lg[data-stage="landscape"] .bs-ready {
+  top: calc(136px + var(--tap, 60px)); height: var(--tap, 60px); min-height: var(--tap, 60px);
+  border-radius: calc(var(--tap, 60px) / 2);
 }
+html.bs-tap-lg[data-stage="landscape"] .bs-board {
+  top: calc(144px + 2 * var(--tap, 60px)); height: calc(488px - 2 * var(--tap, 60px));
+}
+html.bs-tap-lg[data-stage="landscape"] .bs-clockwrap { top: 4px; left: 90px; right: auto; margin: 0; width: 380px; height: 380px; }
+html.bs-tap-lg[data-stage="landscape"] .bs-tip { top: auto; bottom: calc(8px + var(--tap, 60px)); height: 28px; }
+html.bs-tap-lg[data-stage="landscape"] .bs-steps { top: auto; bottom: 4px; height: var(--tap, 60px); }
+html.bs-tap-lg[data-stage="landscape"] .bs-pill { top: 4px; width: 100px; height: var(--tap, 60px); }
+html.bs-tap-lg[data-stage="landscape"] .bs-level { left: 4px; }
+html.bs-tap-lg[data-stage="landscape"] .bs-show { right: 4px; }
+html.bs-tap-lg[data-stage="landscape"] .bs-board { padding: 8px 8px; gap: 4px; }
+html.bs-tap-lg[data-stage="landscape"] .bs-board h2 { font-size: 18px; margin-bottom: 4px; }
+html.bs-tap-lg[data-stage="landscape"] .bs-plate { width: 60px; height: 60px; }
+html.bs-tap-lg[data-stage="landscape"] .bs-cakebtn { width: 140px; height: 120px; margin-top: 0; }
+html.bs-tap-lg[data-stage="landscape"] .bs-cakebtn svg { width: 96px; height: 96px; }
+
+/* ---------- 1122b: hints, "What time is it?" reads, pre-K ---------- */
+/* a miss pulses the hand to look at (and its +/- row) */
+.bs-pulse-hour .bs-hand-hour path, .bs-pulse-min .bs-hand-min path { stroke: #ffb300; stroke-width: 3.2; animation: bsHandPulse .7s ease-in-out infinite alternate; }
+@keyframes bsHandPulse { from { stroke-opacity: .45; } to { stroke-opacity: 1; } }
+.bs-pair.pulse { background: rgba(255, 207, 63, .55); box-shadow: 0 0 0 3px #ffcf3f; animation: bsPairPulse .7s ease-in-out infinite alternate; }
+@keyframes bsPairPulse { from { box-shadow: 0 0 0 2px rgba(255, 179, 0, .4); } to { box-shadow: 0 0 0 4px #ffb300; } }
+.bs-tip.hint { white-space: normal; text-align: center; font-size: 14px; line-height: 1.1; height: auto; min-height: 26px; padding: 1px 6px; background: rgba(255, 248, 231, .92); border-radius: 12px; left: 6px; right: 6px; }
+html[data-stage="landscape"] .bs-tip.hint { font-size: 17px; }
+
+
+/* reads: the clock (no knobs) and four time cards */
+html body.bs-read .bs-clockwrap { top: 30px; left: 50%; transform: translateX(-50%); width: calc(460px - 4 * var(--tap, 60px)); height: calc(460px - 4 * var(--tap, 60px)); }
+body.bs-read #bsClock { cursor: default; }
+.bs-steps.read { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; height: calc(2 * var(--tap, 60px) + 8px); left: 8px; right: 8px; bottom: 6px; }
+body.bs-read .bs-tip { bottom: calc(14px + 2 * var(--tap, 60px) + 8px); }
+.bs-tchoice {
+  min-height: var(--tap, 60px); min-width: var(--tap, 60px); box-sizing: border-box; padding: 2px 4px;
+  border: 3px solid #5a3d1c; border-radius: 16px; background: #fffdf6; box-shadow: 0 3px 0 #c9a36a;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1;
+}
+.bs-tchoice b { font-size: 28px; font-weight: 700; }
+.bs-tchoice small { font-size: 14px; font-weight: 600; color: #6b4a2a; margin-top: 2px; }
+.bs-tchoice.wrong, .bs-choice.wrong { animation: bsShake .4s; }
+.bs-tchoice.out, .bs-choice.out { opacity: .35; border-style: dashed; box-shadow: none; }
+.bs-tchoice:active { transform: translateY(2px); box-shadow: none; }
+
+/* pre-K: picture ticket (clock + big number), three picture clocks */
+.bs-tk-pk { flex-direction: row; justify-content: center; gap: 10px; }
+.bs-tk-pkclock svg { width: 60px; height: 60px; }
+.bs-tk-num {
+  width: 50px; height: 50px; border-radius: 50%; background: #ffcf3f; border: 3px solid #5a3d1c; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 700; color: #3a2714;
+}
+.bs-choices.three { flex-wrap: wrap; align-content: center; gap: 10px 14px; }
+.bs-choices.three .bs-choice { width: 168px; height: 168px; }
+body.bs-prek.bs-toddler .bs-tip { top: auto; bottom: 4px; }
+
+/* level picker: bonus levels */
+.bs-bonus { font-style: normal; font-size: 13px; font-weight: 700; color: #fff; background: #b07a2a; border-radius: 8px; padding: 1px 6px; vertical-align: 2px; }
+
+html[data-stage="landscape"] body.bs-read .bs-clockwrap { left: 50%;  top: 30px; width: min(400px, calc(530px - 2 * var(--tap, 60px))); height: min(400px, calc(530px - 2 * var(--tap, 60px))); }
+html[data-stage="landscape"] .bs-steps.read { grid-template-columns: repeat(4, 1fr); top: auto; bottom: 8px; height: var(--tap, 60px); gap: 10px; left: 10px; right: 10px; }
+html[data-stage="landscape"] body.bs-read .bs-tip { top: auto; bottom: calc(14px + var(--tap, 60px)); }
+html[data-stage="landscape"] .bs-tchoice b { font-size: 30px; }
+html[data-stage="landscape"] .bs-tchoice small { font-size: 15px; }
+html[data-stage="landscape"] .bs-tk-pkclock svg { width: 110px; height: 110px; }
+html[data-stage="landscape"] .bs-tk-num { width: 84px; height: 84px; font-size: 50px; }
+html[data-stage="landscape"] .bs-choices.three .bs-choice { width: 210px; height: 210px; }
+html[data-stage="landscape"] body.bs-prek.bs-toddler .bs-clockwrap { height: calc(100% - 64px); }
+html.bs-tap-lg[data-stage="landscape"] .bs-tk-pkclock svg { width: 88px; height: 88px; }
+html.bs-tap-lg[data-stage="landscape"] .bs-tk-num { width: 70px; height: 70px; font-size: 42px; }
+html.bs-tap-lg[data-stage="landscape"] .bs-choices.three .bs-choice { width: 190px; height: 190px; }
+@media (prefers-reduced-motion: reduce) { .bs-pulse-hour .bs-hand-hour path, .bs-pulse-min .bs-hand-min path, .bs-pair.pulse { animation: none; } }
+html[data-stage="landscape"] .bs-tk-big.bs-tk-q { font-size: 27px; white-space: nowrap; }

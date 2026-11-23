@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="nsHrt" x1="30%" y1="15%" x2="80%" y2="95%">
+      <stop offset="0%" stop-color="#ffd0e4"/>
+      <stop offset="100%" stop-color="#ff8fc7"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#3b2d55" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M64.00 58.80 C57.20 45.20 30.00 41.80 30.00 62.20 C30.00 79.20 50.40 89.40 64.00 103.00 C77.60 89.40 98.00 79.20 98.00 62.20 C98.00 41.80 70.80 45.20 64.00 58.80 Z" fill="url(#nsHrt)"/>
+    <ellipse cx="54" cy="52" rx="8" ry="6" fill="#ffffff" fill-opacity=".75" stroke="none"/>
+  </g>
+
+</svg>

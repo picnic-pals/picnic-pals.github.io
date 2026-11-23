@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="bnBody" x1="30%" y1="15%" x2="80%" y2="95%">
+      <stop offset="0%" stop-color="#c8b0ff"/>
+      <stop offset="55%" stop-color="#a77bff"/>
+      <stop offset="100%" stop-color="#8b63e8"/>
+    </linearGradient>
+    <linearGradient id="bnCuff" x1="30%" y1="15%" x2="80%" y2="95%">
+      <stop offset="0%" stop-color="#fff8e8"/>
+      <stop offset="100%" stop-color="#f0e0c4"/>
+    </linearGradient>
+    <radialGradient id="bnPom" cx="40%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#ffe98a"/>
+      <stop offset="70%" stop-color="#ffd36a"/>
+      <stop offset="100%" stop-color="#f0b44a"/>
+    </radialGradient>
+  </defs>
+  <g stroke="#3b2d55" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M24 86
+             C 22 48 40 22 64 22
+             C 88 22 106 48 104 86
+             Q 64 96 24 86 Z" fill="url(#bnBody)"/>
+    <!-- soft rib hint -->
+    <path d="M40 40 Q64 32 88 40" fill="none" stroke="#d2b8ff" stroke-width="3.2" opacity=".8"/>
+    <rect x="20" y="78" width="88" height="28" rx="12" fill="url(#bnCuff)"/>
+    <path d="M32 88 h64" fill="none" stroke="#f0a878" stroke-width="2.8" opacity=".7"/>
+    <circle cx="64" cy="20" r="12" fill="url(#bnPom)"/>
+    <circle cx="60" cy="16" r="4" fill="#ffffff" stroke="none"/>
+    <!-- tiny heart -->
+    <path d="M64 58
+             C 60 54 54 54 54 60
+             C 54 66 64 72 64 72
+             C 64 72 74 66 74 60
+             C 74 54 68 54 64 58 Z" fill="#ffc1d9" stroke="#3b2d55" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+</svg>

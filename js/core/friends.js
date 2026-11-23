@@ -1,6 +1,7 @@
 /* Picnic Pals — food FRIENDS (was Blob Arcade blob friends): little bios and friendship levels (Blob Room).
-   Friendship grows when a kid plays games AS that blob (1 point per star earned), visits the room (each friend
-   living there: +1 once a day) and taps a friend in the room (+1, up to 3 a day each). Levels unlock small things:
+   Friendship grows when a kid visits the room (each other friend living there: +1 once a day) and taps a friend
+   in the room (+1, up to 3 a day each). The kid's own chosen player friend is never a friendship target.
+   Playing games still earns stars, but those stars do not grow friendship with the friend in play. Levels unlock small things:
      2 Pal          → "likes" (read aloud in the bio)
      3 Good friend  → a new face (expression) the blob shows in the room
      4 Best friend  → dislikes + favorite food
@@ -41,15 +42,27 @@
   function st(p, b) { var f = p.friends || (p.friends = {}); return f[b] || (f[b] = { pts: 0, lvl: 1, day: '', taps: 0, visit: '', news: [] }); }
   function lvlFor(pts) { var l = 1; for (var i = 0; i < LEVELS.length; i++) if (pts >= LEVELS[i]) l = i + 1; return l; }
   function has(p, b) { return p.blob === b || !!(p.unlocks && p.unlocks.blobs && p.unlocks.blobs[b]); }
-  /* add friendship points; returns the new level if it went up (and queues it for the room to celebrate) */
+  /* the kid's chosen player friend is the one in play, never a friendship-hearts target */
+  function isSelf(p, b) { return !!(p && b && p.blob === b); }
+  /* drop queued celebrations for the player character (and an optional previous one after a switch) */
+  function dropSelfNews(p, also) {
+    if (!p) return;
+    if (p.blob) st(p, p.blob).news = [];
+    if (also && also !== p.blob) st(p, also).news = [];
+  }
+  /* add friendship points; returns the new level if it went up (and queues it for the room to celebrate).
+     Playing as a friend, or tapping/visiting yourself, does not grow friendship with yourself. */
   function add(p, b, n, why) {
-    if (!p || p.guest || !BIO[b] || !has(p, b) || !(n > 0)) return 0;
+    if (!p || p.guest || !BIO[b] || !has(p, b) || isSelf(p, b) || !(n > 0)) return 0;
     var s = st(p, b), before = s.lvl; s.pts += n; s.lvl = lvlFor(s.pts);
     if (s.lvl > before) { for (var l = before + 1; l <= s.lvl; l++) s.news.push(l); A.emit && A.emit('friend:level', { p: p, blob: b, lvl: s.lvl, why: why }); return s.lvl; }
     return 0;
   }
-  function tap(p, b) { var s = st(p, b), d = today(); if (s.day !== d) { s.day = d; s.taps = 0; } if (s.taps >= TAPS_PER_DAY) return { pts: 0, lvl: 0 }; s.taps++; return { pts: 1, lvl: add(p, b, 1, 'tap') }; }
-  function visit(p) { var d = today(), ups = []; friendsOf(p).forEach(function (b) { var s = st(p, b); if (s.visit !== d) { s.visit = d; var l = add(p, b, 1, 'visit'); if (l) ups.push(b); } }); return ups; }
+  function tap(p, b) {
+    if (isSelf(p, b)) return { pts: 0, lvl: 0 };
+    var s = st(p, b), d = today(); if (s.day !== d) { s.day = d; s.taps = 0; } if (s.taps >= TAPS_PER_DAY) return { pts: 0, lvl: 0 }; s.taps++; return { pts: 1, lvl: add(p, b, 1, 'tap') };
+  }
+  function visit(p) { var d = today(), ups = []; friendsOf(p).forEach(function (b) { if (isSelf(p, b)) return; var s = st(p, b); if (s.visit !== d) { s.visit = d; var l = add(p, b, 1, 'visit'); if (l) ups.push(b); } }); return ups; }
   function friendsOf(p) { return A.Blobs.CAST.map(function (c) { return c.id; }).filter(function (b) { return has(p, b); }); }
   /* what a friend has unlocked so far */
   function info(p, b) {
@@ -60,6 +73,14 @@
   }
   /* voice parts for the bio card (only what is unlocked) */
   function bioParts(p, b) { var i = info(p, b), v = ['fr_' + b + '_hi']; if (i.likes) v.push('fr_' + b + '_likes'); if (i.dislikes) v.push('fr_' + b + '_dislikes'); if (i.food) v.push('fr_' + b + '_food'); return v; }
-  function takeNews(p) { var out = []; friendsOf(p).forEach(function (b) { var s = st(p, b); while (s.news.length) out.push({ blob: b, lvl: s.news.shift() }); }); return out; }
-  A.Friends = { BIO: BIO, LEVELS: LEVELS, NAMES: NAMES, TAPS_PER_DAY: TAPS_PER_DAY, state: st, add: add, tap: tap, visit: visit, info: info, of: friendsOf, bioParts: bioParts, takeNews: takeNews, levelFor: lvlFor };
+  function takeNews(p) {
+    dropSelfNews(p);
+    var out = [];
+    friendsOf(p).forEach(function (b) {
+      if (isSelf(p, b)) { st(p, b).news = []; return; }
+      var s = st(p, b); while (s.news.length) out.push({ blob: b, lvl: s.news.shift() });
+    });
+    return out;
+  }
+  A.Friends = { BIO: BIO, LEVELS: LEVELS, NAMES: NAMES, TAPS_PER_DAY: TAPS_PER_DAY, state: st, add: add, tap: tap, visit: visit, info: info, of: friendsOf, bioParts: bioParts, takeNews: takeNews, levelFor: lvlFor, isSelf: isSelf, dropSelfNews: dropSelfNews };
 })(window.Arcade);

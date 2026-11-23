@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="chPuff" x1="30%" y1="15%" x2="80%" y2="95%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="70%" stop-color="#f4f1ff"/>
+      <stop offset="100%" stop-color="#e4def8"/>
+    </linearGradient>
+    <linearGradient id="chBand" x1="30%" y1="15%" x2="80%" y2="95%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#ebe6fb"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#3b2d55" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M28 84
+             C 16 84 14 66 24 56
+             C 16 42 32 24 50 34
+             C 56 16 80 16 90 32
+             C 108 22 122 46 110 62
+             C 122 74 112 90 98 86
+             L 28 84 Z" fill="url(#chPuff)"/>
+    <rect x="32" y="80" width="64" height="30" rx="10" fill="url(#chBand)"/>
+    <path d="M46 86 v16" fill="none" stroke="#3b2d55" stroke-width="3.2"/>
+    <path d="M64 86 v16" fill="none" stroke="#3b2d55" stroke-width="3.2"/>
+    <path d="M82 86 v16" fill="none" stroke="#3b2d55" stroke-width="3.2"/>
+    <ellipse cx="52" cy="50" rx="10" ry="7" fill="#ffffff" fill-opacity=".85" stroke="none"/>
+  </g>
+
+</svg>

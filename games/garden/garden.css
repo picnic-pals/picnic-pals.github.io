@@ -102,10 +102,11 @@ body.gd-land .gd-bg, body.gd-land .gd-title-bg { object-position: center center;
 .gd-actions { display: flex; gap: 10px; justify-content: center; width: 100%; }
 .gd-action { padding: 0 18px; background: #fff36a; font-size: 20px; min-width: 160px; }
 
-/* Play: scene is the top two thirds; question card keeps the bottom third clear. */
+/* Play: the garden scene takes leftover space; the question card sizes to
+   its content so every answer stays on the stage with no scrolling. */
 .gd-play { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
 .gd-scene {
-  flex: 2 1 0; min-height: 0; position: relative;
+  flex: 1 1 0; min-height: 0; position: relative;
   border: 3px solid #3a6a32; border-radius: 22px; overflow: hidden;
   background: #8fd0ee;
 }
@@ -135,11 +136,11 @@ body.gd-land .gd-bg, body.gd-land .gd-title-bg { object-position: center center;
 .gd-can.pour { opacity: 1; }
 
 .gd-card {
-  flex: 1 1 0; min-width: 0; min-height: 0;
+  flex: 0 1 auto; min-width: 0; min-height: 0;
   background: #fffdf6; border: 3px solid #3a6a32; border-radius: 18px;
-  padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px;
+  padding: 8px 10px 10px; display: flex; flex-direction: column; gap: 6px;
   position: relative; z-index: 2;
-  overflow: auto;
+  overflow: hidden;
 }
 .gd-seeds {
   display: flex; flex-wrap: nowrap; justify-content: center; align-items: stretch;
@@ -172,26 +173,47 @@ body.gd-land .gd-bg, body.gd-land .gd-title-bg { object-position: center center;
 }
 .gd-seedbtn:focus-visible { outline: 3px solid #2a7a4a; outline-offset: 2px; }
 
-.gd-ask { margin: 0; font-size: clamp(18px, 4.6vw, 26px); color: #244020; text-align: center; }
-.gd-nudge { margin: 0; font-size: 16px; color: #6a3a16; text-align: center; min-height: 1.2em; }
-.gd-pic { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px; }
-.gd-array { display: inline-flex; flex-direction: column; gap: 4px; padding: 6px 8px; background: #fffbe8; border-radius: 12px; border: 2px solid #d9e8b0; }
+.gd-ask {
+  margin: 0;
+  font-size: var(--gd-ask, 22px);
+  line-height: 1.2;
+  color: #244020;
+  text-align: center;
+}
+.gd-nudge { margin: 0; font-size: 16px; color: #6a3a16; text-align: center; }
+.gd-nudge:empty { display: none; }
+.gd-pic {
+  display: flex; justify-content: center; align-items: center; flex-wrap: wrap;
+  gap: 6px; flex: 0 1 auto; min-height: 0;
+}
+.gd-array {
+  display: inline-flex; flex-direction: column; gap: 4px;
+  padding: 6px 8px; background: #fffbe8; border-radius: 12px; border: 2px solid #d9e8b0;
+}
 .gd-arow { display: flex; gap: 4px; justify-content: center; }
-.gd-array .pp-pic, .gd-array img, .gd-food { width: 32px; height: 32px; object-fit: contain; }
+.gd-array .pp-pic, .gd-array img, .gd-food {
+  width: var(--gd-icon, 32px); height: var(--gd-icon, 32px); object-fit: contain;
+}
 .gd-op { font-size: 28px; font-weight: 800; color: #244020; padding: 0 4px; }
-.gd-choices { display: grid; gap: 8px; grid-template-columns: repeat(3, 1fr); flex-shrink: 0; }
+.gd-choices { display: grid; gap: 8px; grid-template-columns: repeat(3, 1fr); flex: 0 0 auto; }
 .gd-choices.n4 { grid-template-columns: repeat(2, 1fr); }
 .gd-choices.n2 { grid-template-columns: repeat(2, 1fr); }
-.gd-choice { font-size: clamp(18px, 5vw, 26px); padding: 8px; background: #e8ffd0; }
-@media (max-width: 500px) and (orientation: portrait) {
-  .gd-scene { flex: 1 1 0; }
-  .gd-card { flex: 1.15 1 0; }
-  .gd-array { gap: 2px; padding: 4px 6px; }
-  .gd-array .pp-pic, .gd-array img, .gd-food { width: 22px; height: 22px; }
-  .gd-choices.n4 { grid-template-columns: repeat(4, 1fr); gap: 6px; }
-  .gd-choice { padding: 6px 2px; font-size: 18px; }
+.gd-choice {
+  font-size: 22px; padding: 8px 6px; background: #e8ffd0;
+  min-width: var(--tap, 60px);
+  min-height: var(--gd-choice-h, var(--tap, 60px));
+  display: flex; align-items: center; justify-content: center; gap: 4px;
 }
-
+.gd-choice { overflow: hidden; max-width: 100%; }
+.gd-choice img, .gd-choice .pp-pic {
+  width: var(--gd-choice-pic, 40px); height: var(--gd-choice-pic, 40px); object-fit: contain;
+}
+.gd-choice .cv-set, .gd-pic .cv-set, .gd-card .cv-set {
+  --cv-d: var(--gd-cv, 16px);
+  max-width: 100%;
+}
+.gd-choices.has-pic.n3,
+.gd-choices.has-pic.n4 { grid-template-columns: repeat(2, 1fr); }
 .gd-choice.wrong { background: #ffd0c8; animation: gshake .35s ease; }
 .gd-choice.right { background: #c8f5a0; }
 @keyframes gshake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
@@ -209,30 +231,70 @@ body.gd-land .gd-bg, body.gd-land .gd-title-bg { object-position: center center;
 .gd-msg p { margin: 0; font-size: 18px; }
 .gd-msg .gd-actions { margin-top: 8px; flex-wrap: wrap; }
 
+/* Portrait design stage is 400x720. Layout does not reflow with the device width. */
+html.stage-on[data-stage="portrait"] .gd-play { flex-direction: column; gap: 6px; }
+html.stage-on[data-stage="portrait"] .gd-scene { flex: 1 1 0; min-height: 200px; }
+html.stage-on[data-stage="portrait"] .gd-play.gd-tight .gd-scene { min-height: 160px; }
+html.stage-on[data-stage="portrait"] .gd-card {
+  flex: 0 1 auto; max-height: none; overflow: hidden;
+  padding: 8px 8px 8px; gap: 6px;
+}
+html.stage-on[data-stage="portrait"] .gd-card.gd-card-q {
+  flex: 1 1 auto;
+  justify-content: space-evenly;
+}
+html.stage-on[data-stage="portrait"] .gd-ask { font-size: var(--gd-ask, 26px); line-height: 1.15; }
+html.stage-on[data-stage="portrait"] .gd-nudge { font-size: 16px; }
+html.stage-on[data-stage="portrait"] .gd-choices { gap: 8px; }
+html.stage-on[data-stage="portrait"] .gd-choice { font-size: 22px; padding: 8px 4px; }
+html.stage-on[data-stage="portrait"] .gd-array .pp-pic,
+html.stage-on[data-stage="portrait"] .gd-array img,
+html.stage-on[data-stage="portrait"] .gd-food { width: var(--gd-icon, 28px); height: var(--gd-icon, 28px); }
+
+/* Landscape design stage is 1024x640. The card uses the full side column. */
+html.stage-on[data-stage="landscape"] .gd-play { flex-direction: row; gap: 10px; }
+html.stage-on[data-stage="landscape"] .gd-scene { flex: 1 1 56%; min-width: 0; min-height: 0; }
+html.stage-on[data-stage="landscape"] .gd-card {
+  flex: 1 1 42%; max-width: 46%; max-height: none; overflow: hidden;
+  justify-content: space-evenly; padding: 14px 16px; gap: 10px;
+}
+html.stage-on[data-stage="landscape"] .gd-ask { font-size: var(--gd-ask, 28px); line-height: 1.2; }
+html.stage-on[data-stage="landscape"] .gd-nudge { font-size: 18px; }
+html.stage-on[data-stage="landscape"] .gd-choices { gap: 10px; }
+html.stage-on[data-stage="landscape"] .gd-choice { font-size: 26px; padding: 12px 8px; }
+html.stage-on[data-stage="landscape"] .gd-array .pp-pic,
+html.stage-on[data-stage="landscape"] .gd-array img,
+html.stage-on[data-stage="landscape"] .gd-food { width: var(--gd-icon, 36px); height: var(--gd-icon, 36px); }
+html.stage-on[data-stage="landscape"] .gd-msg-ui { padding: 8px 12px; gap: 6px; justify-content: center; }
+html.stage-on[data-stage="landscape"] .gd-msg-ui img { width: min(18vw, 100px); }
+html.stage-on[data-stage="landscape"] .gd-msg h2 { font-size: 22px; }
+html.stage-on[data-stage="landscape"] .gd-msg p { font-size: 15px; }
+
+/* nostage fallback only — the live game uses the fixed stage above, not the viewport. */
+@media (max-width: 500px) and (orientation: portrait) {
+  html:not(.stage-on) .gd-scene { flex: 1 1 0; }
+  html:not(.stage-on) .gd-card { flex: 1.15 1 0; }
+  html:not(.stage-on) .gd-array { gap: 2px; padding: 4px 6px; }
+  html:not(.stage-on) .gd-array .pp-pic, html:not(.stage-on) .gd-array img, html:not(.stage-on) .gd-food { width: 22px; height: 22px; }
+  html:not(.stage-on) .gd-choices.n4 { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  html:not(.stage-on) .gd-choice { padding: 6px 2px; font-size: 18px; }
+}
 @media (orientation: landscape) and (max-height: 500px) {
-  .gd-header { min-height: 56px; }
-  .gd-header h1 { font-size: 20px; }
-  .gd-play { flex-direction: row; }
-  .gd-scene { flex: 1 1 56%; }
-  .gd-card { flex: 1 1 44%; }
-  .gd-title h2 { font-size: 28px; margin-top: 2px; }
-  .gd-ask { font-size: 18px; }
-  .gd-msg-ui { padding: 8px 12px; gap: 6px; justify-content: center; overflow: auto; }
-  .gd-msg-ui img { width: min(18vw, 100px); }
-  .gd-msg h2 { font-size: 22px; }
-  .gd-msg p { font-size: 15px; }
-  .gd-msg .gd-actions { margin-top: 4px; }
+  html:not(.stage-on) .gd-header { min-height: 56px; }
+  html:not(.stage-on) .gd-header h1 { font-size: 20px; }
+  html:not(.stage-on) .gd-play { flex-direction: row; }
+  html:not(.stage-on) .gd-scene { flex: 1 1 56%; }
+  html:not(.stage-on) .gd-card { flex: 1 1 44%; }
+  html:not(.stage-on) .gd-title h2 { font-size: 28px; margin-top: 2px; }
+  html:not(.stage-on) .gd-ask { font-size: 18px; }
+  html:not(.stage-on) .gd-msg-ui { padding: 8px 12px; gap: 6px; justify-content: center; overflow: auto; }
+  html:not(.stage-on) .gd-msg-ui img { width: min(18vw, 100px); }
+  html:not(.stage-on) .gd-msg h2 { font-size: 22px; }
+  html:not(.stage-on) .gd-msg p { font-size: 15px; }
+  html:not(.stage-on) .gd-msg .gd-actions { margin-top: 4px; }
 }
 @media (min-width: 900px) and (orientation: landscape) {
-  .gd-play { flex-direction: row; }
-  .gd-scene { flex: 1 1 56%; }
-  .gd-card { flex: 1 1 40%; justify-content: center; }
+  html:not(.stage-on) .gd-play { flex-direction: row; }
+  html:not(.stage-on) .gd-scene { flex: 1 1 56%; }
+  html:not(.stage-on) .gd-card { flex: 1 1 40%; justify-content: center; }
 }
-
-/* stage2: garden prompt and miss hint stay readable on the stage */
-html.stage-on .gd-ask { font-size: 32px; }
-html.stage-on .gd-nudge { font-size: 20px; }
-
-
-/* Stage-enlarged ask text can make the order card more than 45% of the play area. */
-html.stage-on .gd-card { max-height: 45%; overflow: auto; }

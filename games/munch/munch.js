@@ -129,11 +129,29 @@
     }
     return best;
   }
+  // ladder1121: an easy tier of a level (the small steps into a new skill): 1 = the smallest of 8 rules, 2 = + wrong snacks far
+  // from the answer, 3 = + the strategy hint shown from the start
+  function easierRule(skill, level, tier) {
+    if (!skill || !skill.gen) return null;
+    var best = null, bestN = 1e9, t;
+    for (t = 0; t < 8; t++) { var r = skill.gen(level), n = ruleSize(r); if (!best || n < bestN) { best = r; bestN = n; } }
+    if (best && best.bad && tier >= 2) {
+      var orig = best.bad, tgt = best.target;
+      best.bad = function () {
+        var i, c, n, pick = orig(), bestC = pick, bestD = -1;
+        if (tgt == null || !isFinite(+tgt)) return pick;
+        n = cellNum(pick); if (n != null) bestD = Math.abs(n - tgt);
+        for (i = 0; i < 5; i++) { c = orig(); n = cellNum(c); if (n == null) continue; if (Math.abs(n - tgt) > bestD) { bestC = c; bestD = Math.abs(n - tgt); } }
+        return bestC;
+      };
+    }
+    return best;
+  }
   function buildLevel(cont) {
     var cells = [];
     PL.forEach(function (pl) {
       if (A.Steps) A.Steps.ctx.p = pl.P;
-      var hard = !!(pl.round.hard || (SR && SR.cfg && SR.cfg.bossHarder)), R = hard ? harderRule(pl.round.skill, pl.round.level) : pl.round.skill.gen(pl.round.level), mine = TWO ? N / 2 : N, cpb = A.Age.cellsPerBoard(pl.P), nOk = TWO ? A.rnd(5, 6) : pl.round.nOk || A.rnd(cpb[0], cpb[1]), i;
+      var hard = !!(pl.round.hard || (SR && SR.cfg && SR.cfg.bossHarder)), R = hard ? harderRule(pl.round.skill, pl.round.level) : (pl.round.tier && easierRule(pl.round.skill, pl.round.level, pl.round.tier)) || pl.round.skill.gen(pl.round.level), mine = TWO ? N / 2 : N, cpb = A.Age.cellsPerBoard(pl.P), nOk = TWO ? A.rnd(5, 6) : pl.round.nOk || A.rnd(cpb[0], cpb[1]), i;
       var pickable = A.Coach && A.Coach.pickItem && !R.rc && R.hom == null && typeof R.target !== 'string' && !pl.P.guest;
       var seen = {}, ck = function (c) { return c.label + '|' + (c.html || ''); };   // qbatch-1107: distinct targets and distractors when the rule allows it
       var fresh = function (fn) { var c, t = 0; do { c = fn(); } while (seen[ck(c)] && ++t < 12); seen[ck(c)] = 1; return c; };
@@ -188,7 +206,7 @@
       var pl = PL[0];
       // strategy hint only after a mistake (never up front)
       var parts = (A.CountVisual && A.CountVisual.display) ? A.CountVisual.display(pl.rule) : { text: pl.rule.text, pic: pl.rule.pic || '' };
-      var hintHtml = (pl.rule.stepHint && pl.wrong > 0 ? '<span class="hint st">' + pl.rule.stepHint(pl.lastMiss, pl.wrong >= 2 ? 2 : 1) + '</span>' : pl.rule.hint && pl.wrong > 0 ? '<span class="hint">' + pl.rule.hint + '</span>' : '');
+      var hintHtml = (pl.rule.stepHint && (pl.wrong > 0 || pl.round.tier >= 3) ? '<span class="hint st">' + pl.rule.stepHint(pl.lastMiss, pl.wrong >= 2 ? 2 : 1) + '</span>' : pl.rule.hint && (pl.wrong > 0 || pl.round.tier >= 3) ? '<span class="hint">' + pl.rule.hint + '</span>' : '');
       // One picture copy, in a slot the panel can scale. v2p2a: a step shows a picture hint after a miss.
       $('#ruleTxt').innerHTML = parts.text + (parts.pic ? '<span class="st-pic">' + parts.pic + '</span>' : '') + hintHtml;
       if (A.CountVisual && A.CountVisual.fit) A.CountVisual.fit($('#ruleTxt'));
@@ -381,7 +399,7 @@
     pl.freeHinted = true; var best = -1, bd = 1e9;
     G.cells.forEach(function (c, i) { if (!c.ok || c.eaten || (TWO && c.owner !== pl.i)) return; var d = Math.abs(Math.floor(i / COLS) - pl.pos.r) + Math.abs(i % COLS - pl.pos.c); if (d < bd) { bd = d; best = i; } });
     cellEls.forEach(function (e) { e.classList.remove('nudge'); }); if (best >= 0) cellEls[best].classList.add('nudge');
-    setTimeout(function () { if (!G.active) return; bubble('Free try! No heart lost. Try the glowing one!'); talk(['coach_easy_one'], false); }, 1500);
+    setTimeout(function () { if (!G.active) return; bubble('Free try! No heart lost. Try the glowing one!'); fbSay(talk(['coach_easy_one'], false)); }, 1500);
   }
   function bubble(t) { var b = $('#bubble'); $('#bubbleMsg').textContent = t; b.classList.remove('say'); void b.offsetWidth; b.classList.add('say'); fitBubble(); }
   function fitBubble() {
@@ -417,9 +435,16 @@
   }
 
   /* ---------- movement & munching ---------- */
+  /* munch1122: feedback speech is short (a word tile just says its word: "go", not "That word says go") and a new tap cuts off
+     any feedback still playing, so the game never talks over the next choice. Prompts are left alone. */
+  var FB = { tok: 0, on: false };
+  function fbSay(p) { var t = ++FB.tok; FB.on = true; function end() { if (FB.tok === t) FB.on = false; } if (p && p.then) p.then(end, end); else end(); return p; }
+  function cutFb() { if (FB.on) { FB.on = false; FB.tok++; V.stop(); } }
+  function shortFact(f) { f = f || []; return f.length > 1 && (f[0] === 'sw_that_says' || f[0] === 'w_thats') ? f.slice(1) : f; }
   function onCellTap(i) { // mouse / touch: Player 1 only
     var pl = PL[0];
     if (!G.active || blocked()) return;
+    cutFb();
     var r = Math.floor(i / COLS), c = i % COLS;
     if (r === pl.pos.r && c === pl.pos.c) { if (!pl.target) munch(0); return; }
     pl.target = { r: r, c: c }; if (!pl.walkT) step(pl);
@@ -468,9 +493,9 @@
     var pl = PL[i || 0];
     if (!pl || !G.active || pl.busy || blocked()) return;
     var idx = pl.pos.r * COLS + pl.pos.c, cell = G.cells[idx], el = cellEls[idx];
-    poke();
-    if (cell.eaten) { talk(['munch_already']); anim(pl, 'hop', 230); return; }
-    if (TWO && cell.owner !== pl.i) { SFX.soft(); anim(pl, 'squish', 400); talk(['munch_not_yours', nameParts(PL[cell.owner].P)]); return; }
+    poke(); cutFb();
+    if (cell.eaten) { fbSay(talk(['munch_already'])); anim(pl, 'hop', 230); return; }
+    if (TWO && cell.owner !== pl.i) { SFX.soft(); anim(pl, 'squish', 400); fbSay(talk(['munch_not_yours', nameParts(PL[cell.owner].P)])); return; }
     if (pl.done) return;
     var sid = pl.round.skill.id, P = pl.P;
     pl.busy = true; setTimeout(function () { pl.busy = false; }, 460);
@@ -489,7 +514,7 @@
       G.lastFact = cell.fact || [];   // the number fact stays behind the Hear button (not spoken mid-choice)
       // Word-reading (cloze, picture, or listen): say the word after a right munch. Speech is optional; the prompt stays visual.
       if (cell.fact && cell.fact.length && (pl.rule.listen || pl.rule.cloze || pl.rule.pic)) {
-        V.say(cell.fact, { kind: 'listen', bubble: false });
+        fbSay(V.say(shortFact(cell.fact), { kind: 'listen', bubble: false }));
       }
       if (pl.remaining <= 0) {
         pl.done = true; pl.doneAt = Date.now();
@@ -507,8 +532,8 @@
       // word-reading rules: say the re-prompt, but don't print it (the bubble would show the answer's spelling)
       // the oops sound + bubble always; the fact / right word is spoken where the setting allows it ("listen" rounds: every mode but Off)
       G.lastFact = cell.fact || [];   // fact is available on Hear only, so it does not talk while the kid is still choosing
-      if (pl.rule.listen || pl.rule.noPrint) { V.sayMix([[['fb_oops'], 'chatter']]); bubble('Oops! Listen again, then try another one.'); }
-      else { var oo = [nearMiss(pl, cell) ? 'fb_so_close' : 'fb_oops']; bubble(V.text(oo)); V.sayMix([[oo, 'chatter']]); }
+      if (pl.rule.listen || pl.rule.noPrint) { fbSay(V.sayMix([[['fb_oops'], 'chatter']])); bubble('Oops! Listen again, then try another one.'); }
+      else { var oo = [nearMiss(pl, cell) ? 'fb_so_close' : 'fb_oops']; bubble(V.text(oo)); fbSay(V.sayMix([[oo, 'chatter']])); }
       if (!TWO && !GENTLE && G.hearts <= 0) { G.active = false; stopTimer(); stopGrumbly(); setTimeout(function () { (wsig && wsig.worked ? workedExample(pl) : Promise.resolve()).then(outOfHearts); }, 2400); }
       else coachAfter(pl, wsig, cell);
     }
@@ -589,7 +614,7 @@
     // batch1 (plan P1): no "N in a row" celebrations (a run you can lose is pressure); hearts come back after 3 right instead
     if (sig.easeOff) easeOff(pl);
     if (sig.worked) { workedExample(pl); return; }
-    if (sig.speedy) { UI.rain(50); SFX.yay(); talk(['st_speedy']); }
+    if (sig.speedy) { UI.rain(50); SFX.yay(); fbSay(talk(['st_speedy'])); }
     if (sig.speedUp && !pl.round.testOut && !pl.round.review) { C.state(P, sid).offerTestOut = true; talk(['coach_test_out']); }
     // re-ask: a cell munched by mistake comes back 2-3 munches later (judge it again: leaving it is the right answer)
     var k = A.Coach && A.Coach.reaskDue(P, sid);
@@ -614,7 +639,7 @@
     });
     cellEls.forEach(function (e) { e.classList.remove('nudge'); });
     if (best >= 0) cellEls[best].classList.add('nudge');
-    setTimeout(function () { talk(['coach_easy_one'], false); bubble(pl.rule.hint ? 'Hint: ' + pl.rule.hint.replace(/<[^>]+>/g, '') : 'Try the glowing one!'); }, 1500);
+    setTimeout(function () { fbSay(talk(['coach_easy_one'], false)); bubble(pl.rule.hint ? 'Hint: ' + pl.rule.hint.replace(/<[^>]+>/g, '') : 'Try the glowing one!'); }, 1500);
   }
   // 3 misses in a row: a short worked example (number line / count-on dots, sound it out, or the answer sentence highlighted)
   function workedHtml(pl) {
@@ -667,7 +692,7 @@
     if (!free.length) return;
     B.cell = at != null ? at : A.pick(free); B.shown = true; place(false); SFX.sparkle();
     starEl.classList.remove('pop'); void starEl.offsetWidth; starEl.classList.add('pop');
-    if (!V.isSpeaking()) talk(['munch_bonus_star']); else bubble('Ooh, a bonus star! Walk onto it!');
+    if (!V.isSpeaking()) fbSay(talk(['munch_bonus_star'])); else bubble('Ooh, a bonus star! Walk onto it!');
   }
   function checkStar(pl) { if (B.cell >= 0 && !B.open && pl.pos.r * COLS + pl.pos.c === B.cell) { B.cell = -1; B.used = true; place(true); openBonus(pl); } }
   function openBonus(pl) {
@@ -711,7 +736,7 @@
       if (T.on) { res.textContent = 'You got it! +15 seconds!'; voice = ['bonus_right']; B.bonusTime = 15; }
       else { res.textContent = 'You got it! A bonus star!'; voice = ['bonus_right_star']; B.bonusTime = 0; if (!pl.P.guest) pl.bonusStar = true; }   // design2: added to the round's stars at the end (capped at 3, needs 1+ earned star)
       voice = [[voice, 'chatter']];   // no spoken praise unless Full (the card shows it)
-      if (q.fact && q.fact.length && (q.listen || q.cloze || q.pic || q.fact[0] === 'sw_that_says' || q.fact[0] === 'w_thats')) voice.unshift([q.fact, 'listen']);
+      if (q.fact && q.fact.length && (q.listen || q.cloze || q.pic || q.fact[0] === 'sw_that_says' || q.fact[0] === 'w_thats')) voice.unshift([shortFact(q.fact), 'listen']);
       res.className = 'res good';
     } else {
       SFX.soft(); btns[k].classList.add('nope'); B.bonusTime = 0;
@@ -874,7 +899,9 @@
     LEVELN++;
     var from = G.lastStars, blobs = PL.map(function (pl) { return pl.P; });
     G.lastStars = null;
-    return cutscene({ title: 'Round ' + LEVELN + '!', sub: TWO ? (MODE === 'team' ? 'Team munch' : 'Munch race') : PL[0].round.skill.name, voice: ['lvl_ready'],
+    return cutscene({ title: 'Round ' + LEVELN + '!', sub: TWO ? (MODE === 'team' ? 'Team munch' : 'Munch race') : PL[0].round.skill.name,
+      // ladder1121: a climb meter that only goes up (the kawaii star image, no emoji), on its own line under the skill name
+      subHtml: !TWO && A.Ladder && PL[0].round.ladder && A.Ladder.on(PL[0].P) ? '<span class="cs-climb">' + (A.Icons ? A.Icons.html('ui.star', { size: 32, decorative: true, cls: 'cs-climb-star', fallback: '' }) : '') + '<span>' + A.Ladder.meter(PL[0].P, PL[0].round.ladder.subj) + ' steps climbed</span></span>' : '', voice: ['lvl_ready'],
       heroes: blobs, starsFrom: from ? from[0] : null, starsTo: from ? PL[0].P.stars : null });
   }
   // auto: what is said by itself at the start of a round (a story question only, when "Read stories aloud" is off);
@@ -921,7 +948,7 @@
         '<div class="cs-sky"></div><div class="cs-hills"></div>' +
         (hasStars ? '<div class="cs-stars">' + UI.STAR + '<b>' + o.starsFrom + '</b></div>' : '') +
         '<div class="cs-path"><svg viewBox="0 0 400 120" preserveAspectRatio="none"><path d="M10 100 Q100 10 200 70 T390 40" fill="none" stroke="#fff" stroke-width="6" stroke-dasharray="2 16" stroke-linecap="round"/></svg>' + heroes + '<div class="cs-flag">' + (A.Icons ? A.Icons.html('🏁', { size: 48, decorative: true, cls: 'pp-pic', slot: 'munch:flag' }) : '') + '</div></div>' +
-        '<h2 class="cs-title">' + A.esc(o.title) + '</h2>' + (o.sub ? '<div class="cs-sub">' + A.esc(o.sub) + '</div>' : '') +
+        '<h2 class="cs-title">' + A.esc(o.title) + '</h2>' + (o.sub ? '<div class="cs-sub">' + A.esc(o.sub) + (o.subHtml || '') + '</div>' : '') +
         '<div class="cs-friends">' + friends + '</div>' +
         '<span class="kh">' + (A.isTouchOnly() ? 'Tap to skip' : 'Press <kbd class="wide">Space</kbd> to skip') + '</span><span class="ph">Press ' + A.Pad.g('a') + ' to skip</span></div>');
       document.body.appendChild(ov); UI.cardOpen = true; window.__munch && (window.__munch.cutscenes = (window.__munch.cutscenes || 0) + 1);
@@ -995,7 +1022,7 @@
     {
       var cfg = ST.config(P1, i), R = ST.run(P1), stop = ST.STOPS[i], practice = !stop.side && (R.done || i !== R.stop);
       SR = { i: i, cfg: cfg, practice: practice };
-      PL[0].round = { skill: C.byId[cfg.skill], level: cfg.level, nOk: cfg.nOk, timeX: cfg.timeX, story: true, stop: stop, review: false, hard: !!(cfg.hard || cfg.bossHarder) };
+      PL[0].round = { skill: C.byId[cfg.skill], level: cfg.level, nOk: cfg.nOk, timeX: cfg.timeX, story: true, stop: stop, review: false, hard: !!(cfg.hard || cfg.bossHarder), tier: cfg.tier || 0 };
       var artBoss = cfg.boss && A.Story2 && A.Story2.PLACES[A.Story2.placeOfStop(i)].art;
       var oldBanner = document.querySelector('.s2-fight-banner'); if (oldBanner) oldBanner.remove(); document.body.classList.toggle('s2-fighting', !!artBoss);
       if (artBoss) { var place = A.Story2.PLACES[A.Story2.placeOfStop(i)];
@@ -1028,7 +1055,7 @@
         var sk0 = C.byId[cfg.skill], subj0 = sk0 && C.subjectOf(sk0), cur0 = subj0 && C.current(P1, subj0);
         if (!cur0 || !A.Coach.wantsPlacement(P1, cur0.id)) return;
         return UI.placement(P1, cur0).then(function () { A.Store.save(); cfg = ST.config(P1, i); SR.cfg = cfg;
-          PL[0].round = { skill: C.byId[cfg.skill], level: cfg.level, nOk: cfg.nOk, timeX: cfg.timeX, story: true, stop: stop, review: false, hard: !!(cfg.hard || cfg.bossHarder) }; });
+          PL[0].round = { skill: C.byId[cfg.skill], level: cfg.level, nOk: cfg.nOk, timeX: cfg.timeX, story: true, stop: stop, review: false, hard: !!(cfg.hard || cfg.bossHarder), tier: cfg.tier || 0 }; });
       });
       return chain.then(function () {
         if (artBoss) return;
@@ -1279,7 +1306,7 @@
     wrap._munchRO.observe(wrap);
   }
   var clockEl = document.querySelector('#timer .clock'); if (clockEl && A.Icons) clockEl.innerHTML = A.Icons.html('⏱', { size: 28, decorative: true, cls: 'pp-pic', slot: 'munch:timer' });
-  window.__munch = { showIdleHand: showIdleHand, hideHand: hideHand, poke: poke, IDLE_MS: IDLE_MS, nearestGood: nearestGood, renderRule: renderRule, fitRulePic: fitRulePic, fitBubble: fitBubble, layout: layout, cutscene: cutscene, gentleStars: gentleStars, withBonus: withBonus, timerFor: timerFor, G: G, PL: PL, T: T, B: B, openBonus: openBonus, gentle: GENTLE, retryRound: retryRound, P: function () { return P1; }, two: TWO, mode: MODE, munch: munch, moveBy: function (a, b, c) { if (c === undefined) return moveBy(0, a, b); return moveBy(a, b, c); },
+  window.__munch = { showIdleHand: showIdleHand, shortFact: shortFact, fbOn: function () { return FB.on; }, cellTap: function (i) { onCellTap(i); }, hideHand: hideHand, poke: poke, IDLE_MS: IDLE_MS, nearestGood: nearestGood, renderRule: renderRule, fitRulePic: fitRulePic, fitBubble: fitBubble, layout: layout, cutscene: cutscene, gentleStars: gentleStars, withBonus: withBonus, timerFor: timerFor, G: G, PL: PL, T: T, B: B, openBonus: openBonus, gentle: GENTLE, retryRound: retryRound, P: function () { return P1; }, two: TWO, mode: MODE, munch: munch, moveBy: function (a, b, c) { if (c === undefined) return moveBy(0, a, b); return moveBy(a, b, c); },
     onCellTap: onCellTap, nextRound: nextRound, unlockScene: unlockScene, story: STORY, SR: function () { return SR; }, cutscene: cutscene, endRound: endRound, showStar: showStar, fitCells: fitCells, workedExample: workedExample, coachAfter: coachAfter, celebrateStreak: celebrateStreak, renderBoard: renderBoard, setTimeLeft: function (s) { T.left = s; renderTimer(); }, COLS: COLS,
     goTo: function (i, cell) { if (cell === undefined) { cell = i; i = 0; } var pl = PL[i]; pl.target = null; clearTimeout(pl.walkT); pl.walkT = null; pl.pos = { r: Math.floor(cell / COLS), c: cell % COLS }; place(true); checkStar(pl); }, playStop: playStop };
 })(window.Arcade);

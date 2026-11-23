@@ -148,7 +148,7 @@
     [].forEach.call(root.querySelectorAll ? (root.matches && root.matches('.cv-set') ? [root] : root.querySelectorAll('.cv-set')) : [], cvFitOne);
   }
   function cvFitHost(set) {
-    return set.closest('.cell, .bcard, .pc-opt, .pk-frame, .pk-group, #ruleTxt, #rule, .rule, .st-pic, #qPic');
+    return set.closest('.cell, .bcard, .pc-opt, .pk-frame, .pk-group, #ruleTxt, #rule, .rule, .st-pic, #qPic, .gd-choice, .gd-pic');
   }
   function cvFitOne(set) {
     if (!set || !set.style) return;

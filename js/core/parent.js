@@ -70,11 +70,21 @@
           (A.Levels.soon(p, x.id) ? ' <small class="soon" data-soon="' + x.id + '">starts at the top skill · more coming soon</small>' : '') + '</label>';
       }).join(' ') + '<p class="muted">Sets where each subject starts (earlier skills count as placed). <b>Auto</b> starts by age: 2–3 at counting to 3 and big letters; 4 at counting to 10 and beginning sounds; 5 at counting to 20 and first sight words; 6 at adding to 10 and short-vowel words; 7 at doubles and homophones; 8+ at doubles and prefixes &amp; suffixes. A short warm-up (a few questions, it stops at the first miss) then moves the start up. Skills stay in the grade band for the age unless you pick a grade here. Too easy or too hard? The game still moves up and down on its own.</p></div>';
     }
-    h += '<p class="muted">Each subject is its own ladder. A skill is <b>mastered</b> after 2 rounds of 80%+ at its top level; then the next skill in that subject unlocks. Every 4th round of a subject is a quick review of a mastered skill. In ' + A.TITLES.baseball + ' each half-inning counts as one round.</p>';
+    h += (A.Ladder && A.Ladder.on(p)) ? '<p class="muted">Smart levels: each subject is one fine ladder of small steps. A skill is <b>mastered</b> once she is well past it and then gets it right again in a review on a later day. About 1 question in 8 is a quick review of a different mastered skill.</p>' : '<p class="muted">Each subject is its own ladder. A skill is <b>mastered</b> after 2 rounds of 80%+ at its top level; then the next skill in that subject unlocks. Every 4th round of a subject is a quick review of a mastered skill. In ' + A.TITLES.baseball + ' each half-inning counts as one round.</p>';
     h += '<div class="togs" style="margin-bottom:12px">' +
       tog('pin', 'Stay on the chosen skill', 'Turns off automatic moving to new skills (levels still adjust).', p.math.pin) +
       (A.ReadAloud ? tog('readstories', 'Read stories aloud', 'Reading stories: read the story out loud by itself. Auto: on for age 5 and under, off for 6+ (they read it, and only the question is spoken). The 🔊 button always reads it.', A.ReadAloud.on(p)) : '') +
       tog('grumbly', 'Grumbly in ' + A.TITLES.munch, 'A slow, gentle cloud that wanders and bumps the player back to the corner. Extra challenge.', p.games.munch.grumbly) + '</div>';
+    if (A.Ladder && A.Ladder.eligible(p)) {   // ladder1121: the rated ladder (js/core/ladder.js): one switch per player, a plain-words line per subject
+      var lOn = A.Ladder.on(p);
+      h += '<div class="mixbox ladderbox"><div class="togs">' + tog('ladder', 'Smart levels', 'Picks each question so about 8 in 10 are right, moving in small steps (and easier after 2 misses, with a hint). Off = the classic skill-by-skill rules. Kept on this device only.', lOn) + '</div>' +
+        (lOn ? ['math', 'reading'].filter(function (sj) { return C().list(sj).length && W[sj]; }).map(function (sj) {
+          var inf = A.Ladder.info(p, sj), mv = inf.moves.filter(function (m) { return m.k !== 'start'; }).slice(0, 3);
+          return '<p class="ladline" data-ladder="' + sj + '"><b>' + A.esc(inf.line) + '</b>' +
+            (mv.length ? '<br><small class="muted">Recent moves: ' + mv.map(function (m) { return A.esc(m.why); }).join('; ') + '</small>' : '') +
+            (inf.flags.length ? '<br><small class="ladflag">Could use a grown-up\'s help with: ' + inf.flags.map(function (f) { return '<b>' + A.esc(f.name) + '</b>'; }).join(', ') + '</small>' : '') + '</p>';
+        }).join('') : '') + '</div>';
+    }
     SUBJ.forEach(function (x) {
       var T = C().track(p, x.id), cur = C().byId[T.current], cs = p.skills[T.current];
       h += '<section class="subj" data-subj="' + x.id + '"><h3>' + (A.Icons ? A.Icons.html(x.emoji, { size: 28, decorative: true, cls: 'pp-pic', slot: 'subj:' + x.id }) : x.emoji) + ' ' + x.name + (W[x.id] ? ' <small class="muted">' + Math.round(W[x.id] * 100) + '% of rounds</small>' : ' <small class="muted">off in the mix</small>') + '</h3>' +
@@ -100,6 +110,7 @@
     A.$$('.tog', b).forEach(function (t) { t.addEventListener('click', function () {
       if (t.dataset.k === 'pin') p.math.pin = !p.math.pin; else if (t.dataset.k === 'grumbly') p.games.munch.grumbly = !p.games.munch.grumbly;
       else if (t.dataset.k === 'readstories') A.ReadAloud.set(p, !A.ReadAloud.on(p));
+      else if (t.dataset.k === 'ladder' && A.Ladder) { A.Ladder.setOn(p, !A.Ladder.on(p)); save(); render(); return; }
       save(); t.classList.toggle('on');
     }); });
   }
@@ -419,7 +430,7 @@
     A.$$('.pl', b).forEach(function (row) {
       var id = row.dataset.pid, p = A.Store.get(id);
       row.querySelector('input').addEventListener('change', function (e) { A.Store.rename(id, e.target.value); save(); render(); });
-      row.querySelector('[data-blob]').addEventListener('change', function (e) { p.blob = e.target.value; save(); render(); });
+      row.querySelector('[data-blob]').addEventListener('change', function (e) { var was = p.blob; p.blob = e.target.value; if (A.Friends && A.Friends.dropSelfNews) A.Friends.dropSelfNews(p, was); save(); render(); });
       row.querySelector('[data-unlockall]').addEventListener('click', function () { if (A.Story) A.Story.unlockAll(p); else A.Blobs.CAST.forEach(function (c) { if (A.GardenFriends && A.GardenFriends.isGarden && A.GardenFriends.isGarden(c.id)) return; p.unlocks.blobs[c.id] = Date.now(); }); save(); A.UI.toast('All characters unlocked for ' + p.name + '.'); render(); });
       row.querySelector('[data-age]').addEventListener('change', function (e) {   // a new age: offer to move the starting point (soft confirm; stars and prizes stay)
         var sel = e.target, age = sel.value === '' ? null : +sel.value, was = p.age;

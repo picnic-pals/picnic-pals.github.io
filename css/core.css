@@ -93,8 +93,9 @@ kbd.hit { transform: translateY(.14em); box-shadow: 0 .04em 0 #cbbfe0, inset 0 0
 .box { display: inline-block; width: 1.05em; height: 1.05em; line-height: .9; border: .12em dashed currentColor; border-radius: .25em; font-size: .8em; vertical-align: middle; text-align: center; color: #b06ff0; }
 
 /* ---------- overlays & cards ---------- */
-.overlay { position: fixed; inset: 0; background: #4a3b6b59; display: none; align-items: center; justify-content: center; z-index: 70; padding: 16px; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+.overlay { position: fixed; inset: 0; background: #4a3b6b59; display: none; align-items: center; justify-content: center; z-index: 70; padding: 16px; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); cursor: pointer; }
 .overlay.on { display: flex; }
+.overlay .card, .overlay .panel { cursor: default; }
 .card { background: #fff; border-radius: 36px; padding: 24px 28px 28px; text-align: center; max-width: 620px; width: 100%; box-shadow: 0 10px 0 var(--line), 0 20px 50px #4a3b6b40; animation: cardin .45s cubic-bezier(.3, 1.5, .5, 1); max-height: calc(100vh - 32px); overflow: auto; }
 @keyframes cardin { from { transform: scale(.6) translateY(40px); opacity: 0; } }
 .card h2 { margin: 0; font-size: clamp(34px, 7.5vmin, 60px); font-weight: 700; color: var(--pink); text-shadow: 0 3px 0 #ffd6e3; line-height: 1.05; }
@@ -315,6 +316,11 @@ section.subj h3 small { font-weight: 500; font-size: .7em; }
 .placement-card .card { max-width: 640px; max-height: 100%; overflow: auto; box-sizing: border-box; }
 html.stage-on[data-stage="landscape"] .placement-card .card { max-width: min(900px, 96%); }
 body:has(.overlay.placement-card.on) .friend-bubble { display: none !important; }
+/* keep speech bubbles and the save-bar from sitting on top of a card and eating backdrop taps */
+body:has(.overlay.on) .friend-bubble,
+body:has(.rpanel.on) .friend-bubble { display: none !important; }
+body:has(.overlay.on) .savenote,
+body:has(.rpanel.on) .savenote { pointer-events: none; }
 .pc-sub { font-size: clamp(18px, 3vmin, 24px); }
 .pc-dots { display: flex; gap: 8px; justify-content: center; margin: 4px 0 8px; } .pc-dots i { width: 14px; height: 14px; border-radius: 50%; background: #eee6f5; } .pc-dots i.done { background: #9fe0b5; } .pc-dots i.now { background: var(--pink); }
 .pc-q { font-size: clamp(24px, 4.6vmin, 40px); font-weight: 700; margin: 6px 0 10px; } .pc-pic { margin-bottom: 8px; }
@@ -564,7 +570,10 @@ html[data-stage="landscape"] .overlay.howto-a .howto-cap { font-size: 22px; }
 .qb-line i.at::after { content: ''; position: absolute; left: -9px; top: -20px; width: 16px; height: 16px; background: #e0336f; clip-path: polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
 
 /* batch-1107c: skip note on question cards */
-.pc-skipnote { display: block; margin-top: 8px; font-size: 13px; font-weight: 700; color: #7a6a90; opacity: .85; }
+.pc-skiprow { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 8px; }
+.pc-skipbtn { min-height: 48px; min-width: 96px; padding: 8px 18px; border-radius: 999px; font-weight: 800; font-size: 18px; color: #4a3b6b; background: #f3eefb; box-shadow: 0 3px 0 #d5c8ea; cursor: pointer; }
+.pc-skipbtn:active { transform: translateY(2px); box-shadow: 0 1px 0 #d5c8ea; }
+.pc-skipnote { display: block; margin-top: 0; font-size: 13px; font-weight: 700; color: #7a6a90; opacity: .85; }
 /* batch-1107c: phone fit for question cards (warm-up, quick check): smaller answer buttons in one row, the question picture bigger */
 @media (max-width: 480px), (max-height: 560px) {
   .placement-card .card { padding: 14px 12px; }

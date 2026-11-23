@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="htLens" x1="30%" y1="15%" x2="80%" y2="95%">
+      <stop offset="0%" stop-color="#ffe8f3"/>
+      <stop offset="100%" stop-color="#ffc1d9"/>
+    </linearGradient>
+    <linearGradient id="htFrame" x1="30%" y1="15%" x2="80%" y2="95%">
+      <stop offset="0%" stop-color="#ffb3d8"/>
+      <stop offset="100%" stop-color="#ff8fc7"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#3b2d55" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 62 L4 70" fill="none"/>
+    <path d="M114 62 L124 70" fill="none"/>
+    <path d="M36.00 55.00 C31.00 45.00 11.00 42.50 11.00 57.50 C11.00 70.00 26.00 77.50 36.00 87.50 C46.00 77.50 61.00 70.00 61.00 57.50 C61.00 42.50 41.00 45.00 36.00 55.00 Z" fill="url(#htLens)"/>
+    <path d="M92.00 55.00 C87.00 45.00 67.00 42.50 67.00 57.50 C67.00 70.00 82.00 77.50 92.00 87.50 C102.00 77.50 117.00 70.00 117.00 57.50 C117.00 42.50 97.00 45.00 92.00 55.00 Z" fill="url(#htLens)"/>
+    <path d="M56 66 H72" fill="none" stroke-width="5.5"/>
+    <ellipse cx="28" cy="50" rx="6" ry="5" fill="#ffffff" fill-opacity=".9" stroke="none"/>
+    <ellipse cx="84" cy="50" rx="6" ry="5" fill="#ffffff" fill-opacity=".9" stroke="none"/>
+  </g>
+
+</svg>

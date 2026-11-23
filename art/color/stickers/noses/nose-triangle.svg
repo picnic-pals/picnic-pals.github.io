@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="nsTri" x1="30%" y1="15%" x2="80%" y2="95%">
+      <stop offset="0%" stop-color="#ffd8c4"/>
+      <stop offset="100%" stop-color="#f0a878"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#3b2d55" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- rounded inverted triangle: wide at the top, soft point down -->
+    <path d="M26 44
+             Q 26 26 44 26
+             H 84
+             Q 102 26 102 44
+             Q 102 62 70 98
+             Q 64 108 58 98
+             Q 26 62 26 44 Z" fill="url(#nsTri)"/>
+    <ellipse cx="58" cy="46" rx="10" ry="7" fill="#ffffff" fill-opacity=".7" stroke="none"/>
+  </g>
+
+</svg>

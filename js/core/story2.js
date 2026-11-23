@@ -143,7 +143,9 @@
   function syncHero(p) { var s = ST.data(p); s.hero = hero(p); return s.hero; }
   function switchHero(p, id) {
     migrate(p); if (met(p).indexOf(id) < 0) return false;
+    var was = p.blob;
     p.blob = id;
+    if (A.Friends && A.Friends.dropSelfNews) A.Friends.dropSelfNews(p, was);
     var s = ST.data(p);
     s.hero = id;
     var m = meta(p); m.heroAt = Date.now(); m.asked[id] = 1;

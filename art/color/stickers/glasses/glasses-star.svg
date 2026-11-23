@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="stLens" x1="30%" y1="15%" x2="80%" y2="95%">
+      <stop offset="0%" stop-color="#fff6b0"/>
+      <stop offset="100%" stop-color="#ffe14d"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#3b2d55" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M38.00,36.00 L45.64,53.48 L64.63,55.35 L50.36,68.02 L54.46,86.65 L38.00,77.00 L21.54,86.65 L25.64,68.02 L11.37,55.35 L30.36,53.48 Z" fill="url(#stLens)" stroke="#ffa53b" stroke-width="6"/>
+    <path d="M90.00,36.00 L97.64,53.48 L116.63,55.35 L102.36,68.02 L106.46,86.65 L90.00,77.00 L73.54,86.65 L77.64,68.02 L63.37,55.35 L82.36,53.48 Z" fill="url(#stLens)" stroke="#ffa53b" stroke-width="6"/>
+    <path d="M62 64 H70" fill="none" stroke="#ffa53b" stroke-width="6"/>
+    <path d="M38.00,36.00 L45.64,53.48 L64.63,55.35 L50.36,68.02 L54.46,86.65 L38.00,77.00 L21.54,86.65 L25.64,68.02 L11.37,55.35 L30.36,53.48 Z" fill="none"/>
+    <path d="M90.00,36.00 L97.64,53.48 L116.63,55.35 L102.36,68.02 L106.46,86.65 L90.00,77.00 L73.54,86.65 L77.64,68.02 L63.37,55.35 L82.36,53.48 Z" fill="none"/>
+    <path d="M62 64 H70" fill="none"/>
+    <ellipse cx="34" cy="56" rx="6" ry="5" fill="#ffffff" fill-opacity=".85" stroke="none"/>
+    <ellipse cx="86" cy="56" rx="6" ry="5" fill="#ffffff" fill-opacity=".85" stroke="none"/>
+  </g>
+
+</svg>

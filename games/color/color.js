@@ -28,7 +28,8 @@
   /* ---------- coloring ---------- */
   function open(pgId, entry) {
     if (P.colorSeen && !P.colorSeen[pgId]) { P.colorSeen[pgId] = 1; A.Store.save(); }
-    editing = entry || null; var pg = CP.byId[pgId]; $('#cTitle').textContent = pg ? pg.name : 'Coloring';
+    editing = entry || null; var pg = (entry && CP.forEntry) ? (CP.forEntry(entry) || CP.byId[pgId]) : CP.byId[pgId];
+    $('#cTitle').textContent = pg ? pg.name : 'Coloring';
     cl = A.Coloring.mount($('#draw'), { p: P, page: pgId, simple: simple, entry: entry }); view('vDraw'); say('cl_title');
   }
   function keep(quiet) {   // save the picture (if anything is colored); returns 'saved' | 'full' | 'empty'
@@ -76,5 +77,7 @@
   UI.gear({ onClose: function () { if (A.Music) A.Music.apply(); } });
   if (A.Music) A.Music.play('hub');
   A.ColorGame = { open: open, pages: pages, gallery: gallery, keep: keep, api: function () { return cl; }, index: function () { return gi; } };
-  var q = location.search; if (/gallery=1/.test(q)) gallery(); else pages();
+  var q = location.search;
+  if (/gallery=1/.test(q)) gallery();
+  else pages();
 })(window.Arcade);

@@ -235,19 +235,70 @@
   function esc(s) {
     return (A.esc ? A.esc(s) : String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'));
   }
-  function foodIcon(food, size) {
-    var raw = (food && (food.icon || food.id || food.name)) || 'cherries';
-    var byId = { cherry: 'food.cherries', cherries: 'food.cherries', sprout: 'scenery.seedling', seed: 'scenery.seedling', pea: 'scenery.seedling', tomato: 'food.tomato', carrot: 'food.carrot', potato: 'food.potato', pumpkin: 'gaps.pumpkin' };
-    var id = byId[raw] || byId[(food && food.plural) || ''] || ('food.' + raw);
-    var opt = { size: size || 40, decorative: true, cls: 'pp-pic gd-food', context: 'question', word: (food && (food.plural || food.name)) || raw };
-    if (A.Icons && A.Icons.html) {
-      var html = A.Icons.html(id, opt);
-      if (html && html.indexOf('<img') >= 0) return html;
-      html = A.Icons.html('', opt);
-      if (html && html.indexOf('<img') >= 0) return html;
-      return html;
+  /* Full-size painted food files only (never the 32/48 emoji-style glyphs, never emoji text). */
+  var ICON_FILE = {
+    'food.carrot': 'food/carrot.png',
+    'food.tomato': 'food/tomato.png',
+    'food.potato': 'food/potato.png',
+    'food.cherries': 'food/cherries.png',
+    'gaps.pumpkin': 'gaps/pumpkin.png',
+    'scenery.seedling': 'scenery/seedling.png'
+  };
+  var ICON_ID = { cherry: 'food.cherries', cherries: 'food.cherries', sprout: 'scenery.seedling', seed: 'scenery.seedling', pea: 'scenery.seedling', tomato: 'food.tomato', carrot: 'food.carrot', potato: 'food.potato', pumpkin: 'gaps.pumpkin' };
+  var ART_FOODS = ['potato', 'tomato', 'cherries', 'pumpkin', 'carrot'];
+  function iconIdFor(food) {
+    var raw = (food && (food.icon || food.id || food.name)) || 'potato';
+    return ICON_ID[raw] || ICON_ID[(food && food.plural) || ''] || (ICON_FILE['food.' + raw] ? ('food.' + raw) : '');
+  }
+  function iconSrc(id) {
+    if (!id) return '';
+    if (A.Icons && A.Icons.src) {
+      var s = A.Icons.src(id, { size: 256 });
+      if (s && /art\/icons\//.test(s) && !/_32\.|_48\./.test(s)) return s;
+      if (s) return s;
     }
-    return esc(String((food && food.name) || raw));
+    var file = ICON_FILE[id];
+    if (!file) return '';
+    var root = (typeof A.ROOT === 'string' && A.ROOT) ? A.ROOT : '../../';
+    return root + 'art/icons/' + file;
+  }
+  function imgFood(id, food) {
+    var src = iconSrc(id);
+    if (!src) return '';
+    var word = (food && (food.plural || food.name)) || id;
+    return '<img class="pp-pic gd-food" src="' + esc(src) + '" alt="" draggable="false" aria-hidden="true" data-icon="' + esc(id) + '" data-food="' + esc(word) + '">';
+  }
+  function hasFoodArt(food) {
+    var id = iconIdFor(food);
+    if (!id || !ICON_FILE[id]) return false;
+    if (A.Icons && A.Icons.has) return !!A.Icons.has(id);
+    return true;
+  }
+  function pickFood(rng) {
+    var ok = FOODS.filter(hasFoodArt);
+    if (!ok.length) {
+      ok = FOODS.filter(function (f) { return ART_FOODS.indexOf(f.id) >= 0 || ART_FOODS.indexOf(f.name) >= 0; });
+    }
+    return pick(rng, ok.length ? ok : FOODS);
+  }
+  function foodIcon(food, size) {
+    var id = iconIdFor(food);
+    var opt = { size: 256, decorative: true, cls: 'pp-pic gd-food', context: 'question', word: (food && (food.plural || food.name)) || '' };
+    var html, i, fid, fallback;
+    if (id && A.Icons && A.Icons.html) {
+      html = A.Icons.html(id, opt);
+      if (html && html.indexOf('<img') >= 0 && html.indexOf('pp-emoji') < 0 && !/_32\.|_48\./.test(html)) return html;
+    }
+    html = imgFood(id, food);
+    if (html) return html;
+    // Food has no painted art: use another garden food that does, keeping an <img>.
+    for (i = 0; i < ART_FOODS.length; i++) {
+      fallback = FOODS.filter(function (f) { return f.id === ART_FOODS[i] || f.name === ART_FOODS[i]; })[0] || { id: ART_FOODS[i], name: ART_FOODS[i], plural: ART_FOODS[i] };
+      fid = iconIdFor(fallback);
+      html = imgFood(fid, fallback);
+      if (html) return html;
+    }
+    return imgFood('food.potato', { name: 'potato', plural: 'potatoes' });
   }
   function arrayPic(food, rows, cols) {
     var r, c, h = '<div class="gd-array" role="img" aria-label="' + rows + ' rows of ' + cols + ' ' + esc(food.plural) + '">';
@@ -258,10 +309,22 @@
     }
     return h + '</div>';
   }
+  /* Count pictures: exactly n of the named food, in rows of 5 so they stay easy to count. */
+  function countPic(food, n) {
+    var left = n, cols = n > 5 ? 5 : Math.max(1, n), h, w, c;
+    var label = n + ' ' + esc(n === 1 ? food.name : food.plural);
+    h = '<div class="gd-array gd-count" role="img" aria-label="' + label + '">';
+    while (left > 0) {
+      w = Math.min(cols, left);
+      h += '<div class="gd-arow">';
+      for (c = 0; c < w; c++) h += foodIcon(food, 36);
+      h += '</div>';
+      left -= w;
+    }
+    return h + '</div>';
+  }
   function countByHint(rows, cols) {
-    var i, seq = [];
-    for (i = 1; i <= rows; i++) seq.push(i * cols);
-    return 'Count by ' + cols + 's: ' + seq.join(', ') + '.';
+    return 'Count by ' + cols + 's: count each row.';
   }
   function numQ(text, say, T, vals, fact, skill, extra) {
     var arr = vals.slice(), q;
@@ -275,7 +338,7 @@
   }
 
   function gardenMath(p, band, rng) {
-    var food = pick(rng, FOODS), nChoices = band.id === 'g2' ? 4 : 3, T, a, b, rows, cols, kind;
+    var food = pickFood(rng), nChoices = band.id === 'g2' ? 4 : 3, T, a, b, rows, cols, kind;
     var hi = band.id === 'g2' ? 20 : (band.id === 'g1' ? 12 : 10);
     kind = pick(rng, band.id === 'pre' || band.id === 'k'
       ? ['count', 'addseeds']
@@ -305,14 +368,14 @@
         T, shuffle(rng, near(T, nChoices, 1, Math.max(hi, T + 3), rng)),
         a + ' plus ' + b + ' is ' + T + '.',
         T <= 10 ? 'add10' : 'add20',
-        { pic: arrayPic(food, 1, a) + '<span class="gd-op">+</span>' + arrayPic(food, 1, b), a: a, b: b, food: food,
+        { pic: countPic(food, a) + '<span class="gd-op">+</span>' + countPic(food, b), a: a, b: b, food: food,
           hint: 'Start at ' + a + ' and count on ' + b + ' more.' }
       );
     }
     if (kind === 'pick') {
-      // lc1115b: grade 1 should not get 4-pick-1 style items
-      a = num(rng, band.id === 'g1' ? 8 : 4, band.id === 'g2' ? 18 : (band.id === 'g1' ? 12 : 10));
-      b = num(rng, band.id === 'g1' ? 2 : 1, Math.min(band.id === 'g1' ? 5 : 6, a - (band.id === 'g1' ? 3 : 1)));
+      // lc1115b: 6–7yo (g1, and age 7 which Age.band maps to g2) should not get 4-pick-1
+      a = num(rng, band.id === 'g2' ? 6 : (band.id === 'g1' ? 8 : 4), band.id === 'g2' ? 18 : (band.id === 'g1' ? 12 : 10));
+      b = num(rng, (band.id === 'g1' || band.id === 'g2') ? 2 : 1, Math.min(band.id === 'g1' ? 5 : 6, a - (band.id === 'g1' ? 3 : 1)));
       T = a - b;
       return numQ(
         'There are ' + a + ' ' + food.plural + '. You pick ' + b + '. How many ' + food.plural + ' are left?',
@@ -320,7 +383,7 @@
         T, shuffle(rng, near(T, nChoices, 0, Math.max(hi, a), rng)),
         a + ' minus ' + b + ' is ' + T + '.',
         a <= 10 ? 'sub10' : 'sub20',
-        { pic: arrayPic(food, 1, a), a: a, b: b, food: food, hint: 'Start at ' + a + ' and take away ' + b + '.' }
+        { pic: countPic(food, a), a: a, b: b, food: food, hint: 'Start at ' + a + ' and take away ' + b + '.' }
       );
     }
     T = num(rng, 1, band.id === 'pre' ? 6 : 10);
@@ -329,7 +392,8 @@
       'How many ' + (T === 1 ? food.name : food.plural) + '?',
       T, shuffle(rng, near(T, nChoices, 1, 12, rng)),
       'There are ' + T + '.',
-      'count10'
+      'count10',
+      { pic: countPic(food, T), food: food, count: T, hint: 'Count each one, one at a time.' }
     );
   }
 
@@ -377,30 +441,86 @@
     };
   }
 
-  function makeQuestion(p, opt) {
-    opt = opt || {};
-    var rng = rngOf(opt.rng);
-    var band = opt.band || bandFor(p);
-    if (band.toddler) return null;
+  function qKey(q) {
+    if (!q) return '';
+    var t = String(q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+    var m = t.match(/(\d+)\s*\+\s*(\d+)/), a, b;
+    if (m) { a = +m[1]; b = +m[2]; return 'add:' + Math.min(a, b) + '+' + Math.max(a, b); }
+    m = t.match(/you planted (\d+).+then (\d+)/);
+    if (m) { a = +m[1]; b = +m[2]; return 'add:' + Math.min(a, b) + '+' + Math.max(a, b); }
+    m = t.match(/(\d+)\s*[−\-]\s*(\d+)/);
+    if (m) return 'sub:' + (+m[1]) + '-' + (+m[2]);
+    m = t.match(/there are (\d+).+pick (\d+)/);
+    if (m) return 'sub:' + (+m[1]) + '-' + (+m[2]);
+    m = t.match(/(\d+)\s*rows of\s*(\d+)/);
+    if (m) return 'rows:' + (+m[1]) + 'x' + (+m[2]);
+    m = t.match(/how many (.+)\?/);
+    if (m) {
+      var n = q.count != null ? q.count : (q.choices && q.choices[q.answer] ? (q.choices[q.answer].value != null ? q.choices[q.answer].value : q.choices[q.answer].label) : '');
+      return 'count:' + String(m[1]).replace(/\s+/g, '') + ':' + n;
+    }
+    return t;
+  }
+  function rollQuestion(p, opt, rng, band) {
     var q;
     if (opt.force === 'sight') q = sightQ(rng);
     else if (opt.force === 'garden' || (band.math && rng() < 0.45) || ((band.id === 'pre' || band.id === 'k') && rng() < 0.4)) q = gardenMath(p, band, rng);
     else q = curriculumQ(p, band, rng) || ((band.id === 'pre' || band.id === 'k') && rng() < 0.5 ? sightQ(rng) : gardenMath(p, band, rng));
     if (!q) q = gardenMath(p, band, rng);
+    return q;
+  }
+  function makeQuestion(p, opt) {
+    opt = opt || {};
+    var rng = rngOf(opt.rng);
+    var band = opt.band || bandFor(p);
+    if (band.toddler) return null;
+    var recent = opt.recent, q, key, g = 0;
+    do {
+      q = rollQuestion(p, opt, rng, band);
+      key = qKey(q);
+    } while (recent && recent.indexOf(key) >= 0 && g++ < 24);
+    if (!q) q = gardenMath(p, band, rng);
     q.band = band.id;
     q.misses = 0;
+    if (recent) {
+      recent.push(qKey(q));
+      if (recent.length > 12) recent.splice(0, recent.length - 12);
+    }
     return q;
   }
 
+  function answerLabel(q) {
+    if (!q) return '';
+    if (q.count != null) return String(q.count);
+    if (q.choices && q.answer != null && q.choices[q.answer]) {
+      var c = q.choices[q.answer];
+      return String(c.value != null ? c.value : c.label);
+    }
+    return '';
+  }
+  /* On-screen hints must never state the answer (q.fact often does: "There are 4."). */
+  function revealsAnswer(q, text) {
+    var ans = answerLabel(q), s = String(text || '');
+    if (!ans || !s) return false;
+    var escRe = ans.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp('(^|[^A-Za-z0-9])' + escRe + '([^A-Za-z0-9]|$)', 'i').test(s);
+  }
   function hintFor(q) {
     if (!q) return 'Let us look again.';
-    if (q.hint) return q.hint;
-    if (q.rows && q.cols) return countByHint(q.rows, q.cols);
-    if (q.misses >= 2 && q.fact) {
-      if (typeof q.fact === 'string') return q.fact;
+    var list, i, h;
+    list = [
+      q.hint,
+      (q.rows && q.cols) ? countByHint(q.rows, q.cols) : '',
+      (q.skill === 'sight' || q.skill === 'letters') ? 'Listen again, then find the matching word.' : '',
+      (q.skill === 'count10' || q.count != null) ? 'Count each one, one at a time.' : '',
+      (q.a != null && q.b != null && /pick|left/.test(String(q.text || ''))) ? 'Count how many are left.' : '',
+      (q.a != null && q.b != null) ? 'Start at ' + q.a + ' and count on ' + q.b + ' more.' : '',
+      'Let us look again.'
+    ];
+    for (i = 0; i < list.length; i++) {
+      h = list[i];
+      if (h && !revealsAnswer(q, h)) return h;
     }
-    if (q.skill === 'sight' || q.skill === 'letters') return 'Listen again, then find the matching word.';
-    if (q.skill === 'count10') return 'Count carefully, one at a time.';
     return 'Let us look again.';
   }
 
@@ -413,6 +533,7 @@
       state: st,
       friend: currentId(st),
       sessionRight: 0,
+      recent: [],
       question: null,
       lastJob: '',
       lastSay: '',
@@ -505,7 +626,7 @@
     emptyPlots: emptyPlots, packetOpen: packetOpen, packetsOpen: packetsOpen,
     canPlant: canPlant, plantAt: plantAt, selectPlot: selectPlot, selectedPlot: selectedPlot,
     clearPlot: clearPlot, finishPop: finishPop, growingOn: growingOn, emptyPlotIndexes: emptyPlotIndexes,
-    makeQuestion: makeQuestion, hintFor: hintFor, newSession: newSession,
+    makeQuestion: makeQuestion, qKey: qKey, revealsAnswer: revealsAnswer, hintFor: hintFor, hasFoodArt: hasFoodArt, iconIdFor: iconIdFor, newSession: newSession,
     applyCorrect: applyCorrect, snapshot: snapshot
   };
 })(window.Arcade = window.Arcade || {});

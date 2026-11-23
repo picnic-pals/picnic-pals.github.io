@@ -413,8 +413,9 @@
     var coach = A.Coach && A.Coach.pickItem && !pl.P.guest, st;
     if (stretch && coach && G.forceStretch == null && Math.random() < 1 / 3) { st = Q.step(pl.P, r, 1); if (st.offset !== 1 || st.hard) st = Q.step(pl.P, r, .5); }
     else st = Q.step(pl.P, r, stretch && !coach ? .5 : 0);
-    do { q = Q.make(st.skill, st.level, { choices: n, hard: st.hard }); } while (G.recent.indexOf(q.key) >= 0 && g++ < 20);
-    if (!st.hard && coach) {
+    if (st.choices) n = st.choices;   // ladder1121: a 2-choice guided item after 3 misses in a row
+    do { q = Q.make(st.skill, st.level, { choices: n, hard: st.hard, tier: st.tier || 0 }); } while (G.recent.indexOf(q.key) >= 0 && g++ < 20);
+    if (!st.hard && !st.tier && coach) {   // ladder1121: an easy-tier pitch keeps its tier (no coach re-pick)
       var cands = [q]; for (var k = 0; k < (stretch ? 8 : 4); k++) { var c2 = Q.make(st.skill, st.level, { choices: n }); if (G.recent.indexOf(c2.key) < 0) cands.push(c2); }
       if (stretch && st.offset === 0) {   // the hardest fact by the coach's model
         var best = null; cands.forEach(function (c) { var pr = A.Coach.prob(pl.P, st.skill.id, itemKey(c), factPrior(itemKey(c))); if (pr != null && (!best || pr < best.p)) best = { q: c, p: pr }; });
@@ -426,6 +427,11 @@
       }
     }
     q.atLevel = st.atLevel; q.offset = stretch ? Math.max(st.offset, .5) : st.offset; q.stretch = stretch;
+    // ladder1121: after 2 misses in a row the next question comes with its picture hint up front; a guided item too
+    if ((st.hint || st.guided || st.tierHint) && !q.retry) { if (!q.hint) bbHint(q); if (!q.hint) { try { var gr = C.byId[q.skill].gen(q.level); q.hint = gr.stepHint ? gr.stepHint(null, 1) : gr.hint || null; } catch (e) {} }
+      if (st.hint || st.guided) q.ladderHint = !!q.hint; else q.tierShow = !!q.hint; }   // tierShow: the easiest tier of a new skill shows its hint up front (part of the item, rated as such)
+    if (st.guided) q.guided = true;
+    if (st.ladder && st.ladder.review) q.review = true;
     G.recent.push(q.key); if (G.recent.length > 12) G.recent.shift();
     return q;
   }
@@ -499,7 +505,7 @@
     var parts = (A.CountVisual && A.CountVisual.display) ? A.CountVisual.display({ text: txt, pic: q.pic || '' }) : { text: txt, pic: q.pic || '' };
     txt = parts.text;
     $('#qTxt').innerHTML = txt;
-    var hintRaw = q.retry ? (q.hint || q.hintHtml || '') : '';
+    var hintRaw = (q.retry || q.ladderHint || q.tierShow) ? (q.hint || q.hintHtml || '') : '';
     if (hintRaw && /cv-set|cv-frame|cv-dice|st-pic|qcoin/.test(String(hintRaw))) hintRaw = (!/cv-set|cv-frame|cv-dice|st-pic/.test(String(q.hint || ''))) ? (q.hint || 'Count the dots.') : 'Count the dots.';
     var hintText = String(hintRaw || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
     var hintEl = $('#qHint');
@@ -682,7 +688,7 @@
     G.accept = false; G.busy = true; clearInterval(G.timer);
     var q = G.q, pl = bat(), ok = i === q.answer, e = elapsed();
     // v2p2b: answer time (from when the question finished being read) feeds the step fast-skip; a retry after a hint is hinted
-    pl.pitches++; var sig = C.recordAnswer(pl.P, q.skill, ok, { key: itemKey(q), ms: G.voiceDone ? Math.round(e * 1000) : null, hint: !!q.retry });
+    pl.pitches++; var sig = C.recordAnswer(pl.P, q.skill, ok, { key: itemKey(q), ms: G.voiceDone ? Math.round(e * 1000) : null, hint: !!(q.retry || q.ladderHint), guided: !!q.guided, choices: q.choices ? q.choices.length : null });
     if (sig && sig.speedy) pl.speedy = true;
     if (!ok && !q.retry && !pl.P.guest) { if (!q.hint) bbHint(q); if (q.hint && (q.bonus || (A.Steps && A.Steps.STEPS[q.skill]) || /How many|Count the/.test(String(q.text || '')))) G.retry = { q: q, who: pl, lvl: (G.missRun = (G.missRun || 0) + 1) >= 2 ? 2 : 1 }; }
     if (ok) G.missRun = 0;
@@ -922,7 +928,7 @@
     var pre = warm.then(function () { return RIVALON && G.half === 0 ? rivalHalf() : null; });
     return pre.then(function () {
       var first = G.firstRound; G.firstRound = null;
-      pl.round = STORYB ? { skill: C.byId[SC.skill], level: SC.level, story: true, review: false } : first || C.pickRound(pl.P); pl.hr = 0; pl.hw = 0; pl.t0 = Date.now();
+      pl.round = STORYB ? { skill: C.byId[SC.skill], level: SC.level, story: true, review: false, tier: SC.tier || 0 } : first || C.pickRound(pl.P); pl.hr = 0; pl.hw = 0; pl.t0 = Date.now();
       if (pl.runsBy[G.inning - 1] == null) pl.runsBy[G.inning - 1] = 0;
       G.walkoffOn = RIVALON && G.inning === INNINGS && totalRuns(PL[0]) <= totalRuns(RIV);
       renderTurn(); renderBoard();
