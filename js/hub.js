@@ -33,6 +33,7 @@
     { id: 'racers', name: A.TITLES.racers, sub: 'Race your food car', cls: 'racers', href: 'games/racers/index.html', ready: true, all: true, voice: [{ text: 'Snack Racers' }], say: [{ text: 'Snack Racers' }], tip: 'Your food car drives itself. Answer questions to boost. Race a friend, a boss, or your best time!' },
     { id: 'bakeshop', name: A.TITLES.bakeshop, sub: 'Set the oven clock', cls: 'bakeshop', href: 'games/bakeshop/index.html', ready: true, all: true, voice: [{ text: 'Bake Shop Clock' }], say: [{ text: 'Bake Shop Clock' }], tip: 'Friends want a treat ready on time. Match or set the oven clock so it comes out just right!' },
     { id: 'pancake', name: A.TITLES.pancake, sub: 'Stack and race a friend', cls: 'pancake', href: 'games/pancake/index.html', ready: true, all: true, voice: [{ text: 'Pancake Stack Race' }], say: [{ text: 'Pancake Stack Race' }], tip: 'Race a friend to finish breakfast orders. Stack pancakes to make the number, then serve!' },
+    { id: 'fixit', name: A.TITLES.fixit, sub: 'Fix things with tools', cls: 'fixit', href: 'games/fixit/index.html', ready: true, all: true, voice: [{ text: 'Fix-It Shop' }], say: [{ text: 'Fix-It Shop' }], tip: 'Friends bring broken things. Pick the right tool to fix them, and build a birdhouse!' },
     { id: 'garden', name: A.TITLES.garden, sub: 'Grow a new friend', cls: 'garden', href: 'games/garden/index.html', ready: true, all: true, voice: [{ text: 'Garden' }], say: [{ text: 'Garden' }], tip: 'Each right answer does a garden job. Watch a plant grow, then a new friend pops out and joins you!' },
     { id: 'bubble', name: A.TITLES.bubble, sub: 'Pop the right bubbles', cls: 'bubble', href: 'games/bubble/index.html', ready: true, all: true, voice: ['bp_title'], say: ['bp_title'], tip: 'Pop the bubbles your friend asks for: colors, animals, letters, numbers, words.' },
     // p4: Coloring (all ages; toddlers get Fill + Stickers). No stars, no right or wrong; pictures go to the kid's Gallery.
@@ -77,6 +78,12 @@
     }
     if (g.id === 'bakeshop') {
       return '<div class="bakesc" aria-hidden="true"><svg viewBox="0 0 80 80"><rect x="8" y="10" width="64" height="62" rx="8" fill="#6b3a4a" stroke="#3a2714" stroke-width="3"/><circle cx="40" cy="40" r="22" fill="#fff8e7" stroke="#c9a36a" stroke-width="3"/><line x1="40" y1="40" x2="40" y2="24" stroke="#b63442" stroke-width="3" stroke-linecap="round"/><line x1="40" y1="40" x2="52" y2="40" stroke="#3a2714" stroke-width="2" stroke-linecap="round"/><circle cx="40" cy="40" r="3" fill="#3a2714"/><circle cx="26" cy="64" r="3" fill="#e8d4a8"/><circle cx="40" cy="64" r="3" fill="#e8d4a8"/><circle cx="54" cy="64" r="3" fill="#e8d4a8"/></svg></div>' +
+        '<div class="who2">' + B.forProfile(p, { expr: 'happy' }) + '</div>';
+    }
+    if (g.id === 'fixit') {   // fixit1124: the locked painted art: a hammer, a screwdriver and the painted birdhouse
+      var FX = A.ROOT + 'games/fixit/art/';
+      return '<div class="fixsc" aria-hidden="true"><img class="fxt-b" src="' + FX + 'birdhouse/stage4_paint_sm.webp" alt="" draggable="false">' +
+        '<img class="fxt-h" src="' + FX + 'toolbox/hammer.webp" alt="" draggable="false"><img class="fxt-s" src="' + FX + 'toolbox/screwdriver.webp" alt="" draggable="false"></div>' +
         '<div class="who2">' + B.forProfile(p, { expr: 'happy' }) + '</div>';
     }
     if (g.id === 'garden') {

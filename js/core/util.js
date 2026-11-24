@@ -9,7 +9,7 @@
   /* Game and place titles: the ONE place to rename them. Every on-screen title, tag, hint and page <title> reads these
      (elements with data-title="munch|baseball|room" get their text filled in on load). The recorded clips munch_title / bb_title
      ("Picnic Munch!", "Snack Slugger!") are audio and need re-recording/regenerating separately when the names change. */
-  A.TITLES = { foodfight: 'Food Fight', munch: 'Picnic Munch', baseball: 'Snack Slugger', room: 'Picnic Spot', stand: 'Lemonade Stand', bubble: 'Bubble Pop', color: 'Coloring', packer: 'Picnic Packer', racers: 'Snack Racers', bakeshop: 'Bake Shop Clock', pancake: 'Pancake Stack Race', garden: 'Garden', app: 'Picnic Pals' };
+  A.TITLES = { foodfight: 'Food Fight', munch: 'Picnic Munch', baseball: 'Snack Slugger', room: 'Picnic Spot', stand: 'Lemonade Stand', bubble: 'Bubble Pop', color: 'Coloring', packer: 'Picnic Packer', racers: 'Snack Racers', bakeshop: 'Bake Shop Clock', pancake: 'Pancake Stack Race', garden: 'Garden', fixit: 'Fix-It Shop', app: 'Picnic Pals' };
   if (document.addEventListener) document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-title]'), function (el) { var t = A.TITLES[el.getAttribute('data-title')]; if (t) el.textContent = t; });
     var pt = document.documentElement.getAttribute('data-page-title'); if (pt && A.TITLES[pt]) document.title = A.TITLES[pt] + ' · ' + A.TITLES.app;

@@ -394,6 +394,13 @@ body {
 .tile.bakeshop .bakesc { position: absolute; inset: 10% 18% 30% 18%; display: flex; align-items: center; justify-content: center; }
 .tile.bakeshop .bakesc svg { width: 80%; height: auto; }
 .tile.bakeshop .who2 { width: 42%; left: 28%; bottom: 2%; }
+.tile.fixit .scene { background: linear-gradient(#ffe7c9, #e9b98a); }
+.tile.fixit .fixsc { position: absolute; inset: 4% 6% 28% 6%; }
+.tile.fixit .fixsc img { position: absolute; object-fit: contain; }
+.tile.fixit .fixsc .fxt-b { right: 2%; top: 24%; height: 92%; width: 26%; }
+.tile.fixit .fixsc .fxt-h { left: 0; top: 18%; width: 26%; height: 80%; transform: rotate(-14deg); }
+.tile.fixit .fixsc .fxt-s { left: 13%; top: 22%; width: 24%; height: 74%; transform: rotate(16deg); }
+.tile.fixit .who2 { width: 40%; left: 30%; bottom: 2%; }
 
 
 

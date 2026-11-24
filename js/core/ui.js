@@ -632,6 +632,8 @@
       caps: ['Tap a seed packet.', 'Tap a patch of soil to plant it.', 'Answer to water and grow a friend!'] },
     pancake: { e: '🥞', title: 'Pancake Place', art: 'pancake',
       caps: ['Look at the order.', 'Tap pancakes onto the plate.', 'Check with syrup when the stack is right.'] },
+    fixit: { title: 'Fix-It Shop', art: 'fixit',
+      caps: ['Find the part that is broken.', 'Tap the right tool. The word says its name.', 'Fixed! Fix more to build a birdhouse.'] },
     tiny: { e: '🧺', title: 'Tiny Picnic', lines: ['Listen for what to find.', 'Tap the picture. Every tap is OK!'] },
     story: { e: '🗺️', title: 'Story', lines: ['Walk the path with your friends.', 'Play each stop to find the missing star-snacks!'] }
   };
@@ -640,7 +642,7 @@
     portrait: { W: 400, H: 720, cap: [30, 606, 340, 27], go: [174, 645, 52, 53] },
     landscape: {
       lemonade: [935, 509], munch: [935, 439], slugger: [935, 378], racers: [935, 391],
-      packer: [935, 418], bubble: [935, 393], garden: [935, 396], pancake: [935, 373]
+      packer: [935, 418], bubble: [935, 393], garden: [935, 396], pancake: [935, 373], fixit: [935, 464]
     }
   };
   function howtoAuto() { try { var v = localStorage.getItem('blobArcade.howto'); if (v === '1') return true; if (v === '0') return false; } catch (e) {} return !(typeof navigator !== 'undefined' && navigator.webdriver); }
