@@ -1,0 +1,75 @@
+{
+  "units": "1x stage px (double for -2x)",
+  "variant": "b",
+  "kart_canvas": 512,
+  "ground": [
+    262,
+    408
+  ],
+  "landscape": {
+    "road_kerbs_inner_y": [
+      426,
+      556
+    ],
+    "lane_ground_y": [
+      465,
+      551
+    ],
+    "near_post_x": [
+      327,
+      369
+    ],
+    "kart_scale": 0.3,
+    "kart_ground": {
+      "friend_far_lane": {
+        "ground": [
+          448.1,
+          465
+        ],
+        "nose_x": 506,
+        "chequer_left_x": 509
+      },
+      "you_near_lane": {
+        "ground": [
+          390.6,
+          551
+        ],
+        "nose_x": 448.5,
+        "chequer_left_x": 446
+      }
+    }
+  },
+  "portrait": {
+    "road_kerbs_inner_y": [
+      394,
+      481
+    ],
+    "lane_ground_y": [
+      420,
+      478
+    ],
+    "near_post_x": [
+      99,
+      127
+    ],
+    "kart_scale": 0.21,
+    "kart_ground": {
+      "friend_far_lane": {
+        "ground": [
+          159.5,
+          420
+        ],
+        "nose_x": 200,
+        "chequer_left_x": 203
+      },
+      "you_near_lane": {
+        "ground": [
+          142.1,
+          478
+        ],
+        "nose_x": 182.7,
+        "chequer_left_x": 164
+      }
+    }
+  }
+}

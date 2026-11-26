@@ -173,9 +173,14 @@
   /* 6+: a tap in the scene (scene units). Near the part: found. Two misses: the part sparkles so she can see it. */
   function find(g, x, y) {
     if (g.phase !== 'find') return { ok: false, ignored: true };
-    var j = g.job, d = Math.hypot(x - j.part.x, y - j.part.y), a = j.alt;
-    /* alt: the piece that fell off (a nut, a star, a handle, an arm) lying on the floor counts too */
-    if (d <= (j.r || 60) || (a && Math.hypot(x - a.x, y - a.y) <= a.r)) { g.found = true; g.phase = 'pick'; return { ok: true }; }
+    var j = g.job, slop = (A.Kit && A.Kit.tapSlop) ? A.Kit.tapSlop() : 28;
+    var targets = [{ x: j.part.x, y: j.part.y, r: (j.r || 60) + slop, id: 'part' }];
+    if (j.alt) targets.push({ x: j.alt.x, y: j.alt.y, r: (j.alt.r || 60) + slop, id: 'alt' });
+    var hit = (A.Kit && A.Kit.nearest) ? A.Kit.nearest(x, y, targets) : null;
+    if (!A.Kit || !A.Kit.nearest) {
+      hit = targets.filter(function (t) { return Math.hypot(x - t.x, y - t.y) <= t.r; })[0] || null;
+    }
+    if (hit) { g.found = true; g.phase = 'pick'; return { ok: true, at: hit.id }; }
     g.findMiss++;
     return { ok: false, show: g.findMiss >= 2 };
   }

@@ -35,12 +35,46 @@
 .cell.here .lbl:has(.st-ansnum) {
   transform: translateY(calc(var(--cs) * -.32)) scale(.78);
 }
+/* Equation tiles: a big high-contrast fact only (the teaching ten-frame is on the prompt card). */
+.cell .st-eq {
+  font-weight: 800;
+  font-size: calc(var(--icon-cs, var(--cs)) * 0.42);
+  line-height: 1;
+  color: var(--ink, #4a3b6b);
+  text-shadow: 0 1px 0 #ffffffc0;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+.cell:has(.st-eq) .lbl {
+  font-size: 0;
+  line-height: 1;
+  max-width: 92%;
+  overflow: visible;
+}
+.cell.here .lbl:has(.st-eq) {
+  transform: translateY(calc(var(--cs) * -.32)) scale(.8);
+}
 #ruleTxt .st-pic, #ruleTxt .cv-set { flex-shrink: 1; max-width: 100%; max-height: none; vertical-align: middle; display: flex; flex-wrap: nowrap; justify-content: center; } #ruleTxt .cv-set { --cv-d: 14px; }
+/* Keep "Munch the equations that equal N" on its own line; teaching frame sits below, not beside the number. */
+#ruleTxt .st-pic,
+#ruleTxt .st-pic.pb-target,
+#ruleTxt .pb-target {
+  display: flex;
+  width: 100%;
+  margin-left: 0;
+  margin-top: 4px;
+  justify-content: center;
+}
+#ruleTxt .eq-tail { white-space: nowrap; }
+#ruleTxt .rule-pic { display: block; width: 100%; margin: 4px 0 0; text-align: center; }
 .rule .txt { min-width: 0; }
 #board { position: relative; display: grid; --cs: 100px; }
 .cell { position: relative; border-radius: 22%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: calc(var(--cs) * .34);
   box-shadow: 0 calc(var(--cs) * .06) 0 #0000001a; transition: transform .12s, background .3s, opacity .3s; cursor: pointer; overflow: visible; min-width: 0; min-height: var(--cs, 44px); }
-.cell:active { transform: scale(.96); }
+.cell:active, .cell.press { transform: scale(.96); }
+.cell.press { box-shadow: 0 0 0 4px #fff8e8, 0 calc(var(--cs) * .03) 0 #0000001a; }
+#boardWrap { touch-action: manipulation; }
+#board .cell { touch-action: manipulation; }
 .cell .lbl { display: flex; align-items: center; justify-content: center; transition: transform .2s; white-space: nowrap; pointer-events: none;
   font-size: calc(var(--cs) * .34); max-width: 92%; max-height: 100%; overflow: hidden; text-align: center; }
 .cell.long .lbl { font-size: calc(var(--cs) * .26); }
@@ -493,6 +527,10 @@ body.challenge .timer .clock::after { content: ' ⭐'; }
   .bonusq .res { font-size: 17px; margin-top: 8px; }
 }
 .cell .picw { display: block; font-size: calc(var(--cs) * .16); font-weight: 800; line-height: 1; margin-top: 2px; color: #3b2d55; }
+.cell .ea-pw { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 1; max-width: 100%; }
+.cell .ea-pw img.pp-pic, .cell .ea-pw img.ea-emo, .cell .ea-pw .ea-emo { width: calc(var(--cs) * .42); height: calc(var(--cs) * .42); object-fit: contain; }
+.cell .ea-pw .picw { margin-top: 0; font-size: calc(var(--cs) * .18); max-width: 100%; overflow: hidden; text-overflow: clip; }
+
 .cell .lk-pic { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.05; }
 .cell .lk-pic .pb-frames { font-size: .55em; }
 .cell .lk-row { display: inline-flex; gap: 2px; } .cell .lk-row .pb-frames { font-size: .45em; }
@@ -611,6 +649,34 @@ html.stage-on #game #munchBtn {
 html.stage-on #menu #menuScores {
   min-height: max(44px, calc(60px / var(--stage-scale, 1)));
   flex: none;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  width: max-content;
+  max-width: 100%;
+}
+#menu #menuScores {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  flex-shrink: 0;
+  width: max-content;
+}
+#menu #menuScores .pp-icon,
+#menu #menuScores .pp-emoji,
+#menu #menuScores .pp-pic { flex-shrink: 0; }
+/* 400px portrait stage: keep "High scores" on one line, clear of the gear lane. */
+html.stage-on[data-stage="portrait"] #menu #menuScores {
+  grid-area: scores;
+  justify-self: start;
+  align-self: center;
+  white-space: nowrap;
+  width: max-content;
+  max-width: 100%;
+  font-size: 16px;
+  padding-left: 12px;
+  padding-right: 14px;
 }
 
 /* Leave a clear lane for the settings gear so it never sits on a tile or the scores button. */
@@ -626,16 +692,51 @@ html.stage-on[data-stage="portrait"] #menu .mhead {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   grid-template-areas:
-    "home logo music"
-    "scores scores scores";
+    "home scores music"
+    "logo logo logo";
   align-items: center;
-  gap: 8px 10px;
+  justify-items: start;
+  gap: 6px 8px;
   padding-right: max(72px, calc(80px / var(--stage-scale, 1)));
 }
 html.stage-on[data-stage="portrait"] #menu #menuHome { grid-area: home; }
-html.stage-on[data-stage="portrait"] #menu .mlogo { grid-area: logo; min-width: 0; }
-html.stage-on[data-stage="portrait"] #menu #menuMusic { grid-area: music; }
 html.stage-on[data-stage="portrait"] #menu #menuScores { grid-area: scores; justify-self: start; }
+html.stage-on[data-stage="portrait"] #menu #menuMusic { grid-area: music; justify-self: end; }
+html.stage-on[data-stage="portrait"] #menu .mlogo {
+  grid-area: logo;
+  min-width: 0;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+html.stage-on[data-stage="portrait"] #menu .mav { width: 44px; height: 44px; }
+html.stage-on[data-stage="portrait"] #menu .mlogo .pp-kit-title {
+  font-size: 22px !important;
+  height: 52px !important;
+  min-height: 52px !important;
+  padding: 14px 16px 0 !important;
+}
+/* Portrait menu: reserve a bottom strip for the friend bubble, leave room
+   for a focused tile's lift, and lock type to px so vmin does not grow the
+   question or tiles when the 400x720 stage is scaled (iPad, 412px phone). */
+html.stage-on[data-stage="portrait"] #menu { padding-bottom: 100px; gap: 6px; }
+html.stage-on[data-stage="portrait"] #menu .mtiles {
+  align-content: center;
+  gap: 10px;
+  padding-top: 10px;
+  min-height: 0;
+}
+html.stage-on[data-stage="portrait"] #menu .mtile {
+  width: min(200px, 86%);
+  padding: 6px 8px 8px;
+  gap: 4px;
+}
+html.stage-on[data-stage="portrait"] #menu .mtile .ma { max-height: 108px; }
+html.stage-on[data-stage="portrait"] #menu .mtile .mt { font-size: 22px; }
+html.stage-on[data-stage="portrait"] #menu .mtile .ms { font-size: 13px; line-height: 1.25; }
+html.stage-on[data-stage="portrait"] #menu .mq { font-size: 22px; margin: 2px 0 0; line-height: 1.2; }
+html.stage-on[data-stage="portrait"] #menu .mtile:hover,
+html.stage-on[data-stage="portrait"] #menu .mtile:focus-visible { transform: translateY(-4px) rotate(-1deg); }
 
 /* Idle pointing hand (Packer art) */
 .mm-hand {

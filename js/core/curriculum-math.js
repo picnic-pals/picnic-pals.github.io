@@ -11,7 +11,7 @@
   var BOX = '<span class="box">?</span>';
 
   /* v0.4 visual counting (visual_counting_spec.md): one shared renderer for counted sets. */
-  var CV_DICE = { 1: [[1, 1]], 2: [[0, 0], [2, 2]], 3: [[0, 0], [1, 1], [2, 2]], 4: [[0, 0], [0, 2], [2, 0], [2, 2]], 5: [[0, 0], [0, 2], [1, 1], [2, 0], [2, 2]] };
+  var CV_DICE = { 0: [], 1: [[1, 1]], 2: [[0, 0], [2, 2]], 3: [[0, 0], [1, 1], [2, 2]], 4: [[0, 0], [0, 2], [2, 0], [2, 2]], 5: [[0, 0], [0, 2], [1, 1], [2, 0], [2, 2]] };
   function cvLayout(n, opt) {
     opt = opt || {}; n = Math.max(0, Math.min(30, n | 0));
     var L = { n: n, scattered: false, audio_required: false, second_color_use: 'none',
@@ -20,7 +20,12 @@
     if (opt.scattered && (n <= 5 || (n === 6 && opt.subitize))) {
       L.scattered = true; L.pattern = 'scattered'; if (n === 6) L.subitize = true; return L;
     }
-    if (n <= 5) {
+    if (n === 0) {
+      /* An empty five-frame shows zero clearly. Never fall through to a 1-pip die. */
+      var pat0 = opt.pattern || 'five_frame';
+      if (pat0 === 'dice') { L.pattern = 'dice'; L.dice_pips = 0; L.frames = []; L.structure = 'dice_0'; }
+      else { L.pattern = 'five_frame'; L.frames = [{ cells: 5, filled: 0, color: 'primary' }]; L.structure = 'five_0'; }
+    } else if (n <= 5) {
       var pat = opt.pattern || (opt.five_frame ? 'five_frame' : 'dice');
       if (pat === 'five_frame') { L.pattern = 'five_frame'; L.frames = [{ cells: 5, filled: n, color: 'primary' }]; L.structure = 'five_' + n; }
       else { L.pattern = 'dice'; L.dice_pips = n; L.frames = []; L.structure = 'dice_' + n; }
@@ -65,7 +70,7 @@
     return h + '</span>';
   }
   function cvDice(n, opt) {
-    var spots = CV_DICE[n] || CV_DICE[1], grid = {}; spots.forEach(function (p) { grid[p[0] + ',' + p[1]] = 1; });
+    var spots = (CV_DICE[n] != null) ? CV_DICE[n] : (n <= 0 ? [] : CV_DICE[1]), grid = {}; spots.forEach(function (p) { grid[p[0] + ',' + p[1]] = 1; });
     // lc1115b: draw only filled pips so empty 3x3 cells are not countable
     var h = '<span class="cv-dice cv-pips" aria-hidden="true">', r, c;
     for (r = 0; r < 3; r++) for (c = 0; c < 3; c++) {
@@ -269,6 +274,71 @@
   function near(T, lo, hi, offs) { var s, g = 0; do { s = T + pick(offs); g++; } while ((s < lo || s > hi || s === T) && g < 200); if (s < lo || s > hi || s === T) s = (T + 1 <= hi) ? T + 1 : T - 1; return s; }
   function plus(a, b) { return { label: a + ' + ' + b, fact: [a, 'w_plus', b, 'w_is', a + b] }; }
   function minus(a, b) { return { label: a + ' − ' + b, fact: [a, 'w_minus', b, 'w_is', a - b] }; }
+  function activePlayer() {
+    try { return (A.Steps && A.Steps.ctx && A.Steps.ctx.p) || (A.Store && A.Store.active && A.Store.active()); } catch (e) { return null; }
+  }
+  function littleP() {
+    var p = activePlayer();
+    if (!p || p.age == null || p.age === '' || isNaN(+p.age)) return true;   // no / unknown age stays pre-K: no written sums
+    return +p.age < 5;
+  }
+  function ageBand() { return (A.Age && A.Age.band) ? A.Age.band(activePlayer()) : 'none'; }
+  // Written take-away facts on mixed "equals N" boards: 1st grade and up (age 6+). Unknown age follows that mix.
+  function mixMinus() {
+    if (littleP()) return false;
+    var b = ageBand();
+    return b === 'g1' || b === 'g2' || b === 'g3' || b === 'none';
+  }
+  function plusFact(s, maxA) {
+    maxA = maxA != null ? maxA : Math.max(s, 10);
+    var a = s >= 2 ? rnd(1, s - 1) : rnd(0, s);
+    if (s - a > maxA) a = Math.max(0, s - maxA);
+    if (a > maxA) a = maxA;
+    if (a < 0) a = 0;
+    return plus(a, s - a);
+  }
+  function minusFact(s, maxA) {
+    maxA = maxA != null ? maxA : Math.max(s + 1, 10);
+    var room = Math.max(1, maxA - s);
+    var b = rnd(1, room);
+    return minus(s + b, b);
+  }
+  /* Mix addition, take-away, and sometimes the numeral on "equals T" boards, sized by age band.
+     PreK / K: addition (and the numeral). 1st grade and up: also 6 − 1 next to 2 + 3 and 4 + 1. */
+  function equalsMix(T, opt) {
+    opt = opt || {};
+    var maxA = opt.max != null ? opt.max : 10;
+    var allowPlus = opt.plus !== false;
+    var allowMinus = opt.minus !== false && (opt.forceMinus || mixMinus()) && T < maxA;
+    var allowNum = opt.numeral === true;
+    var lo = opt.lo != null ? opt.lo : 0, hi = opt.hi != null ? opt.hi : maxA;
+    var gi = 0;
+    function kinds() {
+      var k = [];
+      if (allowPlus) k.push('plus');
+      if (allowMinus) k.push('minus');
+      if (allowNum) k.push('num');
+      if (!k.length) k.push(opt.forceMinus ? 'minus' : 'plus');
+      return k;
+    }
+    function markWrong(c) { c.fact = (c.fact || []).concat(['w_not', T]); return c; }
+    return {
+      mixed: !!(allowPlus && allowMinus),
+      good: function () {
+        var ks = kinds(), k = ks[gi++ % ks.length];
+        if (k === 'minus') return minusFact(T, maxA);
+        if (k === 'num') return { label: String(T), fact: ['w_thats', T] };
+        return plusFact(T, maxA);
+      },
+      bad: function () {
+        var w = near(T, lo, hi, [-2, -1, 1, 2]);
+        var ks = kinds(), k = ks[Math.floor(Math.random() * ks.length)];
+        if (k === 'minus' && w < maxA) return markWrong(minusFact(w, maxA));
+        if (k === 'num') return { label: String(w), fact: ['w_thats', w, 'w_not', T] };
+        return markWrong(plusFact(w, maxA));
+      }
+    };
+  }
 
   /* ---------- picnic story problems (word problems) ----------
      Food friends, the picnic basket and the family pet. The pet's name is a grown-up setting kept only on this device
@@ -315,20 +385,20 @@
       intro: { line: 'skill_count10', example: '<b>7</b> &nbsp;=&nbsp; ' + frame(7) },
       gen: function (L) {
         var N = L ? rnd(4, 10) : rnd(1, 5), max = L ? 10 : 6;
-        function littleP() {
-          var p = null;
-          try { p = (A.Steps && A.Steps.ctx && A.Steps.ctx.p) || (A.Store && A.Store.active && A.Store.active()); } catch (e) {}
-          if (!p || p.age == null || p.age === '' || isNaN(+p.age)) return true;   // no / unknown age stays pre-K: no written sums
-          return +p.age < 5;
-        }
         var sums = !!(L && !littleP());   // written a + b tiles are for kindergarten and up
+        var take = !!(sums && mixMinus() && N < max);   // 1st grade+: also a − b that equals N
         function mk(v) { var dots = v > 0 && Math.random() < (L ? .35 : .5); return { label: String(v), html: dots ? frame(v) : null, fact: v !== N ? ['w_thats', v, 'w_not', N] : ['w_thats', v] }; }
-        // qbatch-1107: same value, different look (numeral, ten-frame, and at K+ a + b), so targets are not all copies of one numeral
-        var gi = 0;
-        function goodN() { var k = gi++ % (sums ? 3 : 2); if (k === 0) return { label: String(N), fact: ['w_thats', N] }; if (k === 1) return { label: String(N), html: frame(N), fact: ['w_thats', N] };
-          var a = rnd(0, N); return { label: a + ' + ' + (N - a), fact: [a, 'w_plus', N - a, 'w_is', N] }; }
+        // qbatch-1107 / munch3: same value, different look (numeral, ten-frame, a + b, and at 1st grade a − b)
+        var gi = 0, nKinds = sums ? (take ? 4 : 3) : 2;
+        function goodN() {
+          var k = gi++ % nKinds;
+          if (k === 0) return { label: String(N), fact: ['w_thats', N] };
+          if (k === 1) return { label: String(N), html: frame(N), fact: ['w_thats', N] };
+          if (k === 3) return minusFact(N, max);
+          return plusFact(N, max);
+        }
         return { text: 'Munch the number ' + em(N), hint: (N > 5 ? 'A full row in a ten-frame is 5. Count the dots in the frame to find ' + N + '.' : 'Touch each dot and count to find ' + N + '.'), say: ['munch_rule_number', N],
-          good: goodN, bad: function () { var v; do { v = rnd(0, max); } while (v === N); if (sums && Math.random() < .3) { var a = rnd(0, v); return { label: a + ' + ' + (v - a), fact: [a, 'w_plus', v - a, 'w_is', v, 'w_not', N] }; } return mk(v); } };
+          good: goodN, bad: function () { var v; do { v = rnd(0, max); } while (v === N); if (sums && Math.random() < .3) { return Math.random() < .5 || !take || v >= max ? (function (c) { c.fact = c.fact.concat(['w_not', N]); return c; })(plusFact(v, max)) : (function (c) { c.fact = c.fact.concat(['w_not', N]); return c; })(minusFact(v, max)); } return mk(v); } };
       } },
     { id: 'compare', name: 'Bigger & smaller', short: 'Compare numbers to 20', strand: 'Counting', std: 'K.CC.7 / 1.NBT.3', grade: '1', sayFact: true,
       levels: ['Numbers to 10', 'Numbers to 20'],
@@ -346,25 +416,25 @@
       intro: { line: 'skill_add10', example: '<b>3 + 2</b> makes <b>5</b>' },
       gen: function (L) {
         var T = L ? rnd(5, 10) : rnd(3, 6);
-        function sum(s) { var a = (s >= 2 && !(L && Math.random() < .12)) ? rnd(1, s - 1) : rnd(0, s); return plus(a, s - a); }
-        return { text: 'Munch the ones that make ' + em(T), hint: 'Start with the bigger number, then count on.', say: ['munch_rule_make', T],
-          good: function () { return sum(T); }, bad: function () { return sum(near(T, 1, 10, [-2, -1, 1, 2])); } };
+        var mix = equalsMix(T, { max: 10, plus: true, minus: true, numeral: true, lo: 1, hi: 10 });
+        return { text: 'Munch the equations that equal ' + em(T), hint: mix.mixed ? 'Look for adding or taking away that makes ' + T + '.' : 'Start with the bigger number, then count on.', say: ['munch_rule_make', T],
+          good: mix.good, bad: mix.bad };
       } },
     { id: 'sub10', name: 'Take away to 10', short: 'Subtraction within 10', strand: 'Add & subtract', std: '1.OA.6', grade: '1', sayFact: true,
       levels: ['Small take-aways', 'Take away within 10'],
       intro: { line: 'skill_sub10', example: '<b>5 − 2</b> makes <b>3</b>' },
       gen: function (L) {
         var T = L ? rnd(0, 7) : rnd(1, 4), maxA = L ? 10 : 6;
-        function diff(d) { var a = d < maxA ? rnd(d + 1, maxA) : d; return minus(a, a - d); }
-        return { text: 'Munch the ones that make ' + em(T), hint: 'Start at the first number, then count back.', say: ['munch_rule_make', T],
-          good: function () { return diff(T); }, bad: function () { return diff(near(T, 0, L ? 9 : 5, [-2, -1, 1, 2])); } };
+        var mix = equalsMix(T, { max: maxA, plus: true, minus: true, forceMinus: true, numeral: true, lo: 0, hi: L ? 9 : 5 });
+        return { text: 'Munch the equations that equal ' + em(T), hint: mix.mixed ? 'Look for adding or taking away that makes ' + T + '.' : 'Start at the first number, then count back.', say: ['munch_rule_make', T],
+          good: mix.good, bad: mix.bad };
       } },
     { id: 'make10', name: 'Make 10', short: 'Pairs that make ten', strand: 'Add & subtract', std: '1.OA.6', grade: '1', sayFact: true,
       levels: ['Ten vs. far-off sums', 'Ten vs. 9 and 11'],
       intro: { line: 'skill_make10', example: '<b>6 + 4</b> makes <b>10</b>' },
       gen: function (L) {
         function pair(s) { var a = rnd(Math.max(1, s - 9), Math.min(9, s - 1)); return plus(a, s - a); }
-        return { text: 'Make ' + em(10) + '! Munch pairs that make 10', hint: 'Use your 10 fingers! 🖐🖐', say: ['munch_rule_make10'],
+        return { text: 'Make ' + em(10) + '! Munch the equations that equal ' + em(10), hint: 'Use your 10 fingers!', say: ['munch_rule_make10'],
           good: function () { return pair(10); }, bad: function () { return pair(L ? pick([9, 11]) : pick([7, 8, 12, 13])); } };
       } },
     { id: 'teen', name: 'Teen numbers', short: 'Ten and some more (11–20)', strand: 'Place value', std: '1.NBT.2b', grade: '1', sayFact: true,
@@ -395,23 +465,18 @@
       intro: { line: 'skill_add20', example: '<b>9 + 4</b>: make 10, then 3 more = <b>13</b>' },
       gen: function (L) {
         var T = L ? rnd(13, 18) : rnd(11, 14);
-        function sum(s) { var a = rnd(Math.max(1, s - 10), Math.min(10, s - 1)); return plus(a, s - a); }
-        return { text: 'Munch the ones that make ' + em(T), hint: 'Tip: make 10 first!', say: ['munch_rule_make', T],
-          good: function () { return sum(T); }, bad: function () { return sum(near(T, 10, 20, [-2, -1, 1, 2])); } };
+        var mix = equalsMix(T, { max: 20, plus: true, minus: true, numeral: true, lo: 10, hi: 20 });
+        return { text: 'Munch the equations that equal ' + em(T), hint: mix.mixed ? 'Look for adding or taking away that makes ' + T + '. Tip: make 10 first!' : 'Tip: make 10 first!', say: ['munch_rule_make', T],
+          good: mix.good, bad: mix.bad };
       } },
     { id: 'sub20', name: 'Take away to 20', short: 'Subtraction within 20', strand: 'Add & subtract', std: '1.OA.6', grade: '1', sayFact: true,
       levels: ['Teens take away a little', 'Take away across 10'],
       intro: { line: 'skill_sub20', example: '<b>14 − 4</b> makes <b>10</b>' },
       gen: function (L) {
         var T = L ? rnd(3, 9) : rnd(10, 14);
-        function diff(d) {
-          var a;
-          if (d >= 10) { a = rnd(d + 1, Math.min(20, d + 6)); }
-          else { a = rnd(Math.max(11, d + 1), Math.min(18, d + 9)); }
-          return minus(a, a - d);
-        }
-        return { text: 'Munch the ones that make ' + em(T), hint: L ? 'Tip: take away to 10 first!' : 'Count back!', say: ['munch_rule_make', T],
-          good: function () { return diff(T); }, bad: function () { return diff(near(T, L ? 1 : 8, L ? 11 : 16, [-2, -1, 1, 2])); } };
+        var mix = equalsMix(T, { max: 20, plus: true, minus: true, forceMinus: true, numeral: true, lo: L ? 1 : 8, hi: L ? 11 : 16 });
+        return { text: 'Munch the equations that equal ' + em(T), hint: mix.mixed ? 'Look for adding or taking away that makes ' + T + '.' : (L ? 'Tip: take away to 10 first!' : 'Count back!'), say: ['munch_rule_make', T],
+          good: mix.good, bad: mix.bad };
       } },
     { id: 'wordprob', name: 'Picnic story problems', short: 'Add & subtract word problems (within 10, then 20)', strand: 'Add & subtract', std: '1.OA.1', grade: '1', sayFact: true,
       levels: ['Stories within 10', 'Stories within 20'],

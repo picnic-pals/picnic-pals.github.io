@@ -841,3 +841,81 @@ html.stage-on .pc-how .pc-ready {
   min-width: var(--pc-hit);
   min-height: var(--pc-hit);
 }
+
+
+/* Scene A: diner counter, full-bleed. Stacks sit on painted wells; no extra plates. */
+html.stage-on #pancake { max-width: none; margin: 0; padding: 0; gap: 0; overflow: hidden; position: relative; }
+html.stage-on .pc-header {
+  position: absolute; left: 0; right: 0; top: 0; z-index: 20;
+  padding: 6px 10px 0; box-sizing: border-box;
+}
+html.stage-on .pc-play { position: absolute; inset: 0; display: block; gap: 0; }
+html.stage-on .pc-stand,
+html.stage-on[data-stage="portrait"] body:not(.pc-won) .pc-stand,
+html.stage-on[data-stage="portrait"] body.pc-won .pc-stand,
+html.stage-on[data-stage="landscape"] .pc-stand,
+html.stage-on body.pc-won .pc-stand {
+  position: absolute; inset: 0;
+  flex: none !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  min-width: 0 !important;
+  width: 100%; height: 100%;
+  background-size: 100% 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+}
+html.stage-on .pc-griddle, html.stage-on .pc-awning, html.stage-on .pc-counter, html.stage-on .pc-decos { display: none !important; }
+html.stage-on .pc-stand-inner { inset: 0; padding: 0; display: block; }
+html.stage-on .pc-race {
+  width: auto; max-width: none; height: auto;
+  pointer-events: none;
+}
+html.stage-on .pc-race-label {
+  order: 0;
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  transform: translateX(-50%);
+  margin: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+html.stage-on .pc-race-track {
+  order: 0;
+  position: absolute; inset: 0 0 22px 0;
+  width: 100%;
+}
+html.stage-on .pc-buddy, html.stage-on .pc-buddy-shadow {
+  position: absolute; pointer-events: none; object-fit: contain; object-position: center bottom; z-index: 8;
+}
+html.stage-on .pc-buddy-shadow {
+  z-index: 7;
+  background: rgba(40, 28, 16, .28);
+  border-radius: 50%;
+  filter: blur(2px);
+}
+html.stage-on #pcCardHost {
+  position: absolute;
+  z-index: 14;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+html.stage-on[data-stage="portrait"] #pcCardHost {
+  top: 148px;
+  max-height: 200px;
+}
+html.stage-on[data-stage="landscape"] #pcCardHost {
+  top: 80px;
+  left: 80px;
+  right: 80px;
+  max-height: 250px;
+}
+html.stage-on #pcCardHost .pc-card { overflow: auto; max-height: 100%; }

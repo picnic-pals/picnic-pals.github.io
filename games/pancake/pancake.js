@@ -6,6 +6,12 @@
 
   var G = K.newSession(P);
   var stats = P.games.pancake = P.games.pancake || { sessions: 0 };
+  function isLand() {
+    var stage = document.documentElement.getAttribute('data-stage');
+    if (stage === 'landscape') return true;
+    if (stage === 'portrait') return false;
+    return window.innerWidth > window.innerHeight;
+  }
   var pose = 'front', nudge = '', drag = null, lastSay = '', busy = false, cheerT = null, raceT = null, pourT = null, resultT = null;
   var CHECK_LINE = 'When your stack is right, pour the syrup to check it!';
   var ordersStarted = 0;
@@ -60,27 +66,74 @@
     if (!you || !they) return;
     var vis = K.raceVisual(G);
     var yn = vis.player, fn = vis.friend;
-    if (Art.has && Art.has('plate') && Art.stackStage) {
+    var land = isLand();
+    var pack = Art.pack ? Art.pack(land) : null;
+    var pw = pack ? pack.plate_w : (land ? 190 : 80);
+    var cakeW = Math.max(28, Math.round(pw * 0.46));
+    if (Art.stackStage) {
       var yTrack = you.parentNode, fTrack = they.parentNode;
+      var yH = (yTrack && yTrack.clientHeight) || 120;
+      var fH = (fTrack && fTrack.clientHeight) || 120;
       you.innerHTML = Art.stackStage(raceCakes(Math.max(yn, 0), 'gold'), {
-        plateId: 'plate', interactive: false, cls: 'race',
-        fitW: (yTrack && yTrack.clientWidth) || 120,
-        fitH: (yTrack && yTrack.clientHeight) || 80
+        plateId: 'plate', interactive: false, cls: 'race', noPlate: true,
+        fitW: cakeW, fitH: Math.max(60, yH - 8)
       });
       they.innerHTML = Art.stackStage(raceCakes(Math.max(fn, 0), 'berry'), {
-        plateId: 'friend_plate', interactive: false, cls: 'race',
-        fitW: (fTrack && fTrack.clientWidth) || 120,
-        fitH: (fTrack && fTrack.clientHeight) || 80
+        plateId: 'friend_plate', interactive: false, cls: 'race', noPlate: true,
+        fitW: cakeW, fitH: Math.max(60, fH - 8)
       });
     } else {
-      you.innerHTML = stackHtml(Math.max(yn, 0), 'gold', 36);
-      they.innerHTML = stackHtml(Math.max(fn, 0), 'berry', 36);
+      you.innerHTML = stackHtml(Math.max(yn, 0), 'gold', cakeW);
+      they.innerHTML = stackHtml(Math.max(fn, 0), 'berry', cakeW);
     }
   }
   function syncStandBg() {
     var el = $('#pcStand');
     if (!el) return;
-    el.classList.toggle('tall', el.clientHeight > el.clientWidth + 8);
+    var land = isLand();
+    el.classList.toggle('tall', !land);
+    el.style.backgroundImage = 'url("' + Art.src(land ? 'stand_bg_landscape' : 'stand_bg_portrait') + '")';
+    layoutStand();
+  }
+  function layoutStand() {
+    var el = $('#pcStand');
+    if (!el || !Art.pack) return;
+    var land = isLand();
+    var pack = Art.pack(land);
+    var pw = pack.plate_w;
+    var stackH = land ? 220 : 160;
+    function placeRace(sel, plate) {
+      var race = el.querySelector(sel);
+      if (!race) return;
+      race.style.position = 'absolute';
+      race.style.left = Math.round(plate[0] - pw / 2) + 'px';
+      race.style.width = pw + 'px';
+      race.style.top = Math.round(plate[1] - stackH) + 'px';
+      race.style.height = stackH + 'px';
+      race.style.maxWidth = 'none';
+    }
+    placeRace('.pc-race.you', pack.you_plate);
+    placeRace('.pc-race.friend', pack.friend_plate);
+    var buddy = $('#pcBuddy'), shadow = $('#pcBuddyShadow');
+    if (buddy && pack.friend_spot) {
+      var fh = pack.friend_h || pack.friend_spot[2] || (land ? 190 : 150);
+      var fx = pack.friend_spot[0], fy = pack.friend_spot[1];
+      /* Square box so contain does not letterbox under the feet. Sprites have
+         ~21px empty pad in a 256 canvas; plant visual feet on friend_spot. */
+      var fw = fh;
+      buddy.style.objectPosition = 'center bottom';
+      buddy.style.left = Math.round(fx - fw / 2) + 'px';
+      buddy.style.top = Math.round(fy - fh * (1 - 21 / 256)) + 'px';
+      buddy.style.width = fw + 'px';
+      buddy.style.height = fh + 'px';
+      if (shadow) {
+        var sw = Math.round(fw * 1.05), sh = Math.round(sw * 0.28);
+        shadow.style.left = Math.round(fx - sw / 2) + 'px';
+        shadow.style.top = Math.round(fy - sh * 0.55) + 'px';
+        shadow.style.width = sw + 'px';
+        shadow.style.height = sh + 'px';
+      }
+    }
   }
 
   function renderDecos(popNewest) {
@@ -95,25 +148,19 @@
     var who = (G.order && G.order.friend) || G.friend || P.blob;
     var boss = G.order && G.order.boss;
     $('#pcStand').innerHTML =
-      '<div class="pc-awning" aria-hidden="true"></div>' +
-      '<div class="pc-counter" aria-hidden="true"></div>' +
-      (Art.src('griddle') ? '<div class="pc-griddle" aria-hidden="true"><img src="' + Art.src('griddle') + '" alt="">' +
-        (Art.src('spatula') ? '<img class="pc-spatula" src="' + Art.src('spatula') + '" alt="">' : '') +
-      '</div>' : '') +
-      (boss ? '<div class="pc-banner" aria-hidden="true">' + (Art.src('boss_banner') ? '<img class="pc-banner-art" src="' + Art.src('boss_banner') + '" alt="">' : Art.deco('bunting', 120)) + '</div>' : '') +
-      '<div class="pc-decos" id="pcDecos"></div>' +
+      (boss ? '<div class="pc-banner" aria-hidden="true">' + (Art.src('boss_banner') ? '<img class="pc-banner-art" src="' + Art.src('boss_banner') + '" alt="">' : '') + '</div>' : '') +
+      '<div class="pc-buddy-shadow" id="pcBuddyShadow" aria-hidden="true"></div>' +
+      '<img class="pc-buddy" id="pcBuddy" src="' + friendImg(who, pose) + '" alt="">' +
       '<div class="pc-stand-inner">' +
         '<div class="pc-race you">' +
           '<div class="pc-race-label">You</div>' +
           '<div class="pc-race-track"><div class="pc-race-stack" id="pcYouStack"></div></div>' +
         '</div>' +
         '<div class="pc-race friend">' +
-          '<img class="pc-friend-img" src="' + friendImg(who, pose) + '" alt="">' +
           '<div class="pc-race-label">' + A.esc(fname(who)) + '</div>' +
           '<div class="pc-race-track"><div class="pc-race-stack" id="pcFriendStack"></div></div>' +
         '</div>' +
       '</div>';
-    renderDecos(false);
     syncStandBg();
     paintRace();
   }

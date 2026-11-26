@@ -1,7 +1,5 @@
 {
-  "notes": "Zoom targets for each world region on the Picnic World overview (style B: seven distinct island-plates on a picnic-cloth field, along one winding sprinkle path). bbox is [x, y, w, h]. center is the suggested zoom focus. Values are in pixels of that PNG. World order is the official PLACES order: meadow, lagoon, hills, woods, peaks, bay, caves. Option A is not included; it lives only under art/story/samples/.",
-  "style": "B",
-  "label": "island plates on picnic cloth",
+  "notes": "Zoom/hit targets per world on scene-options map A. Same shape as art/story/overview/regions.json; values are px of the -2x PNG (halve for the 1x PNG). center = the level plate.",
   "world_order": [
     "meadow",
     "lagoon",
@@ -12,7 +10,7 @@
     "caves"
   ],
   "portrait": {
-    "file": "overview_portrait.png",
+    "file": "overview_portrait.webp",
     "size": [
       800,
       1440
@@ -20,134 +18,134 @@
     "regions": {
       "meadow": {
         "center": [
-          400,
-          1248
+          366,
+          1310
         ],
         "bbox": [
-          112,
-          1137,
-          576,
-          223
+          80,
+          1140,
+          560,
+          240
         ],
         "bbox_xyxy": [
-          112,
-          1137,
-          688,
-          1360
+          80,
+          1140,
+          640,
+          1380
         ]
       },
       "lagoon": {
         "center": [
-          400,
-          1047
+          394,
+          1116
         ],
         "bbox": [
-          112,
-          943,
-          576,
-          209
+          180,
+          960,
+          480,
+          184
         ],
         "bbox_xyxy": [
-          112,
-          943,
-          688,
-          1152
+          180,
+          960,
+          660,
+          1144
         ]
       },
       "hills": {
         "center": [
-          400,
-          863
+          396,
+          926
         ],
         "bbox": [
-          112,
-          770,
-          576,
-          187
+          190,
+          804,
+          420,
+          160
         ],
         "bbox_xyxy": [
-          112,
-          770,
-          688,
-          957
+          190,
+          804,
+          610,
+          964
         ]
       },
       "woods": {
         "center": [
           400,
-          694
+          770
         ],
         "bbox": [
-          112,
-          604,
-          576,
-          180
+          196,
+          630,
+          424,
+          170
         ],
         "bbox_xyxy": [
-          112,
-          604,
-          688,
-          784
+          196,
+          630,
+          620,
+          800
         ]
       },
       "peaks": {
         "center": [
           400,
-          532
+          600
         ],
         "bbox": [
-          160,
-          453,
-          480,
-          159
+          224,
+          444,
+          376,
+          180
         ],
         "bbox_xyxy": [
-          160,
-          453,
-          640,
-          612
+          224,
+          444,
+          600,
+          624
         ]
       },
       "bay": {
         "center": [
           400,
-          374
+          424
         ],
         "bbox": [
-          112,
-          280,
-          576,
-          188
+          190,
+          276,
+          420,
+          164
         ],
         "bbox_xyxy": [
-          112,
-          280,
-          688,
-          468
+          190,
+          276,
+          610,
+          440
         ]
       },
       "caves": {
         "center": [
-          400,
-          183
+          420,
+          246
         ],
         "bbox": [
-          128,
-          79,
-          544,
-          209
+          200,
+          64,
+          424,
+          200
         ],
         "bbox_xyxy": [
-          128,
-          79,
-          672,
-          288
+          200,
+          64,
+          624,
+          264
         ]
       }
     }
   },
   "landscape": {
-    "file": "overview_landscape.png",
+    "file": "overview_landscape.webp",
     "size": [
       2048,
       1280
@@ -155,128 +153,128 @@
     "regions": {
       "meadow": {
         "center": [
-          171,
-          767
+          206,
+          690
         ],
         "bbox": [
-          16,
-          537,
-          311,
-          461
+          40,
+          380,
+          340,
+          520
         ],
         "bbox_xyxy": [
-          16,
-          537,
-          327,
-          998
+          40,
+          380,
+          380,
+          900
         ]
       },
       "lagoon": {
         "center": [
-          460,
-          767
+          510,
+          624
         ],
         "bbox": [
-          317,
-          537,
-          287,
-          461
+          380,
+          390,
+          280,
+          560
         ],
         "bbox_xyxy": [
-          317,
-          537,
-          604,
-          998
+          380,
+          390,
+          660,
+          950
         ]
       },
       "hills": {
         "center": [
-          747,
-          767
+          790,
+          636
         ],
         "bbox": [
-          604,
-          537,
-          286,
-          461
+          660,
+          380,
+          270,
+          520
         ],
         "bbox_xyxy": [
-          604,
-          537,
-          890,
-          998
+          660,
+          380,
+          930,
+          900
         ]
       },
       "woods": {
         "center": [
-          1033,
-          755
+          1054,
+          630
         ],
         "bbox": [
-          890,
-          512,
-          287,
-          486
+          924,
+          380,
+          270,
+          540
         ],
         "bbox_xyxy": [
-          890,
-          512,
-          1177,
-          998
+          924,
+          380,
+          1194,
+          920
         ]
       },
       "peaks": {
         "center": [
-          1310,
-          767
+          1320,
+          624
         ],
         "bbox": [
-          1177,
-          537,
-          266,
-          461
+          1194,
+          330,
+          276,
+          580
         ],
         "bbox_xyxy": [
-          1177,
-          537,
-          1443,
-          998
+          1194,
+          330,
+          1470,
+          910
         ]
       },
       "bay": {
         "center": [
           1586,
-          767
+          624
         ],
         "bbox": [
-          1443,
-          537,
-          287,
-          461
+          1470,
+          360,
+          266,
+          580
         ],
         "bbox_xyxy": [
-          1443,
-          537,
-          1730,
-          998
+          1470,
+          360,
+          1736,
+          940
         ]
       },
       "caves": {
         "center": [
-          1878,
-          755
+          1836,
+          624
         ],
         "bbox": [
-          1720,
-          512,
-          317,
-          486
+          1724,
+          370,
+          296,
+          510
         ],
         "bbox_xyxy": [
-          1720,
-          512,
-          2037,
-          998
+          1724,
+          370,
+          2020,
+          880
         ]
       }
     }

@@ -1,0 +1,513 @@
+/* Picnic Pals Set B presentation kit (locked 1125).
+   Swap art by setting the CSS variables below, or replace files in art/ui/.
+   Fonts are self-hosted SIL OFL (fonts/OFL.txt, fonts/OFL_baloo2.txt). */
+
+@font-face {
+  font-family: "Baloo 2";
+  src: url("../fonts/Baloo2-Variable.ttf") format("truetype");
+  font-weight: 400 800;
+  font-display: swap;
+}
+
+:root {
+  --pp-kit-title-font: "Baloo 2", "Fredoka Arcade", var(--font, ui-rounded, sans-serif);
+  --pp-kit-title-color: #fff8ec;
+  --pp-kit-title-outline: #6b4423;
+  --pp-kit-title-shadow: 0 3px 0 rgba(59, 45, 85, .85);
+  --pp-kit-title-banner: url("../art/ui/title-banner-3x.webp");
+  --pp-kit-card-art: url("../art/ui/card-3x.webp");
+  --pp-kit-card-ink: #3b2d55;
+  --pp-kit-card-font: "Fredoka Arcade", var(--font, ui-rounded, sans-serif);
+  --pp-kit-tray-shelf: url("../art/ui/tray-shelf-3x.webp");
+  --pp-kit-home-art: url("../art/ui/home-128.webp");
+  --pp-kit-home-art-pressed: url("../art/ui/home-pressed-128.webp");
+  --pp-kit-scene-frac: 2;
+  --pp-kit-tray-frac: 1;
+  --pp-kit-hit-pad: 12px;
+}
+
+/* Standard stage shell: big scene (~2/3) on top, instruction card, choice tray below.
+   Portrait and landscape both keep this structure; the fixed stage (400x720 / 1024x640) scales as a whole. */
+.pp-kit-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  position: relative;
+}
+.pp-kit-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex: 0 0 auto;
+  min-height: 72px;
+  padding: 4px 8px;
+}
+.pp-kit-bar .pp-kit-home {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.pp-kit-scene {
+  flex: var(--pp-kit-scene-frac, 2) 1 0;
+  min-height: 0;
+  position: relative;
+}
+.pp-kit-tray {
+  flex: var(--pp-kit-tray-frac, 1) 1 0;
+  min-height: 0;
+  position: relative;
+  z-index: 2;
+  padding-bottom: 22px;
+}
+.pp-kit-tray::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 0;
+  height: 22px;
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 0 20px;
+  border-image: var(--pp-kit-tray-shelf) 0 60 fill / 0 20px stretch;
+  pointer-events: none;
+}
+
+/* Instruction card: 9-slice gingham-band card, Fredoka SemiBold, Ink. */
+.pp-kit-card {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  margin: 6px auto;
+  padding: 18px;
+  max-width: 560px;
+  width: calc(100% - 24px);
+  background: transparent;
+  color: var(--pp-kit-card-ink);
+  font-family: var(--pp-kit-card-font);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1.25;
+  text-align: center;
+  border-style: solid;
+  border-width: 36px;
+  border-image: var(--pp-kit-card-art) 108 fill / 36px round stretch;
+  border-radius: 0;
+  box-shadow: none;
+  position: relative;
+  z-index: 3;
+  overflow: visible;
+}
+html[data-stage="portrait"] .pp-kit-card {
+  max-width: 376px;
+  font-size: 22px;
+}
+
+/* Title B: hanging wood sign + Baloo 2 ExtraBold. Live text, 3-slice banner. */
+.pp-kit-title {
+  display: inline-block;
+  box-sizing: border-box;
+  white-space: nowrap;
+  text-align: center;
+  font-family: var(--pp-kit-title-font) !important;
+  font-weight: 800 !important;
+  font-size: 34px !important;
+  line-height: 1;
+  letter-spacing: .01em;
+  color: var(--pp-kit-title-color) !important;
+  paint-order: stroke fill;
+  -webkit-text-stroke-width: 6px;
+  -webkit-text-stroke-color: var(--pp-kit-title-outline);
+  text-shadow: var(--pp-kit-title-shadow) !important;
+  height: 72px !important;
+  min-height: 72px !important;
+  min-width: min-content;
+  flex: 0 0 auto !important;
+  flex-shrink: 0;
+  padding: 24px 26px 0 !important;
+  margin: 0 auto;
+  background: transparent !important;
+  border-style: solid !important;
+  border-width: 0 21px !important;
+  border-image-source: var(--pp-kit-title-banner) !important;
+  border-image-slice: 0 64 fill !important;
+  border-image-width: 0 21px !important;
+  border-image-repeat: stretch !important;
+  border-image: var(--pp-kit-title-banner) 0 64 fill / 0 21px stretch !important;
+  overflow: visible !important;
+}
+@media (max-aspect-ratio: 1/1) {
+  .pp-kit-title { font-size: 26px !important; }
+}
+html[data-stage="portrait"] .pp-kit-title { font-size: 26px !important; }
+
+/* In portrait, the wood sign sits on its own row under Home / Hear so long titles fit.
+   `.pp-kit-stack` is toggled by kit.js; media-query / data-stage rules are the CSS fallback. */
+.pp-kit-stack,
+html[data-stage="portrait"] .pc-header,
+html[data-stage="portrait"] .ff-header,
+html[data-stage="portrait"] .fx-header,
+html[data-stage="portrait"] .pk-header,
+html[data-stage="portrait"] .gd-header,
+html[data-stage="portrait"] .sr-header,
+html[data-stage="portrait"] .bs-header,
+html[data-stage="portrait"] .pp-kit-bar {
+  flex-wrap: wrap !important;
+  height: auto !important;
+  min-height: var(--tap, 60px) !important;
+  overflow: visible !important;
+}
+.pp-kit-stack::before,
+html[data-stage="portrait"] .pc-header::before,
+html[data-stage="portrait"] .ff-header::before,
+html[data-stage="portrait"] .fx-header::before,
+html[data-stage="portrait"] .pk-header::before,
+html[data-stage="portrait"] .gd-header::before,
+html[data-stage="portrait"] .sr-header::before,
+html[data-stage="portrait"] .bs-header::before {
+  content: "";
+  flex: 1 0 100%;
+  order: 15;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.pp-kit-stack > .pp-kit-title,
+html[data-stage="portrait"] .pc-header .pp-kit-title,
+html[data-stage="portrait"] .ff-header .pp-kit-title,
+html[data-stage="portrait"] .fx-header .pp-kit-title,
+html[data-stage="portrait"] .pk-header .pp-kit-title,
+html[data-stage="portrait"] .gd-header .pp-kit-title,
+html[data-stage="portrait"] .sr-header .pp-kit-title,
+html[data-stage="portrait"] .bs-header .pp-kit-title,
+html[data-stage="portrait"] .pp-kit-bar .pp-kit-title {
+  order: 20;
+  flex: 0 0 auto !important;
+  width: auto !important;
+  max-width: calc(100% - 8px);
+  margin: 2px auto 4px !important;
+}
+html[data-stage="portrait"] .pp-kit-bar,
+.pp-kit-bar.pp-kit-stack {
+  padding-top: calc(var(--tap, 60px) + 4px);
+  justify-content: center;
+}
+html[data-stage="portrait"] .pp-kit-bar .pp-kit-home,
+.pp-kit-bar.pp-kit-stack .pp-kit-home {
+  top: 4px;
+  transform: none;
+}
+@media (max-aspect-ratio: 1/1) {
+  .pc-header, .ff-header, .fx-header, .pk-header,
+  .gd-header, .sr-header, .bs-header, .pp-kit-bar {
+    flex-wrap: wrap !important;
+    height: auto !important;
+    min-height: var(--tap, 60px) !important;
+    overflow: visible !important;
+  }
+  .pc-header::before, .ff-header::before, .fx-header::before, .pk-header::before,
+  .gd-header::before, .sr-header::before, .bs-header::before {
+    content: "";
+    flex: 1 0 100%;
+    order: 15;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .pc-header .pp-kit-title, .ff-header .pp-kit-title, .fx-header .pp-kit-title,
+  .pk-header .pp-kit-title, .gd-header .pp-kit-title, .sr-header .pp-kit-title,
+  .bs-header .pp-kit-title, .pp-kit-bar .pp-kit-title {
+    order: 20;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: calc(100% - 8px);
+    margin: 2px auto 4px !important;
+  }
+  .pp-kit-bar { padding-top: calc(var(--tap, 60px) + 4px); justify-content: center; }
+  .pp-kit-bar .pp-kit-home { top: 4px; transform: none; }
+}
+html[data-stage="landscape"] .pc-header,
+html[data-stage="landscape"] .ff-header,
+html[data-stage="landscape"] .fx-header,
+html[data-stage="landscape"] .pk-header,
+html[data-stage="landscape"] .gd-header,
+html[data-stage="landscape"] .sr-header,
+html[data-stage="landscape"] .bs-header {
+  min-height: 72px !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+/* Universal Home: full-bleed cottage art (the cream circle is in the PNG). >=60px, no extra chrome. */
+button.pp-kit-home,
+#homeBtn.pp-kit-home,
+.homebtn.pp-kit-home,
+#fxHome.pp-kit-home,
+#ffHome.pp-kit-home,
+#pkHome.pp-kit-home,
+#pcHome.pp-kit-home,
+#srHome.pp-kit-home,
+#bsHome.pp-kit-home,
+#gdHome.pp-kit-home {
+  box-sizing: border-box;
+  min-width: var(--tap, 60px) !important;
+  min-height: var(--tap, 60px) !important;
+  width: var(--tap, 60px);
+  height: var(--tap, 60px);
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  background-image: var(--pp-kit-home-art) !important;
+  background-image: -webkit-image-set(
+    url("../art/ui/home-64.webp") 1x,
+    url("../art/ui/home-128.webp") 2x,
+    url("../art/ui/home-192.webp") 3x
+  ) !important;
+  background-image: image-set(
+    url("../art/ui/home-64.webp") 1x,
+    url("../art/ui/home-128.webp") 2x,
+    url("../art/ui/home-192.webp") 3x
+  ) !important;
+  background-size: 100% 100% !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  box-shadow: none !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  overflow: visible;
+  cursor: pointer;
+  touch-action: manipulation;
+  z-index: 8;
+}
+button.pp-kit-home:active,
+#homeBtn.pp-kit-home:active,
+.homebtn.pp-kit-home:active,
+#fxHome.pp-kit-home:active,
+#ffHome.pp-kit-home:active,
+#pkHome.pp-kit-home:active,
+#pcHome.pp-kit-home:active,
+#srHome.pp-kit-home:active,
+#bsHome.pp-kit-home:active,
+#gdHome.pp-kit-home:active {
+  background-image: var(--pp-kit-home-art-pressed) !important;
+  background-image: -webkit-image-set(
+    url("../art/ui/home-pressed-64.webp") 1x,
+    url("../art/ui/home-pressed-128.webp") 2x,
+    url("../art/ui/home-pressed-192.webp") 3x
+  ) !important;
+  background-image: image-set(
+    url("../art/ui/home-pressed-64.webp") 1x,
+    url("../art/ui/home-pressed-128.webp") 2x,
+    url("../art/ui/home-pressed-192.webp") 3x
+  ) !important;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+.pp-kit-home:focus-visible {
+  outline: 3px solid #3b2d55;
+  outline-offset: 2px;
+}
+.pp-kit-home .pp-kit-home-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.pp-kit-home > svg,
+.pp-kit-home > img { display: none; }
+
+/* Opening B: picnic basket lid. pointer-events none so tests and taps are never blocked. */
+.pp-kit-intro-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 246, 232, 0.28);
+  animation: pp-kit-intro-wash 1100ms ease forwards;
+}
+@keyframes pp-kit-intro-wash {
+  0%, 70% { background-color: rgba(255, 246, 232, 0.28); }
+  100% { background-color: rgba(255, 246, 232, 0); }
+}
+.pp-kit-basket {
+  position: relative;
+  width: 80%;
+  aspect-ratio: 674 / 416;
+  max-height: 70%;
+  animation: pp-kit-basket-move 1100ms ease-out forwards;
+}
+html[data-stage="landscape"] .pp-kit-basket { width: 50%; }
+.pp-kit-basket-body,
+.pp-kit-basket-lid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+.pp-kit-basket-lid {
+  z-index: 2;
+  transform-origin: 50% 28%;
+  animation: pp-kit-lid 1100ms ease-out forwards;
+}
+/* 0-300ms rise + 6% overshoot; 800-1100ms sink out. */
+@keyframes pp-kit-basket-move {
+  0% { transform: translateY(42%); opacity: 1; }
+  27.27% { transform: translateY(-6%); }
+  32% { transform: translateY(0); }
+  72.73% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(70%); opacity: 0; }
+}
+/* 300-450ms lid wiggles ±4° twice; 450-800ms lid up 45% of the stage, -14°, fade. */
+@keyframes pp-kit-lid {
+  0%, 27.27% { transform: rotate(0deg); opacity: 1; }
+  30.7% { transform: rotate(4deg); }
+  34.1% { transform: rotate(-4deg); }
+  37.5% { transform: rotate(4deg); }
+  40.91% { transform: rotate(0deg); }
+  72.73% { transform: translateY(calc(-0.45 * var(--pp-kit-stage-h, 720px))) rotate(-14deg); opacity: 0; }
+  100% { transform: translateY(calc(-0.45 * var(--pp-kit-stage-h, 720px))) rotate(-14deg); opacity: 0; }
+}
+
+/* Reveal B: gingham bow squashes, pops, fades (400ms); then the card unfolds. */
+.pp-kit-reveal {
+  position: relative;
+  overflow: visible !important;
+  animation: pp-kit-card-unfold 350ms ease 350ms both;
+}
+@keyframes pp-kit-card-unfold {
+  0% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+.pp-kit-reveal-bow {
+  position: absolute;
+  left: 50%;
+  top: -22px;
+  width: 80px;
+  height: auto;
+  margin-left: -40px;
+  z-index: 5;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+  animation: pp-kit-bow 400ms ease forwards;
+}
+@keyframes pp-kit-bow {
+  0% { transform: scale(1, 1); opacity: 1; }
+  18% { transform: scale(1.18, 0.72); }
+  40% { transform: scale(0.92, 1.18) translateY(-8px); }
+  62% { transform: scale(1, 1) translateY(-16px); opacity: 1; }
+  100% { transform: scale(1.08, 1.08) translateY(-28px); opacity: 0; }
+}
+
+/* Celebration B: paper confetti, ray-ring burst, sparkles. */
+.pp-kit-confetti {
+  position: absolute;
+  top: -36px;
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 90;
+  animation: pp-kit-confetti-fall var(--t, 1.5s) linear forwards;
+}
+@keyframes pp-kit-confetti-fall {
+  to {
+    transform: translate(var(--dx, 24px), 120%) rotate(var(--r, 180deg));
+    opacity: 0.15;
+  }
+}
+.pp-kit-burst {
+  position: absolute;
+  left: var(--x, 50%);
+  top: var(--y, 45%);
+  width: 160px;
+  height: 160px;
+  margin: -80px 0 0 -80px;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 85;
+  animation: pp-kit-burst 250ms ease-out forwards, pp-kit-burst-fade 400ms ease 700ms forwards;
+}
+@keyframes pp-kit-burst {
+  0% { transform: scale(0.4) rotate(0deg); }
+  70% { transform: scale(1.1) rotate(16deg); }
+  100% { transform: scale(1) rotate(20deg); }
+}
+@keyframes pp-kit-burst-fade {
+  to { opacity: 0; }
+}
+.pp-kit-sparkle {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 92;
+  animation: pp-kit-twinkle 500ms ease-out forwards;
+  animation-delay: var(--d, 0s);
+}
+@keyframes pp-kit-twinkle {
+  0% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+  40% { opacity: 1; transform: scale(1.15) rotate(15deg); }
+  100% { opacity: 0; transform: scale(0.8) rotate(30deg); }
+}
+
+/* Absolute-header games: make room for the portrait title row under the buttons. */
+html[data-stage="portrait"] .fx-order,
+.fx-header.pp-kit-stack ~ .fx-order {
+  top: calc(10px + var(--tap, 60px) + 106px) !important;
+}
+html[data-stage="portrait"] .fx-scene,
+.fx-header.pp-kit-stack ~ .fx-scene {
+  top: calc(114px + var(--tap, 60px) + 106px) !important;
+}
+html[data-stage="portrait"] .bs-ticket,
+.bs-header.pp-kit-stack ~ .bs-ticket {
+  top: calc(10px + var(--tap, 60px) + 106px) !important;
+}
+html[data-stage="portrait"] .bs-panel,
+.bs-header.pp-kit-stack ~ .bs-panel {
+  top: calc(84px + var(--tap, 60px) + 106px) !important;
+}
+
+/* Enlarged hit padding without changing layout size */
+.pp-kit-hit {
+  position: relative;
+}
+.pp-kit-hit::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--pp-kit-hit-pad, 12px));
+  border-radius: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pp-kit-intro-layer,
+  .pp-kit-basket,
+  .pp-kit-basket-lid,
+  .pp-kit-reveal,
+  .pp-kit-reveal-bow,
+  .pp-kit-confetti,
+  .pp-kit-burst,
+  .pp-kit-sparkle {
+    animation: none !important;
+  }
+  .pp-kit-intro-layer { display: none; }
+  .pp-kit-reveal { opacity: 1; transform: none; }
+  .pp-kit-reveal-bow { display: none; }
+}

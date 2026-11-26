@@ -30,7 +30,8 @@ html.stage-on .stage-scale #racers,
 html.stage-on .stage-scale #packer,
 html.stage-on .stage-scale #garden,
 html.stage-on .stage-scale #stand,
-html.stage-on .stage-scale #pancake {
+html.stage-on .stage-scale #pancake,
+html.stage-on .stage-scale #foodfight {
   width: 100%;
   height: 100%;
   max-width: 100%;

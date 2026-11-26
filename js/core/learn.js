@@ -344,7 +344,12 @@
     return '<span class="pbpic"><b>' + a + ' − ' + b + '</b><span class="pb-row">' + (a <= 10 ? tf({ on: a, x: b }) : dotsFor(a)) + '</span></span>';
   }
   function numPic(label) { var m = String(label).match(/^\s*(\d+)\s*$/); if (!m || +m[1] > 40) return null; return '<span class="pbpic num"><b>' + m[1] + '</b>' + dotsFor(+m[1]) + '</span>'; }
-  function picturizeCell(c) { if (!c || c.html) return c; var h = eqPic(c.label) || numPic(c.label); if (h) { c.html = h; c.long = c.long || /pb-row/.test(h); c.pictured = true; } return c; }
+  // Equation tiles stay equation-only (munch-tiles1124): the teaching ten-frame is on the prompt card.
+  function picturizeCell(c) {
+    if (!c || c.html) return c;
+    if (/^\s*\d+\s*[+−\-]\s*\d+\s*$/.test(String(c.label || ''))) return c;
+    var h = numPic(c.label); if (h) { c.html = h; c.pictured = true; } return c;
+  }
   function noAutoPic(s) { var id = (s && s.id) || s || ''; return /^(count10|pk_numid|pk_next|pk_before)/.test(id); }
   function textPic(text) { var m = String(text).replace(/<[^>]+>/g, ' ').match(/(\d+)/g); if (!m || /pb-frames|st-pic|frame/.test(text)) return text; var n = +m[m.length - 1]; if (n > 30) return text; return text + '<span class="st-pic pb-target">' + dotsFor(n) + '</span>'; }
   function picturizeGen(s) {

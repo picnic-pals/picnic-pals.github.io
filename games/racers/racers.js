@@ -392,7 +392,7 @@
       var faceHtml = face === 'sil' ? '<div class="sr-sil"></div>' : '<img src="' + friendImg(face, 'front') + '" alt="">';
       return '<div class="sr-prog-row ' + cls + '">' + faceHtml +
         '<div class="sr-prog-track"><i style="left:' + pct + '%"></i></div>' +
-        '<span class="sr-prog-flag">' + icon('🏁', 20, 'flag') + '</span></div>';
+        '<span class="sr-prog-flag"><img src="' + fxUrl('checker_flag') + '" alt=""></span></div>';
     }
     return '<div class="sr-progress" id="srProgress" aria-hidden="true">' +
       row('me', race.playerDist, 'me', P.blob) +
@@ -474,10 +474,14 @@
     if (!K.garageOf(family).tracks[track]) track = 'picnic';
     G = K.startRace(P, family, { mode: 'two', track: track, p2: P2, now: Date.now() });
     if (!G || G.mode !== 'two') { renderTwoPicker(); return; }
-    screen = 'race';
-    twoBusy = [false, false];
-    askedAtTwo = [Date.now(), Date.now()];
-    renderTwoRace();
+    function go() {
+      screen = 'race';
+      twoBusy = [false, false];
+      askedAtTwo = [Date.now(), Date.now()];
+      renderTwoRace();
+    }
+    if (wantIntro(arguments[1] || {})) renderIntro(go);
+    else go();
   }
   function twoPips(side) {
     var html = '', i, cls;
@@ -573,17 +577,38 @@
     else if (side && side.done) say(side.name + ' is finished.', 'tap');
     else say('Answer the questions on your side.', 'tap');
   }
+  var START_AT = 3.2, FINISH_AT = 92, WORLD_SCREENS = 2.5;
+  function worldPlace(dist, finished) {
+    var trackLen = K.TRACK_LEN || 1000;
+    var travel = FINISH_AT - START_AT;
+    var pr = Math.min(1, Math.max(0, (dist || 0) / trackLen));
+    /* While questions remain, keep the kart clearly behind the planted finish line. */
+    if (!finished) pr = Math.min(pr, 0.80);
+    return START_AT + travel * pr;
+  }
+  function worldCam(meLeft, opLeft, mid) {
+    var view = 100 / WORLD_SCREENS;
+    var cam = mid ? ((meLeft + opLeft) / 2 - view * 0.5) : (meLeft - view * 0.30);
+    var lock = FINISH_AT - view + 3;
+    if (cam > lock) cam = lock;
+    if (cam < 0) cam = 0;
+    if (cam > 100 - view) cam = 100 - view;
+    return { cam: cam, view: view, locked: cam >= lock - 0.01 };
+  }
+  function raceWorld(opt) {
+    opt = opt || {};
+    var finished = !!opt.finished;
+    var meLeft = worldPlace(opt.meDist, finished || !!opt.meDone);
+    var opLeft = worldPlace(opt.opDist, finished || !!opt.opDone);
+    var w = worldCam(meLeft, opLeft, !!opt.mid);
+    w.meLeft = meLeft; w.opLeft = opLeft;
+    return w;
+  }
   function renderTwoRace() {
     if (!G || G.mode !== 'two') return;
     document.body.className = 'sr-two track-' + G.track;
-    var trackLen = K.TRACK_LEN || 1000;
-    var WORLD_SCREENS = 2.5, START_AT = 3.2, FINISH_AT = 92;
-    var view = 100 / WORLD_SCREENS, travel = FINISH_AT - START_AT;
-    var meLeft = START_AT + travel * Math.min(1, G.sides[0].dist / trackLen);
-    var opLeft = START_AT + travel * Math.min(1, G.sides[1].dist / trackLen);
-    var cam = (meLeft + opLeft) / 2 - view * 0.5;
-    if (cam < 0) cam = 0;
-    if (cam > 100 - view) cam = 100 - view;
+    var W = raceWorld({ meDist: G.sides[0].dist, opDist: G.sides[1].dist, meDone: G.sides[0].done, opDone: G.sides[1].done, mid: true, finished: G.phase === 'podium' });
+    var meLeft = W.meLeft, opLeft = W.opLeft, cam = W.cam, view = W.view;
     var b0 = G.sides[0].phase === 'drive' && G.sides[0].answers.length && G.sides[0].answers[G.sides[0].answers.length - 1].correct;
     var s0 = G.sides[0].phase === 'drive' && G.sides[0].answers.length && !G.sides[0].answers[G.sides[0].answers.length - 1].correct;
     var b1 = G.sides[1].phase === 'drive' && G.sides[1].answers.length && G.sides[1].answers[G.sides[1].answers.length - 1].correct;
@@ -593,7 +618,7 @@
     $('#srContent').innerHTML =
       '<div class="sr-two" id="srTwoPlay">' +
         sideCardHtml(0) +
-        '<div class="sr-track ' + G.track + ' live' + ((b0 || b1) ? ' boosting' : '') + ((s0 || s1) ? ' slipping' : '') + '" id="srTrack">' +
+        '<div class="sr-track ' + G.track + ' live' + ((b0 || b1) ? ' boosting' : '') + ((s0 || s1) ? ' slipping' : '') + (W.locked ? ' sr-finish-lock' : '') + '" id="srTrack">' +
           trackStageHtml(G.track, cam, {
             meLeft: meLeft, opLeft: opLeft, obsLeft: 0,
             me: carHtml(K.garageOf(family).car, G.sides[0].blob, '', move0),
@@ -620,21 +645,15 @@
     /* Keep the shared track in sync without rebuilding the other player's buttons. */
     var trackHost = document.getElementById('srTrack');
     if (!trackHost || !G || !G.sides) return;
-    var trackLen = K.TRACK_LEN || 1000;
-    var WORLD_SCREENS = 2.5, START_AT = 3.2, FINISH_AT = 92;
-    var view = 100 / WORLD_SCREENS, travel = FINISH_AT - START_AT;
-    var meLeft = START_AT + travel * Math.min(1, G.sides[0].dist / trackLen);
-    var opLeft = START_AT + travel * Math.min(1, G.sides[1].dist / trackLen);
-    var cam = (meLeft + opLeft) / 2 - view * 0.5;
-    if (cam < 0) cam = 0;
-    if (cam > 100 - view) cam = 100 - view;
+    var W = raceWorld({ meDist: G.sides[0].dist, opDist: G.sides[1].dist, meDone: G.sides[0].done, opDone: G.sides[1].done, mid: true, finished: G.phase === 'podium' });
+    var meLeft = W.meLeft, opLeft = W.opLeft, cam = W.cam, view = W.view;
     var b0 = G.sides[0].phase === 'drive' && G.sides[0].answers.length && G.sides[0].answers[G.sides[0].answers.length - 1].correct;
     var s0 = G.sides[0].phase === 'drive' && G.sides[0].answers.length && !G.sides[0].answers[G.sides[0].answers.length - 1].correct;
     var b1 = G.sides[1].phase === 'drive' && G.sides[1].answers.length && G.sides[1].answers[G.sides[1].answers.length - 1].correct;
     var s1 = G.sides[1].phase === 'drive' && G.sides[1].answers.length && !G.sides[1].answers[G.sides[1].answers.length - 1].correct;
     var move0 = b0 ? 'boosting' : (s0 ? 'slipping' : (G.sides[0].done ? '' : 'rolling'));
     var move1 = b1 ? 'boosting' : (s1 ? 'slipping' : (G.sides[1].done ? '' : 'rolling'));
-    trackHost.className = 'sr-track ' + G.track + ' live' + ((b0 || b1) ? ' boosting' : '') + ((s0 || s1) ? ' slipping' : '');
+    trackHost.className = 'sr-track ' + G.track + ' live' + ((b0 || b1) ? ' boosting' : '') + ((s0 || s1) ? ' slipping' : '') + (W.locked ? ' sr-finish-lock' : '');
     trackHost.innerHTML = trackStageHtml(G.track, cam, {
       meLeft: meLeft, opLeft: opLeft, obsLeft: 0,
       me: carHtml(K.garageOf(family).car, G.sides[0].blob, '', move0),
@@ -739,15 +758,214 @@
     coinsEl();
   }
 
-  function beginRace(mode) {
-    if (mode === 'two') { if (P2) beginTwoRace(P2); else renderTwoPicker(); return; }
+
+  var INTRO = {
+  "units": "1x stage px (double for -2x)",
+  "variant": "b",
+  "kart_canvas": 512,
+  "ground": [
+    262,
+    408
+  ],
+  "landscape": {
+    "road_kerbs_inner_y": [
+      426,
+      556
+    ],
+    "lane_ground_y": [
+      465,
+      551
+    ],
+    "near_post_x": [
+      327,
+      369
+    ],
+    "kart_scale": 0.3,
+    "kart_ground": {
+      "friend_far_lane": {
+        "ground": [
+          448.1,
+          465
+        ],
+        "nose_x": 506,
+        "chequer_left_x": 509
+      },
+      "you_near_lane": {
+        "ground": [
+          390.6,
+          551
+        ],
+        "nose_x": 448.5,
+        "chequer_left_x": 446
+      }
+    }
+  },
+  "portrait": {
+    "road_kerbs_inner_y": [
+      394,
+      481
+    ],
+    "lane_ground_y": [
+      420,
+      478
+    ],
+    "near_post_x": [
+      99,
+      127
+    ],
+    "kart_scale": 0.21,
+    "kart_ground": {
+      "friend_far_lane": {
+        "ground": [
+          159.5,
+          420
+        ],
+        "nose_x": 200,
+        "chequer_left_x": 203
+      },
+      "you_near_lane": {
+        "ground": [
+          142.1,
+          478
+        ],
+        "nose_x": 182.7,
+        "chequer_left_x": 164
+      }
+    }
+  }
+};
+  var introGo = null;
+  function isLand() {
+    var stage = document.documentElement.getAttribute('data-stage');
+    if (stage === 'landscape') return true;
+    if (stage === 'portrait') return false;
+    return window.innerWidth > window.innerHeight;
+  }
+  function wantIntro(opt) {
+    opt = opt || {};
+    if (opt.skipIntro) return false;
+    if (opt.forceIntro) return true;
+    try {
+      if (/\bnointro=1\b/.test(location.search || '')) return false;
+      if (navigator.webdriver) return false;
+    } catch (e) {}
+    return true;
+  }
+  function introUrl(kind, land) {
+    var o = land ? 'landscape' : 'portrait';
+    var root = (A.ROOT || '') + 'art/racers/intro/';
+    if (kind === 'fg') return root + 'intro_' + o + '_fg.webp';
+    return root + 'intro_' + o + '.webp';
+  }
+  function introUrl2x(kind, land) {
+    var o = land ? 'landscape' : 'portrait';
+    var root = (A.ROOT || '') + 'art/racers/intro/';
+    if (kind === 'fg') return root + 'intro_' + o + '_fg-2x.webp';
+    return root + 'intro_' + o + '-2x.webp';
+  }
+  function kartSlot(ground, scale) {
+    var canvas = INTRO.kart_canvas || 512;
+    var gx = (INTRO.ground && INTRO.ground[0]) || 262;
+    var gy = (INTRO.ground && INTRO.ground[1]) || 408;
+    return {
+      left: ground[0] - gx * scale,
+      top: ground[1] - gy * scale,
+      sz: canvas * scale
+    };
+  }
+  function introKartHtml(lane, car, driver, box) {
+    return '<div class="sr-intro-kart ' + lane + '" style="left:' + box.left.toFixed(1) + 'px;top:' + box.top.toFixed(1) + 'px;width:' + box.sz.toFixed(1) + 'px;height:' + box.sz.toFixed(1) + 'px">' +
+      '<span class="sr-intro-shadow" aria-hidden="true"></span>' +
+      carHtml(car, driver) +
+    '</div>';
+  }
+  function layoutIntro() {
+    var host = $('#srIntro');
+    if (!host || !INTRO) return;
+    var land = isLand();
+    var pack = INTRO[land ? 'landscape' : 'portrait'];
+    if (!pack) return;
+    var scene = host.querySelector('.sr-intro-scene');
+    var fg = host.querySelector('.sr-intro-fg');
+    if (scene) {
+      scene.src = introUrl('scene', land);
+      scene.srcset = introUrl('scene', land) + ' 1x, ' + introUrl2x('scene', land) + ' 2x';
+    }
+    if (fg) {
+      fg.src = introUrl('fg', land);
+      fg.srcset = introUrl('fg', land) + ' 1x, ' + introUrl2x('fg', land) + ' 2x';
+    }
+    var scale = pack.kart_scale;
+    var farEl = host.querySelector('.sr-intro-kart.far');
+    var nearEl = host.querySelector('.sr-intro-kart.near');
+    var far = kartSlot(pack.kart_ground.friend_far_lane.ground, scale);
+    var near = kartSlot(pack.kart_ground.you_near_lane.ground, scale);
+    function apply(el, box) {
+      if (!el) return;
+      el.style.left = box.left.toFixed(1) + 'px';
+      el.style.top = box.top.toFixed(1) + 'px';
+      el.style.width = box.sz.toFixed(1) + 'px';
+      el.style.height = box.sz.toFixed(1) + 'px';
+    }
+    apply(farEl, far);
+    apply(nearEl, near);
+  }
+  function leaveIntro(done) {
+    var host = $('#srIntro');
+    function go() { introGo = null; if (done) done(); }
+    var cut = false;
+    try { cut = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+    if (cut || !host) { go(); return; }
+    host.classList.add('leave');
+    var finished = false;
+    function end() { if (finished) return; finished = true; go(); }
+    host.addEventListener('transitionend', end);
+    setTimeout(end, 600);
+  }
+  function renderIntro(onGo) {
+    screen = 'intro';
+    introGo = onGo;
+    document.body.className = 'sr-on-intro';
+    var land = isLand();
+    var pack = INTRO[land ? 'landscape' : 'portrait'];
+    var scale = pack.kart_scale;
+    var far = kartSlot(pack.kart_ground.friend_far_lane.ground, scale);
+    var near = kartSlot(pack.kart_ground.you_near_lane.ground, scale);
+    var g = K.garageOf(family);
+    var youCar = g.car;
+    var oppCar = oppCarSpec();
+    var oppDriver = (G && G.mode === 'two' && P2 && (P2.blob || P2.friend)) ? (P2.blob || P2.friend) : ((G && G.friend) || 'apple');
+    var scene = introUrl('scene', land);
+    var fg = introUrl('fg', land);
+    $('#srContent').innerHTML =
+      '<div class="sr-intro" id="srIntro">' +
+        '<img class="sr-intro-scene" src="' + scene + '" srcset="' + scene + ' 1x, ' + introUrl2x('scene', land) + ' 2x" alt="">' +
+        introKartHtml('far', oppCar, oppDriver, far) +
+        introKartHtml('near', youCar, P.blob, near) +
+        '<img class="sr-intro-fg" src="' + fg + '" srcset="' + fg + ' 1x, ' + introUrl2x('fg', land) + ' 2x" alt="">' +
+        '<button type="button" class="sr-btn sr-intro-go" id="srIntroGo">Go!</button>' +
+      '</div>';
+    $('#srIntroGo').onclick = function () {
+      if ($('#srIntroGo').disabled) return;
+      $('#srIntroGo').disabled = true;
+      leaveIntro(function () { if (introGo) introGo(); else if (onGo) onGo(); });
+    };
+  }
+
+  function beginRace(mode, opt) {
+    opt = opt || {};
+    if (mode === 'two') { if (P2) beginTwoRace(P2, opt); else renderTwoPicker(); return; }
     var track = (family.racers && family.racers._track) || 'picnic';
     if (!K.garageOf(family).tracks[track]) track = 'picnic';
     G = K.startRace(P, family, { mode: mode, track: track, now: Date.now() });
-    screen = 'race';
-    askedAt = Date.now();
-    renderRace();
-    sayQuestion();
+    function go() {
+      screen = 'race';
+      askedAt = Date.now();
+      renderRace();
+      sayQuestion();
+    }
+    if (wantIntro(opt)) renderIntro(go);
+    else go();
   }
 
   function qWho() {
@@ -759,28 +977,69 @@
 
 
   function trackLayerUrl(track, layer) {
-    return K.trackLayerSrc(track, layer, A.ROOT);
+    return K.trackLayerSrc(track, layer, A.ROOT, isLand() ? 'landscape' : 'portrait');
   }
-  function parHtml(track, layer, cam) {
+  function trackLayerUrl2x(track, layer) {
+    return String(trackLayerUrl(track, layer) || '').replace(/\.webp$/, '-2x.webp');
+  }
+  function fxUrl(id) { return (A.ROOT || '') + 'art/racers/fx/' + id + '.webp'; }
+  function fxUrl2x(id) { return (A.ROOT || '') + 'art/racers/fx/' + id + '-2x.webp'; }
+  function atFinish(race) {
+    if (!race) return false;
+    if (race.phase === 'podium') return true;
+    if (K.reachedFinish && K.reachedFinish(race.playerDist)) return true;
+    if (race.playerDist >= (K.TRACK_LEN || 1000)) return true;
+    if (race.i >= race.n && race.mode !== 'two') return true;
+    return false;
+  }
+  function parHtml(track, layer, cam, cls) {
     var src = trackLayerUrl(track, layer);
+    var src2 = trackLayerUrl2x(track, layer);
+    var tiles = '', i, n = (cls === 'a') ? 8 : 2;
+    for (i = 0; i < n; i++) {
+      tiles += '<img src="' + src + '" srcset="' + src + ' 1x, ' + src2 + ' 2x" alt="" draggable="false">';
+    }
     return '<div class="sr-par sr-par-' + layer + '" style="transform:translateX(-' + cam.toFixed(3) + '%)">' +
-      '<div class="sr-par-art">' +
-        '<img src="' + src + '" alt="" draggable="false">' +
-        '<img src="' + src + '" alt="" draggable="false">' +
-      '</div>' +
+      '<div class="sr-par-art' + (cls ? ' sr-par-art-' + cls : '') + '">' + tiles + '</div>' +
+    '</div>';
+  }
+  function finishFlagHtml() {
+    return '<img class="sr-finish-flag" src="' + fxUrl('checker_flag') + '" srcset="' + fxUrl('checker_flag') + ' 1x, ' + fxUrl2x('checker_flag') + ' 2x" alt="">';
+  }
+  function kartFxHtml(kind) {
+    return '<span class="sr-kart-fx" aria-hidden="true">' +
+      '<img class="sr-fx-trail" src="' + fxUrl('puff_trail') + '" srcset="' + fxUrl('puff_trail') + ' 1x, ' + fxUrl2x('puff_trail') + ' 2x" alt="">' +
+      '<img class="sr-fx-puff" src="' + fxUrl('dust_puff') + '" srcset="' + fxUrl('dust_puff') + ' 1x, ' + fxUrl2x('dust_puff') + ' 2x" alt="">' +
+    '</span>';
+  }
+  function speedStreaksHtml() {
+    return '<div class="sr-fx-streaks" aria-hidden="true">' +
+      '<img src="' + fxUrl('speed_streaks') + '" srcset="' + fxUrl('speed_streaks') + ' 1x, ' + fxUrl2x('speed_streaks') + ' 2x" alt="">' +
+      '<img src="' + fxUrl('speed_streaks') + '" srcset="' + fxUrl('speed_streaks') + ' 1x, ' + fxUrl2x('speed_streaks') + ' 2x" alt="">' +
+      '<img src="' + fxUrl('speed_streaks') + '" srcset="' + fxUrl('speed_streaks') + ' 1x, ' + fxUrl2x('speed_streaks') + ' 2x" alt="">' +
     '</div>';
   }
   function trackStageHtml(track, cam, bits) {
     var info = (K.TRACK_ART && K.TRACK_ART[track]) || (K.TRACK_ART && K.TRACK_ART.picnic);
-    var hasFar = !!(info && info.layers.indexOf('far') >= 0);
     var actors =
       '<div class="sr-par sr-par-actors" style="transform:translateX(-' + cam.toFixed(3) + '%)">' +
         '<div class="sr-start" aria-hidden="true"></div>' +
-        '<div class="sr-finish" aria-hidden="true"></div>' +
-        '<div class="sr-lane opp"><div style="left:' + bits.opLeft + '%">' + bits.opp + '</div></div>' +
-        '<div class="sr-lane me">' + (bits.obs || '') + '<div style="left:' + bits.meLeft + '%">' + bits.me + '</div></div>' +
+        '<div class="sr-finish" style="left:' + FINISH_AT + '%" aria-hidden="true">' + finishFlagHtml() + '</div>' +
+        '<div class="sr-lane opp"><div style="left:' + bits.opLeft + '%">' + (bits.opp || '') + kartFxHtml('opp') + '</div></div>' +
+        '<div class="sr-lane me">' + (bits.obs || '') + '<div style="left:' + bits.meLeft + '%">' + (bits.me || '') + kartFxHtml('me') + '</div></div>' +
         (bits.boss || '') +
       '</div>';
+    if (info && info.style === 'A') {
+      var farRate = (info.farRate != null) ? info.farRate : 0.55;
+      var roadRate = (info.roadRate != null) ? info.roadRate : 1;
+      return '<div class="sr-stage sr-stage-a">' +
+        parHtml(track, 'tile', cam * farRate, 'a') +
+        parHtml(track, 'road', cam * roadRate, 'a') +
+        actors +
+        speedStreaksHtml() +
+      '</div>';
+    }
+    var hasFar = !!(info && info.layers && info.layers.indexOf('far') >= 0);
     return '<div class="sr-stage">' +
       parHtml(track, 'sky', cam * 0.25) +
       (hasFar ? parHtml(track, 'far', cam * 0.35) : '') +
@@ -788,6 +1047,7 @@
       parHtml(track, 'road', cam) +
       parHtml(track, 'near', cam) +
       actors +
+      speedStreaksHtml() +
     '</div>';
   }
 
@@ -797,19 +1057,9 @@
     document.body.className = 'track-' + G.track;
     var q = K.current(G);
     var g = K.garageOf(family);
-    var trackLen = K.TRACK_LEN || 1000;
-    /* World is 2.5 screens wide. Positions are % of that world. Camera follows the player. */
-    var WORLD_SCREENS = 2.5;
-    var START_AT = 3.2;
-    var FINISH_AT = 92;
-    var view = 100 / WORLD_SCREENS;
-    var travel = FINISH_AT - START_AT;
-    var meLeft = START_AT + travel * Math.min(1, G.playerDist / trackLen);
-    var opLeft = START_AT + travel * Math.min(1, G.oppDist / trackLen);
-    var focus = view * 0.30;
-    var cam = meLeft - focus;
-    if (cam < 0) cam = 0;
-    if (cam > 100 - view) cam = 100 - view;
+    /* World is 2.5 screens wide. Positions are % of that world. The finish line stays planted. */
+    var W = raceWorld({ meDist: G.playerDist, opDist: G.oppDist, finished: G.phase === 'podium' });
+    var meLeft = W.meLeft, opLeft = W.opLeft, cam = W.cam, view = W.view;
     var obs = '';
     var obsLeft = Math.min(meLeft + view * 0.28, cam + view * 0.82);
     if (obsLeft < meLeft + 5) obsLeft = meLeft + 5;
@@ -834,7 +1084,7 @@
       pips += '<i class="' + cls + '"></i>';
     }
     var card = '';
-    var showQ = (G.phase === 'question' && q) ? q : (G.phase === 'drive' && G.missHint && G.missQ ? G.missQ : null);
+    var showQ = atFinish(G) ? null : ((G.phase === 'question' && q) ? q : (G.phase === 'drive' && G.missHint && G.missQ ? G.missQ : null));
     if (showQ) {
       q = showQ;
       var pics = '';
@@ -873,7 +1123,7 @@
       '<div class="sr-race">' +
         '<div class="sr-pips" aria-hidden="true">' + pips + '</div>' +
         progressHtml(G) +
-        '<div class="sr-track ' + G.track + (boosting ? ' boosting' : '') + (slipping ? ' slipping' : '') + ((G.phase === 'question' || G.phase === 'drive') ? ' live' : '') + '" id="srTrack">' +
+        '<div class="sr-track ' + G.track + (boosting ? ' boosting' : '') + (slipping ? ' slipping' : '') + ((G.phase === 'question' || G.phase === 'drive') ? ' live' : '') + (W.locked ? ' sr-finish-lock' : '') + '" id="srTrack">' +
           trackStageHtml(G.track, cam, {
             meLeft: meLeft, opLeft: opLeft, obsLeft: obsLeft,
             me: carHtml(g.car, P.blob, '', boosting ? 'boosting' : (slipping ? 'slipping' : (G.phase === 'drive' || G.phase === 'question' ? 'rolling' : ''))),
@@ -1026,7 +1276,9 @@
     renderRace();
     setTimeout(function () {
       G.missHint = ''; G.missHintHtml = ''; G.missQ = null;
+      if (atFinish(G) || G.phase === 'podium') { busy = false; renderPodium(); return; }
       K.nextQuestion(G);
+      if (atFinish(G) || G.phase === 'podium') { busy = false; renderPodium(); return; }
       askedAt = Date.now();
       busy = false;
       renderRace();
@@ -1106,13 +1358,15 @@
   headerIcons();
   if (A.HowTo) A.HowTo.button('racers', '#srHome');
 
-  window.addEventListener('resize', function () { fitTrack(); fitQuestionCard(); });
+  window.addEventListener('resize', function () { if (screen === 'intro') layoutIntro(); fitTrack(); fitQuestionCard(); });
 
   window.__racers = {
     family: family, stats: stats,
     get G() { return G; },
     renderMenu: renderMenu, renderGarage: renderGarage, renderRace: renderRace, renderPodium: renderPodium,
     beginRace: beginRace, beginTwoRace: beginTwoRace, pickChoice: pickChoice, pickTwoChoice: pickTwoChoice,
+    renderIntro: renderIntro, wantIntro: wantIntro, INTRO: INTRO, layoutIntro: layoutIntro,
+    atFinish: atFinish, FINISH_AT: FINISH_AT,
     renderTwoPicker: renderTwoPicker,
     showQuestion: function () { if (G) { G.phase = 'question'; renderRace(); } },
     setObstacle: function (id) { if (G) { G.obstacle = id || 'tomato'; G.boss = true; G.phase = 'question'; renderRace(); } },

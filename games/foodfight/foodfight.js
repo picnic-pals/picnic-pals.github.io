@@ -7,6 +7,7 @@
   var stats = P.games.foodfight = P.games.foodfight || { matches: 0, best: 0, rules: false, less: false };
   var pose = ['thinking', 'thinking'];
   var advanceT = null, advanceGen = 0, celebrating = false;
+  var facedown = false, wildCelebrated = false, pendingLessTip = false, started = false;
   var CORRECT_WAIT = 1500, MISS_WAIT = 2500, TIE_WAIT = 1200, GIANT_WAIT = 1500, PARTY_WAIT = 2000, VOICE_POLL = 200, VOICE_CAP = 2500;
   var METER = F.METER || 5;
   function cancelAdvance() {
@@ -111,22 +112,32 @@
   // Familiar mirrored playing-card positions; corners show numerals only so kids count center pips.
   /* 1-5: dice / five-frame style. 6-10: one ten-frame (top row of 5, then the rest), never loose scatter. */
   function pipLayout(n) {
-    var i, r, c, out = [];
-    if (n <= 5) {
-      var dice = { 1:[[50,50]], 2:[[26,18],[74,82]], 3:[[26,18],[50,50],[74,82]], 4:[[26,18],[74,18],[26,82],[74,82]], 5:[[26,18],[74,18],[50,50],[26,82],[74,82]] };
-      return dice[n] || dice[1];
-    }
-    for (i = 0; i < n && i < 10; i++) { r = i < 5 ? 0 : 1; c = i % 5; out.push([18 + c * 16, 28 + r * 40]); }
-    return out;
+    var L = 24, R = 76, M = 50, i, out = [];
+    /* Classic playing-card layouts. Numerals stay in the corners only. */
+    if (n === 1) return [[M, 50]];
+    if (n === 2) return [[M, 22], [M, 78]];
+    if (n === 3) return [[M, 22], [M, 50], [M, 78]];
+    if (n === 4) return [[L, 22], [R, 22], [L, 78], [R, 78]];
+    if (n === 5) return [[L, 22], [R, 22], [M, 50], [L, 78], [R, 78]];
+    if (n === 6) return [[L, 20], [R, 20], [L, 50], [R, 50], [L, 80], [R, 80]];
+    if (n === 7) return [[L, 18], [R, 18], [L, 50], [M, 50], [R, 50], [L, 82], [R, 82]]; /* 2-3-2, never a crammed 5+2 that looks like 8 */
+    if (n === 8) return [[L, 18], [M, 18], [R, 18], [L, 50], [R, 50], [L, 82], [M, 82], [R, 82]];
+    if (n === 9) return [[L, 18], [M, 18], [R, 18], [L, 50], [M, 50], [R, 50], [L, 82], [M, 82], [R, 82]];
+    if (n === 10) { for (i = 0; i < 10; i++) out.push([14 + (i % 5) * 18, i < 5 ? 28 : 72]); return out; }
+    return [[M, 50]];
   }
   var layouts = {}; for (var n = 1; n <= 10; n++) layouts[n] = pipLayout(n);
   function card(c, side, glow, wild) {
+    var down = !example && facedown;
+    if (down) {
+      return '<button class="ff-card ff-back" data-side="' + side + '" disabled aria-label="' + (side ? 'Your' : 'Sunny’s') + ' card, face down">' + img(ART + 'back.png') + '</button>';
+    }
     var suit = side ? 'strawberry' : 'lemon', label = c.label || String(c.value), solve = label !== String(c.value);
     var shown = !solve || !!G.result;
     var h = '<button class="ff-card ' + (glow ? 'ff-glow ' : '') + (wild ? 'ff-wild ' : '') + (solve && G.result ? 'ff-solved ' : '') + '" data-side="' + side + '" aria-label="' + (side ? 'Your' : 'Sunny’s') + ' card: ' + (wild ? 'Picnic Basket wild' : A.esc(shown ? String(c.value) : label)) + '"' + (example || G.phase !== 'choose' ? ' disabled' : '') + '>';
     if (wild) return h + img(ART + 'wild.png') + '</button>';
     h += '<span class="ff-corner" aria-hidden="true"><b>' + (shown ? c.value : '?') + '</b></span><span class="ff-corner ff-invert" aria-hidden="true"><b>' + (shown ? c.value : '?') + '</b></span>';
-    if (c.value <= 10 && shown) h += '<span class="ff-pips" aria-hidden="true">' + layouts[c.value].map(function (p) { return '<i style="left:' + p[0] + '%;top:' + p[1] + '%">' + pip(suit) + '</i>'; }).join('') + '</span>';
+    if (c.value <= 10 && shown) h += '<span class="ff-pips" data-pips="' + c.value + '" aria-hidden="true">' + layouts[c.value].map(function (p) { return '<i style="left:' + p[0] + '%;top:' + p[1] + '%">' + pip(suit) + '</i>'; }).join('') + '</span>';
     if (solve && !G.result) h += '<span class="ff-equation">' + A.esc(label) + '<small>Solve first</small></span>';
     else if (solve && G.result) h += '<span class="ff-number">' + c.value + '</span><span class="ff-equation ff-revealed">' + A.esc(label) + '</span>';
     else if (!solve && c.value > 10) h += '<span class="ff-number">' + c.value + '</span><span class="ff-model" aria-hidden="true">' + A.PV100.blocks3(Math.floor(c.value / 100), Math.floor(c.value % 100 / 10), c.value % 10) + '</span>';
@@ -146,13 +157,38 @@
     if (!example && G.result && G.result.message) return G.result.message;
     if (!example && G.phase === 'tie') return "It's a tie! The next flip is for a giant splat.";
     if (!example && G.giant && G.phase === 'choose') return 'Tap who has ' + G.rule + '. This flip is for a giant splat.';
-    return example === 'more' ? 'More means a bigger amount. Sunny has 3. You have 5. 5 is more than 3. Tap the card with more.' : example === 'less' ? 'Less means a smaller amount. Sunny has 3. You have 5. 3 is less than 5. Tap the card with less.' : G.phase === 'wild' ? 'Wild! Pick a number ' + G.rule + ' than ' + G.cards[0].value + '.' : 'Tap who has ' + G.rule + '.';
+    return example === 'more' ? 'More means a bigger amount. Sunny has 3. You have 5. 5 is more than 3. Tap the card with more.' : example === 'less' ? 'Less means a smaller amount. Sunny has 3. You have 5. 3 is less than 5. Tap the card with less.' : G.phase === 'wild' ? wildSpeech() : 'Tap who has ' + G.rule + '.';
+  }
+  function wildSpeech() {
+    var n = (G.cards && G.cards[0] && G.cards[0].value) || 0;
+    return 'A Wild is your pick! Choose a number ' + G.rule + ' than ' + n + '.';
+  }
+  function wildChoices() {
+    var opts = F.wildOptions(G);
+    if (G.band && G.band.toddler) {
+      opts = opts.filter(function (n) { return G.rule === 'more' ? n > G.cards[0].value : n < G.cards[0].value; });
+      if (!opts.length) opts = [G.rule === 'less' ? G.cards[0].value - 1 : G.cards[0].value + 1];
+    }
+    return opts;
+  }
+  function wildPopup() {
+    if (example || facedown || G.phase !== 'wild') return '';
+    var n = G.cards[0].value;
+    var line = 'Choose a number that is ' + G.rule.toUpperCase() + ' than ' + n + '. That number goes on your card.';
+    var picks = wildChoices().map(function (v) { return '<button type="button" class="ff-pick" data-pick="' + v + '">' + v + '</button>'; }).join('');
+    return '<div class="ff-wild-pop" id="ffWildPop" role="dialog" aria-labelledby="ffWildTitle" aria-describedby="wildHint">' +
+      '<div class="ff-wild-card">' +
+      '<h2 id="ffWildTitle">Wild card!</h2>' +
+      '<p id="wildHint">' + line + '</p>' +
+      '<div class="ff-picker">' + picks + '</div>' +
+      '</div></div>';
   }
   function footer() {
-    if (example) return '<div class="ff-footer"><p class="ff-example-line">' + (example === 'more' ? '5 is MORE! More means a bigger amount.' : '3 is LESS! Less means a smaller amount.') + '</p><button class="ff-action" id="' + (example === 'less' ? 'lessStart' : 'ruleStart') + '">' + (returning ? 'Back to play' : "Let's play!") + '</button></div>';
+    if (example) return '<div class="ff-footer"><p class="ff-example-line">' + (example === 'more' ? '5 is MORE! More means a bigger amount.' : '3 is LESS! Less means a smaller amount.') + '</p><button class="ff-action" id="' + (example === 'less' ? 'lessStart' : 'ruleStart') + '">Back to play</button></div>';
     if (G.phase === 'tie') return '<div class="ff-footer"><p>The next flip is for a giant splat.</p></div>';
-    if (G.phase === 'wild') return '<div class="ff-footer"><p id="wildHint">Pick a number ' + G.rule.toUpperCase() + ' than ' + G.cards[0].value + '.</p><div class="ff-picker">' + F.wildOptions(G).map(function (n) { return '<button class="ff-pick" data-pick="' + n + '">' + n + '</button>'; }).join('') + '</div></div>';
+    if (G.phase === 'wild') return '<div class="ff-footer"><p id="wildHintLine">A Wild is your pick.</p></div>';
     if (G.result) return '<div class="ff-footer"><p role="status">' + G.result.message + '</p></div>';
+    if (facedown) return '<div class="ff-footer"><p>Here come the cards.</p></div>';
     return '<div class="ff-footer"><p>' + (G.giant ? 'This flip is for a giant splat!' : G.band.toddler ? 'Tap either card. Let’s splat!' : 'Both cards are up. Take your time.') + '</p></div>';
   }
   function bannerText(rule, tie) {
@@ -161,6 +197,8 @@
     if (G.result && G.result.party && G.result.correct) return 'Splat party!';
     if (G.result && G.result.correct && G.result.giant) return 'Giant splat!';
     if (G.result && G.result.correct) return 'Splat!';
+    if (!example && facedown) return 'Get ready!';
+    if (!example && G.phase === 'wild') return 'Wild card!';
     return 'Tap who has <strong>' + rule.toUpperCase() + '</strong>';
   }
   function render() {
@@ -169,16 +207,52 @@
     var cards = example ? [{ value: 3, suit: 'lemon' }, { value: 5, suit: 'strawberry' }] : G.cards;
     var rule = example || G.rule, tie = !example && G.phase === 'tie';
     var winning = example ? (example === 'less' ? 0 : 1) : G.result ? G.result.winner : -1;
-    $('#ffContent').innerHTML = '<div class="ff-table ' + (example ? 'ff-example ' : '') + (rule === 'less' ? 'ff-less' : '') + (G.giant && !G.result ? ' ff-giant-ready' : '') + '">' + friend(0) + '<div class="ff-mat ff-yellow">' + card(cards[0], 0, winning === 0, false) + '</div><div class="ff-banner" role="status">' + bannerText(rule, tie) + '</div><div class="ff-mat ff-pink">' + card(cards[1], 1, winning === 1, !example && G.wild && G.phase === 'wild') + '</div>' + friend(1) + footer() + '</div>';
+    $('#ffContent').innerHTML = '<div class="ff-table ' + (example ? 'ff-example ' : '') + (rule === 'less' ? 'ff-less' : '') + (G.giant && !G.result ? ' ff-giant-ready' : '') + '">' + friend(0) + '<div class="ff-mat ff-yellow">' + card(cards[0], 0, winning === 0, false) + '</div><div class="ff-banner" role="status">' + bannerText(rule, tie) + '</div><div class="ff-mat ff-pink">' + card(cards[1], 1, winning === 1, !example && !facedown && G.wild && G.phase === 'wild') + '</div>' + friend(1) + footer() + wildPopup() + '</div>';
     function bindTap(el, fn) { if (!el) return; if (A.UI && A.UI.onTap) A.UI.onTap(el, fn); else el.onclick = fn; }
     A.$$('.ff-mat').forEach(function (mat) {
       var cardEl = mat.querySelector('.ff-card'); if (!cardEl) return;
       mat.setAttribute('data-side', cardEl.getAttribute('data-side'));
       bindTap(mat, function () { tap(+cardEl.dataset.side); });
     });
-    A.$$('.ff-pick').forEach(function (el) { bindTap(el, function () { if (F.wildPick(G, +el.dataset.pick)) { render(); if (G.band.toddler) tap(1); } else { $('#wildHint').textContent = 'Look for ' + G.rule.toUpperCase() + ' than ' + G.cards[0].value + '.'; el.classList.add('ff-try'); var right = F.wildOptions(G).filter(function (n) { return G.rule === 'more' ? n > G.cards[0].value : n < G.cards[0].value; })[0]; $('[data-pick="' + right + '"]').classList.add('ff-glow'); } }); });
+    A.$$('.ff-pick').forEach(function (el) { bindTap(el, function () { pickWild(+el.dataset.pick, el); }); });
     var start = $('#ruleStart') || $('#lessStart'); if (start) bindTap(start, closeExample);
+    if (!example && !facedown && G.phase === 'wild') onWildShown();
     scheduleAdvance();
+  }
+  function pickWild(n, el) {
+    if (G.phase !== 'wild') return;
+    if (F.wildPick(G, n)) {
+      wildCelebrated = false;
+      facedown = false;
+      render();
+      tap(1);
+      return;
+    }
+    var hint = $('#wildHint');
+    if (hint) hint.textContent = 'Look for ' + G.rule.toUpperCase() + ' than ' + G.cards[0].value + '.';
+    if (el) el.classList.add('ff-try');
+    var right = F.wildOptions(G).filter(function (n) { return G.rule === 'more' ? n > G.cards[0].value : n < G.cards[0].value; })[0];
+    var good = $('[data-pick="' + right + '"]');
+    if (good) good.classList.add('ff-glow');
+  }
+  function skipMotion() {
+    try { if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return true; } catch (e) {}
+    try { if (navigator.webdriver) return true; } catch (e2) {}
+    try { if (/[?&]nointro=1(?:&|$)/.test(location.search || '')) return true; } catch (e3) {}
+    return false;
+  }
+  function onWildShown() {
+    if (wildCelebrated) return;
+    wildCelebrated = true;
+    if (A.Kit && A.Kit.celebrate) A.Kit.celebrate({ root: $('.ff-table') || $('#foodfight') || document.body, sfx: 'yay' });
+    else { A.Audio.sfx('bonus'); confetti(); }
+    say(wildSpeech(), 'prompt');
+  }
+  function kitRevealCards() {
+    if (A.Kit && A.Kit.reveal) {
+      A.$$('.ff-card').forEach(function (el) { A.Kit.reveal(el); });
+    }
+    flipCards();
   }
   function closeExample() {
     if (example === 'more') stats.rules = true; else stats.less = true;
@@ -186,20 +260,49 @@
     if (returning) { returning = false; render(); } else if (!G.flips) next(); else { render(); speakFirst(); }
   }
   function speakFirst() { if (!firstSpoken) { firstSpoken = true; say(instruction(), 'prompt'); } }
+  function flipUp() {
+    facedown = false;
+    render();
+    if (example) return;
+    kitRevealCards();
+    if (G.phase === 'wild') return; // spoken with the pop-up
+    speakFirst();
+    if (pendingLessTip && G.rule === 'less') {
+      pendingLessTip = false;
+      say('Less means a smaller amount. Tap the card with less.', 'prompt');
+    }
+    if (G.phase === 'tie') say("It's a tie!", 'prompt');
+  }
   function next() {
     cancelAdvance();
     celebrating = false;
-    pose = ['thinking', 'thinking']; F.deal(G);
-    if (G.rule === 'less' && !stats.less) { example = 'less'; returning = false; }
-    render(); if (!example) { reveal(); speakFirst(); }
-    if (G.phase === 'tie' && !example) say("It's a tie!", 'prompt');
-    // Toddler wild is a celebration, never a number quiz.
-    if (G.wild && G.band.toddler && !example) { F.wildPick(G, G.cards[0].value + 1); tap(1); }
+    wildCelebrated = false;
+    pose = ['thinking', 'thinking'];
+    F.deal(G);
+    if (G.rule === 'less' && !stats.less) { stats.less = true; pendingLessTip = true; A.Store.save(); }
+    facedown = true;
+    render();
+    if (skipMotion()) flipUp();
+    else setTimeout(flipUp, started ? 320 : 50);
+    started = true;
   }
-  function reveal() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  function beginPlay() {
+    stats.rules = true;
+    facedown = true;
+    if (!G.cards || !G.cards.length) {
+      G.cards = [{ value: 0, suit: 'lemon', label: '' }, { value: 0, suit: 'strawberry', label: '' }];
+      G.phase = 'ready';
+    }
+    render();
+    function go() { if (!G.flips) next(); }
+    if (skipMotion()) go();
+    else setTimeout(go, (A.Kit && A.Kit.INTRO_MS) ? A.Kit.INTRO_MS + 40 : 1140);
+  }
+  function flipCards() {
+    if (skipMotion()) return;
     A.$$('.ff-card').forEach(function (el) { if (el.animate) el.animate([{ transform: 'rotateY(90deg)' }, { transform: 'rotateY(0)' }], { duration: 350, easing: 'ease-out' }); });
   }
+  function reveal() { kitRevealCards(); }
   function tap(side) {
     if (example || G.phase !== 'choose') return;
     var r = F.choose(G, side); if (!r) { render(); return; }
@@ -290,6 +393,6 @@
   if (A.UI && A.UI.bindHome) A.UI.bindHome($('#ffHome'), home); else $('#ffHome').onclick = home;
   if (A.UI && A.UI.onTap) { A.UI.onTap($('#ffSpeak'), function () { say(instruction()); }); A.UI.onTap($('#ffHelp'), function () { if (!G.band.supported) return; cancelAdvance(); returning = G.flips > 0; example = 'more'; render(); }); }
   else { $('#ffSpeak').onclick = function () { say(instruction()); }; $('#ffHelp').onclick = function () { if (!G.band.supported) return; cancelAdvance(); returning = G.flips > 0; example = 'more'; render(); }; }
-  window.__foodfight = { G: G, render: render, next: next, results: results, cancelAdvance: cancelAdvance, continueTie: continueTie, CORRECT_WAIT: CORRECT_WAIT, MISS_WAIT: MISS_WAIT, TIE_WAIT: TIE_WAIT, GIANT_WAIT: GIANT_WAIT, PARTY_WAIT: PARTY_WAIT }; // same local inspection pattern as the other arcade games
-  if (!stats.rules) { example = 'more'; render(); } else next();
+  window.__foodfight = { G: G, render: render, next: next, results: results, cancelAdvance: cancelAdvance, continueTie: continueTie, pipLayout: pipLayout, forceFlip: function (a, b) { example = false; facedown = false; wildCelebrated = false; if (!G) { G = F.newMatch(P); window.__foodfight.G = G; } G.cards = [{ value: a, suit: 'lemon', label: String(a) }, { value: b, suit: 'strawberry', label: String(b) }]; G.phase = 'choose'; G.result = null; G.wild = false; G.giant = false; if (G.band && G.band.supported === false) G.band = { id: 'pk', min: 1, max: 10, supported: true, toddler: false }; render(); }, forceWild: function (v, rule) { example = false; facedown = false; wildCelebrated = false; if (!G) { G = F.newMatch(P); window.__foodfight.G = G; } v = v == null ? 6 : v; G.rule = rule || 'more'; G.cards = [{ value: v, suit: 'lemon', label: String(v) }, { value: v, suit: 'strawberry', label: 'wild' }]; G.phase = 'wild'; G.wild = true; G.result = null; G.giant = false; if (G.band && G.band.supported === false) G.band = { id: 'pk', min: 1, max: 10, supported: true, toddler: false }; render(); }, showFacedown: function () { example = false; facedown = true; if (!G.cards || !G.cards.length) { G.cards = [{ value: 0, suit: 'lemon', label: '' }, { value: 0, suit: 'strawberry', label: '' }]; G.phase = 'ready'; } G.result = null; render(); }, CORRECT_WAIT: CORRECT_WAIT, MISS_WAIT: MISS_WAIT, TIE_WAIT: TIE_WAIT, GIANT_WAIT: GIANT_WAIT, PARTY_WAIT: PARTY_WAIT }; // same local inspection pattern as the other arcade games
+  beginPlay();
 })(window.Arcade);

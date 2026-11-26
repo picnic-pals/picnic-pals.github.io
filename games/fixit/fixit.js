@@ -293,7 +293,7 @@
 
   $('#fxHome').onclick = home;
   $('#fxMeter').onclick = projectCard;
-  $('#fxScene').addEventListener('click', onSceneTap);
+  if (A.Kit && A.Kit.onPointer) A.Kit.onPointer($('#fxScene'), onSceneTap); else $('#fxScene').addEventListener('click', onSceneTap);
   $('#fxTray').addEventListener('click', function (e) { var b = e.target.closest('.fx-tool'); if (b) onTool(b.getAttribute('data-tool'), b); });
 
   function syncTapClass() {

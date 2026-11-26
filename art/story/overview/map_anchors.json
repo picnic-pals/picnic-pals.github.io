@@ -1,0 +1,384 @@
+{
+  "status": "locked",
+  "option": "A",
+  "note": "Each locked world gets its own cloud cluster. Draw cloud_<world>.png at (x, y) with size (w, h) in 1x stage px (or the % values, relative to the stage). The opaque core fully covers that world's zone bbox (checked: coverage = 1.0). Plate = the level marker spot (centre). Fade the cloud out when the world unlocks.",
+  "world_order": [
+    "meadow",
+    "lagoon",
+    "hills",
+    "woods",
+    "peaks",
+    "bay",
+    "caves"
+  ],
+  "landscape": {
+    "stage_1x": [
+      1024,
+      640
+    ],
+    "bg": "bg/map_A_landscape.png",
+    "bg_2x": "bg/map_A_landscape-2x.png",
+    "worlds": {
+      "meadow": {
+        "cloud": "clouds/landscape/cloud_meadow.png",
+        "cloud_2x": "clouds/landscape/cloud_meadow-2x.png",
+        "x": -10.5,
+        "y": 165.0,
+        "w": 235.0,
+        "h": 320.5,
+        "pct": {
+          "left": -1.03,
+          "top": 25.78,
+          "width": 22.95,
+          "height": 50.08
+        },
+        "zone_bbox_xyxy": [
+          20,
+          190,
+          190,
+          450
+        ],
+        "plate": [
+          103,
+          345
+        ],
+        "coverage": 1.0
+      },
+      "lagoon": {
+        "cloud": "clouds/landscape/cloud_lagoon.png",
+        "cloud_2x": "clouds/landscape/cloud_lagoon-2x.png",
+        "x": 160.5,
+        "y": 178.5,
+        "w": 194.5,
+        "h": 310.0,
+        "pct": {
+          "left": 15.67,
+          "top": 27.89,
+          "width": 18.99,
+          "height": 48.44
+        },
+        "zone_bbox_xyxy": [
+          190,
+          195,
+          330,
+          475
+        ],
+        "plate": [
+          255,
+          312
+        ],
+        "coverage": 1.0
+      },
+      "hills": {
+        "cloud": "clouds/landscape/cloud_hills.png",
+        "cloud_2x": "clouds/landscape/cloud_hills-2x.png",
+        "x": 301.0,
+        "y": 169.0,
+        "w": 192.5,
+        "h": 308.5,
+        "pct": {
+          "left": 29.39,
+          "top": 26.41,
+          "width": 18.8,
+          "height": 48.2
+        },
+        "zone_bbox_xyxy": [
+          330,
+          190,
+          465,
+          450
+        ],
+        "plate": [
+          395,
+          318
+        ],
+        "coverage": 1.0
+      },
+      "woods": {
+        "cloud": "clouds/landscape/cloud_woods.png",
+        "cloud_2x": "clouds/landscape/cloud_woods-2x.png",
+        "x": 434.0,
+        "y": 168.5,
+        "w": 191.5,
+        "h": 320.0,
+        "pct": {
+          "left": 42.38,
+          "top": 26.33,
+          "width": 18.7,
+          "height": 50.0
+        },
+        "zone_bbox_xyxy": [
+          462,
+          190,
+          597,
+          460
+        ],
+        "plate": [
+          527,
+          315
+        ],
+        "coverage": 1.0
+      },
+      "peaks": {
+        "cloud": "clouds/landscape/cloud_peaks.png",
+        "cloud_2x": "clouds/landscape/cloud_peaks-2x.png",
+        "x": 567.5,
+        "y": 144.5,
+        "w": 196.5,
+        "h": 338.0,
+        "pct": {
+          "left": 55.42,
+          "top": 22.58,
+          "width": 19.19,
+          "height": 52.81
+        },
+        "zone_bbox_xyxy": [
+          597,
+          165,
+          735,
+          455
+        ],
+        "plate": [
+          660,
+          312
+        ],
+        "coverage": 1.0
+      },
+      "bay": {
+        "cloud": "clouds/landscape/cloud_bay.png",
+        "cloud_2x": "clouds/landscape/cloud_bay-2x.png",
+        "x": 712.5,
+        "y": 162.5,
+        "w": 183.5,
+        "h": 334.5,
+        "pct": {
+          "left": 69.58,
+          "top": 25.39,
+          "width": 17.92,
+          "height": 52.27
+        },
+        "zone_bbox_xyxy": [
+          735,
+          180,
+          868,
+          470
+        ],
+        "plate": [
+          793,
+          312
+        ],
+        "coverage": 1.0
+      },
+      "caves": {
+        "cloud": "clouds/landscape/cloud_caves.png",
+        "cloud_2x": "clouds/landscape/cloud_caves-2x.png",
+        "x": 832.5,
+        "y": 163.5,
+        "w": 209.0,
+        "h": 290.5,
+        "pct": {
+          "left": 81.3,
+          "top": 25.55,
+          "width": 20.41,
+          "height": 45.39
+        },
+        "zone_bbox_xyxy": [
+          862,
+          185,
+          1010,
+          440
+        ],
+        "plate": [
+          918,
+          312
+        ],
+        "coverage": 1.0
+      }
+    }
+  },
+  "portrait": {
+    "stage_1x": [
+      400,
+      720
+    ],
+    "bg": "bg/map_A_portrait.png",
+    "bg_2x": "bg/map_A_portrait-2x.png",
+    "worlds": {
+      "meadow": {
+        "cloud": "clouds/portrait/cloud_meadow.png",
+        "cloud_2x": "clouds/portrait/cloud_meadow-2x.png",
+        "x": 13.5,
+        "y": 552.0,
+        "w": 325.5,
+        "h": 163.0,
+        "pct": {
+          "left": 3.38,
+          "top": 76.67,
+          "width": 81.38,
+          "height": 22.64
+        },
+        "zone_bbox_xyxy": [
+          40,
+          570,
+          320,
+          690
+        ],
+        "plate": [
+          183,
+          655
+        ],
+        "coverage": 1.0
+      },
+      "lagoon": {
+        "cloud": "clouds/portrait/cloud_lagoon.png",
+        "cloud_2x": "clouds/portrait/cloud_lagoon-2x.png",
+        "x": 64.0,
+        "y": 464.5,
+        "w": 290.0,
+        "h": 133.0,
+        "pct": {
+          "left": 16.0,
+          "top": 64.51,
+          "width": 72.5,
+          "height": 18.47
+        },
+        "zone_bbox_xyxy": [
+          90,
+          480,
+          330,
+          572
+        ],
+        "plate": [
+          197,
+          558
+        ],
+        "coverage": 1.0
+      },
+      "hills": {
+        "cloud": "clouds/portrait/cloud_hills.png",
+        "cloud_2x": "clouds/portrait/cloud_hills-2x.png",
+        "x": 68.5,
+        "y": 383.5,
+        "w": 255.0,
+        "h": 124.0,
+        "pct": {
+          "left": 17.12,
+          "top": 53.26,
+          "width": 63.75,
+          "height": 17.22
+        },
+        "zone_bbox_xyxy": [
+          95,
+          402,
+          305,
+          482
+        ],
+        "plate": [
+          198,
+          463
+        ],
+        "coverage": 1.0
+      },
+      "woods": {
+        "cloud": "clouds/portrait/cloud_woods.png",
+        "cloud_2x": "clouds/portrait/cloud_woods-2x.png",
+        "x": 81.5,
+        "y": 295.5,
+        "w": 247.0,
+        "h": 116.5,
+        "pct": {
+          "left": 20.38,
+          "top": 41.04,
+          "width": 61.75,
+          "height": 16.18
+        },
+        "zone_bbox_xyxy": [
+          98,
+          315,
+          310,
+          400
+        ],
+        "plate": [
+          200,
+          385
+        ],
+        "coverage": 1.0
+      },
+      "peaks": {
+        "cloud": "clouds/portrait/cloud_peaks.png",
+        "cloud_2x": "clouds/portrait/cloud_peaks-2x.png",
+        "x": 96.0,
+        "y": 204.0,
+        "w": 228.0,
+        "h": 119.5,
+        "pct": {
+          "left": 24.0,
+          "top": 28.33,
+          "width": 57.0,
+          "height": 16.6
+        },
+        "zone_bbox_xyxy": [
+          112,
+          222,
+          300,
+          312
+        ],
+        "plate": [
+          200,
+          300
+        ],
+        "coverage": 1.0
+      },
+      "bay": {
+        "cloud": "clouds/portrait/cloud_bay.png",
+        "cloud_2x": "clouds/portrait/cloud_bay-2x.png",
+        "x": 69.0,
+        "y": 122.0,
+        "w": 261.0,
+        "h": 109.5,
+        "pct": {
+          "left": 17.25,
+          "top": 16.94,
+          "width": 65.25,
+          "height": 15.21
+        },
+        "zone_bbox_xyxy": [
+          95,
+          138,
+          305,
+          220
+        ],
+        "plate": [
+          200,
+          212
+        ],
+        "coverage": 1.0
+      },
+      "caves": {
+        "cloud": "clouds/portrait/cloud_caves.png",
+        "cloud_2x": "clouds/portrait/cloud_caves-2x.png",
+        "x": 78.5,
+        "y": 14.5,
+        "w": 258.5,
+        "h": 143.0,
+        "pct": {
+          "left": 19.62,
+          "top": 2.01,
+          "width": 64.62,
+          "height": 19.86
+        },
+        "zone_bbox_xyxy": [
+          100,
+          32,
+          312,
+          132
+        ],
+        "plate": [
+          210,
+          123
+        ],
+        "coverage": 1.0
+      }
+    }
+  }
+}

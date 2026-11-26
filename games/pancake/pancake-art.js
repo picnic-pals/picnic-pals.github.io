@@ -35,6 +35,67 @@
   ];
 
   var ART = '../../art/pancake/';
+  var ANCHORS = {
+  "units": "1x stage px (double for -2x)",
+  "stage": {
+    "landscape": [
+      1024,
+      640
+    ],
+    "portrait": [
+      400,
+      720
+    ]
+  },
+  "notes": "you_plate = left (gold side, yellow placemat/runner); friend_plate = right (berry side, pink). Point = plate well (stack base). Pancake width ~0.46 x plate_w. friend_spot = friend foot point in the calm front strip on the friend (right) side, drawn on top with a contact shadow. counter_back_y = back edge of the counter/table if you ever want something to stand behind it.",
+  "status": "locked",
+  "option": "A",
+  "landscape": {
+    "you_plate": [
+      183,
+      418
+    ],
+    "friend_plate": [
+      773,
+      418
+    ],
+    "plate_w": 190,
+    "griddle": [
+      512,
+      418
+    ],
+    "griddle_w": 175,
+    "counter_back_y": 368,
+    "friend_spot": [
+      900,
+      628
+    ],
+    "friend_h": 190
+  },
+  "portrait": {
+    "you_plate": [
+      73,
+      393
+    ],
+    "friend_plate": [
+      313,
+      393
+    ],
+    "plate_w": 80,
+    "griddle": [
+      200,
+      393
+    ],
+    "griddle_w": 75,
+    "counter_back_y": 362,
+    "friend_spot": [
+      318,
+      640
+    ],
+    "friend_h": 150
+  }
+};
+  function pack(land) { return ANCHORS[land ? 'landscape' : 'portrait']; }
   var SRC = {
     stand_bg: ART + 'stand_bg_portrait.webp',
     stand_bg_portrait: ART + 'stand_bg_portrait.webp',
@@ -153,8 +214,10 @@
     opts = opts || {};
     var plateId = opts.plateId || 'plate';
     var plat = GEOM[plateId] || GEOM.plate;
-    var items = [{ typ: 'plate', id: plateId, x: 0, y: 0, s: 1 }];
-    var box = { minX: plat.bbox[0], minY: plat.bbox[1], maxX: plat.bbox[2], maxY: plat.bbox[3] };
+    var items = opts.noPlate ? [] : [{ typ: 'plate', id: plateId, x: 0, y: 0, s: 1 }];
+    var box = opts.noPlate
+      ? { minX: plat.anchor[0], minY: plat.anchor[1], maxX: plat.anchor[0], maxY: plat.anchor[1] }
+      : { minX: plat.bbox[0], minY: plat.bbox[1], maxX: plat.bbox[2], maxY: plat.bbox[3] };
     var groups = groupList(cakes);
     var widths = groups.map(function (g) { return pieceWidth(g.kind, g.cakes[0] && g.cakes[0].color); });
     var gap = 96;
@@ -339,7 +402,7 @@
   function stackStage(cakes, opts) {
     opts = opts || {};
     var plateId = opts.plateId || 'plate';
-    if (!has(plateId)) return '';
+    if (!opts.noPlate && !has(plateId)) return '';
     var availW = Math.max(40, opts.fitW || 280);
     var availH = Math.max(40, opts.fitH || 180);
     var m = measureStack(cakes, Object.assign({}, opts, { fitW: availW, fitH: availH }));
@@ -479,6 +542,7 @@
   A.PancakeArt = {
     NEEDED: NEEDED, SRC: SRC, src: src, has: has, GEOM: GEOM, pieceId: pieceId,
     cake: cake, pancake: pancakeSvg, waffle: waffleSvg, topping: toppingSvg, deco: decoSvg, plate: plateSvg,
+    ANCHORS: ANCHORS, pack: pack,
     thumb: thumb, stackStage: stackStage, fitWrap: fitWrap, measureStack: measureStack, groupList: groupList, kindOf: kindOf
   };
 })(window.Arcade);

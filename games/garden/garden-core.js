@@ -547,11 +547,11 @@
   function applyCorrect(p, G) {
     var st = G.state, plot = selectedPlot(st), id, need, before, job, after, unlocked, stage, soft, allDone;
     if (!plot || !plot.id) {
-      G.nudge = 'Tap a seed packet, then a patch of soil.';
+      G.nudge = 'Drag or tap a seed onto a clear dirt spot.';
       return { job: '', stage: 'empty', needPlant: true, unlocked: false, friend: null, sessionDone: false, allDone: unlockedCount(st) >= ids().length };
     }
     if (st.plants[plot.id] && st.plants[plot.id].unlocked) {
-      G.nudge = 'Tap a plant to water it, or plant a seed from the shelf.';
+      G.nudge = 'Tap a plant to water it, or drag a seed onto a clear dirt spot.';
       return { job: '', stage: 'pop', needPlant: true, unlocked: false, friend: plot.id, sessionDone: false, allDone: unlockedCount(st) >= ids().length };
     }
     id = plot.id;

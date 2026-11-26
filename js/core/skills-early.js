@@ -13,12 +13,37 @@
   function shade(hex, k) { var n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255; function f(v) { return Math.max(0, Math.min(255, Math.round(v * k))); } return 'rgb(' + f(r) + ',' + f(g) + ',' + f(b) + ')'; }
 
   /* ---------- pictures ---------- */
-  function emo(w) { var e = E.PICS[w]; if (A.Icons) { var opt = { word: w, size: 64, label: w, decorative: true, context: 'quiz' }; var has = A.Icons.has(e, opt); return A.Icons.html(e, Object.assign({ cls: has ? 'ea-emo pp-pic' : 'ea-emo' }, opt)); } return '<span class="ea-emo" aria-hidden="true">' + e + '</span>'; }
-  // batch-1107c: with the sound off, a picture cell also shows its word, so a picture with two names (bear / teddy) is not a guess
+  function emo(w) { var e = E.PICS[w]; if (A.Icons) { var opt = { word: w, size: 64, label: w, decorative: true, context: 'quiz', fallback: '' }; var has = A.Icons.has(e, opt) || A.Icons.has(w, opt); return has ? A.Icons.html(e || w, Object.assign({ cls: 'ea-emo pp-pic' }, opt)) : ''; } return ''; }
   function quiet() { return !!(A.SightWords && A.SightWords.quiet && A.SightWords.quiet()); }
-  function picCell(w, fact) { var p = E.pic(w); return { label: w, html: emo(w) + (quiet() ? '<small class="picw">' + A.esc(w) + '</small>' : ''), fact: fact, name: [p.line], k: w }; }
+  function littleReader() {
+    if (A.MunchRules && A.MunchRules.littleReader) return A.MunchRules.littleReader();
+    var p = (A.Steps && A.Steps.ctx && A.Steps.ctx.p) || (A.Store && A.Store.active && A.Store.active());
+    var a = A.Age && A.Age.of && A.Age.of(p);
+    return a == null || a < 6;
+  }
+  function hasArt(w) {
+    if (A.MunchRules && A.MunchRules.hasArt) return A.MunchRules.hasArt(w);
+    if (!A.Icons || !w) return false;
+    var opt = { word: w, context: 'quiz' };
+    return !!(A.Icons.has(E.PICS[w], opt) || A.Icons.has(w, opt));
+  }
+  function picCell(w, fact) {
+    var p = E.pic(w), img = hasArt(w) ? emo(w) : '';
+    if (!img && littleReader()) { if (A.MunchRules && A.MunchRules.notePic) A.MunchRules.notePic(w); }
+    var word = '<small class="picw">' + A.esc(w) + '</small>';
+    var html = littleReader() ? (img ? '<span class="ea-pw">' + img + word + '</span>' : wordHtml(w)) : wordHtml(w);
+    return { label: w, html: html, fact: fact, name: [p.line], k: w };
+  }
   // qquality1: muted (and preferred-with-sound) pools use only pictures with one clear name
-  function picPool(arr) { return E.clearPool ? E.clearPool(arr) : (arr || []).slice(); }
+  function picPool(arr) {
+    var pool = E.clearPool ? E.clearPool(arr) : (arr || []).slice();
+    if (littleReader()) {
+      var art = pool.filter(hasArt);
+      if (art.length) return art;
+      pool.forEach(function (w) { if (!hasArt(w) && A.MunchRules && A.MunchRules.notePic) A.MunchRules.notePic(w); });
+    }
+    return pool;
+  }
   function beginPool(ch) { var pool = picPool(E.BEGIN[ch] || []); return pool.length ? pool : (E.BEGIN[ch] || []).slice(); }
   // a blob of paint (color swatch)
   function swatch(id, cls) {
@@ -90,7 +115,11 @@
       function mk(cid) {
         var c = COL[cid], line = E.colorLine(cid);
         if (Math.random() < .35 || !c.things.length) return { label: cid + ' paint', html: swatch(cid), fact: ['w_thats', line], name: [line], k: cid, color: cid };
-        var w = pick(c.things), p = E.pic(w); return { label: w, html: emo(w), fact: [p.line, p.pl ? 'w_are' : 'w_is', line], name: [p.line], k: cid, color: cid };
+        var things = (c.things || []).slice(), art = things.filter(hasArt);
+        if (art.length) things = art;
+        var w = pick(things), p = E.pic(w), img = emo(w);
+        if (!img && A.MunchRules && A.MunchRules.notePic) A.MunchRules.notePic(w);
+        return { label: w, html: img || wordHtml(w), fact: [p.line, p.pl ? 'w_are' : 'w_is', line], name: [p.line], k: cid, color: cid };
       }
       return { text: 'Munch the ' + swatch(T, 'ea-mini') + ' ' + em(T) + ' things', hint: 'Look for ' + T + '!', say: ['rule_color_' + T], target: T,
         good: function () { return mk(T); },
@@ -122,7 +151,7 @@
   function startsRule() {
     var letters = Object.keys(START_WORDS), T = pick(letters);
     function mk(ch) { var w = pick(START_WORDS[ch]); return { label: w, html: wordHtml(w), fact: [{ text: w + ' starts with ' + ch.toUpperCase() }], name: [{ text: w }], k: ch }; }
-    return { starts: true, listen: true, text: 'Munch the words that start with ' + em(T.toUpperCase()), hint: 'Listen for the first sound.', say: ['rule_begins', 'lt_' + T], target: T,
+    return { starts: true, listen: true, reading: true, sayWord: true, deckKind: 'starts', text: 'Munch the ones that start with ' + em(T.toUpperCase()), hint: 'Listen for the first sound.', say: ['rule_begins', 'lt_' + T], target: T,
       good: function () { return mk(T); }, bad: function () { return mk(pick(others(letters, T))); } };
   }
   /* ----- Letters (Reading & Words) ----- */
@@ -133,7 +162,7 @@
       if (olderLetters()) return startsRule();
       var pool = L ? E.LETTERS_BOTH : E.LETTERS, T = pick(pool);
       function mk(ch) { var up = !L || Math.random() < .5, s = up ? ch.toUpperCase() : ch; return { label: s, html: ltrHtml(s), fact: ['w_thats', 'lt_' + ch], name: ['lt_' + ch], k: ch }; }
-      return { text: 'Munch the letter ' + em(L ? T.toUpperCase() + ' ' + T : T.toUpperCase()), hint: L ? 'Big ' + T.toUpperCase() + ' and little ' + T + '!' : 'Find ' + T.toUpperCase() + '!',
+      return { reading: true, sayWord: true, deckKind: 'letters', text: 'Munch the letter ' + em(L ? T.toUpperCase() + ' ' + T : T.toUpperCase()), hint: L ? 'Big ' + T.toUpperCase() + ' and little ' + T + '!' : 'Find ' + T.toUpperCase() + '!',
         say: L ? ['rule_letter', 'lt_' + T, 'w_big_little'] : ['rule_letter', 'lt_' + T], target: T,
         good: function () { return mk(T); },
         bad: function () { var close = (E.LETTER_CLOSE[T] || '').split('').filter(function (x) { return pool.indexOf(x) >= 0; }); return mk(close.length && Math.random() < (L ? .55 : .3) ? pick(close) : pick(others(pool, T))); } };
@@ -150,7 +179,7 @@
       if (!lets.length) lets = lets0.slice();
       var T = pick(lets), anchor = pick(beginPool(T));
       function mk(ch) { var w = pick(beginPool(ch)); return picCell(w, [E.pic(w).line, 'w_starts_with', 'lt_' + ch]); }
-      return { text: 'Munch the things that start with ' + em(T.toUpperCase()), hint: 'Like ' + E.PICS[anchor] + ' ' + anchor + '!', say: ['rule_begins', 'lt_' + T, 'w_like', E.pic(anchor).line], target: T,
+      return { reading: true, sayWord: true, starts: true, deckKind: 'starts', text: 'Munch the ones that start with ' + em(T.toUpperCase()), hint: 'Like ' + anchor + '!', say: ['rule_begins', 'lt_' + T, 'w_like', E.pic(anchor).line], target: T,
         good: function () { return mk(T); }, bad: function () {
           var badLets = (L ? all : lets.concat(pick([['f', 'g'], ['h', 'k'], ['l', 'r'], ['w', 'f']]))).filter(function (ch) { return ch !== T && beginPool(ch).length; });
           if (!badLets.length) badLets = others(all, T);
@@ -174,7 +203,7 @@
       far = far.concat(picPool(E.RHYME_OTHERS));
       if (!far.length) { E.RHYME_LEVELS[L].forEach(function (k) { if (k !== setId) far = far.concat(E.RHYMES[k]); }); far = far.concat(E.RHYME_OTHERS); }
       var same = Object.keys(E.PICS).filter(function (w) { return E.isClearPic ? E.isClearPic(w) : true; }).filter(function (w) { return w.charAt(0) === T.charAt(0) && RHY_ALL[w] !== setId && w.indexOf(' ') < 0 && E.RHYME_OTHERS.concat(Object.keys(RHY_ALL)).indexOf(w) >= 0; });
-      return { text: 'Munch the things that rhyme with ' + em(E.PICS[T] + ' ' + T), hint: 'Does it end like ' + T + '?', say: ['rule_rhymes', tl], target: T,
+      return { reading: true, sayWord: true, rhymes: true, deckKind: 'rhymes', text: 'Munch the ones that rhyme with ' + em(T), hint: 'Does it end like ' + T + '?', say: ['rule_rhymes', tl], target: T,
         good: function () { var w = pick(others(set, T)); return picCell(w, [E.pic(w).line, 'w_rhymes_with', tl]); },
         bad: function () { var w = L && same.length && Math.random() < .4 ? pick(same) : pick(far); return picCell(w, [E.pic(w).line, 'w_no_rhyme', tl]); } };
     } });
@@ -195,7 +224,7 @@
       var ok = pool.filter(function (w) { return !alike(w, T); });
       var like = ok.filter(function (w) { return w.charAt(0).toLowerCase() === T.charAt(0).toLowerCase() || w.length === T.length; });
       function mk(w) { return { label: w, html: wordHtml(w), fact: w === T ? ['sw_that_says', swLine(w)] : ['rule_sight', swLine(T)], name: [], k: w.toLowerCase() }; }
-      return A.SightWords.mute({ text: '<span class="listen">Listen and find the word</span>', listen: true, hint: SIGHT_HINT, say: ['rule_sight', swLine(T)], target: T,
+      return A.SightWords.mute({ text: '<span class="listen">Munch the word you hear</span>', listen: true, reading: true, sayWord: true, deckKind: 'sight', hint: SIGHT_HINT, say: ['rule_sight', swLine(T)], target: T,
         good: function () { return mk(T); }, bad: function () { return mk(like.length && Math.random() < (L ? .55 : .3) ? pick(like) : pick(ok)); } }, pool, mk);
     } });
   SK[5].ask = askFrom(SK[5].gen, function (r) { return r.cloze ? { text: r.text, listen: false, say: r.say || [] } : { text: '<span class="listen">Listen and find the word</span>', listen: true, say: ['sw_find', swLine(r.target)] }; });

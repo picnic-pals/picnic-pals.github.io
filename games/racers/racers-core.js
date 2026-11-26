@@ -533,7 +533,7 @@
     if (correct) { race._streak = (race._streak || 0) + 1; race._misses = 0; }
     else { race._streak = 0; race._misses = (race._misses || 0) + 1; }
     race.i++;
-    if (race.i >= race.n) return finishRace(race, family, p, opt);
+    if (race.i >= race.n || race.playerDist >= TRACK_LEN) return finishRace(race, family, p, opt);
     race.phase = 'drive';
     race.obstacle = (race.obstacles.indexOf(race.i) >= 0) ? pick(rngOf(race.rng), FOODS).id : null;
     return { correct: correct, race: race, done: false };
@@ -552,7 +552,7 @@
       }
       return race;
     }
-    if (race.i >= race.n) return race;
+    if (race.i >= race.n || race.playerDist >= TRACK_LEN) return race;
     race.phase = 'question';
     return race;
   }
@@ -570,7 +570,7 @@
     if (correct) s.dist += s.base + s.boost;
     else s.dist += s.base;
     s.i++;
-    if (s.i >= s.n) { s.done = true; s.phase = 'done'; }
+    if (s.i >= s.n || s.dist >= TRACK_LEN) { s.done = true; s.phase = 'done'; }
     else s.phase = 'drive';
     race.playerDist = race.sides[0].dist;
     race.oppDist = race.sides[1].dist;
@@ -679,17 +679,32 @@
   }
 
   var TRACK_ART = {
-    picnic: { folder: 'bg_picnic_park_v4', layers: ['sky', 'far', 'mid', 'road', 'near'] },
+    picnic: {
+      style: 'A',
+      layers: ['tile', 'road'],
+      farRate: 0.55,
+      roadRate: 1,
+      tileSize: { landscape: [791, 640], portrait: [890, 720] },
+      files: {
+        tile: { landscape: 'track/track_A_tile_landscape.webp', portrait: 'track/track_A_tile_portrait.webp' },
+        road: { landscape: 'track/track_A_road_landscape.webp', portrait: 'track/track_A_road_portrait.webp' }
+      }
+    },
     candy: { folder: 'bg_candy_lane_v4', layers: ['sky', 'far', 'mid', 'road', 'near'] },
     pizza: { folder: 'bg_pizza_speedway_v4', layers: ['sky', 'mid', 'road', 'near'] }
   };
-  function trackLayerSrc(track, layer, root) {
+  function trackLayerSrc(track, layer, root, orient) {
     var t = TRACK_ART[track] || TRACK_ART.picnic;
+    if (t.style === 'A' && t.files) {
+      var rec = t.files[layer] || t.files.tile;
+      var o = (orient === 'portrait' || orient === 'landscape') ? orient : 'landscape';
+      return (root || '') + 'art/racers/' + rec[o];
+    }
     return (root || '') + 'art/racers/env/tracks/layers/' + t.folder + '/' + layer + '.png';
   }
 
   A.Racers = {
-    NQ: NQ, TRACK_LEN: TRACK_LEN, BASE: BASE, BOOST: BOOST, GHOST: GHOST, UPGRADE_COST: UPGRADE_COST, MISS_PENALTY: MISS_PENALTY, FOODS: FOODS, BY: BY, PARTS: PARTS, TRACKS: TRACKS,
+    NQ: NQ, TRACK_LEN: TRACK_LEN, BASE: BASE, BOOST: BOOST, reachedFinish: function (d) { return d >= TRACK_LEN; }, GHOST: GHOST, UPGRADE_COST: UPGRADE_COST, MISS_PENALTY: MISS_PENALTY, FOODS: FOODS, BY: BY, PARTS: PARTS, TRACKS: TRACKS,
     PART_ALIAS: PART_ALIAS, ART: ART,
     migrateId: migrateId, partFile: partFile, partSrc: partSrc, spoilerMount: spoilerMount, spoilerFoot: spoilerFoot, seatOf: seatOf,
     TRACK_ART: TRACK_ART, trackLayerSrc: trackLayerSrc,

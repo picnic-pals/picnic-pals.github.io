@@ -76,6 +76,79 @@
   var HOUR_PIVOT = [120, 276], HOUR_SIZE = [240, 328];
   var MIN_PIVOT = [90, 384], MIN_SIZE = [180, 436];
   var HUB_PIVOT = [60, 60], HUB_SIZE = [120, 120];
+  var ANCHORS = {
+  "units": "1x stage px (double for -2x)",
+  "stage": {
+    "landscape": [
+      1024,
+      640
+    ],
+    "portrait": [
+      400,
+      720
+    ]
+  },
+  "notes": "A (mode oven): draw locked oven.png bottom-centred on oven_bottom_center at oven_height px tall (scale = oven_scale_1x); clock_face/hands/hub behind it at clock_center with clock_scale_1x (= oven scale x 0.4253, per the locked anchors). B (mode frame): clock_face straight in the wall frame, centred on clock_center, rim radius clock_outer_r (scale clock_scale_1x); hands/hub same scale. customers = [foot_x, foot_y, height] for waiting customers (contact shadow under feet). Mockup time 3:00.",
+  "status": "locked",
+  "option": "A",
+  "landscape": {
+    "mode": "oven",
+    "oven_bottom_center": [
+      508,
+      394
+    ],
+    "oven_height": 330,
+    "customers": [
+      [
+        700,
+        630,
+        240
+      ],
+      [
+        880,
+        630,
+        165
+      ]
+    ],
+    "pickup_counter_top_y": 395,
+    "clock_center": [
+      507.5,
+      237.6
+    ],
+    "clock_outer_r": 74.8,
+    "oven_scale_1x": 0.3503,
+    "clock_scale_1x": 0.149
+  },
+  "portrait": {
+    "mode": "oven",
+    "oven_bottom_center": [
+      200,
+      282
+    ],
+    "oven_height": 232,
+    "customers": [
+      [
+        215,
+        600,
+        190
+      ],
+      [
+        325,
+        606,
+        130
+      ]
+    ],
+    "pickup_counter_top_y": 282,
+    "clock_center": [
+      199.6,
+      172.0
+    ],
+    "clock_outer_r": 52.6,
+    "oven_scale_1x": 0.2463,
+    "clock_scale_1x": 0.1047
+  }
+};
+  function pack(land) { return ANCHORS[land ? 'landscape' : 'portrait']; }
   var CLOCK_SCALE = 0.4253; /* recommended scale of the 1024 face into the oven cutout */
 
 
@@ -300,7 +373,7 @@
   }
 
   A.BakeShopArt = {
-    NEEDED: NEEDED, SRC: SRC, src: src, CLOCK_SCALE: CLOCK_SCALE,
+    NEEDED: NEEDED, SRC: SRC, src: src, CLOCK_SCALE: CLOCK_SCALE, ANCHORS: ANCHORS, pack: pack,
     clock: clockSvg, treat: treat, deco: deco, oven: ovenFrame,
     treatSvg: TREAT_SVG, decoSvg: DECO_SVG,
     bigClock: bigClock, cake: cake, treatSrc: treatSrc, KNOB: KNOB, HAND_LEN: HAND_LEN, NUM: NUM, numXY: numXY

@@ -2456,11 +2456,10 @@ html.stage-on[data-stage="portrait"] .sr-qcard #srCardSpeak {
   z-index: 2;
 }
 html.stage-on[data-stage="portrait"] .sr-ask {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
+  min-height: 1.25em;
   max-height: none;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
   font-size: 28px;
   padding-right: 52px;
   grid-column: auto;
@@ -2504,4 +2503,221 @@ html.stage-on[data-stage="portrait"] .sr-race .sr-qcard .cv-set,
 html.stage-on[data-stage="portrait"] .sr-race .sr-fact .cv-set,
 html.stage-on[data-stage="portrait"] .sr-race .sr-qcard .cv-set.cv-foods {
   --cv-d: 22px;
+}
+
+/* Keep the finish line planted once it is in view: no camera ease, no scrolling road under the flag. */
+.sr-track.sr-finish-lock .sr-par,
+.sr-track.sr-finish-lock .sr-world,
+.sr-track.sr-finish-lock .sr-far,
+.sr-track.sr-finish-lock .sr-mid { transition: none; }
+.sr-track.sr-finish-lock .sr-par-road { animation: none; }
+.sr-finish { transition: none; }
+
+
+/* Scene A3b: Gingham gantry intro. Layer order: scene, karts, fg at 0,0. Fade or cut to the race, never a pan. */
+html.stage-on body.sr-on-intro #racers { overflow: hidden; }
+html.stage-on body.sr-on-intro .sr-header {
+  position: absolute; left: 0; right: 0; top: 0; z-index: 20;
+  padding: 6px 10px 0; box-sizing: border-box;
+}
+html.stage-on body.sr-on-intro #srContent {
+  position: absolute; inset: 0;
+  display: block;
+  gap: 0;
+}
+.sr-intro {
+  position: absolute; inset: 0;
+  overflow: hidden;
+  z-index: 8;
+}
+.sr-intro.leave { opacity: 0; transition: opacity .45s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .sr-intro.leave { opacity: 0; transition: none; }
+}
+.sr-intro-scene, .sr-intro-fg {
+  position: absolute; left: 0; top: 0;
+  width: 100%; height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  border: 0;
+}
+.sr-intro-scene { z-index: 1; }
+.sr-intro-kart {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+.sr-intro-kart.far { z-index: 2; }
+.sr-intro-kart.near { z-index: 3; }
+.sr-intro-kart .sr-kart {
+  --sz: 100%;
+  width: 100%;
+  height: 100%;
+  filter: none;
+}
+.sr-intro-shadow {
+  position: absolute;
+  left: 18%;
+  right: 10%;
+  bottom: 16%;
+  height: 12%;
+  background: rgba(59, 45, 85, .32);
+  border-radius: 50%;
+  filter: blur(2px);
+  z-index: 0;
+  pointer-events: none;
+}
+.sr-intro-fg { z-index: 4; }
+.sr-intro-go {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 6;
+  min-width: 160px;
+  min-height: max(60px, calc(60px / var(--stage-scale, 1)));
+  pointer-events: auto;
+}
+
+
+/* Track A Picnic road + light race FX. Far tile repeats sideways; road scrolls faster. */
+.sr-track.picnic .sr-stage-a {
+  top: 0;
+  height: 100%;
+  width: 100%;
+}
+/* Landscape question card overlaps the bottom ~148px of the track. Crop Track A
+   so the road and karts sit in the visible band (art y ~360–640 of the 640 tile). */
+html.stage-on[data-stage="landscape"] .sr-track.picnic .sr-stage-a {
+  height: calc(640 * var(--ts) * 1px);
+  top: calc(-360 * var(--ts) * 1px);
+}
+.sr-track.picnic .sr-par-art-a {
+  width: auto;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+.sr-track.picnic .sr-par-art-a img {
+  width: auto;
+  height: 100%;
+  aspect-ratio: 791 / 640;
+  object-fit: fill;
+  flex-shrink: 0;
+  display: block;
+}
+html[data-stage="portrait"] .sr-track.picnic .sr-par-art-a img,
+html.stage-on[data-stage="portrait"] .sr-track.picnic .sr-par-art-a img {
+  aspect-ratio: 890 / 720;
+}
+.sr-track.picnic .sr-par-tile { z-index: 1; }
+.sr-track.picnic .sr-par-road { z-index: 3; }
+.sr-track.picnic .sr-par-actors { z-index: 7; }
+/* Lanes as a fraction of the full tile height (mockup ground / 640 or 720). */
+.sr-track.picnic { --gy-opp-pct: 70; --gy-me-pct: 80.9375; }
+html[data-stage="portrait"] .sr-track.picnic,
+html.stage-on[data-stage="portrait"] .sr-track.picnic {
+  --gy-opp-pct: 71.11;
+  --gy-me-pct: 82.22;
+}
+.sr-track.picnic .sr-lane > div {
+  top: calc(var(--gy-pct) * 1%);
+}
+.sr-track.picnic .sr-lane.opp { --gy-pct: var(--gy-opp-pct); }
+.sr-track.picnic .sr-lane.me { --gy-pct: var(--gy-me-pct); }
+.sr-track.picnic .sr-finish,
+.sr-track.picnic .sr-start {
+  top: calc(var(--gy-opp-pct) * 1% - 8%);
+  height: 22%;
+  background: none;
+  box-shadow: none;
+  border: 0;
+  width: 36px;
+}
+.sr-finish-flag {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 36px;
+  height: auto;
+  transform: translateX(-50%);
+  pointer-events: none;
+  display: block;
+}
+.sr-prog-flag img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Light, local FX. Streaks only while boosting; trails sit behind the kart. */
+.sr-kart-fx {
+  position: absolute;
+  right: 78%;
+  top: 48%;
+  width: 72px;
+  height: 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+.sr-fx-trail, .sr-fx-puff {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  opacity: 0;
+}
+.sr-fx-trail {
+  left: 0; top: 8px;
+  width: 72px; height: auto;
+}
+.sr-fx-puff {
+  right: 0; top: 0;
+  width: 40px; height: auto;
+}
+.sr-track.live .sr-lane.me .sr-fx-trail { opacity: 0.7; }
+.sr-track.boosting .sr-lane.me .sr-fx-trail { opacity: 0.95; }
+.sr-track.boosting .sr-lane.me .sr-fx-puff,
+.sr-track.live .sr-lane.me .sr-fx-puff {
+  opacity: 0.8;
+  animation: srPuff 0.7s ease-out infinite;
+}
+.sr-fx-streaks {
+  position: absolute;
+  inset: 38% 0 18% 0;
+  z-index: 6;
+  pointer-events: none;
+  opacity: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 8%;
+}
+.sr-fx-streaks img {
+  width: 18%;
+  height: auto;
+  opacity: 0.55;
+  display: block;
+}
+.sr-track.boosting .sr-fx-streaks {
+  opacity: 1;
+  animation: srStreak 0.9s linear infinite;
+}
+@keyframes srPuff {
+  from { transform: translate(0, 0) scale(0.7); opacity: 0.8; }
+  to { transform: translate(-18px, -6px) scale(1.1); opacity: 0; }
+}
+@keyframes srStreak {
+  from { transform: translateX(6%); }
+  to { transform: translateX(-8%); }
+}
+.sr-track.sr-finish-lock .sr-fx-streaks,
+.sr-track.sr-finish-lock .sr-fx-puff { animation: none; opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .sr-fx-streaks, .sr-fx-puff, .sr-fx-trail { animation: none !important; }
+  .sr-track.boosting .sr-fx-streaks { opacity: 0; }
+  .sr-track.live .sr-lane.me .sr-fx-trail,
+  .sr-track.boosting .sr-lane.me .sr-fx-trail { opacity: 0.45; }
+  .sr-track.boosting .sr-lane.me .sr-fx-puff { opacity: 0; }
 }

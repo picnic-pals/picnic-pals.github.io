@@ -1,0 +1,218 @@
+{
+  "units": "1x stage px (multiply by 2 for -2x files)",
+  "stage": {
+    "landscape": [
+      1024,
+      640
+    ],
+    "portrait": [
+      400,
+      720
+    ]
+  },
+  "play_band": "scene art keeps the bed and friend in the upper 2/3; the bottom 1/3 is calm lawn for the seed tray/card. With UI kit set B: landscape keep y<180 (title+card) and y>500 (shelf tray) free of key art; portrait keep y<160 and y>472 free (card at y=482 for Garden)",
+  "friend_note": "Draw the player's friend sprite with its feet (body bottom, not any baked shadow) at foot, and props/contact_shadow.png centred on foot under it (width ~1.05x the sprite width).",
+  "seed_types": [
+    "peapod",
+    "potato",
+    "tomato",
+    "cherries",
+    "pumpkin"
+  ],
+  "status": "locked",
+  "option": "A",
+  "landscape": {
+    "file": "bg/garden_A_landscape.png",
+    "file_2x": "bg/garden_A_landscape-2x.png",
+    "dirt_patch": {
+      "bbox_xywh": [
+        123,
+        307,
+        372,
+        75
+      ],
+      "safe_drop_bbox_xyxy": [
+        133,
+        312,
+        487,
+        377
+      ],
+      "polygon": [
+        [
+          123,
+          381
+        ],
+        [
+          493,
+          381
+        ],
+        [
+          494,
+          377
+        ],
+        [
+          453,
+          311
+        ],
+        [
+          422,
+          307
+        ],
+        [
+          179,
+          309
+        ],
+        [
+          172,
+          313
+        ]
+      ]
+    },
+    "drop_spots": [
+      {
+        "id": 1,
+        "row": 0,
+        "col": 0,
+        "x": 196,
+        "y": 331
+      },
+      {
+        "id": 2,
+        "row": 0,
+        "col": 1,
+        "x": 310,
+        "y": 331
+      },
+      {
+        "id": 3,
+        "row": 0,
+        "col": 2,
+        "x": 423,
+        "y": 331
+      },
+      {
+        "id": 4,
+        "row": 1,
+        "col": 0,
+        "x": 196,
+        "y": 360
+      },
+      {
+        "id": 5,
+        "row": 1,
+        "col": 1,
+        "x": 310,
+        "y": 360
+      },
+      {
+        "id": 6,
+        "row": 1,
+        "col": 2,
+        "x": 423,
+        "y": 360
+      }
+    ],
+    "friend": {
+      "foot": [
+        675,
+        415
+      ],
+      "height": 150
+    }
+  },
+  "portrait": {
+    "file": "bg/garden_A_portrait.png",
+    "file_2x": "bg/garden_A_portrait-2x.png",
+    "dirt_patch": {
+      "bbox_xywh": [
+        49,
+        348,
+        254,
+        65
+      ],
+      "safe_drop_bbox_xyxy": [
+        56,
+        351,
+        298,
+        409
+      ],
+      "polygon": [
+        [
+          49,
+          412
+        ],
+        [
+          302,
+          409
+        ],
+        [
+          273,
+          351
+        ],
+        [
+          147,
+          348
+        ],
+        [
+          85,
+          350
+        ],
+        [
+          78,
+          356
+        ]
+      ]
+    },
+    "drop_spots": [
+      {
+        "id": 1,
+        "row": 0,
+        "col": 0,
+        "x": 99,
+        "y": 368
+      },
+      {
+        "id": 2,
+        "row": 0,
+        "col": 1,
+        "x": 177,
+        "y": 368
+      },
+      {
+        "id": 3,
+        "row": 0,
+        "col": 2,
+        "x": 254,
+        "y": 368
+      },
+      {
+        "id": 4,
+        "row": 1,
+        "col": 0,
+        "x": 99,
+        "y": 394
+      },
+      {
+        "id": 5,
+        "row": 1,
+        "col": 1,
+        "x": 177,
+        "y": 394
+      },
+      {
+        "id": 6,
+        "row": 1,
+        "col": 2,
+        "x": 254,
+        "y": 394
+      }
+    ],
+    "friend": {
+      "foot": [
+        50,
+        456
+      ],
+      "height": 78
+    }
+  }
+}

@@ -5,14 +5,18 @@ html, body { margin: 0; height: 100%; background: #f6e3c4; color: #3a2714; }
 #bakeshop {
   position: relative; width: 400px; height: 720px; margin: 0 auto; overflow: hidden;
   font: 600 16px/1.2 var(--font, system-ui), system-ui, sans-serif; color: #3a2714;
-  background: #f6e3c4;
+  background-color: #f6e3c4;
+  background-image: url("../../art/bakeshop/shop_bg_portrait.webp");
+  background-size: 100% 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 html.stage-on .stage-scale #bakeshop { width: 100%; height: 100%; }
 #bakeshop button { font-family: inherit; color: #3a2714; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 #bakeshop [hidden] { display: none !important; }
 
 /* ---------- header ---------- */
-.bs-header { position: absolute; top: 4px; left: 8px; right: 8px; height: var(--tap, 60px); display: flex; align-items: center; gap: 8px; }
+.bs-header { position: absolute; top: 4px; left: 8px; right: 8px; height: var(--tap, 60px); display: flex; align-items: center; gap: 8px; z-index: 21; }
 .bs-header h1 { flex: 1; margin: 0; text-align: center; font-size: 24px; font-weight: 700; color: #6b3a22; white-space: nowrap; }
 .bs-header button {
   width: 72px; height: var(--tap, 60px); min-width: var(--tap, 60px); min-height: var(--tap, 60px);
@@ -37,10 +41,10 @@ body.bs-right .bs-tk-friend { animation: bsHop .5s ease 2; }
 /* ---------- clock panel ---------- */
 .bs-panel {
   position: absolute; top: calc(84px + var(--tap, 60px)); left: 8px; width: 384px; height: calc(550px - 2 * var(--tap, 60px)); box-sizing: border-box;
-  border: 3px solid #5a3d1c; border-radius: 22px; overflow: hidden;
-  background: #f3d7b0 url("../../art/bakeshop/shop_bg_portrait.webp") center 55% / cover no-repeat;
+  border: 0; border-radius: 22px; overflow: visible;
+  background: transparent;
 }
-.bs-panel::before { content: ""; position: absolute; inset: 0; background: rgba(255, 246, 228, .55); pointer-events: none; }
+.bs-panel::before { display: none; content: none; }
 .bs-pill {
   position: absolute; top: 5px; z-index: 2; width: 96px; height: var(--tap, 60px);
   min-width: var(--tap, 60px); min-height: var(--tap, 60px); box-sizing: border-box;
@@ -119,7 +123,11 @@ body.bs-toddler .bs-clockwrap { top: 20px; left: 0; right: auto; margin: 0; widt
 .bs-lg-m i { width: 30px; background: #1f2a44; }
 
 /* ---------- overlays ---------- */
-.bs-overlay { position: absolute; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; }
+.bs-overlay { position: absolute; left: 0; right: 0; bottom: 0; top: calc(8px + var(--tap, 60px)); z-index: 18; display: flex; align-items: center; justify-content: center; }
+html[data-stage="portrait"] .bs-overlay,
+.bs-header.pp-kit-stack ~ .bs-overlay {
+  top: calc(8px + var(--tap, 60px) + 106px);
+}
 .bs-ov-back { position: absolute; inset: 0; background: rgba(58, 39, 20, .45); }
 .bs-card {
   position: relative; width: 372px; max-height: 704px; box-sizing: border-box; overflow: hidden;
@@ -283,3 +291,24 @@ html.bs-tap-lg[data-stage="landscape"] .bs-tk-num { width: 70px; height: 70px; f
 html.bs-tap-lg[data-stage="landscape"] .bs-choices.three .bs-choice { width: 190px; height: 190px; }
 @media (prefers-reduced-motion: reduce) { .bs-pulse-hour .bs-hand-hour path, .bs-pulse-min .bs-hand-min path, .bs-pair.pulse { animation: none; } }
 html[data-stage="landscape"] .bs-tk-big.bs-tk-q { font-size: 27px; white-space: nowrap; }
+
+
+/* Scene A: shop counter + oven-framed clock */
+.bs-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.bs-scene-clock { position: absolute; z-index: 1; }
+.bs-scene-clock svg, .bs-scene-clock .bs-clock { width: 100%; height: 100%; display: block; }
+.bs-oven { position: absolute; z-index: 2; object-fit: contain; pointer-events: none; }
+.bs-custs { position: absolute; inset: 0; z-index: 3; }
+.bs-cust, .bs-cust-shadow { position: absolute; pointer-events: none; object-fit: contain; }
+.bs-cust-shadow { z-index: 3; background: rgba(40, 28, 16, .28); border-radius: 50%; filter: blur(2px); }
+.bs-cust { z-index: 4; }
+.bs-ticket, .bs-panel, .bs-ready, .bs-board { z-index: 5; }
+html[data-stage="landscape"] #bakeshop {
+  background-image: url("../../art/bakeshop/shop_bg_landscape.webp");
+  background-size: 100% 100%;
+}
+html[data-stage="landscape"] .bs-panel {
+  background-image: none;
+  background-color: transparent;
+  border: 0;
+}

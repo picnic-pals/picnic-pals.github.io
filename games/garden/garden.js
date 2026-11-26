@@ -19,6 +19,9 @@
     return A.ROOT + 'assets/picnic/friends/' + id + '/locked_256.webp';
   }
   function isLand() {
+    var stage = document.documentElement.getAttribute('data-stage');
+    if (stage === 'landscape') return true;
+    if (stage === 'portrait') return false;
     var el = $('#gdStage') || document.getElementById('garden');
     if (el && el.clientWidth && el.clientHeight) return el.clientWidth > el.clientHeight;
     return window.innerWidth > window.innerHeight;
@@ -39,8 +42,8 @@
     if (G.phase === 'rest') return 'The plants are growing! They will still be here when you come back.';
     if (G.phase === 'done') return 'The garden is full of friends!';
     if (G.nudge) return G.nudge;
-    if (G.heldPacket) return 'Tap a soft patch of soil to plant ' + K.nameOf(G.heldPacket) + '.';
-    if (!K.selectedPlot(G.state) && K.packetsOpen(G.state).length) return 'Tap a seed packet, then a patch of soil.';
+    if (G.heldPacket) return 'Drag or tap the seed onto a clear dirt spot to plant ' + K.nameOf(G.heldPacket) + '.';
+    if (!K.selectedPlot(G.state) && K.packetsOpen(G.state).length) return 'Drag or tap a seed onto a clear dirt spot.';
     if (G.question) return G.question.say || G.question.text;
     if (G.band && G.band.toddler) return 'Tap Water to help the plant grow.';
     return lastSay;
@@ -71,102 +74,33 @@
   function layoutWorld() {
     var scene = $('#gdScene');
     if (!scene || !Art) return;
-    var W = scene.clientWidth, H = scene.clientHeight;
-    if (!W || !H) return;
-    var land = W > H;
+    var land = isLand();
     var bg = $('#gdBg');
-    if (bg) bg.src = Art.bgSrc(land);
-
-    var shelfDraw, shelfVX, shelfVY, bedVW, bedVX, bedVY;
-    var bedRatio = (Art.BBOX.soil_bed[3] - Art.BBOX.soil_bed[1]) / (Art.BBOX.soil_bed[2] - Art.BBOX.soil_bed[0]);
-    var bedPad = (1024 - Art.BBOX.soil_bed[3]) / (Art.BBOX.soil_bed[2] - Art.BBOX.soil_bed[0]);
-    if (land) {
-      shelfDraw = Math.min(W * 0.34, H * 0.72, 300);
-      shelfVX = W * 0.01;
-      shelfVY = Math.max(8, (H - shelfDraw * (Art.BBOX.seed_shelf[3] - Art.BBOX.seed_shelf[1]) / (Art.BBOX.seed_shelf[2] - Art.BBOX.seed_shelf[0])) * 0.4);
-      bedVW = Math.min(W * (H < 420 ? 0.54 : 0.60), H * (H < 420 ? 0.98 : 1.08), 520);
-      var bedVH = bedVW * bedRatio;
-      bedVX = Math.min(W * 0.38, W - bedVW - 8);
-      bedVY = H - 6 - bedVH - bedVW * bedPad;
-      if (bedVY < H * 0.08) { bedVY = H * 0.08; }
-    } else {
-      shelfDraw = Math.min(W * 0.56, 280);
-      shelfVX = 6;
-      shelfVY = Math.max(4, H * 0.02);
-      bedVW = Math.min(W * 0.94, 440);
-      var bedVH = bedVW * bedRatio;
-      bedVX = (W - bedVW) / 2;
-      bedVY = H - 6 - bedVH - bedVW * bedPad;
-      var shelfBottom = shelfVY + shelfDraw * (Art.BBOX.seed_shelf[3] - Art.BBOX.seed_shelf[1]) / (Art.BBOX.seed_shelf[2] - Art.BBOX.seed_shelf[0]);
-      if (bedVY < shelfBottom - H * 0.22) bedVY = Math.max(H * 0.28, shelfBottom - H * 0.22);
+    if (bg) {
+      bg.src = Art.bgSrc(land);
+      if (Art.bgSrc2x) bg.srcset = Art.bgSrc(land) + ' 1x, ' + Art.bgSrc2x(land) + ' 2x';
     }
-
-    var shelfVisH = shelfDraw * (Art.BBOX.seed_shelf[3] - Art.BBOX.seed_shelf[1]) / (Art.BBOX.seed_shelf[2] - Art.BBOX.seed_shelf[0]);
-    var shelfRight = shelfVX + shelfDraw;
-    var sun = $('#gdSun');
-    var cloud = $('#gdCloud');
-    var sunS = Math.min(W, H) * (land && H < 420 ? 0.18 : 0.16);
-    var skyLeft = Math.min(shelfRight + 4, W * 0.55);
-    var sunLeft = Math.min(W - sunS - 6, Math.max(skyLeft, W * 0.70));
-    if (sun) {
-      sun.style.left = px(sunLeft);
-      sun.style.top = px(Math.max(2, H * 0.01));
-      sun.style.width = px(sunS);
-      sun.style.height = px(sunS);
-    }
-    if (cloud) {
-      var cS = sunS * 0.85;
-      var cloudLeft = Math.max(skyLeft, sunLeft - cS - 8);
-      if (cloudLeft + cS > sunLeft - 2) cloudLeft = Math.max(2, sunLeft - cS - 4);
-      cloud.style.left = px(cloudLeft);
-      cloud.style.top = px(Math.max(2, H * 0.02));
-      cloud.style.width = px(cS);
-      cloud.style.height = px(cS);
-    }
-
-    var shelfArt = $('#gdShelfArt');
-    var shelfPlaced = shelfArt ? Art.placeCanvas(shelfArt, 1024, Art.BBOX.seed_shelf, shelfVX, shelfVY, shelfDraw) : null;
-    var packetPx = 512 * Art.PACKET_SCALE * ((shelfPlaced ? shelfPlaced.img : shelfDraw * 1024 / (Art.BBOX.seed_shelf[2] - Art.BBOX.seed_shelf[0])) / 1024);
-    Art.SHELF_SLOTS.forEach(function (slot) {
-      var wrap = document.querySelector('.gd-packet[data-id="' + slot.id + '"]');
-      if (!wrap || !shelfPlaced) return;
-      var foot = Art.packetFoot(slot.id);
-      var pos = Art.canvasToScene(shelfPlaced, slot.x, slot.y);
-      var img = wrap.querySelector('img');
-      var iw = packetPx;
-      var hit = Math.max(60, iw);
-      var cx = pos.x, cy = pos.y - iw * 0.28;
-      minHit(wrap, cx, cy, iw);
-      if (img) {
-        img.style.position = 'absolute';
-        img.style.width = px(iw);
-        img.style.height = px(iw);
-        img.style.left = px((pos.x - (foot.x / 512) * iw) - (cx - hit / 2));
-        img.style.top = px((pos.y - (foot.y / 512) * iw) - (cy - hit / 2));
-      }
-    });
-
-    var bedArt = $('#gdBedArt');
-    var bedPlaced = bedArt ? Art.placeCanvas(bedArt, 1024, Art.BBOX.soil_bed, bedVX, bedVY, bedVW) : null;
-    var plantSize = bedPlaced ? Math.max(70, bedPlaced.scale * 210) : 90;
-    Art.BED_SPOTS.forEach(function (spot, i) {
+    var spots = Art.stageSpots ? Art.stageSpots(land) : Art.BED_SPOTS;
+    var plantSize = land ? 92 : 78;
+    spots.forEach(function (spot, i) {
       var wrap = document.querySelector('.gd-spot[data-i="' + i + '"]');
-      if (!wrap || !bedPlaced) return;
-      var pos = Art.canvasToScene(bedPlaced, spot.x, spot.y);
+      if (!wrap) return;
       var img = wrap.querySelector('.gd-plant');
       var burst = wrap.querySelector('.gd-burst');
       var spark = wrap.querySelector('.gd-spark');
-      var foot = Art.stageFoot();
-      var hit = Math.max(60, plantSize * 0.55);
-      var cx = pos.x, cy = pos.y - plantSize * 0.22;
-      minHit(wrap, cx, cy, hit);
+      var hit = Math.max(renderedMin(60), plantSize * 0.7);
+      minHit(wrap, spot.x, spot.y, hit);
       wrap.style.zIndex = String(6 + (spot.row || 0) * 2);
+      wrap.style.background = 'transparent';
+      wrap.style.boxShadow = 'none';
+      if (wrap.classList.contains('selected')) wrap.style.boxShadow = '0 0 0 4px #fff36a, 0 0 0 7px #3a6a32';
       if (img) {
         img.style.position = 'absolute';
         img.style.width = px(plantSize);
         img.style.height = px(plantSize);
-        img.style.left = px((pos.x - (foot.x / 512) * plantSize) - (cx - hit / 2));
-        img.style.top = px((pos.y - (foot.y / 512) * plantSize) - (cy - hit / 2));
+        img.style.left = '50%';
+        img.style.top = '50%';
+        img.style.transform = 'translate(-50%, -85%)';
       }
       if (burst) {
         burst.style.width = px(plantSize * 0.7);
@@ -186,24 +120,53 @@
         spark.style.marginTop = px(-plantSize * 0.275);
         spark.style.transform = 'none';
       }
-      wrap.dataset.sx = String(pos.x);
-      wrap.dataset.sy = String(pos.y);
+      wrap.dataset.sx = String(spot.x);
+      wrap.dataset.sy = String(spot.y);
     });
 
-    layoutCan(bedPlaced);
+    var fa = Art.friendAnchor ? Art.friendAnchor(land) : null;
+    var buddy = $('#gdBuddy');
+    var shadow = $('#gdBuddyShadow');
+    if (fa && buddy) {
+      var fh = fa.height || (land ? 150 : 78);
+      /* Friend poses are square 256 canvases with ~24px empty pad under the feet.
+         Use a square box and sit the opaque feet on the anchor, not the canvas edge. */
+      var pad = 24 / 256;
+      var fw = fh;
+      buddy.style.position = 'absolute';
+      buddy.style.left = px(fa.foot[0] - fw / 2);
+      buddy.style.top = px(fa.foot[1] - fh * (1 - pad));
+      buddy.style.width = px(fw);
+      buddy.style.height = px(fh);
+      buddy.style.objectPosition = 'center bottom';
+      buddy.style.zIndex = '7';
+      if (shadow) {
+        var sw = Math.round(fw * 1.05);
+        var sh = Math.round(sw * 44 / 160);
+        shadow.style.position = 'absolute';
+        shadow.style.left = px(fa.foot[0] - sw / 2);
+        shadow.style.top = px(fa.foot[1] - sh * 0.55);
+        shadow.style.width = px(sw);
+        shadow.style.height = px(sh);
+        shadow.style.zIndex = '6';
+      }
+    }
+    layoutCan(null);
   }
 
-  function layoutCan(bedPlaced) {
+  function layoutCan() {
     var can = $('#gdCan'), stream = $('#gdStream');
     if (!can) return;
     var sel = document.querySelector('.gd-spot.selected');
-    var sx, sy, canS, spout, top, left, streamS;
+    var sx, sy, canS, spout, top, left, streamS, spots, mid;
     if (sel && sel.dataset.sx) { sx = +sel.dataset.sx; sy = +sel.dataset.sy; }
-    else if (bedPlaced) {
-      var mid = Art.canvasToScene(bedPlaced, Art.BED_SPOTS[4].x, Art.BED_SPOTS[4].y);
+    else if (Art.stageSpots) {
+      spots = Art.stageSpots(isLand());
+      mid = spots[4] || spots[0];
+      if (!mid) return;
       sx = mid.x; sy = mid.y;
     } else return;
-    canS = Math.max(70, (bedPlaced ? bedPlaced.scale * 200 : 90));
+    canS = isLand() ? 96 : 80;
     spout = Art.POUR_SPOUT;
     if (can.classList.contains('pour')) {
       left = sx - (spout.x / 512) * canS;
@@ -230,21 +193,11 @@
   function renderScene(shot, job) {
     var land = isLand();
     var st = G.state;
-    var sunOn = job === 'sun' || !!(shot && shot.plots && shot.plots.some(function (pl) { return pl.stage === 'grown' || pl.stage === 'peek' || pl.stage === 'pop'; }));
     var html = '';
     html += '<img class="gd-bg" id="gdBg" src="' + Art.bgSrc(land) + '" alt="">';
-    html += '<img class="gd-sun' + (sunOn ? ' on' : '') + '" id="gdSun" src="' + Art.src('sun') + '" alt="">';
-    html += '<img class="gd-cloud" id="gdCloud" src="' + Art.src('rain_cloud') + '" alt="">';
-    html += '<img class="gd-shelf-art" id="gdShelfArt" src="' + Art.src('seed_shelf') + '" alt="">';
-    Art.SHELF_SLOTS.forEach(function (slot) {
-      var open = K.packetOpen(st, slot.id);
-      var held = G.heldPacket === slot.id;
-      var gone = !!(st.plants[slot.id] && st.plants[slot.id].unlocked) || K.growingOn(st, slot.id) >= 0;
-      var cls = 'gd-packet' + (open ? ' open' : ' shut') + (held ? ' held' : '') + (gone ? ' gone' : '');
-      html += '<button type="button" class="' + cls + '" data-id="' + slot.id + '" aria-label="' + A.esc(K.nameOf(slot.id)) + ' seeds">';
-      html += '<img src="' + Art.packetSrc(slot.id) + '" alt=""></button>';
-    });
-    html += '<img class="gd-bed-art" id="gdBedArt" src="' + Art.src('soil_bed') + '" alt="">';
+    if (Art.shadowSrc) html += '<img class="gd-buddy-shadow" id="gdBuddyShadow" src="' + Art.shadowSrc() + '" alt="">';
+    var hero = (P && (P.blob || P.friend)) || 'strawberry';
+    html += '<img class="gd-buddy" id="gdBuddy" src="' + friendSrc(hero, 'front', 256) + '" alt="">';
     (st.plots || []).forEach(function (pl, i) {
       var selected = st.selected === i;
       var stage = 'empty';
@@ -252,13 +205,14 @@
         if (G.justUnlocked === pl.id && (job === 'hop' || popFrame === 'hop')) stage = 'hop';
         else if (G.justUnlocked === pl.id && (job === 'wave' || job === 'pop' || popFrame === 'wave')) stage = 'wave';
         else stage = K.stageOf(pl.answers, K.needOf(pl.id));
+        if (stage === 'empty') stage = 'seed';
         if (stage === 'peek') stage = 'popout';
         if (stage === 'pop' && G.justUnlocked === pl.id) stage = popFrame || 'hop';
         if (stage === 'pop') stage = 'wave';
       }
       html += '<button type="button" class="gd-spot' + (selected ? ' selected' : '') + (pl.id ? ' planted' : ' empty') + '" data-i="' + i + '" aria-label="Plot ' + (i + 1) + '">';
       if (pl.id && stage && stage !== 'empty') {
-        html += '<img class="gd-plant" src="' + Art.stageSrc(pl.id, stage === 'popout' ? 'peek' : stage) + '" alt="">';
+        html += '<img class="gd-plant' + (job === 'plant' && selected ? ' gd-just' : '') + '" src="' + Art.stageSrc(pl.id, stage === 'popout' ? 'peek' : stage) + '" alt="">';
       }
       if (job === 'plant' && selected) html += '<img class="gd-burst" src="' + Art.src('soil_burst') + '" alt="">';
       if ((job === 'sun' || job === 'water' || job === 'plant') && selected) {
@@ -301,7 +255,7 @@
   }
 
   function seedTrayHtml() {
-    var st = G.state, html = '<div class="gd-seeds" id="gdSeeds">';
+    var st = G.state, html = '<div class="gd-seeds pp-kit-tray" id="gdSeeds">';
     K.ids().forEach(function (id) {
       var open = K.packetOpen(st, id);
       var held = G.heldPacket === id;
@@ -309,12 +263,9 @@
       var growing = K.growingOn(st, id) >= 0;
       var gone = unlocked || growing;
       var cls = 'gd-seedbtn' + (open ? ' open' : ' shut') + (held ? ' held' : '') + (gone ? ' gone' : '');
-      var aria = held ? 'Selected seed packet' : (open ? 'Seed packet, tap to plant' : (gone ? 'Seed already planted' : 'Seed packet, still locked'));
-      // Silhouette rule: unmet friends stay unnamed faceless silhouettes.
-      var who = unlocked ? friendSrc(id, 'front', 128) : lockedSrc(id);
+      var aria = held ? 'Selected seed' : (open ? 'Seed, drag or tap to plant' : (gone ? 'Seed already planted' : 'Seed, still locked'));
       html += '<button type="button" class="' + cls + '" data-id="' + id + '" aria-label="' + aria + '"' + (open ? '' : ' disabled') + '>';
-      html += '<img class="pkt" src="' + Art.packetSrc(id) + '" alt="">';
-      html += '<img class="who" src="' + who + '" alt="">';
+      html += '<img class="pkt" src="' + Art.packetSrc(id) + '" draggable="false"' + (Art.packetSrc2x ? ' srcset="' + Art.packetSrc(id) + ' 1x, ' + Art.packetSrc2x(id) + ' 2x"' : '') + ' alt="">';
       html += '</button>';
     });
     return html + '</div>';
@@ -322,6 +273,7 @@
   function layoutCard(pass) {
     var card = $('#gdCard'), play = document.querySelector('.gd-play'), stage;
     if (!card) return;
+    placeCard();
     stage = document.querySelector('.stage-scale') || document.getElementById('garden');
     var land = isLand();
     var nItems = card.querySelectorAll('.gd-food, .gd-array img, .gd-pic img').length;
@@ -412,21 +364,21 @@
     }
   }
   function renderCard(shot) {
-    if (!hasPlant() && !(G.band && G.band.toddler && hasPlant())) {
-      if (!hasPlant()) {
-        return '<div class="gd-card" id="gdCard"><p class="gd-ask" id="gdAsk">Tap a seed packet, then a patch of soil.</p>' +
-          seedTrayHtml() +
-          '<p class="gd-nudge" id="gdNudge">' + A.esc(G.nudge || '') + '</p></div>';
-      }
+    if (!hasPlant()) {
+      var ask = G.heldPacket ? plantPrompt(K.nameOf(G.heldPacket)) : plantPrompt();
+      return '<div class="gd-card pp-kit-card" id="gdCard"><p class="gd-ask" id="gdAsk">' + A.esc(ask) + '</p></div>';
     }
     if (G.band && G.band.toddler) {
-      return '<div class="gd-card" id="gdCard"><p class="gd-ask" id="gdAsk">Tap Water to help the plant grow.</p>' +
+      return '<div class="gd-card pp-kit-card" id="gdCard"><p class="gd-ask" id="gdAsk">Tap Water to help the plant grow.</p>' +
         '<p class="gd-nudge" id="gdNudge">' + A.esc(G.nudge || '') + '</p>' +
         '<button type="button" class="gd-water" id="gdWater">Water</button></div>';
     }
     var q = G.question;
-    if (!q) return '<div class="gd-card" id="gdCard"><p class="gd-ask" id="gdAsk">Tap a seed packet, then a patch of soil.</p>' + seedTrayHtml() + '<p class="gd-nudge" id="gdNudge">' + A.esc(G.nudge || '') + '</p></div>';
-    var html = '<div class="gd-card gd-card-q" id="gdCard"><p class="gd-ask" id="gdAsk">' + (q.html || A.esc(q.text)) + '</p>';
+    if (!q) {
+      var ask2 = G.heldPacket ? plantPrompt(K.nameOf(G.heldPacket)) : plantPrompt();
+      return '<div class="gd-card pp-kit-card" id="gdCard"><p class="gd-ask" id="gdAsk">' + A.esc(ask2) + '</p></div>';
+    }
+    var html = '<div class="gd-card pp-kit-card gd-card-q" id="gdCard"><p class="gd-ask" id="gdAsk">' + (q.html || A.esc(q.text)) + '</p>';
     if (q.pic) html += '<div class="gd-pic">' + q.pic + '</div>';
     if (G.nudge && !(K.revealsAnswer && K.revealsAnswer(q, G.nudge))) {
       html += '<p class="gd-nudge" id="gdNudge">' + A.esc(G.nudge) + '</p>';
@@ -441,6 +393,51 @@
     return html;
   }
 
+
+  function placeCard() {
+    var card = $('#gdCard');
+    if (!card) return;
+    var land = isLand();
+    card.style.position = 'absolute';
+    card.style.zIndex = '12';
+    card.style.margin = '0';
+    if (land) {
+      var box = (Art && Art.CARD_LANDSCAPE) || { x: 232, y: 116, w: 560, h: 64 };
+      card.style.left = px(box.x);
+      card.style.top = px(box.y);
+      card.style.width = px(box.w);
+      card.style.minHeight = px(box.h);
+      card.style.maxHeight = px(G.question ? 280 : 130);
+      card.style.right = 'auto';
+      card.style.bottom = 'auto';
+    } else {
+      var y = (Art && Art.CARD_Y_PORTRAIT) || 482;
+      card.style.left = '12px';
+      card.style.top = px(y);
+      card.style.width = '376px';
+      card.style.right = 'auto';
+      card.style.bottom = 'auto';
+      card.style.maxHeight = px(G.question ? 188 : 136);
+    }
+  }
+  function layoutTray() {
+    var tray = $('#gdSeeds');
+    if (!tray) return;
+    var land = isLand();
+    tray.style.position = 'absolute';
+    tray.style.zIndex = '13';
+    tray.style.left = land ? '40px' : '4px';
+    tray.style.width = land ? '944px' : '392px';
+    tray.style.right = 'auto';
+    tray.style.bottom = 'auto';
+    /* 22px kit shelf under the bags. Landscape 120px. Portrait can't fit five 110px
+       bags on the 400px shelf, so use the largest size that keeps all five visible. */
+    var bag = land ? 120 : 74;
+    var shelf = 22;
+    tray.style.height = px(bag + shelf);
+    tray.style.top = px(land ? 640 - bag - shelf : 720 - bag - shelf);
+  }
+
   function bindWorld() {
     document.querySelectorAll('.gd-packet').forEach(function (el) {
       el.onclick = function () { if (!busy) onPacket(el.getAttribute('data-id')); };
@@ -450,13 +447,226 @@
     });
   }
 
+  var drag = null;
+  var scrollLockBound = false;
+
+  function plantPrompt(name) {
+    if (name) return 'Drag or tap the seed onto a clear dirt spot to plant ' + name + '.';
+    return 'Drag or tap a seed onto a clear dirt spot.';
+  }
+  function playRoot() {
+    return document.querySelector('.stage-scale') || document.querySelector('[data-stage-root]') || $('#gdStage') || document.getElementById('garden');
+  }
+  function ghostHost() {
+    /* stage-frame is unscaled; position:fixed inside the scaled stage would miss the finger. */
+    return document.querySelector('.stage-frame') || document.body;
+  }
+  function bindScrollLock() {
+    if (scrollLockBound) return;
+    scrollLockBound = true;
+    function block(e) {
+      if (!drag) return;
+      if (e.cancelable) e.preventDefault();
+    }
+    document.addEventListener('touchmove', block, { passive: false, capture: true });
+    document.addEventListener('wheel', block, { passive: false, capture: true });
+  }
+  function setDragging(on) {
+    bindScrollLock();
+    document.documentElement.classList.toggle('gd-dragging', !!on);
+    try { document.body.style.overflow = on ? 'hidden' : ''; } catch (err) {}
+  }
+  function scenePoint(e) {
+    var scene = $('#gdScene') || document.getElementById('garden');
+    var x = e.clientX, y = e.clientY;
+    if (e.touches && e.touches[0]) { x = e.touches[0].clientX; y = e.touches[0].clientY; }
+    if (!scene) return { x: x, y: y };
+    var r = scene.getBoundingClientRect();
+    var sx = r.width / (isLand() ? 1024 : 400);
+    var sy = r.height / (isLand() ? 640 : 720);
+    return { x: (x - r.left) / (sx || 1), y: (y - r.top) / (sy || 1) };
+  }
+  function dirtBox() {
+    var d = Art.dirtPatch && Art.dirtPatch(isLand());
+    var pad = 48;
+    if (!d) return null;
+    if (d.safe_drop_bbox_xyxy) {
+      var b = d.safe_drop_bbox_xyxy;
+      return { x0: b[0] - pad, y0: b[1] - pad, x1: b[2] + pad, y1: b[3] + pad };
+    }
+    if (d.bbox_xywh) {
+      var w = d.bbox_xywh;
+      return { x0: w[0] - pad, y0: w[1] - pad, x1: w[0] + w[2] + pad, y1: w[1] + w[3] + pad };
+    }
+    return null;
+  }
+  function inDirt(p) {
+    var b = dirtBox();
+    if (!b) return false;
+    return p.x >= b.x0 && p.x <= b.x1 && p.y >= b.y0 && p.y <= b.y1;
+  }
+  function plotTargets() {
+    var spots = (Art.stageSpots ? Art.stageSpots(isLand()) : []);
+    var slop = (A.Kit && A.Kit.tapSlop) ? A.Kit.tapSlop() : 28;
+    var r = 80 + slop;
+    return spots.map(function (s, i) {
+      return { x: s.x, y: s.y, r: r, i: i, empty: !(G.state.plots[i] && G.state.plots[i].id) };
+    });
+  }
+  function closestEmpty(p) {
+    var list = plotTargets().filter(function (t) { return t.empty; });
+    var best = null, bestD = Infinity, i, d;
+    for (i = 0; i < list.length; i++) {
+      d = Math.hypot(p.x - list[i].x, p.y - list[i].y);
+      if (d < bestD) { best = list[i]; bestD = d; }
+    }
+    return best;
+  }
+  function hitPlot(p) {
+    var all = plotTargets();
+    var empty = all.filter(function (t) { return t.empty; });
+    var filled = all.filter(function (t) { return !t.empty; });
+    var emptyNear = (A.Kit && A.Kit.nearest) ? A.Kit.nearest(p.x, p.y, empty) : null;
+    if (emptyNear) return emptyNear;
+    if (inDirt(p)) return closestEmpty(p);
+    var filledNear = (A.Kit && A.Kit.nearest) ? A.Kit.nearest(p.x, p.y, filled) : null;
+    if (filledNear) return filledNear;
+    return null;
+  }
+  function markHot(i) {
+    document.querySelectorAll('.gd-spot').forEach(function (el) {
+      var idx = +el.getAttribute('data-i');
+      var empty = el.classList.contains('empty');
+      el.classList.toggle('drop-ready', !!(drag && empty));
+      el.classList.toggle('drop-hot', !!(drag && empty && idx === i));
+    });
+  }
+  function makeGhost(el) {
+    var img = el.querySelector('.pkt');
+    var g = document.createElement('img');
+    g.className = 'gd-drag-ghost';
+    g.src = img ? (img.currentSrc || img.src) : '';
+    g.alt = '';
+    g.setAttribute('aria-hidden', 'true');
+    g.draggable = false;
+    var sz = img ? img.getBoundingClientRect() : { width: 74, height: 74 };
+    g.style.width = Math.max(60, Math.round(sz.width)) + 'px';
+    g.style.height = Math.max(60, Math.round(sz.height)) + 'px';
+    (ghostHost()).appendChild(g);
+    return g;
+  }
+  function moveGhost(g, x, y) {
+    if (!g) return;
+    g.style.left = Math.round(x) + 'px';
+    g.style.top = Math.round(y) + 'px';
+  }
+  function clearDrag() {
+    if (drag && drag.ghost && drag.ghost.parentNode) drag.ghost.parentNode.removeChild(drag.ghost);
+    if (drag && drag.el) drag.el.classList.remove('dragging');
+    drag = null;
+    setDragging(false);
+    document.querySelectorAll('.gd-spot').forEach(function (el) {
+      el.classList.remove('drop-ready', 'drop-hot');
+    });
+  }
+  function afterPlant(name, plotIndex) {
+    G.heldPacket = null;
+    K.saveState(P, G.state);
+    say('You planted ' + name + '!', 'chatter');
+    renderPlay('plant');
+    var wrap = document.querySelector('.gd-spot[data-i="' + plotIndex + '"]');
+    if (A.Kit && A.Kit.celebrate) {
+      var host = playRoot();
+      var opt = { root: host, sfx: 'ok' };
+      if (wrap && wrap.getBoundingClientRect) {
+        var r = wrap.getBoundingClientRect();
+        var hb = host && host.getBoundingClientRect ? host.getBoundingClientRect() : { left: 0, top: 0 };
+        opt.x = r.left - hb.left + r.width / 2;
+        opt.y = r.top - hb.top + r.height / 2;
+        opt.around = wrap;
+      }
+      A.Kit.celebrate(opt);
+    } else if (A.Audio && A.Audio.sfx) A.Audio.sfx('ok');
+    busy = true;
+    setTimeout(function () {
+      busy = false;
+      if (G.pendingGrowth) {
+        G.pendingGrowth = false;
+        afterCorrect(K.applyCorrect(P, G));
+        return;
+      }
+      if (!G.question && !(G.band && G.band.toddler)) nextQuestion();
+      else renderPlay('');
+    }, cheerMs || 0);
+  }
+  function finishDrop(e) {
+    if (busy) { clearDrag(); return; }
+    var p = scenePoint(e);
+    var hit = hitPlot(p);
+    if (hit && G.heldPacket) {
+      var pl = G.state.plots[hit.i];
+      if (pl && pl.id) {
+        say('That patch already has a plant. Try an empty one.', 'chatter');
+        clearDrag();
+        return;
+      }
+      if (K.plantAt(G.state, hit.i, G.heldPacket)) {
+        var name = K.nameOf(G.heldPacket);
+        clearDrag();
+        afterPlant(name, hit.i);
+        return;
+      }
+    }
+    clearDrag();
+  }
+  function bindSeedDrag() {
+    if (!A.Kit || !A.Kit.onDrag) return;
+    document.querySelectorAll('.gd-seedbtn').forEach(function (el) {
+      if (el.getAttribute('data-pp-kit-drag') === '1' || el.disabled) return;
+      var id = el.getAttribute('data-id');
+      el.setAttribute('data-pp-kit-drag', '1');
+      try { el.style.touchAction = 'none'; } catch (err) {}
+      A.Kit.onDrag(el, {
+        slop: 8,
+        onStart: function (e) {
+          if (busy || el.disabled) return;
+          if (e && e.preventDefault) e.preventDefault();
+          onPacket(id, 'silent');
+          setDragging(true);
+          drag = { id: id, el: el, ghost: null };
+          markHot(-1);
+        },
+        onMove: function (e, pt) {
+          if (!drag || drag.id !== id) return;
+          if (e && e.preventDefault) e.preventDefault();
+          if (!drag.ghost) {
+            drag.ghost = makeGhost(el);
+            el.classList.add('dragging');
+          }
+          moveGhost(drag.ghost, pt.x, pt.y);
+          var hit = hitPlot(scenePoint(e));
+          var hot = (hit && !(G.state.plots[hit.i] && G.state.plots[hit.i].id)) ? hit.i : -1;
+          markHot(hot);
+        },
+        onEnd: function (e) { finishDrop(e); },
+        onCancel: function () { clearDrag(); },
+        onTap: function () {
+          clearDrag();
+          if (!busy && !el.disabled) onPacket(id);
+        }
+      });
+    });
+  }
   function bindCard() {
     if ($('#gdWater')) $('#gdWater').onclick = function () { if (!busy) onToddlerTap(); };
     if ($('#gdSeeds')) {
-      $('#gdSeeds').addEventListener('click', function (e) {
-        var b = e.target.closest('.gd-seedbtn'); if (!b || busy || b.disabled) return;
-        onPacket(b.getAttribute('data-id'));
-      });
+      if (A.Kit && A.Kit.onDrag) bindSeedDrag();
+      else {
+        $('#gdSeeds').addEventListener('click', function (e) {
+          var b = e.target.closest('.gd-seedbtn'); if (!b || busy || b.disabled) return;
+          onPacket(b.getAttribute('data-id'));
+        });
+      }
     }
     if ($('#gdChoices')) {
       $('#gdChoices').addEventListener('click', function (e) {
@@ -469,15 +679,20 @@
   function renderPlay(job) {
     document.body.className = 'gd-on-play' + (isLand() ? ' gd-land' : ' gd-port');
     var shot = K.snapshot(G);
+    var showTray = !hasPlant() || !G.question;
+    if (G.band && G.band.toddler && hasPlant()) showTray = false;
+    if (G.question) showTray = false;
     $('#gdStage').innerHTML =
       '<div class="gd-play">' +
         '<div class="gd-scene" id="gdScene">' + renderScene(shot, job || '') + '</div>' +
         renderCard(shot) +
+        (showTray ? seedTrayHtml() : '') +
       '</div>';
     bindWorld();
     bindCard();
     layoutWorld();
     layoutCard();
+    layoutTray();
   }
 
   function renderPop(res) {
@@ -614,10 +829,18 @@
       return;
     }
     G.heldPacket = id;
-    G.nudge = 'Tap a soft patch of soil to plant ' + K.nameOf(id) + '.';
+    G.nudge = plantPrompt(K.nameOf(id));
     say(G.nudge, 'chatter');
+    if (arguments[1] === 'silent') {
+      document.querySelectorAll('.gd-seedbtn').forEach(function (b) {
+        b.classList.toggle('held', b.getAttribute('data-id') === id);
+      });
+      var askEl = $('#gdAsk'); if (askEl) askEl.textContent = G.nudge;
+      var n = $('#gdNudge'); if (n) n.textContent = '';
+      return;
+    }
     renderPlay('');
-    var n = $('#gdNudge'); if (n) n.textContent = G.nudge;
+    var n2 = $('#gdNudge'); if (n2) n2.textContent = G.nudge;
   }
 
   function onSpot(i) {
@@ -630,16 +853,7 @@
       }
       if (K.plantAt(G.state, i, G.heldPacket)) {
         var name = K.nameOf(G.heldPacket);
-        G.heldPacket = null;
-        K.saveState(P, G.state);
-        say('You planted ' + name + '!', 'chatter');
-        if (G.pendingGrowth) {
-          G.pendingGrowth = false;
-          afterCorrect(K.applyCorrect(P, G));
-          return;
-        }
-        if (!G.question && !(G.band && G.band.toddler)) nextQuestion();
-        else renderPlay('');
+        afterPlant(name, i);
         return;
       }
     }
@@ -662,7 +876,7 @@
       var res = K.applyCorrect(P, G);
       if (res.needPlant) {
         G.pendingGrowth = true;
-        say(G.nudge || 'Tap a seed packet, then a patch of soil.', 'chatter');
+        say(G.nudge || plantPrompt(), 'chatter');
         var n = $('#gdNudge'); if (n) n.textContent = G.nudge || '';
         busy = false;
         return;
@@ -685,7 +899,7 @@
 
   function onToddlerTap() {
     if (!hasPlant()) {
-      G.nudge = 'Tap a seed packet, then a patch of soil.';
+      G.nudge = plantPrompt();
       say(G.nudge, 'chatter');
       var n = $('#gdNudge'); if (n) n.textContent = G.nudge;
       return;
@@ -748,7 +962,11 @@
     render: render,
     layout: function () { layoutWorld(); layoutCard(); },
     setCheerMs: function (ms) { cheerMs = ms; hopMs = ms; },
-    nameOf: K.nameOf
+    nameOf: K.nameOf,
+    dragActive: function () { return !!drag; },
+    dragState: function () {
+      return drag ? { id: drag.id, hasGhost: !!drag.ghost } : null;
+    }
   };
 
   (A.HowTo && A.HowTo.first ? A.HowTo.first('garden') : Promise.resolve()).then(renderTitle);

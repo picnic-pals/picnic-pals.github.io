@@ -227,10 +227,68 @@
     $('#bsCake').setAttribute('aria-label', 'Celebration cake: ' + st.layers + ' of 4 layers');
   }
 
+
+  function isLand() {
+    var stage = document.documentElement.getAttribute('data-stage');
+    if (stage === 'landscape') return true;
+    if (stage === 'portrait') return false;
+    return window.innerWidth > window.innerHeight;
+  }
+  function layoutScene() {
+    var scene = $('#bsScene');
+    if (!scene || !Art || !Art.pack) return;
+    var land = isLand();
+    var pack = Art.pack(land);
+    var bg = Art.src(land ? 'shop_bg_landscape' : 'shop_bg_portrait');
+    var root = document.getElementById('bakeshop');
+    if (root && bg) root.style.backgroundImage = 'url("' + bg + '")';
+    var oven = $('#bsOven');
+    if (oven) {
+      var oh = pack.oven_height;
+      var oc = pack.oven_bottom_center;
+      oven.src = Art.src('oven') || (A.ROOT + 'art/bakeshop/oven.webp');
+      oven.style.position = 'absolute';
+      oven.style.height = oh + 'px';
+      oven.style.width = oh + 'px';
+      oven.style.left = (oc[0] - oh / 2) + 'px';
+      oven.style.top = (oc[1] - oh) + 'px';
+      oven.style.zIndex = '2';
+    }
+    var clock = $('#bsSceneClock');
+    if (clock) {
+      var cc = pack.clock_center;
+      var r = pack.clock_outer_r;
+      var tset = (G.order && G.order.kind === 'read' && G.order.target) ? G.order.target : (G.set || { h: 3, m: 0 });
+      clock.style.position = 'absolute';
+      clock.style.left = (cc[0] - r) + 'px';
+      clock.style.top = (cc[1] - r) + 'px';
+      clock.style.width = (2 * r) + 'px';
+      clock.style.height = (2 * r) + 'px';
+      clock.style.zIndex = '1';
+      clock.innerHTML = Art.clock(tset, { size: Math.round(2 * r), interactive: false, numbers: true, label: '' });
+    }
+    var box = $('#bsCusts');
+    if (box) {
+      var who = (G.order && G.order.friend) || (P && P.blob) || 'strawberry';
+      var you = (P && (P.blob || P.friend)) || 'blueberry';
+      if (you === who) you = 'strawberry';
+      var ids = [who, you];
+      box.innerHTML = (pack.customers || []).map(function (c, i) {
+        var fh = c[2], fx = c[0], fy = c[1];
+        var fw = Math.round(fh * 0.75);
+        var sw = Math.round(fw * 1.05), sh = Math.round(sw * 0.28);
+        var src = friendImg(ids[i] || who, 'front');
+        return '<span class="bs-cust-shadow" style="left:' + Math.round(fx - sw / 2) + 'px;top:' + Math.round(fy - sh * 0.45) + 'px;width:' + sw + 'px;height:' + sh + 'px"></span>' +
+          '<img class="bs-cust" src="' + src + '" alt="" style="left:' + Math.round(fx - fw / 2) + 'px;top:' + Math.round(fy - fh) + 'px;width:' + fw + 'px;height:' + fh + 'px">';
+      }).join('');
+    }
+  }
+
   function render() {
     renderTicket();
     renderPanel();
     renderBoard(false);
+    layoutScene();
   }
 
   /* ---------- answers ---------- */

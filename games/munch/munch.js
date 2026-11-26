@@ -151,7 +151,9 @@
     var cells = [];
     PL.forEach(function (pl) {
       if (A.Steps) A.Steps.ctx.p = pl.P;
-      var hard = !!(pl.round.hard || (SR && SR.cfg && SR.cfg.bossHarder)), R = hard ? harderRule(pl.round.skill, pl.round.level) : (pl.round.tier && easierRule(pl.round.skill, pl.round.level, pl.round.tier)) || pl.round.skill.gen(pl.round.level), mine = TWO ? N / 2 : N, cpb = A.Age.cellsPerBoard(pl.P), nOk = TWO ? A.rnd(5, 6) : pl.round.nOk || A.rnd(cpb[0], cpb[1]), i;
+      var hard = !!(pl.round.hard || (SR && SR.cfg && SR.cfg.bossHarder)), R, mine = TWO ? N / 2 : N, cpb = A.Age.cellsPerBoard(pl.P), nOk = TWO ? A.rnd(5, 6) : pl.round.nOk || A.rnd(cpb[0], cpb[1]), i;
+      if (A.MunchRules && A.MunchRules.ruleFor) R = A.MunchRules.ruleFor(pl, { hard: hard, tier: pl.round.tier });
+      if (!R) R = hard ? harderRule(pl.round.skill, pl.round.level) : (pl.round.tier && easierRule(pl.round.skill, pl.round.level, pl.round.tier)) || pl.round.skill.gen(pl.round.level);
       var pickable = A.Coach && A.Coach.pickItem && !R.rc && R.hom == null && typeof R.target !== 'string' && !pl.P.guest;
       var seen = {}, ck = function (c) { return c.label + '|' + (c.html || ''); };   // qbatch-1107: distinct targets and distractors when the rule allows it
       var fresh = function (fn) { var c, t = 0; do { c = fn(); } while (seen[ck(c)] && ++t < 12); seen[ck(c)] = 1; return c; };
@@ -183,11 +185,12 @@
   function renderBoard() {
     board.innerHTML = ''; cellEls = [];
     G.cells.forEach(function (c, i) {
-      var d = document.createElement('div'); d.className = 'cell in c' + ((i * 3 + Math.floor(i / COLS)) % 5) + (c.long ? ' long' : '') + (TWO ? ' own p' + (c.owner + 1) : '');
+      var eq = eqLabelOf(c);
+      var d = document.createElement('div'); d.className = 'cell in c' + ((i * 3 + Math.floor(i / COLS)) % 5) + (!eq && c.long ? ' long' : '') + (eq ? ' eq' : '') + (TWO ? ' own p' + (c.owner + 1) : '');
       d.style.animationDelay = (Math.floor(i / COLS) * 70 + (i % COLS) * 45) + 'ms';
       d.setAttribute('role', 'button'); d.setAttribute('aria-label', (TWO ? PL[c.owner].name + ': ' : '') + c.label);
-      d.innerHTML = '<span class="lbl">' + (c.html || A.esc(c.label)) + '</span><span class="crumb">' + (A.Icons ? A.Icons.html('🌼', { size: 32, decorative: true, cls: 'pp-pic', slot: 'munch:crumb' }) : '') + '</span>' + (TWO ? '<span class="tagdot">' + A.esc(PL[c.owner].name.charAt(0).toUpperCase()) + '</span>' : '');
-      d.addEventListener('click', function () { onCellTap(i); });
+      d.innerHTML = '<span class="lbl">' + (eq ? '<span class="st-eq">' + A.esc(eq) + '</span>' : (c.html || A.esc(c.label))) + '</span><span class="crumb">' + (A.Icons ? A.Icons.html('🌼', { size: 32, decorative: true, cls: 'pp-pic', slot: 'munch:crumb' }) : '') + '</span>' + (TWO ? '<span class="tagdot">' + A.esc(PL[c.owner].name.charAt(0).toUpperCase()) + '</span>' : '');
+      if (A.Kit && A.Kit.padHit && CS < 60) A.Kit.padHit(d, Math.ceil((60 - CS) / 2));
       board.appendChild(d); cellEls.push(d);
     });
     PL.forEach(function (pl) {
@@ -209,6 +212,7 @@
       var hintHtml = (pl.rule.stepHint && (pl.wrong > 0 || pl.round.tier >= 3) ? '<span class="hint st">' + pl.rule.stepHint(pl.lastMiss, pl.wrong >= 2 ? 2 : 1) + '</span>' : pl.rule.hint && (pl.wrong > 0 || pl.round.tier >= 3) ? '<span class="hint">' + pl.rule.hint + '</span>' : '');
       // One picture copy, in a slot the panel can scale. v2p2a: a step shows a picture hint after a miss.
       $('#ruleTxt').innerHTML = parts.text + (parts.pic ? '<span class="st-pic">' + parts.pic + '</span>' : '') + hintHtml;
+      layoutRuleAsk($('#ruleTxt'));
       if (A.CountVisual && A.CountVisual.fit) A.CountVisual.fit($('#ruleTxt'));
       fitRulePic();
       var chip = $('#levelChip'), s = pl.round.skill;
@@ -224,6 +228,19 @@
     $('#levelChip').textContent = MODE === 'team' ? 'Team munch' : 'Munch race'; $('#levelChip').classList.remove('review');
     if (A.CountVisual && A.CountVisual.fit) A.CountVisual.fit($('#ruleTxt'));
     fitRulePic();
+  }
+  function layoutRuleAsk(el) {
+    if (!el) return;
+    el.innerHTML = el.innerHTML.replace(/(that equal\s*)(<b class="hl">[\s\S]*?<\/b>)/i, '<span class="eq-tail">$1$2</span>');
+    var pics = el.querySelectorAll(':scope > .st-pic, :scope > .pb-target, :scope > .pb-qpic');
+    for (var i = 0; i < pics.length; i++) {
+      var pic = pics[i];
+      if (pic.parentNode !== el) continue;
+      var wrap = document.createElement('span');
+      wrap.className = 'rule-pic';
+      el.insertBefore(wrap, pic);
+      wrap.appendChild(pic);
+    }
   }
   function fitRulePic() {
     var top = document.querySelector('#game .top') || document.querySelector('.top');
@@ -293,7 +310,9 @@
     }
     // Never grow past the wrap (the old 44px floor overflowed short landscape screens and covered the question card).
     var fitCS = Math.floor(Math.min((W - GAP * (COLS - 1)) / COLS, (H - GAP * (ROWS - 1)) / ROWS));
-    CS = Math.max(20, Math.min(CS, fitCS));
+    // Official stages have room for 60px tiles; never go below that unless the wrap is smaller.
+    CS = Math.max(Math.min(60, fitCS), Math.min(CS, fitCS));
+    CS = Math.max(20, CS);
     // skills with phrase answers (stories) get wider tiles when there is room (same rows, so the walk/munch grid is unchanged)
     var wide = PL.some(function (pl) { return pl.round && pl.round.skill && pl.round.skill.wideCells; });
     CW = wide ? Math.max(CS, Math.min(Math.floor((W - GAP * (COLS - 1)) / COLS), Math.round(CS * 1.7))) : CS;
@@ -313,6 +332,10 @@
     board.style.setProperty('--icon-cs', CS + 'px');  // artswap: icon/emoji size ignores fitCells label shrink
     PL.map(function (p) { return p.el; }).concat([grumEl, starEl]).forEach(function (e) { if (e) { e.style.width = CS + 'px'; e.style.height = CS + 'px'; } });
     place(false); fitCells();
+    if (A.Kit && A.Kit.padHit) {
+      var pad = CS < TAP_MIN ? Math.ceil((TAP_MIN - CS) / 2) : 8;
+      cellEls.forEach(function (el) { A.Kit.padHit(el, pad); });
+    }
     if (layout._fitT) cancelAnimationFrame(layout._fitT);
     layout._fitT = requestAnimationFrame(function () {
       fitCells();
@@ -328,6 +351,12 @@
         layout._didRelayout = false;
       }
     });
+  }
+  // a + b / a − b tiles: show the equation only, large and unclipped (teaching ten-frame is on the prompt card)
+  function eqLabelOf(c) {
+    var s = String((c && c.label) || '');
+    if (!/^\s*\d+\s*[+−\-]\s*\d+\s*$/.test(s)) return null;
+    return s.replace(/\s*-\s*/g, ' − ').replace(/\s+/g, ' ').trim();
   }
   // Make every tile label fit inside its tile: first shrink on one line (a little), then wrap at spaces and shrink again,
   // never below MIN_FONT px for the label's text. Shrinking sets the label's own --cs, so pictures/frames scale with the text.
@@ -347,6 +376,37 @@
     if (l.querySelector('.st-ansnum')) {
       l.style.maxWidth = Math.floor(d.clientWidth * .88) + 'px';
       return;   // How-many numerals are sized from --icon-cs (~48% of the tile); do not shrink them
+    }
+    if (l.querySelector('.st-eq')) {
+      l.style.removeProperty('--icon-cs');
+      l.style.maxWidth = Math.floor(d.clientWidth * .92) + 'px';
+      l.style.fontSize = '0';   // kill the label strut so it cannot shrink the equation
+      l.style.lineHeight = '1';
+      l.style.overflow = 'visible';
+      var eq = l.querySelector('.st-eq');
+      eq.style.removeProperty('font-size');
+      eq.style.letterSpacing = /\d{2}/.test(eq.textContent || '') ? '0' : '';
+      function eqOver() {
+        // Use bounding rects on both sides so a stage scale does not look like overflow.
+        var er = eq.getBoundingClientRect(), cr = d.getBoundingClientRect(), pad = 2;
+        return er.width > cr.width * .92 || er.height > cr.height * .92 ||
+          er.left < cr.left - pad || er.right > cr.right + pad || er.top < cr.top - pad || er.bottom > cr.bottom + pad;
+      }
+      var kEq = 1, minEq = 20;
+      l.style.setProperty('--icon-cs', (CS * kEq) + 'px');
+      eq.style.fontSize = (CS * 0.42 * kEq) + 'px';
+      while (eqOver() && CS * 0.42 * kEq * .94 >= minEq) {
+        kEq *= .94;
+        l.style.setProperty('--icon-cs', (CS * kEq) + 'px');
+        eq.style.fontSize = (CS * 0.42 * kEq) + 'px';
+      }
+      // Never clip a long fact; shrink below 20px only if it still will not fit.
+      while (eqOver() && kEq > .4) {
+        kEq *= .94;
+        l.style.setProperty('--icon-cs', (CS * kEq) + 'px');
+        eq.style.fontSize = (CS * 0.42 * kEq) + 'px';
+      }
+      return;
     }
     if (A.CountVisual && A.CountVisual.fit && l.querySelector('.cv-set')) A.CountVisual.fit(d);
     if (!over(l)) return;
@@ -441,6 +501,36 @@
   function fbSay(p) { var t = ++FB.tok; FB.on = true; function end() { if (FB.tok === t) FB.on = false; } if (p && p.then) p.then(end, end); else end(); return p; }
   function cutFb() { if (FB.on) { FB.on = false; FB.tok++; V.stop(); } }
   function shortFact(f) { f = f || []; return f.length > 1 && (f[0] === 'sw_that_says' || f[0] === 'w_thats') ? f.slice(1) : f; }
+  var TAP_MIN = 60;
+  function pressCell(el) {
+    if (!el) return;
+    cellEls.forEach(function (x) { x.classList.remove('press'); });
+    el.classList.add('press');
+    setTimeout(function () { if (el) el.classList.remove('press'); }, 160);
+  }
+  function cellTargets() {
+    var slop = (A.Kit && A.Kit.tapSlop) ? A.Kit.tapSlop() : 28;
+    return cellEls.map(function (el, i) {
+      var r = el.getBoundingClientRect();
+      if (!r.width || !r.height) return null;
+      return { i: i, el: el, x: r.left + r.width / 2, y: r.top + r.height / 2, r: Math.max(Math.max(r.width, r.height) / 2 + slop, TAP_MIN / 2) };
+    }).filter(Boolean);
+  }
+  function pickCellAt(x, y) {
+    var t = (A.Kit && A.Kit.nearest) ? A.Kit.nearest(x, y, cellTargets()) : null;
+    if (t) return t;
+    var n = document.elementFromPoint(x, y);
+    var el = n && n.closest ? n.closest('#board .cell') : null;
+    var i = el ? cellEls.indexOf(el) : -1;
+    return i >= 0 ? { i: i, el: el } : null;
+  }
+  function onBoardPointer(e) {
+    if (!G.active || blocked()) return;
+    var t = pickCellAt(e.clientX, e.clientY);
+    if (!t) return;
+    pressCell(t.el);
+    onCellTap(t.i);
+  }
   function onCellTap(i) { // mouse / touch: Player 1 only
     var pl = PL[0];
     if (!G.active || blocked()) return;
@@ -513,8 +603,12 @@
       var praise = YUM_TEXT[(pl.correct + pl.i) % YUM_TEXT.length];
       G.lastFact = cell.fact || [];   // the number fact stays behind the Hear button (not spoken mid-choice)
       // Word-reading (cloze, picture, or listen): say the word after a right munch. Speech is optional; the prompt stays visual.
-      if (cell.fact && cell.fact.length && (pl.rule.listen || pl.rule.cloze || pl.rule.pic)) {
-        fbSay(V.say(shortFact(cell.fact), { kind: 'listen', bubble: false }));
+      // Pre-readers also hear the word on a right munch (and again on Hear) for rhyme / start / sight / letter boards.
+      var pre = A.MunchRules && A.MunchRules.littleReader ? A.MunchRules.littleReader(pl.P) : (A.Age && A.Age.of && A.Age.of(pl.P) < 6);
+      var wordSay = (cell.name && cell.name.length) ? cell.name : (cell.fact && cell.fact.length ? shortFact(cell.fact) : null);
+      if (wordSay && (pl.rule.listen || pl.rule.cloze || pl.rule.pic || (pre && (pl.rule.reading || pl.rule.sayWord)))) {
+        G.lastFact = wordSay;
+        fbSay(V.say(shortFact(wordSay), { kind: 'listen', bubble: false }));
       }
       if (pl.remaining <= 0) {
         pl.done = true; pl.doneAt = Date.now();
@@ -602,7 +696,7 @@
       // the bubble still says "All done!" from the board that just ended: reset it for the new board, and say its new rule
       bubble('Board ' + r.board + ' of ' + r.boards + '!');
       var rule = $('#rule'); rule.classList.remove('pop'); void rule.offsetWidth; rule.classList.add('pop');
-      Promise.resolve(doneSaid).then(function () { if (G.active && r.board === bn && PL[0].round === r && !V.isSpeaking()) V.say(ruleParts(true), { kind: ruleKind() }); });   // after "All done!" finishes
+      Promise.resolve(doneSaid).then(function () { if (G.active && r.board === bn && PL[0].round === r) speakBoardRule(true); });   // after "All done!" finishes; speakBoardRule cuts off leftover speech
       if (T.on) { var add = Math.round(secondsFor(pl)); T.left += add; T.limit = Math.max(T.limit, T.left); T.low = false; renderTimer(); }
       poke();
     }, 900);
@@ -649,8 +743,15 @@
     if (dg) return dg + workedHtml0(pl);
     return workedHtml0(pl);
   }
+  // Prefer an adding / take-away tile for the walkthrough so mixed "equals N" boards
+  // (which also show the numeral) still get a number line and count-on dots.
+  function exampleCell() {
+    var goods = G.cells.filter(function (c) { return c.ok; });
+    var eq = goods.filter(function (c) { return /^\d+\s*[+−]\s*\d+$/.test(String(c.label || '')); });
+    return eq[0] || goods[0] || {};
+  }
   function workedHtml0(pl) {
-    var r = pl.rule, good = G.cells.filter(function (c) { return c.ok; })[0] || {}, lab = String(good.label || ''), m;
+    var r = pl.rule, good = exampleCell(), lab = String(good.label || ''), m;
     if (r.rc) {
       var pass = (r.text.match(/<span class="ea-story">([\s\S]*?)<\/span>/) || [])[1] || '', sents = pass.match(/[^.!?]+[.!?]+/g) || [pass];
       var aw = String(r.target).toLowerCase().match(/[a-z']+/g) || [], qw = String(r.q || '').toLowerCase().match(/[a-z']+/g) || [];
@@ -672,7 +773,7 @@
   }
   function workedExample(pl) {
     if (pl.workedOpen) return Promise.resolve(); pl.workedOpen = true; pl.workedShown = true;
-    var good = G.cells.filter(function (c) { return c.ok; })[0] || {}, voice = ['coach_watch_me'].concat(pl.rule.rc ? pl.rule.say : (good.fact || []));
+    var good = exampleCell(), voice = ['coach_watch_me'].concat(pl.rule.rc ? pl.rule.say : (good.fact || []));
     return UI.card({ cls: 'worked-card', tag: 'Watch me!', title: "Let's do one together", html: workedHtml(pl), btn: 'Got it! ▶', voice: voice, voiceMix: [[['coach_watch_me'], 'chatter'], [voice.slice(1), pl.rule.listen ? 'listen' : 'answer']], minMs: 600 })
       .then(function () { pl.workedOpen = false; });
   }
@@ -911,6 +1012,17 @@
     if (!TWO) return ruleSay(PL[0], auto);
     return PL.reduce(function (a, pl) { return a.concat([nameParts(pl.P)]).concat(ruleSay(pl, auto)); }, []);
   }
+  function voiceOn() { return !!(S.voice && A.Talk.mode() !== 'off'); }
+  function ruleKind() { return PL.some(function (pl) { return pl.rule && pl.rule.listen; }) ? 'listen' : 'prompt'; }
+  // Auto-speak the board rule whenever talking isn't Off, even in Tap-to-hear (the rule is how you play).
+  // Replay (button / R / bubble) always uses kind 'tap'. V.say stops any clip already playing, so lines never overlap.
+  function speakBoardRule(auto) {
+    if (!PL[0] || !PL[0].rule || !voiceOn()) return;
+    var parts = ruleParts(!!auto);
+    if (!parts || !parts.length) return;
+    var kind = auto ? ((A.Talk.allows('prompt') || A.Talk.allows(ruleKind())) ? ruleKind() : 'tap') : 'tap';
+    V.say(parts, { kind: kind });
+  }
   function startLevel() {
     PL.forEach(setupBoards);
     buildLevel();
@@ -918,16 +1030,14 @@
     renderBoard(); G.active = true; G.winner = null;
     var rule = $('#rule'); rule.classList.remove('pop'); void rule.offsetWidth; rule.classList.add('pop');
     bubble(TWO ? (MODE === 'team' ? 'Munch your own color — together!' : 'Munch your own color — go!') : A.isTouchOnly() ? 'Tap a square to walk. Tap your friend to munch!' : 'Arrow keys to move · Space to munch!');
-    var parts = ruleParts(true);
     // 2026-10-22 voice: short intro: only the rule is spoken (once, as the prompt); the how-to stays in the bubble
     G.first = false;
-    V.say(parts, { kind: ruleKind() });
+    speakBoardRule(true);
     startTimer(); startGrumbly(); poke(); M.play('game');
   }
-  function ruleKind() { return PL.some(function (pl) { return pl.rule && pl.rule.listen; }) ? 'listen' : 'prompt'; }
-  // 🔊 button, R key, tapping the rule or the friend's bubble: the kid asked, so it plays at every setting but Off
+  // Hear-it-again button, R key, tapping the rule or the friend's bubble: the kid asked, so it plays at every setting but Off
   function speakRule() {
-    if (!PL[0].rule) return;
+    if (!PL[0] || !PL[0].rule) return;
     if (A.Talk.mode() === 'off' || !S.voice) { bubble(S.voice ? 'Talking is off. Read the question at the top!' : 'Voice is off (grown-up settings).'); return; }
     var parts = ruleParts() || [];
     if (G.lastFact && G.lastFact.length) parts = parts.concat(G.lastFact);
@@ -1225,12 +1335,31 @@
     if (mv) { if (e.repeat && now - pl.lastMove < 150) return; pl.lastMove = now; moveBy(who, mv[0], mv[1]); }
     else if (mu) { if (e.repeat || now < skipGuard) return; if (who === 0) { var mb = $('#munchBtn'); mb.classList.add('pressed'); setTimeout(function () { mb.classList.remove('pressed'); }, 120); } munch(who); }
   }, true);
-  $('#munchBtn').addEventListener('click', function (e) { if (e.detail === 0) return; munch(0); });
-  $('#speakBtn').addEventListener('click', function (e) { e.stopPropagation(); if (!S.voice) { bubble('Voice is off (grown-up settings).'); return; } speakRule(); });
-  $('#rule').addEventListener('click', speakRule);
+  function onMunchBtn(e) { if (e && e.type === 'click' && e.detail === 0) return; munch(0); }
+  function hearAgain(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    if (!S.voice) { bubble('Voice is off (grown-up settings).'); return; }
+    speakRule();
+  }
+  if (A.Kit && A.Kit.onPointer) {
+    A.Kit.onPointer($('#munchBtn'), onMunchBtn);
+    A.Kit.onPointer($('#speakBtn'), hearAgain);
+    A.Kit.onPointer($('#rule'), function (e) {
+      if (e && e.target && e.target.closest && e.target.closest('#speakBtn')) return;
+      hearAgain(e);
+    });
+    A.Kit.onPointer($('#bubble'), hearAgain);
+    if (wrap) A.Kit.onPointer(wrap, onBoardPointer, { move: 20 });
+  } else {
+    $('#munchBtn').addEventListener('click', onMunchBtn);
+    $('#speakBtn').addEventListener('click', hearAgain);
+    $('#rule').addEventListener('click', function (e) { if (e.target && e.target.closest && e.target.closest('#speakBtn')) return; speakRule(); });
+    $('#bubble').addEventListener('click', function (e) { e.stopPropagation(); hearAgain(e); });
+    if (wrap) wrap.addEventListener('click', onBoardPointer);
+  }
   // the bubble is the food friend talking: their face at its left (2026-10-22 voice)
   (function () { var bb = $('#bubble'); if (!bb || bb.querySelector('.bfriend') || !P1) return; var f = document.createElement('span'); f.className = 'bfriend'; f.setAttribute('aria-hidden', 'true'); try { f.innerHTML = A.Blobs.forProfile(P1, { expr: 'happy' }); } catch (e) {} bb.insertBefore(f, bb.firstChild); })();
-  $('#bubble').classList.add('tappable'); $('#bubble').setAttribute('title', 'Tap to hear the question'); $('#bubble').addEventListener('click', function (e) { e.stopPropagation(); speakRule(); });
+  $('#bubble').classList.add('tappable'); $('#bubble').setAttribute('title', 'Tap to hear the question');
   function toggleMusic() { var on = M.toggle(); renderMusicBtn(); bubble(on ? 'Music on 🎵' : 'Music off'); }
   function renderMusicBtn() { var b = $('#musicBtn'); b.classList.toggle('off', S.music === false); b.setAttribute('aria-label', S.music === false ? 'Music is off (M)' : 'Music is on (M)'); }
   $('#musicBtn').addEventListener('click', function (e) { e.stopPropagation(); toggleMusic(); });
@@ -1307,6 +1436,7 @@
   }
   var clockEl = document.querySelector('#timer .clock'); if (clockEl && A.Icons) clockEl.innerHTML = A.Icons.html('⏱', { size: 28, decorative: true, cls: 'pp-pic', slot: 'munch:timer' });
   window.__munch = { showIdleHand: showIdleHand, shortFact: shortFact, fbOn: function () { return FB.on; }, cellTap: function (i) { onCellTap(i); }, hideHand: hideHand, poke: poke, IDLE_MS: IDLE_MS, nearestGood: nearestGood, renderRule: renderRule, fitRulePic: fitRulePic, fitBubble: fitBubble, layout: layout, cutscene: cutscene, gentleStars: gentleStars, withBonus: withBonus, timerFor: timerFor, G: G, PL: PL, T: T, B: B, openBonus: openBonus, gentle: GENTLE, retryRound: retryRound, P: function () { return P1; }, two: TWO, mode: MODE, munch: munch, moveBy: function (a, b, c) { if (c === undefined) return moveBy(0, a, b); return moveBy(a, b, c); },
-    onCellTap: onCellTap, nextRound: nextRound, unlockScene: unlockScene, story: STORY, SR: function () { return SR; }, cutscene: cutscene, endRound: endRound, showStar: showStar, fitCells: fitCells, workedExample: workedExample, coachAfter: coachAfter, celebrateStreak: celebrateStreak, renderBoard: renderBoard, setTimeLeft: function (s) { T.left = s; renderTimer(); }, COLS: COLS,
+    onCellTap: onCellTap, pickCellAt: pickCellAt, onBoardPointer: onBoardPointer, speakRule: speakRule, speakBoardRule: speakBoardRule, ruleParts: ruleParts, TAP_MIN: TAP_MIN,
+    nextRound: nextRound, unlockScene: unlockScene, story: STORY, SR: function () { return SR; }, cutscene: cutscene, endRound: endRound, showStar: showStar, fitCells: fitCells, workedExample: workedExample, coachAfter: coachAfter, celebrateStreak: celebrateStreak, renderBoard: renderBoard, setTimeLeft: function (s) { T.left = s; renderTimer(); }, COLS: COLS,
     goTo: function (i, cell) { if (cell === undefined) { cell = i; i = 0; } var pl = PL[i]; pl.target = null; clearTimeout(pl.walkT); pl.walkT = null; pl.pos = { r: Math.floor(cell / COLS), c: cell % COLS }; place(true); checkStar(pl); }, playStop: playStop };
 })(window.Arcade);

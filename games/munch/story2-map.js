@@ -206,9 +206,15 @@
       b.addEventListener('click', function () { if (!busy) openPlace(k); });
       board.appendChild(b);
     });
-    // unreached worlds stay fogged plates — no name, no icon
+    // unreached worlds stay under a cloud cluster — no name, no icon. Keep unlock logic as-is.
     S2.PLACES.forEach(function (pl, k) {
       if (R.indexOf(k) >= 0) return;
+      var cloud = A.StoryArt && A.StoryArt.cloudPct && A.StoryArt.cloudPct(pl.id);
+      var curl = A.StoryArt && A.StoryArt.cloudURL && A.StoryArt.cloudURL(pl.id);
+      if (cloud && curl) {
+        board.appendChild(A.el('<img class="s2-world-cloud" alt="" src="' + curl + '" style="left:' + cloud.l + '%;top:' + cloud.t + '%;width:' + cloud.w + '%;height:' + cloud.h + '%">'));
+        return;
+      }
       var pct = A.StoryArt && A.StoryArt.regionPct(pl.id);
       var style = pct ? ('left:' + pct.l + '%;top:' + pct.t + '%;width:' + pct.w + '%;height:' + pct.h + '%') : ('left:' + WXY[k][0] + '%;top:' + WXY[k][1] + '%');
       board.appendChild(A.el('<div class="s2-fog" aria-hidden="true" style="' + style + '"><span class="s2-cloud"></span><span class="s2-cloud"></span><span class="s2-cloud"></span></div>'));

@@ -312,13 +312,12 @@
     var miss = p ? missedList(p).map(function (m) { return m.k; }) : [], hot = fam.filter(function (f) { return miss.indexOf(f.label) >= 0; });
     return hot.length && Math.random() < .5 ? pick(hot) : pick(fam);
   }
-  // batch-1107c: a step with few facts for T still gets different-looking targets on one board, same fact, same band:
-  // look 0 = a + b, 1 = b + a (adding), 2 = the fact with a ten-frame picture of the first number
+  // batch-1107c / munch-tiles1124: a step with few facts for T still gets different-looking targets
+  // on one board, same fact, same band: look 0 = a + b, 1 = b + a (adding). Per-tile ten-frames were
+  // dropped so the equation stays large and readable; the teaching frame lives on the prompt card.
   function lookOf(c, f, k, think) {
     if (think || !k) return c; k = k % 3;
-    if (k === 1 && f.op === '+' && f.a !== f.b) { c.label = f.b + ' + ' + f.a; c.fact = [f.b, 'w_plus', f.a, 'w_is', f.v]; c.look = 'swap'; return c; }
-    if (k === 1 && A.Learn && A.Learn.dotsFor && f.a <= 20 && f.b <= 20) { c.html = '<span class="lk-pic">' + A.esc(c.label) + '<span class="lk-row">' + A.Learn.dotsFor(f.a) + A.Learn.dotsFor(f.b) + '</span></span>'; c.long = true; c.look = 'both'; return c; }
-    if (A.Learn && A.Learn.dotsFor && f.a <= 20) { c.html = '<span class="lk-pic">' + A.esc(c.label) + A.Learn.dotsFor(f.a) + '</span>'; c.long = true; c.look = 'frame'; }
+    if (k === 1 && f.op === '+' && f.a !== f.b) { c.label = f.b + ' + ' + f.a; c.fact = [f.b, 'w_plus', f.a, 'w_is', f.v]; c.look = 'swap'; }
     return c;
   }
   function genFacts(s) {
@@ -328,7 +327,7 @@
       var goods = fam.filter(function (f) { return f.v === T; }), rv = due.filter(function (f) { return f.v === T && !goods.some(function (g) { return g.label === f.label; }); }).slice(0, 2);
       var bads = fam.filter(function (f) { return f.v !== T && Math.abs(f.v - T) <= 3; });
       var think = s.id === 's_think', rvLeft = rv.length, n = 0;
-      return { text: think ? 'Munch where ' + BOX + ' is ' + em(T) : 'Munch the ones that make ' + em(T), say: [think ? 'munch_rule_missing' : 'munch_rule_make', T], step: s.id, hint: '',
+      return { text: think ? 'Munch where ' + BOX + ' is ' + em(T) : 'Munch the equations that equal ' + em(T), say: [think ? 'munch_rule_missing' : 'munch_rule_make', T], step: s.id, hint: '',
         stepHint: function (cell, lvl) { return factHint(hintFact(cell && cell.f, goods, T, s.id), lvl, s.id); }, target: T, worked: function (cell) { return worked(s, null, cell && cell.f || goods[0]); },
         good: function () { n++; var f = rvLeft > 0 && Math.random() < .35 ? rv[--rvLeft] : goods[(n - 1) % goods.length]; var c = lookOf(cellF(f, s.id), f, Math.floor((n - 1) / goods.length), think); if (rv.indexOf(f) >= 0) c.review = true; return c; },
         bad: function () { var f = bads.length >= 2 && Math.random() < .7 ? pick(bads) : nearFact(pick(goods)); return lookOf(cellF(f, s.id), f, rnd(0, 2), think); } };   // distractors use the same looks (no look is a giveaway)
@@ -486,7 +485,7 @@
   /* batch1 (2026-10-31): the first half of the 2nd-grade math ladder, after even/odd (i-Ready Classroom Mathematics Grade 2 /
      Khan 2nd grade order; questions are our own): 2-digit adding and taking away without, then with regrouping (2.NBT.5),
      hundreds-tens-ones to 1,000 (2.NBT.1, 2.NBT.3), comparing 3-digit numbers (2.NBT.4), skip counting by 5s, 10s, 100s (2.NBT.2).
-     Munch boards: "Munch the ones that make 59" with different 2-digit sums (or "Munch 345" style for place value).
+     Munch boards: "Munch the equations that equal 59" with different 2-digit sums (or "Munch 345" style for place value).
      Wrong answers are the real mistakes: forgetting to regroup, the ten off by one, digits swapped. */
   function g2Ok(kind, a, b) {
     var ao = a % 10, bo = b % 10;
@@ -529,7 +528,7 @@
       if (!bads.length) bads = [F(f0.a, f0.op, f0.b + 1)];
       goods = A.shuffle(goods); bads = A.shuffle(bads.filter(function (f, i, a) { return a.map(function (x) { return x.label; }).indexOf(f.label) === i; })); var gn = 0, bn = 0;
       function next(pool, n) { var f = pool[n % pool.length]; return n < pool.length ? g2Cell(f) : pvLook(f.v, 1 + n - pool.length); }
-      return { text: 'Munch the ones that make ' + em(T), say: ['munch_rule_make', T], step: s.id, hint: '', target: T,
+      return { text: 'Munch the equations that equal ' + em(T), say: ['munch_rule_make', T], step: s.id, hint: '', target: T,
         stepHint: function (cell, lvl) { return g2Hint(cell && cell.f && cell.f.v === T ? cell.f : pick(goods), lvl); }, worked: function (cell) { var w = pick(goods); return '<div class="worked st-worked"><p class="st-wq">Watch: <b>' + w.label + '</b></p><div class="st-steps"><div class="s1">' + g2Hint(w, 1) + '</div><div class="s2">' + g2Hint(w, 2) + '</div></div></div>'; },
         good: function () { return next(goods, gn++); }, bad: function () { return next(bads, bn++); } };
     };
