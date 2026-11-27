@@ -4662,6 +4662,1206 @@
         "48": "objects/seat_48.png",
         "32": "objects/seat_32.png"
       }
+    },
+    {
+      "id": "rhymes.balloon",
+      "label": "balloon",
+      "file": "picture_words/rhymes/balloon.png",
+      "sizes": {
+        "256": "picture_words/rhymes/balloon.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.bat",
+      "label": "bat",
+      "file": "picture_words/rhymes/bat.png",
+      "sizes": {
+        "256": "picture_words/rhymes/bat.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.bear",
+      "label": "bear",
+      "file": "picture_words/rhymes/bear.png",
+      "sizes": {
+        "256": "picture_words/rhymes/bear.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.bed",
+      "label": "bed",
+      "file": "picture_words/rhymes/bed.png",
+      "sizes": {
+        "256": "picture_words/rhymes/bed.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.bee",
+      "label": "bee",
+      "file": "picture_words/rhymes/bee.png",
+      "sizes": {
+        "256": "picture_words/rhymes/bee.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.boat",
+      "label": "boat",
+      "file": "picture_words/rhymes/boat.png",
+      "sizes": {
+        "256": "picture_words/rhymes/boat.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.bread",
+      "label": "bread",
+      "file": "picture_words/rhymes/bread.png",
+      "sizes": {
+        "256": "picture_words/rhymes/bread.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.cake",
+      "label": "cake",
+      "file": "picture_words/rhymes/cake.png",
+      "sizes": {
+        "256": "picture_words/rhymes/cake.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.car",
+      "label": "car",
+      "file": "picture_words/rhymes/car.png",
+      "sizes": {
+        "256": "picture_words/rhymes/car.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.cat",
+      "label": "cat",
+      "file": "picture_words/rhymes/cat.png",
+      "sizes": {
+        "256": "picture_words/rhymes/cat.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.chain",
+      "label": "chain",
+      "file": "picture_words/rhymes/chain.png",
+      "sizes": {
+        "256": "picture_words/rhymes/chain.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.chair",
+      "label": "chair",
+      "file": "picture_words/rhymes/chair.png",
+      "sizes": {
+        "256": "picture_words/rhymes/chair.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.clock",
+      "label": "clock",
+      "file": "picture_words/rhymes/clock.png",
+      "sizes": {
+        "256": "picture_words/rhymes/clock.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.coat",
+      "label": "coat",
+      "file": "picture_words/rhymes/coat.png",
+      "sizes": {
+        "256": "picture_words/rhymes/coat.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.eye",
+      "label": "eye",
+      "file": "picture_words/rhymes/eye.png",
+      "sizes": {
+        "256": "picture_words/rhymes/eye.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.fly",
+      "label": "fly",
+      "file": "picture_words/rhymes/fly.png",
+      "sizes": {
+        "256": "picture_words/rhymes/fly.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.goat",
+      "label": "goat",
+      "file": "picture_words/rhymes/goat.png",
+      "sizes": {
+        "256": "picture_words/rhymes/goat.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.guitar",
+      "label": "guitar",
+      "file": "picture_words/rhymes/guitar.png",
+      "sizes": {
+        "256": "picture_words/rhymes/guitar.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.hair",
+      "label": "hair",
+      "file": "picture_words/rhymes/hair.png",
+      "sizes": {
+        "256": "picture_words/rhymes/hair.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.hat",
+      "label": "hat",
+      "file": "picture_words/rhymes/hat.png",
+      "sizes": {
+        "256": "picture_words/rhymes/hat.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.head",
+      "label": "head",
+      "file": "picture_words/rhymes/head.png",
+      "sizes": {
+        "256": "picture_words/rhymes/head.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.jar",
+      "label": "jar",
+      "file": "picture_words/rhymes/jar.png",
+      "sizes": {
+        "256": "picture_words/rhymes/jar.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.key",
+      "label": "key",
+      "file": "picture_words/rhymes/key.png",
+      "sizes": {
+        "256": "picture_words/rhymes/key.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.knee",
+      "label": "knee",
+      "file": "picture_words/rhymes/knee.png",
+      "sizes": {
+        "256": "picture_words/rhymes/knee.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.lock",
+      "label": "lock",
+      "file": "picture_words/rhymes/lock.png",
+      "sizes": {
+        "256": "picture_words/rhymes/lock.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.mat",
+      "label": "mat",
+      "file": "picture_words/rhymes/mat.png",
+      "sizes": {
+        "256": "picture_words/rhymes/mat.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.moon",
+      "label": "moon",
+      "file": "picture_words/rhymes/moon.png",
+      "sizes": {
+        "256": "picture_words/rhymes/moon.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.pear",
+      "label": "pear",
+      "file": "picture_words/rhymes/pear.png",
+      "sizes": {
+        "256": "picture_words/rhymes/pear.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.pie",
+      "label": "pie",
+      "file": "picture_words/rhymes/pie.png",
+      "sizes": {
+        "256": "picture_words/rhymes/pie.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.plane",
+      "label": "plane",
+      "file": "picture_words/rhymes/plane.png",
+      "sizes": {
+        "256": "picture_words/rhymes/plane.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.raccoon",
+      "label": "raccoon",
+      "file": "picture_words/rhymes/raccoon.png",
+      "sizes": {
+        "256": "picture_words/rhymes/raccoon.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.rain",
+      "label": "rain",
+      "file": "picture_words/rhymes/rain.png",
+      "sizes": {
+        "256": "picture_words/rhymes/rain.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.rake",
+      "label": "rake",
+      "file": "picture_words/rhymes/rake.png",
+      "sizes": {
+        "256": "picture_words/rhymes/rake.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.rat",
+      "label": "rat",
+      "file": "picture_words/rhymes/rat.png",
+      "sizes": {
+        "256": "picture_words/rhymes/rat.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.red",
+      "label": "red",
+      "file": "picture_words/rhymes/red.png",
+      "sizes": {
+        "256": "picture_words/rhymes/red.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.rock",
+      "label": "rock",
+      "file": "picture_words/rhymes/rock.png",
+      "sizes": {
+        "256": "picture_words/rhymes/rock.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.sled",
+      "label": "sled",
+      "file": "picture_words/rhymes/sled.png",
+      "sizes": {
+        "256": "picture_words/rhymes/sled.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.snake",
+      "label": "snake",
+      "file": "picture_words/rhymes/snake.png",
+      "sizes": {
+        "256": "picture_words/rhymes/snake.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.snowflake",
+      "label": "snowflake",
+      "file": "picture_words/rhymes/snowflake.png",
+      "sizes": {
+        "256": "picture_words/rhymes/snowflake.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.sock",
+      "label": "sock",
+      "file": "picture_words/rhymes/sock.png",
+      "sizes": {
+        "256": "picture_words/rhymes/sock.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.spoon",
+      "label": "spoon",
+      "file": "picture_words/rhymes/spoon.png",
+      "sizes": {
+        "256": "picture_words/rhymes/spoon.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.star",
+      "label": "star",
+      "file": "picture_words/rhymes/star.png",
+      "sizes": {
+        "256": "picture_words/rhymes/star.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.three",
+      "label": "three",
+      "file": "picture_words/rhymes/three.png",
+      "sizes": {
+        "256": "picture_words/rhymes/three.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.tie",
+      "label": "tie",
+      "file": "picture_words/rhymes/tie.png",
+      "sizes": {
+        "256": "picture_words/rhymes/tie.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.train",
+      "label": "train",
+      "file": "picture_words/rhymes/train.png",
+      "sizes": {
+        "256": "picture_words/rhymes/train.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "rhymes.tree",
+      "label": "tree",
+      "file": "picture_words/rhymes/tree.png",
+      "sizes": {
+        "256": "picture_words/rhymes/tree.png"
+      },
+      "set": "rhymes",
+      "emoji": []
+    },
+    {
+      "id": "words.balloon",
+      "label": "balloon",
+      "file": "picture_words/words/balloon.png",
+      "sizes": {
+        "256": "picture_words/words/balloon.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.banana",
+      "label": "banana",
+      "file": "picture_words/words/banana.png",
+      "sizes": {
+        "256": "picture_words/words/banana.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.bear",
+      "label": "bear",
+      "file": "picture_words/words/bear.png",
+      "sizes": {
+        "256": "picture_words/words/bear.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.bed",
+      "label": "bed",
+      "file": "picture_words/words/bed.png",
+      "sizes": {
+        "256": "picture_words/words/bed.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.bee",
+      "label": "bee",
+      "file": "picture_words/words/bee.png",
+      "sizes": {
+        "256": "picture_words/words/bee.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.bell",
+      "label": "bell",
+      "file": "picture_words/words/bell.png",
+      "sizes": {
+        "256": "picture_words/words/bell.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.book",
+      "label": "book",
+      "file": "picture_words/words/book.png",
+      "sizes": {
+        "256": "picture_words/words/book.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.bus",
+      "label": "bus",
+      "file": "picture_words/words/bus.png",
+      "sizes": {
+        "256": "picture_words/words/bus.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.deer",
+      "label": "deer",
+      "file": "picture_words/words/deer.png",
+      "sizes": {
+        "256": "picture_words/words/deer.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.dinosaur",
+      "label": "dinosaur",
+      "file": "picture_words/words/dinosaur.png",
+      "sizes": {
+        "256": "picture_words/words/dinosaur.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.dog",
+      "label": "dog",
+      "file": "picture_words/words/dog.png",
+      "sizes": {
+        "256": "picture_words/words/dog.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.dolphin",
+      "label": "dolphin",
+      "file": "picture_words/words/dolphin.png",
+      "sizes": {
+        "256": "picture_words/words/dolphin.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.door",
+      "label": "door",
+      "file": "picture_words/words/door.png",
+      "sizes": {
+        "256": "picture_words/words/door.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.duck",
+      "label": "duck",
+      "file": "picture_words/words/duck.png",
+      "sizes": {
+        "256": "picture_words/words/duck.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.fire",
+      "label": "fire",
+      "file": "picture_words/words/fire.png",
+      "sizes": {
+        "256": "picture_words/words/fire.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.fish",
+      "label": "fish",
+      "file": "picture_words/words/fish.png",
+      "sizes": {
+        "256": "picture_words/words/fish.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.foot",
+      "label": "foot",
+      "file": "picture_words/words/foot.png",
+      "sizes": {
+        "256": "picture_words/words/foot.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.fox",
+      "label": "fox",
+      "file": "picture_words/words/fox.png",
+      "sizes": {
+        "256": "picture_words/words/fox.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.ghost",
+      "label": "ghost",
+      "file": "picture_words/words/ghost.png",
+      "sizes": {
+        "256": "picture_words/words/ghost.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.goat",
+      "label": "goat",
+      "file": "picture_words/words/goat.png",
+      "sizes": {
+        "256": "picture_words/words/goat.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.guitar",
+      "label": "guitar",
+      "file": "picture_words/words/guitar.png",
+      "sizes": {
+        "256": "picture_words/words/guitar.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.hammer",
+      "label": "hammer",
+      "file": "picture_words/words/hammer.png",
+      "sizes": {
+        "256": "picture_words/words/hammer.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.heart",
+      "label": "heart",
+      "file": "picture_words/words/heart.png",
+      "sizes": {
+        "256": "picture_words/words/heart.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.helicopter",
+      "label": "helicopter",
+      "file": "picture_words/words/helicopter.png",
+      "sizes": {
+        "256": "picture_words/words/helicopter.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.hippo",
+      "label": "hippo",
+      "file": "picture_words/words/hippo.png",
+      "sizes": {
+        "256": "picture_words/words/hippo.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.house",
+      "label": "house",
+      "file": "picture_words/words/house.png",
+      "sizes": {
+        "256": "picture_words/words/house.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.kangaroo",
+      "label": "kangaroo",
+      "file": "picture_words/words/kangaroo.png",
+      "sizes": {
+        "256": "picture_words/words/kangaroo.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.key",
+      "label": "key",
+      "file": "picture_words/words/key.png",
+      "sizes": {
+        "256": "picture_words/words/key.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.kite",
+      "label": "kite",
+      "file": "picture_words/words/kite.png",
+      "sizes": {
+        "256": "picture_words/words/kite.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.koala",
+      "label": "koala",
+      "file": "picture_words/words/koala.png",
+      "sizes": {
+        "256": "picture_words/words/koala.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.ladybug",
+      "label": "ladybug",
+      "file": "picture_words/words/ladybug.png",
+      "sizes": {
+        "256": "picture_words/words/ladybug.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.leaf",
+      "label": "leaf",
+      "file": "picture_words/words/leaf.png",
+      "sizes": {
+        "256": "picture_words/words/leaf.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.lemon",
+      "label": "lemon",
+      "file": "picture_words/words/lemon.png",
+      "sizes": {
+        "256": "picture_words/words/lemon.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.lion",
+      "label": "lion",
+      "file": "picture_words/words/lion.png",
+      "sizes": {
+        "256": "picture_words/words/lion.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.lizard",
+      "label": "lizard",
+      "file": "picture_words/words/lizard.png",
+      "sizes": {
+        "256": "picture_words/words/lizard.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.lock",
+      "label": "lock",
+      "file": "picture_words/words/lock.png",
+      "sizes": {
+        "256": "picture_words/words/lock.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.lollipop",
+      "label": "lollipop",
+      "file": "picture_words/words/lollipop.png",
+      "sizes": {
+        "256": "picture_words/words/lollipop.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.magnet",
+      "label": "magnet",
+      "file": "picture_words/words/magnet.png",
+      "sizes": {
+        "256": "picture_words/words/magnet.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.map",
+      "label": "map",
+      "file": "picture_words/words/map.png",
+      "sizes": {
+        "256": "picture_words/words/map.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.milk",
+      "label": "milk",
+      "file": "picture_words/words/milk.png",
+      "sizes": {
+        "256": "picture_words/words/milk.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.monkey",
+      "label": "monkey",
+      "file": "picture_words/words/monkey.png",
+      "sizes": {
+        "256": "picture_words/words/monkey.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.moon",
+      "label": "moon",
+      "file": "picture_words/words/moon.png",
+      "sizes": {
+        "256": "picture_words/words/moon.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.mouse",
+      "label": "mouse",
+      "file": "picture_words/words/mouse.png",
+      "sizes": {
+        "256": "picture_words/words/mouse.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.mushroom",
+      "label": "mushroom",
+      "file": "picture_words/words/mushroom.png",
+      "sizes": {
+        "256": "picture_words/words/mushroom.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.nose",
+      "label": "nose",
+      "file": "picture_words/words/nose.png",
+      "sizes": {
+        "256": "picture_words/words/nose.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.panda",
+      "label": "panda",
+      "file": "picture_words/words/panda.png",
+      "sizes": {
+        "256": "picture_words/words/panda.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.pear",
+      "label": "pear",
+      "file": "picture_words/words/pear.png",
+      "sizes": {
+        "256": "picture_words/words/pear.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.pencil",
+      "label": "pencil",
+      "file": "picture_words/words/pencil.png",
+      "sizes": {
+        "256": "picture_words/words/pencil.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.penguin",
+      "label": "penguin",
+      "file": "picture_words/words/penguin.png",
+      "sizes": {
+        "256": "picture_words/words/penguin.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.pig",
+      "label": "pig",
+      "file": "picture_words/words/pig.png",
+      "sizes": {
+        "256": "picture_words/words/pig.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.pineapple",
+      "label": "pineapple",
+      "file": "picture_words/words/pineapple.png",
+      "sizes": {
+        "256": "picture_words/words/pineapple.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.pizza",
+      "label": "pizza",
+      "file": "picture_words/words/pizza.png",
+      "sizes": {
+        "256": "picture_words/words/pizza.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.popcorn",
+      "label": "popcorn",
+      "file": "picture_words/words/popcorn.png",
+      "sizes": {
+        "256": "picture_words/words/popcorn.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.rainbow",
+      "label": "rainbow",
+      "file": "picture_words/words/rainbow.png",
+      "sizes": {
+        "256": "picture_words/words/rainbow.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.ring",
+      "label": "ring",
+      "file": "picture_words/words/ring.png",
+      "sizes": {
+        "256": "picture_words/words/ring.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.robot",
+      "label": "robot",
+      "file": "picture_words/words/robot.png",
+      "sizes": {
+        "256": "picture_words/words/robot.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.rocket",
+      "label": "rocket",
+      "file": "picture_words/words/rocket.png",
+      "sizes": {
+        "256": "picture_words/words/rocket.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.rose",
+      "label": "rose",
+      "file": "picture_words/words/rose.png",
+      "sizes": {
+        "256": "picture_words/words/rose.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.salad",
+      "label": "salad",
+      "file": "picture_words/words/salad.png",
+      "sizes": {
+        "256": "picture_words/words/salad.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.sandwich",
+      "label": "sandwich",
+      "file": "picture_words/words/sandwich.png",
+      "sizes": {
+        "256": "picture_words/words/sandwich.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.seal",
+      "label": "seal",
+      "file": "picture_words/words/seal.png",
+      "sizes": {
+        "256": "picture_words/words/seal.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.shell",
+      "label": "shell",
+      "file": "picture_words/words/shell.png",
+      "sizes": {
+        "256": "picture_words/words/shell.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.soap",
+      "label": "soap",
+      "file": "picture_words/words/soap.png",
+      "sizes": {
+        "256": "picture_words/words/soap.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.sock",
+      "label": "sock",
+      "file": "picture_words/words/sock.png",
+      "sizes": {
+        "256": "picture_words/words/sock.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.sun",
+      "label": "sun",
+      "file": "picture_words/words/sun.png",
+      "sizes": {
+        "256": "picture_words/words/sun.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.taco",
+      "label": "taco",
+      "file": "picture_words/words/taco.png",
+      "sizes": {
+        "256": "picture_words/words/taco.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.tent",
+      "label": "tent",
+      "file": "picture_words/words/tent.png",
+      "sizes": {
+        "256": "picture_words/words/tent.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.tiger",
+      "label": "tiger",
+      "file": "picture_words/words/tiger.png",
+      "sizes": {
+        "256": "picture_words/words/tiger.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.tomato",
+      "label": "tomato",
+      "file": "picture_words/words/tomato.png",
+      "sizes": {
+        "256": "picture_words/words/tomato.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.tooth",
+      "label": "tooth",
+      "file": "picture_words/words/tooth.png",
+      "sizes": {
+        "256": "picture_words/words/tooth.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.turtle",
+      "label": "turtle",
+      "file": "picture_words/words/turtle.png",
+      "sizes": {
+        "256": "picture_words/words/turtle.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.watermelon",
+      "label": "watermelon",
+      "file": "picture_words/words/watermelon.png",
+      "sizes": {
+        "256": "picture_words/words/watermelon.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.window",
+      "label": "window",
+      "file": "picture_words/words/window.png",
+      "sizes": {
+        "256": "picture_words/words/window.png"
+      },
+      "set": "words",
+      "emoji": []
+    },
+    {
+      "id": "words.worm",
+      "label": "worm",
+      "file": "picture_words/words/worm.png",
+      "sizes": {
+        "256": "picture_words/words/worm.png"
+      },
+      "set": "words",
+      "emoji": []
     }
   ],
   "words": {
@@ -4953,9 +6153,11 @@
     "food": 52,
     "scenery": 32,
     "nature": 24,
-    "total": 302,
+    "total": 422,
     "objects": 66,
     "body": 8,
-    "gaps": 9
+    "gaps": 9,
+    "rhymes": 46,
+    "words": 74
   }
 }

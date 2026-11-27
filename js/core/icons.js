@@ -68,6 +68,12 @@
       // 🎨 is chrome on the color-mixer / subject tiles; quiz/question gets the paint palette pic
       else if (key === '🎨' || key === 'paint' || key === 'gaps.paint') id = 'gaps.paint';
     }
+    // Locked picture-word sets (rhymes 2026-11-27, fillers/beginning sounds 2026-11-27).
+    // Prefer these over older quiz icons. Rhyme boards try the rhyme set first, then the words set (fillers).
+    if (!id && (opt.context === 'rhymes' || opt.context === 'rhyme')) {
+      id = rhymeId(word) || rhymeId(key) || wordId(word) || wordId(key);
+    }
+    if (!id) id = wordId(word) || wordId(key);
     if (!id && word && BY_WORD[word]) id = BY_WORD[word];
     if (!id && key && BY_ID[key]) id = key;
     if (!id && key && BY_EMOJI[key]) id = BY_EMOJI[key];
@@ -217,6 +223,47 @@
     else try { upgradeDom(); } catch (e) {}
   }
 
+  /* Locked Picnic Munch rhymes picture-word set (2026-11-27).
+     Prefer these on rhyme boards only (context: 'rhymes'). Defaults: three = hand, head = side view.
+     head_alt / three_numeral files are on disk but are not auto-picked. */
+  var RHYME_WORDS = ["balloon","bat","bear","bed","bee","boat","bread","cake","car","cat","chain","chair","clock","coat","eye","fly","goat","guitar","hair","hat","head","jar","key","knee","lock","mat","moon","pear","pie","plane","raccoon","rain","rake","rat","red","rock","sled","snake","snowflake","sock","spoon","star","three","tie","train","tree"];
+  var RHYME_DIR = 'picture_words/rhymes/';
+  var RHYME_ART = {};
+  RHYME_WORDS.forEach(function (w) {
+    var id = 'rhymes.' + w, file = RHYME_DIR + w + '.png';
+    if (!BY_ID[id]) BY_ID[id] = { id: id, label: w, file: file, sizes: { '256': file }, set: 'rhymes' };
+    RHYME_ART[w] = id;
+  });
+  function rhymeId(word) {
+    if (!word) return null;
+    var w = String(word).toLowerCase();
+    return RHYME_ART[w] || (BY_ID['rhymes.' + w] ? 'rhymes.' + w : null);
+  }
+  function hasRhymeArt(w) { return !!rhymeId(w); }
+
+  /* Locked Picnic Munch fillers + beginning-sounds set (2026-11-27).
+     Pig: the locked new-style pig; pig.png in this set (and animals/pig.png) is that one. */
+  var WORD_WORDS = ["balloon", "banana", "bear", "bed", "bee", "bell", "book", "bus", "deer", "dinosaur", "dog", "dolphin", "door", "duck", "fire", "fish", "foot", "fox", "ghost", "goat", "guitar", "hammer", "heart", "helicopter", "hippo", "house", "kangaroo", "key", "kite", "koala", "ladybug", "leaf", "lemon", "lion", "lizard", "lock", "lollipop", "magnet", "map", "milk", "monkey", "moon", "mouse", "mushroom", "nose", "panda", "pear", "pencil", "penguin", "pig", "pineapple", "pizza", "popcorn", "rainbow", "ring", "robot", "rocket", "rose", "salad", "sandwich", "seal", "shell", "soap", "sock", "sun", "taco", "tent", "tiger", "tomato", "tooth", "turtle", "watermelon", "window", "worm"];
+  var WORD_DIR = 'picture_words/words/';
+  var WORD_ART = {};
+  WORD_WORDS.forEach(function (w) {
+    var id = 'words.' + w, file = WORD_DIR + w + '.png';
+    if (!BY_ID[id]) BY_ID[id] = { id: id, label: w, file: file, sizes: { '256': file }, set: 'words' };
+    WORD_ART[w] = id;
+  });
+  // Every pig lookup in Picnic Munch uses the new-style drawing.
+  if (BY_ID['animal.pig'] && BY_ID['words.pig']) {
+    BY_ID['animal.pig'].file = BY_ID['words.pig'].file;
+    BY_ID['animal.pig'].sizes = BY_ID['words.pig'].sizes;
+  }
+  BY_WORD.pig = 'words.pig';
+  function wordId(word) {
+    if (!word) return null;
+    var w = String(word).toLowerCase();
+    return WORD_ART[w] || (BY_ID['words.' + w] ? 'words.' + w : null);
+  }
+  function hasWordArt(w) { return !!wordId(w); }
+
   A.Icons = {
     BY_ID: BY_ID,
     BY_EMOJI: BY_EMOJI,
@@ -228,6 +275,12 @@
     icon: html,
     embed: embed,
     variantEntry: variantEntry,
-    upgradeDom: upgradeDom
+    upgradeDom: upgradeDom,
+    rhymeId: rhymeId,
+    hasRhymeArt: hasRhymeArt,
+    RHYME_WORDS: RHYME_WORDS,
+    wordId: wordId,
+    hasWordArt: hasWordArt,
+    WORD_WORDS: WORD_WORDS
   };
 })(window.Arcade = window.Arcade || {});

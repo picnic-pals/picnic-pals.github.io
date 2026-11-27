@@ -13,7 +13,41 @@
   function shade(hex, k) { var n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255; function f(v) { return Math.max(0, Math.min(255, Math.round(v * k))); } return 'rgb(' + f(r) + ',' + f(g) + ',' + f(b) + ')'; }
 
   /* ---------- pictures ---------- */
-  function emo(w) { var e = E.PICS[w]; if (A.Icons) { var opt = { word: w, size: 64, label: w, decorative: true, context: 'quiz', fallback: '' }; var has = A.Icons.has(e, opt) || A.Icons.has(w, opt); return has ? A.Icons.html(e || w, Object.assign({ cls: 'ea-emo pp-pic' }, opt)) : ''; } return ''; }
+  function emo(w, ctx) { var e = E.PICS[w]; if (A.Icons) { var opt = { word: w, size: 64, label: w, decorative: true, context: ctx || 'quiz', fallback: '' }; var has = A.Icons.has(e, opt) || A.Icons.has(w, opt); return has ? A.Icons.html(e || w, Object.assign({ cls: 'ea-emo pp-pic' }, opt)) : ''; } return ''; }
+  function hasRhymeArt(w) {
+    if (E.hasRhymeArt) return E.hasRhymeArt(w);
+    return !!(A.Icons && A.Icons.hasRhymeArt && A.Icons.hasRhymeArt(w));
+  }
+  function hasWordArt(w) {
+    if (E.hasWordArt) return E.hasWordArt(w);
+    return !!(A.Icons && A.Icons.hasWordArt && A.Icons.hasWordArt(w));
+  }
+  function dealUnique(used, arr) {
+    var out = [];
+    A.shuffle((arr || []).slice()).forEach(function (w) {
+      if (used.indexOf(w) >= 0 || out.indexOf(w) >= 0) return;
+      if (E.rhymeAllowed && !E.rhymeAllowed(w, used.concat(out))) return;
+      out.push(w);
+    });
+    return out;
+  }
+  function forceOpts() {
+    var o = { begin: '', word: '', fillers: false };
+    try {
+      var q = (typeof location !== 'undefined' && location.search) ? new URLSearchParams(location.search) : null;
+      if (q) {
+        o.begin = (q.get('begin') || '').toLowerCase();
+        o.word = (q.get('word') || '').toLowerCase();
+        o.fillers = q.get('fillers') === '1';
+      }
+      if (typeof window !== 'undefined' && window.__munchForce) {
+        if (!o.begin && window.__munchForce.begin) o.begin = String(window.__munchForce.begin).toLowerCase();
+        if (!o.word && window.__munchForce.word) o.word = String(window.__munchForce.word).toLowerCase();
+        if (window.__munchForce.fillers) o.fillers = true;
+      }
+    } catch (e) {}
+    return o;
+  }
   function quiet() { return !!(A.SightWords && A.SightWords.quiet && A.SightWords.quiet()); }
   function littleReader() {
     if (A.MunchRules && A.MunchRules.littleReader) return A.MunchRules.littleReader();
@@ -27,8 +61,11 @@
     var opt = { word: w, context: 'quiz' };
     return !!(A.Icons.has(E.PICS[w], opt) || A.Icons.has(w, opt));
   }
-  function picCell(w, fact) {
-    var p = E.pic(w), img = hasArt(w) ? emo(w) : '';
+  function picCell(w, fact, ctx) {
+    var rhyme = ctx === 'rhymes' || ctx === 'rhyme';
+    if (!ctx && hasWordArt(w)) ctx = 'words';
+    var art = rhyme ? (hasRhymeArt(w) || hasWordArt(w)) : (hasWordArt(w) || hasArt(w));
+    var p = E.pic(w), img = art ? emo(w, ctx) : '';
     if (!img && littleReader()) { if (A.MunchRules && A.MunchRules.notePic) A.MunchRules.notePic(w); }
     var word = '<small class="picw">' + A.esc(w) + '</small>';
     var html = littleReader() ? (img ? '<span class="ea-pw">' + img + word + '</span>' : wordHtml(w)) : wordHtml(w);
@@ -44,7 +81,14 @@
     }
     return pool;
   }
-  function beginPool(ch) { var pool = picPool(E.BEGIN[ch] || []); return pool.length ? pool : (E.BEGIN[ch] || []).slice(); }
+  function beginPool(ch) {
+    var raw = (E.BEGIN[ch] || []).slice();
+    if (littleReader()) {
+      var art = raw.filter(function (w) { return hasWordArt(w) || hasArt(w); });
+      return art;
+    }
+    return picPool(raw).length ? picPool(raw) : raw;
+  }
   // a blob of paint (color swatch)
   function swatch(id, cls) {
     var c = COL[id];
@@ -172,19 +216,30 @@
   /* ----- Beginning sounds (Reading & Words) ----- */
   SK.push({ id: 'begsound', name: 'Beginning sounds', short: 'Pictures that start with a letter’s sound', strand: 'Phonics', std: 'K.RF.2d / K.RF.3a', grade: 'PK–K', subject: 'reading', sayFact: true, secs: [11, 12],
     levels: ['B, M, S, T, P, D', '13 letters'],
-    intro: { line: 'skill_begsound', example: emo('banana') + ' ' + emo('bear') + ' ' + emo('bus') + ' start with ' + ltrHtml('B') },
+    intro: { line: 'skill_begsound', example: emo('banana', 'words') + ' ' + emo('bear', 'words') + ' ' + emo('bus', 'words') + ' start with ' + ltrHtml('B') },
     gen: function (L) {
       var lets0 = E.BEGIN_LEVELS[L], all = Object.keys(E.BEGIN);
       var lets = lets0.filter(function (ch) { return beginPool(ch).length; });
       if (!lets.length) lets = lets0.slice();
-      var T = pick(lets), anchor = pick(beginPool(T));
-      function mk(ch) { var w = pick(beginPool(ch)); return picCell(w, [E.pic(w).line, 'w_starts_with', 'lt_' + ch]); }
-      return { reading: true, sayWord: true, starts: true, deckKind: 'starts', text: 'Munch the ones that start with ' + em(T.toUpperCase()), hint: 'Like ' + anchor + '!', say: ['rule_begins', 'lt_' + T, 'w_like', E.pic(anchor).line], target: T,
-        good: function () { return mk(T); }, bad: function () {
-          var badLets = (L ? all : lets.concat(pick([['f', 'g'], ['h', 'k'], ['l', 'r'], ['w', 'f']]))).filter(function (ch) { return ch !== T && beginPool(ch).length; });
-          if (!badLets.length) badLets = others(all, T);
-          return mk(pick(badLets));
-        } };
+      var force = forceOpts(), T;
+      if (force.word) {
+        lets.concat(all).some(function (ch) { if (beginPool(ch).indexOf(force.word) >= 0) { force.begin = ch; return true; } return false; });
+      }
+      T = (force.begin && beginPool(force.begin).length) ? force.begin : pick(lets);
+      var used = [], goods = dealUnique(used, beginPool(T));
+      if (force.word && beginPool(T).indexOf(force.word) >= 0) {
+        goods = [force.word].concat(goods.filter(function (w) { return w !== force.word; }));
+      }
+      used = [T].concat(goods);
+      var badLets = (L ? all : lets.concat(pick([['f', 'g'], ['h', 'k'], ['l', 'r'], ['w', 'f']]))).filter(function (ch) { return ch !== T && beginPool(ch).length; });
+      if (!badLets.length) badLets = others(all, T);
+      var far = [];
+      badLets.forEach(function (ch) { far = far.concat(beginPool(ch)); });
+      var bads = dealUnique(used, far);
+      var gi = 0, bi = 0, anchor = goods[0] || pick(beginPool(T) || [T]);
+      return { reading: true, sayWord: true, starts: true, deckKind: 'starts', text: 'Munch the ones that start with ' + em(T.toUpperCase()), hint: 'Like ' + anchor + '!', say: ['rule_begins', 'lt_' + T, 'w_like', E.pic(anchor).line], target: T, maxOk: goods.length,
+        good: function () { var w = gi < goods.length ? goods[gi++] : pick(beginPool(T)); return picCell(w, [E.pic(w).line, 'w_starts_with', 'lt_' + T], 'words'); },
+        bad: function () { var w = bi < bads.length ? bads[bi++] : pick(far.length ? far : beginPool(pick(badLets.length ? badLets : others(all, T)))); return picCell(w, [E.pic(w).line, 'w_starts_with', 'lt_' + (w && w.charAt(0) || '')], 'words'); } };
     } });
   SK[3].ask = askFrom(SK[3].gen, function (r) { return { text: 'Which one starts with ' + em(r.target.toUpperCase()) + '?', say: ['q_which_starts', 'lt_' + r.target] }; });
 
@@ -192,20 +247,57 @@
   var RHY_ALL = {}; Object.keys(E.RHYMES).forEach(function (k) { E.RHYMES[k].forEach(function (w) { RHY_ALL[w] = k; }); });
   SK.push({ id: 'rhymes', name: 'Rhymes', short: 'Pictures that rhyme', strand: 'Phonological awareness', std: 'K.RF.2a', grade: 'PK–K', subject: 'reading', sayFact: true, secs: [12, 13],
     levels: ['Easy rhymes', 'Tricky look-alikes (cat · car)'],
-    intro: { line: 'skill_rhymes', example: emo('cat') + ' cat · ' + emo('hat') + ' hat · ' + emo('bat') + ' bat' },
+    intro: { line: 'skill_rhymes', example: emo('cat', 'rhymes') + ' cat · ' + emo('hat', 'rhymes') + ' hat · ' + emo('bat', 'rhymes') + ' bat' },
     gen: function (L) {
-      var levelIds = E.RHYME_LEVELS[L].filter(function (k) { return picPool(E.RHYMES[k]).length >= 2; });
-      if (!levelIds.length) levelIds = E.RHYME_LEVELS[L].slice();
-      var setId = pick(levelIds), set = picPool(E.RHYMES[setId]);
-      if (set.length < 2) set = E.RHYMES[setId].slice();
-      var T = pick(set), tl = E.pic(T).line;
-      var far = []; levelIds.forEach(function (k) { if (k !== setId) far = far.concat(picPool(E.RHYMES[k])); });
-      far = far.concat(picPool(E.RHYME_OTHERS));
-      if (!far.length) { E.RHYME_LEVELS[L].forEach(function (k) { if (k !== setId) far = far.concat(E.RHYMES[k]); }); far = far.concat(E.RHYME_OTHERS); }
-      var same = Object.keys(E.PICS).filter(function (w) { return E.isClearPic ? E.isClearPic(w) : true; }).filter(function (w) { return w.charAt(0) === T.charAt(0) && RHY_ALL[w] !== setId && w.indexOf(' ') < 0 && E.RHYME_OTHERS.concat(Object.keys(RHY_ALL)).indexOf(w) >= 0; });
-      return { reading: true, sayWord: true, rhymes: true, deckKind: 'rhymes', text: 'Munch the ones that rhyme with ' + em(T), hint: 'Does it end like ' + T + '?', say: ['rule_rhymes', tl], target: T,
-        good: function () { var w = pick(others(set, T)); return picCell(w, [E.pic(w).line, 'w_rhymes_with', tl]); },
-        bad: function () { var w = L && same.length && Math.random() < .4 ? pick(same) : pick(far); return picCell(w, [E.pic(w).line, 'w_no_rhyme', tl]); } };
+      function rhymePool(arr) { return (arr || []).filter(hasRhymeArt); }
+      function wordPool(arr) { return (arr || []).filter(function (w) { return hasWordArt(w) || hasArt(w); }); }
+      var little = littleReader();
+      var force = forceOpts();
+      var levelIds = (E.RHYME_LEVELS[L] || Object.keys(E.RHYMES)).slice();
+      var cands = levelIds.filter(function (k) {
+        var n = rhymePool(E.RHYMES[k]).length;
+        // PreK/K 3x3 needs 3 unique good rhymers (the prompt word is not a snack)
+        return little ? n >= 4 : n >= 2;
+      });
+      if (!cands.length) cands = levelIds.filter(function (k) { return rhymePool(E.RHYMES[k]).length >= 2; });
+      if (!cands.length) cands = levelIds.slice();
+      var setId = pick(cands), set = rhymePool(E.RHYMES[setId]);
+      if (set.length < 2) set = (E.RHYMES[setId] || []).slice();
+      var T = pick(set), tl = E.pic(T).line, used = [T];
+      var goods = dealUnique(used, others(set, T));
+      used = used.concat(goods);
+      var far = [];
+      (cands.length ? cands : levelIds).forEach(function (k) { if (k !== setId) far = far.concat(rhymePool(E.RHYMES[k])); });
+      if (!far.length) Object.keys(E.RHYMES).forEach(function (k) { if (k !== setId) far = far.concat(rhymePool(E.RHYMES[k])); });
+      var fillers = wordPool(E.RHYME_OTHERS);
+      var fillerDeal = dealUnique(used, fillers);
+      var bads;
+      if (little || force.fillers) {
+        var mixed = force.fillers && fillerDeal.length ? fillerDeal.concat(far) : far.concat(fillerDeal);
+        bads = dealUnique(used, mixed);
+        if (force.fillers && fillerDeal.length) {
+          bads = fillerDeal.concat(bads.filter(function (w) { return fillerDeal.indexOf(w) < 0; }));
+        }
+      } else {
+        bads = dealUnique(used, far);
+      }
+      var same = [];
+      if (L) {
+        same = Object.keys(E.PICS).filter(function (w) {
+          return hasRhymeArt(w) && w.charAt(0) === T.charAt(0) && RHY_ALL[w] !== setId && w.indexOf(' ') < 0;
+        });
+        same = dealUnique(used.concat(bads), same);
+      }
+      var gi = 0, bi = 0, si = 0;
+      return { reading: true, sayWord: true, rhymes: true, deckKind: 'rhymes', text: 'Munch the ones that rhyme with ' + em(T), hint: 'Does it end like ' + T + '?', say: ['rule_rhymes', tl], target: T, maxOk: goods.length,
+        good: function () { var w = gi < goods.length ? goods[gi++] : pick(others(set, T)); return picCell(w, [E.pic(w).line, 'w_rhymes_with', tl], 'rhymes'); },
+        bad: function () {
+          var w;
+          if (L && same.length && Math.random() < .4 && si < same.length) w = same[si++];
+          else if (bi < bads.length) w = bads[bi++];
+          else w = pick(bads.length ? bads : (far.length ? far : others(set, T)));
+          return picCell(w, [E.pic(w).line, 'w_no_rhyme', tl], 'rhymes');
+        } };
     } });
   SK[4].ask = askFrom(SK[4].gen, function (r) { return { text: 'Which one rhymes with ' + em(E.PICS[r.target] + ' ' + r.target) + '?', say: ['q_which_rhymes', E.pic(r.target).line] }; });
 

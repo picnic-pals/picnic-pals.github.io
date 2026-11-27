@@ -8,7 +8,7 @@
   var HOME_SEL = '#homeBtn, .homebtn, #fxHome, #ffHome, #pkHome, #pcHome, #srHome, #bsHome, #gdHome';
   var TITLE_SEL = 'h1[data-title], [data-title], .mlogo b, .ff-header h1, .pc-header h1, .fx-header h1, .pk-header h1, .sr-header h1, .bs-header h1, .gd-header h1';
   var TAP_SLOP = 28;
-  var INTRO_MS = 1100;
+  var INTRO_MS = 800;
   var REVEAL_MS = 550;
   var CONFETTI = ['curl_blue', 'curl_mint', 'curl_red', 'dot_butter', 'dot_grape', 'gingham_square', 'gingham_triangle', 'petal_frosting', 'strip_orange'];
   var SPARKLES = ['butter4', 'cream4', 'plus', 'star5'];
@@ -123,38 +123,54 @@
 
   /* ---------- intro + question reveal ---------- */
   function isAuto() { try { return !!navigator.webdriver; } catch (e) { return false; } }
+  function introForced(opt) {
+    if (opt && opt.force) return true;
+    try { return /[?&]forceintro=1(?:&|$)/.test(location.search || ''); } catch (e) { return false; }
+  }
+  function introTitle() {
+    if (document.querySelector('h1.logo, #ppLogo')) return (A.TITLES && A.TITLES.app) || 'Picnic Pals';
+    var key = document.documentElement.getAttribute('data-page-title');
+    if (key && A.TITLES && A.TITLES[key]) return A.TITLES[key];
+    var el = document.querySelector('h1[data-title], h1.pp-kit-title, .mlogo b, .ff-header h1, .pc-header h1, .fx-header h1, .pk-header h1, .sr-header h1, .bs-header h1, .gd-header h1, [data-title], h1');
+    var t = el ? String(el.textContent || '').replace(/\s+/g, ' ').trim() : '';
+    if (t) return t;
+    var doc = String((document.title || '').split('\u00b7')[0] || '').trim();
+    return doc || ((A.TITLES && A.TITLES.app) || 'Picnic Pals');
+  }
+  function introFriendSrc() {
+    try {
+      var p = A.Store && A.Store.active && A.Store.active();
+      if (!p || !p.blob) return '';
+      if (A.Blobs && typeof A.Blobs.art === 'function') return A.Blobs.art(p.blob, 'happy', 256) || '';
+      return asset('assets/picnic/friends/' + encodeURIComponent(p.blob) + '/happy_256.webp');
+    } catch (e) { return ''; }
+  }
   function intro(opt) {
     opt = opt || {};
     var hold = opt.ms != null ? opt.ms : INTRO_MS;
-    var skip = reduced() || (!opt.force && (/[?&]nointro=1(?:&|$)/.test(location.search || '') || isAuto()));
+    var skip = reduced() || (!introForced(opt) && (/[?&]nointro=1(?:&|$)/.test(location.search || '') || isAuto()));
     if (skip) return Promise.resolve('skip');
-    var host = opt.root || stageRoot();
+    var host = opt.root || document.body;
     if (!host) return Promise.resolve('skip');
     var layer = document.createElement('div');
     layer.className = 'pp-kit-intro-layer';
     layer.setAttribute('aria-hidden', 'true');
-    var stageH = host.clientHeight || 720;
-    layer.style.setProperty('--pp-kit-stage-h', stageH + 'px');
-    var basket = document.createElement('div');
-    basket.className = 'pp-kit-basket';
-    var body = document.createElement('img');
-    body.className = 'pp-kit-basket-body';
-    body.src = asset('art/ui/basket-body.webp');
-    body.alt = '';
-    var lid = document.createElement('img');
-    lid.className = 'pp-kit-basket-lid';
-    lid.src = asset('art/ui/basket-lid.webp');
-    lid.alt = '';
-    basket.appendChild(body);
-    basket.appendChild(lid);
-    layer.appendChild(basket);
-    host.appendChild(layer);
-    if (hold >= 500 && !reduced()) {
-      setTimeout(function () {
-        if (!layer.parentNode) return;
-        addSparkles(layer, { count: 4, around: basket });
-      }, 500);
+    var mark = document.createElement('div');
+    mark.className = 'pp-kit-intro-mark';
+    var src = introFriendSrc();
+    if (src) {
+      var img = document.createElement('img');
+      img.className = 'pp-kit-intro-friend';
+      img.src = src;
+      img.alt = '';
+      mark.appendChild(img);
     }
+    var title = document.createElement('div');
+    title.className = 'pp-kit-intro-title';
+    title.textContent = introTitle();
+    mark.appendChild(title);
+    layer.appendChild(mark);
+    host.appendChild(layer);
     return new Promise(function (resolve) {
       var done = function () {
         if (layer.parentNode) layer.parentNode.removeChild(layer);

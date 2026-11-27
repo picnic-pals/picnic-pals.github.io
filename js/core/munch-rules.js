@@ -37,8 +37,43 @@
     noteClip(id, text || id);
     return { id: id, text: text != null ? text : id };
   }
+  var HAND_ART = {
+    airplane:1, ant:1, apple:1, ball:1, balloon:1, banana:1, basket:1, basketball:1, bat:1, bear:1,
+    beaver:1, bed:1, bee:1, bell:1, bento:1, bike:1, bird:1, "birthday cake":1, blueberries:1, blueberry:1,
+    boat:1, bolt:1, bone:1, book:1, box:1, bread:1, brick:1, broccoli:1, bulb:1, bus:1,
+    butterfly:1, cactus:1, cake:1, calendar:1, camel:1, candy:1, "canned food":1, cap:1, car:1, carrot:1,
+    cat:1, caterpillar:1, chain:1, chair:1, cheese:1, cheetah:1, cherries:1, "cherry blossom":1, chestnut:1, chick:1,
+    chicken:1, chipmunk:1, chocolate:1, clock:1, clover:1, coat:1, coconut:1, "cold face":1, cold_face:1, cookie:1,
+    corn:1, cow:1, crab:1, crocodile:1, crown:1, cucumber:1, cup:1, "cup with straw":1, cupcake:1, deer:1,
+    desert:1, dice:1, dinosaur:1, dish:1, dog:1, dolphin:1, donut:1, door:1, droplet:1, drum:1,
+    duck:1, eagle:1, ear:1, egg:1, eggplant:1, elephant:1, eyes:1, feather:1, fire:1, "fire truck":1,
+    fire_truck:1, fish:1, flamingo:1, foot:1, fox:1, frog:1, gamepad:1, giraffe:1, globe:1, gloves:1,
+    goat:1, grapes:1, "green apple":1, guitar:1, hamburger:1, hammer:1, hat:1, "hatching chick":1, hedgehog:1, helicopter:1,
+    hippo:1, hippopotamus:1, honey:1, horse:1, house:1, ice:1, "ice cream":1, "ice cube":1, ice_cream:1, jam:1,
+    jeans:1, "juice box":1, kangaroo:1, key:1, kite:1, kiwi:1, koala:1, ladybug:1, leaf:1, "leaf fluttering":1,
+    leaves:1, leg:1, lemon:1, leopard:1, "light bulb":1, light_bulb:1, lightning:1, lion:1, lizard:1, lock:1,
+    lollipop:1, lotus:1, magnet:1, map:1, "meat on bone":1, milk:1, mittens:1, monkey:1, moon:1, mouse:1,
+    mushroom:1, nest:1, "nest with eggs":1, nose:1, octopus:1, orange:1, owl:1, paint:1, painting:1, pancake:1,
+    panda:1, parrot:1, "paw prints":1, peach:1, pear:1, pen:1, pencil:1, penguin:1, pie:1, pig:1,
+    pin:1, pineapple:1, pizza:1, plane:1, planet:1, plant:1, plate:1, "polar bear":1, polar_bear:1, popcorn:1,
+    "pot of food":1, potato:1, "potted plant":1, pumpkin:1, rabbit:1, raccoon:1, rain:1, rainbow:1, "red apple":1, ring:1,
+    robin:1, robot:1, rock:1, rocket:1, rose:1, sailboat:1, salad:1, salt:1, sandwich:1, seal:1,
+    "see-no-evil monkey":1, shark:1, sheep:1, shell:1, ship:1, shirt:1, shoe:1, shortcake:1, shorts:1, sled:1,
+    snail:1, snake:1, "snow cloud":1, snowflake:1, snowman:1, soap:1, soccer:1, "soccer ball":1, sock:1, spider:1,
+    "spider web":1, spoon:1, storm:1, strawberry:1, sun:1, "sun rain":1, sunflower:1, sunglasses:1, sunrise:1, sunset:1,
+    taco:1, "tanabata tree":1, teddy:1, "teddy bear":1, teeth:1, tent:1, thermometer:1, tie:1, tiger:1, tomato:1,
+    tooth:1, tornado:1, train:1, tree:1, "tropical drink":1, turtle:1, "two-hump camel":1, umbrella:1, van:1, volcano:1,
+    waffle:1, "water drop":1, watermelon:1, web:1, whale:1, wind:1, window:1, wing:1, wood:1, worm:1,
+    zebra:1
+  };
   function hasArt(w) {
-    if (!A.Icons || !w) return false;
+    if (!w) return false;
+    var key = String(w).toLowerCase();
+    if (A.Icons && A.Icons.hasWordArt && A.Icons.hasWordArt(key)) return true;
+    if (A.EarlyWords && A.EarlyWords.hasWordArt && A.EarlyWords.hasWordArt(key)) return true;
+    if (A.Icons && A.Icons.hasRhymeArt && A.Icons.hasRhymeArt(key)) return true;
+    if (A.EarlyWords && A.EarlyWords.hasRhymeArt && A.EarlyWords.hasRhymeArt(key)) return true;
+    if (!HAND_ART[key] || !A.Icons) return false;
     var e = A.EarlyWords && A.EarlyWords.PICS && A.EarlyWords.PICS[w];
     var opt = { word: w, context: 'quiz' };
     return !!(A.Icons.has(e, opt) || A.Icons.has(w, opt) || A.Icons.has(null, opt));

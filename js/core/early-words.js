@@ -31,7 +31,9 @@
     watermelon: '🍉', worm: '🪱', window: '🪟',
     cat: '🐱', bat: '🦇', hat: '🎩', tree: '🌳', car: '🚗', star: '⭐', cake: '🎂', snake: '🐍', snowflake: '❄️',
     spoon: '🥄', raccoon: '🦝', boat: '⛵', coat: '🧥', chair: '🪑', clock: '⏰', sled: '🛷', bread: '🍞',
-    pie: '🥧', tie: '👔', eye: '👁️', train: '🚆', rain: '🌧️', chain: '⛓️', nose: '👃', rose: '🌹', shell: '🐚'
+    pie: '🥧', tie: '👔', eye: '👁️', train: '🚆', rain: '🌧️', chain: '⛓️', nose: '👃', rose: '🌹', shell: '🐚',
+    rat: '🐀', mat: '🟩', knee: '🦵', three: '3️⃣', jar: '🫙', rake: '🧹', hair: '💇', rock: '🪨',
+    red: '🔴', head: '🗣️', fly: '🪰', plane: '✈️'
   };
   var PLURAL = { cherries: 1, blueberries: 1, jeans: 1, grapes: 1 };
   /* qquality1: pictures with ONE everyday name for a young child (muted rhyme / beginning-sound).
@@ -109,9 +111,28 @@
 
   /* ---------- rhymes ---------- sets of pictures that rhyme; no word in one set rhymes with a word in another set */
   E.RHYMES = {
-    at: words('cat bat hat'), ee: words('bee tree key'), ar: words('car star guitar'), ake: words('cake snake snowflake'),
-    oon: words('moon spoon balloon raccoon'), oat: words('boat goat coat'), air: words('bear chair pear'),
-    ock: words('sock clock lock'), ed: words('bed sled bread'), ie: words('pie tie eye'), ain: words('train rain chain')
+    at: words('cat bat hat rat mat'), ee: words('bee tree key knee three'), ar: words('car star guitar jar'), ake: words('cake snake snowflake rake'),
+    oon: words('moon spoon balloon raccoon'), oat: words('boat goat coat'), air: words('bear chair pear hair'),
+    ock: words('sock clock lock rock'), ed: words('bed sled bread red head'), ie: words('pie tie eye fly'), ain: words('train rain chain plane')
+  };
+  // Locked 2026-11-27 rhyme picture-word set. PreK/K rhyme boards use only these pictures.
+  E.RHYME_ART = words('balloon bat bear bed bee boat bread cake car cat chain chair clock coat eye fly goat guitar hair hat head jar key knee lock mat moon pear pie plane raccoon rain rake rat red rock sled snake snowflake sock spoon star three tie train tree');
+  var RHYME_ART_SET = {}; E.RHYME_ART.forEach(function (w) { RHYME_ART_SET[w] = 1; });
+  E.hasRhymeArt = function (w) { return !!(w && (RHYME_ART_SET[String(w).toLowerCase()] || (A.Icons && A.Icons.hasRhymeArt && A.Icons.hasRhymeArt(w)))); };
+  E.WORD_ART = words('balloon banana bear bed bee bell book bus deer dinosaur dog dolphin door duck fire fish foot fox ghost goat guitar hammer heart helicopter hippo house kangaroo key kite koala ladybug leaf lemon lion lizard lock lollipop magnet map milk monkey moon mouse mushroom nose panda pear pencil penguin pig pineapple pizza popcorn rainbow ring robot rocket rose salad sandwich seal shell soap sock sun taco tent tiger tomato tooth turtle watermelon window worm');
+  var WORD_ART_SET = {}; E.WORD_ART.forEach(function (w) { WORD_ART_SET[w] = 1; });
+  E.hasWordArt = function (w) { return !!(w && (WORD_ART_SET[String(w).toLowerCase()] || (A.Icons && A.Icons.hasWordArt && A.Icons.hasWordArt(w)))); };
+  // Never place these pairs on one rhyme board.
+  E.RHYME_FORBID = [['head', 'hair'], ['knee', 'leg'], ['rat', 'mouse']];
+  E.rhymeAllowed = function (w, used) {
+    if (!w) return false;
+    var i, pair, a, b, u = used || [];
+    for (i = 0; i < E.RHYME_FORBID.length; i++) {
+      pair = E.RHYME_FORBID[i]; a = pair[0]; b = pair[1];
+      if (w === a && u.indexOf(b) >= 0) return false;
+      if (w === b && u.indexOf(a) >= 0) return false;
+    }
+    return true;
   };
   E.RHYME_LEVELS = [words('at ee ar oon oat ake'), words('at ee ar ake oon oat air ock ed ie ain')];
   // pictures that rhyme with none of the sets above (extra "wrong" cells)

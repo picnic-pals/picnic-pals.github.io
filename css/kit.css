@@ -325,63 +325,59 @@ button.pp-kit-home:active,
 .pp-kit-home > svg,
 .pp-kit-home > img { display: none; }
 
-/* Opening B: picnic basket lid. pointer-events none so tests and taps are never blocked. */
+/* Opening: short soft fade/slide of the game title and friend. pointer-events none so tests and taps are never blocked. */
 .pp-kit-intro-layer {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  z-index: 80;
+  z-index: 200;
   pointer-events: none;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 246, 232, 0.28);
-  animation: pp-kit-intro-wash 1100ms ease forwards;
+  background: #fff6e8;
+  animation: pp-kit-intro-wash 800ms ease forwards;
 }
 @keyframes pp-kit-intro-wash {
-  0%, 70% { background-color: rgba(255, 246, 232, 0.28); }
+  0%, 55% { background-color: #fff6e8; }
   100% { background-color: rgba(255, 246, 232, 0); }
 }
-.pp-kit-basket {
-  position: relative;
-  width: 80%;
-  aspect-ratio: 674 / 416;
-  max-height: 70%;
-  animation: pp-kit-basket-move 1100ms ease-out forwards;
+.pp-kit-intro-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  max-width: 90%;
+  animation: pp-kit-intro-mark 800ms ease forwards;
 }
-html[data-stage="landscape"] .pp-kit-basket { width: 50%; }
-.pp-kit-basket-body,
-.pp-kit-basket-lid {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+@keyframes pp-kit-intro-mark {
+  0% { opacity: 0; transform: translateY(16px); }
+  18% { opacity: 1; transform: translateY(0); }
+  58% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+.pp-kit-intro-friend {
+  width: 30%;
+  max-width: 168px;
+  height: auto;
   object-fit: contain;
   display: block;
   pointer-events: none;
 }
-.pp-kit-basket-lid {
-  z-index: 2;
-  transform-origin: 50% 28%;
-  animation: pp-kit-lid 1100ms ease-out forwards;
+html[data-stage="landscape"] .pp-kit-intro-friend {
+  width: 16%;
+  max-width: 132px;
 }
-/* 0-300ms rise + 6% overshoot; 800-1100ms sink out. */
-@keyframes pp-kit-basket-move {
-  0% { transform: translateY(42%); opacity: 1; }
-  27.27% { transform: translateY(-6%); }
-  32% { transform: translateY(0); }
-  72.73% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(70%); opacity: 0; }
-}
-/* 300-450ms lid wiggles ±4° twice; 450-800ms lid up 45% of the stage, -14°, fade. */
-@keyframes pp-kit-lid {
-  0%, 27.27% { transform: rotate(0deg); opacity: 1; }
-  30.7% { transform: rotate(4deg); }
-  34.1% { transform: rotate(-4deg); }
-  37.5% { transform: rotate(4deg); }
-  40.91% { transform: rotate(0deg); }
-  72.73% { transform: translateY(calc(-0.45 * var(--pp-kit-stage-h, 720px))) rotate(-14deg); opacity: 0; }
-  100% { transform: translateY(calc(-0.45 * var(--pp-kit-stage-h, 720px))) rotate(-14deg); opacity: 0; }
+.pp-kit-intro-title {
+  font-family: var(--pp-kit-title-font);
+  font-weight: 800;
+  font-size: clamp(28px, 7vw, 56px);
+  line-height: 1.05;
+  color: #6b4423;
+  text-align: center;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 /* Reveal B: gingham bow squashes, pops, fades (400ms); then the card unfolds. */
@@ -498,8 +494,7 @@ html[data-stage="portrait"] .bs-panel,
 
 @media (prefers-reduced-motion: reduce) {
   .pp-kit-intro-layer,
-  .pp-kit-basket,
-  .pp-kit-basket-lid,
+  .pp-kit-intro-mark,
   .pp-kit-reveal,
   .pp-kit-reveal-bow,
   .pp-kit-confetti,

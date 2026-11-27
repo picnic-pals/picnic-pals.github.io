@@ -28,11 +28,21 @@
       <div class="txt" id="ruleTxt"></div>
       <button class="speak" id="speakBtn" aria-label="Hear the rule again (R)"><svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#5aa9f0"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="#5aa9f0" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></button>
     </div>
-    <button class="iconbtn music" id="musicBtn" aria-label="Music is on (M)"><svg viewBox="0 0 24 24"><path d="M9 17.5V6.2l10-2.2v11.3" fill="none" stroke="#7a6a99" stroke-width="2.2" stroke-linejoin="round"/><ellipse cx="6.6" cy="17.6" rx="2.8" ry="2.2" fill="#c9b2ff" stroke="#7a6a99" stroke-width="1.6"/><ellipse cx="16.6" cy="15.5" rx="2.8" ry="2.2" fill="#9fd2ff" stroke="#7a6a99" stroke-width="1.6"/><path class="slash" d="M4 4l16 16" stroke="#ff6b8b" stroke-width="2.6" stroke-linecap="round"/></svg></button>
-    <div class="tally" aria-label="Stars"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg><span id="starCount">0</span></div>
+    <div class="more-wrap">
+      <button type="button" class="iconbtn more" id="moreBtn" aria-label="More" aria-expanded="false" aria-controls="moreTray">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="2.2" fill="#7a6a99"/><circle cx="12" cy="12" r="2.2" fill="#7a6a99"/><circle cx="18" cy="12" r="2.2" fill="#7a6a99"/></svg>
+      </button>
+      <div class="more-tray" id="moreTray" hidden>
+        <button class="iconbtn music" id="musicBtn" aria-label="Music is on (M)"><svg viewBox="0 0 24 24"><path d="M9 17.5V6.2l10-2.2v11.3" fill="none" stroke="#7a6a99" stroke-width="2.2" stroke-linejoin="round"/><ellipse cx="6.6" cy="17.6" rx="2.8" ry="2.2" fill="#c9b2ff" stroke="#7a6a99" stroke-width="1.6"/><ellipse cx="16.6" cy="15.5" rx="2.8" ry="2.2" fill="#9fd2ff" stroke="#7a6a99" stroke-width="1.6"/><path class="slash" d="M4 4l16 16" stroke="#ff6b8b" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+        <div class="tally" aria-label="Stars"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg><span id="starCount">0</span></div>
+        <button type="button" class="chipbtn" id="moreScores">High scores</button>
+        <button type="button" class="chipbtn" id="moreHowto">How to play</button>
+        <button type="button" class="chipbtn" id="moreGear">Settings</button>
+      </div>
+    </div>
   </div>
-  <div class="timer" id="timer" role="timer" aria-label="Time left"><div class="track"><div class="fill" id="timerFill"></div></div><span class="clock">⏱</span><span class="ttxt" id="timerTxt">1:00</span></div>
-  <div id="boardWrap"><div id="board" aria-label="Number grid"></div></div>
+  <div class="timer" id="timer" role="timer" aria-label="Time left"><div class="track"><div class="fill" id="timerFill"></div></div><span class="clock" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="#fff" stroke="#7a6a99" stroke-width="2"/><path d="M12 7.5v5l3.2 2" fill="none" stroke="#7a6a99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="ttxt" id="timerTxt">1:00</span></div>
+  <div id="boardWrap"><div id="board" aria-label="Number grid"></div><div class="board-hint" id="boardHint" hidden></div></div>
   <div class="bottom">
     <div class="hearts" id="hearts" aria-label="Hearts"></div>
     <div class="bubble" id="bubble"><span class="chip" id="levelChip"></span><span class="msg" id="bubbleMsg" aria-live="polite"></span></div>

@@ -34,6 +34,17 @@
   var LEVELN = 0;               // rounds played this visit ("Round N!" intro; not the skill level, which the chip shows)
 
   var COLS = TWO ? 6 : 5, ROWS = 4, N = COLS * ROWS;
+  // Guided Munch: PreK/K use a 3x3 grid centered in the same fixed stage (bigger tiles, no reflow).
+  function littleGrid() { return !TWO && !!(A.MunchRules && A.MunchRules.littleReader && A.MunchRules.littleReader(P1)); }
+  function applyGrid() {
+    if (TWO) { COLS = 6; ROWS = 4; }
+    else if (littleGrid()) { COLS = 3; ROWS = 3; }
+    else { COLS = 5; ROWS = 4; }
+    N = COLS * ROWS;
+    document.body.classList.toggle('little-grid', littleGrid());
+    if (window.__munch) window.__munch.COLS = COLS;
+  }
+  applyGrid();
   var HEART = '<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9.2C1.2 8.6 3.3 5 6.8 5c2 0 3.6 1.1 5.2 3 1.6-1.9 3.2-3 5.2-3 3.5 0 5.6 3.6 4.3 6.8C19.5 16.4 12 21 12 21z"/></svg>';
   // 2026-10-22 voice: the 8 rotating spoken praise lines are gone; a right munch shows one of these short words in the bubble (no voice)
   var YUM_TEXT = ['Yum!', 'Nom nom!', 'Yummy!'];
@@ -44,6 +55,7 @@
   function mkPlayer(P, i) { return { i: i, P: P, name: P.name, col: COLORS[i], pos: { r: 0, c: 0 }, target: null, walkT: null, lastMove: 0, busy: false, el: null, round: null, rule: null, nOk: 0, remaining: 0, correct: 0, wrong: 0, done: false, doneAt: 0 }; }
   var PL = [mkPlayer(P1, 0)]; if (TWO) PL.push(mkPlayer(P2, 1));
   var G = { lastStars: null, active: false, cells: [], hearts: 3, grum: null, grumT: null, t0: 0, first: true, team: { done: false } };
+  var DEMO = { on: false, skipOk: false, close: null, walkT: null };
   var T = { on: timerWanted(), limit: 0, left: 0, low: false, lastSec: -1, iv: null, said: false, bonusAdd: 0 };
   var B = { cell: -1, shown: false, plannedAt: 0, open: false, q: null, sel: 0, el: null, used: false };
   var board = $('#board'), wrap = $('#boardWrap'), cellEls = [], grumEl, starEl, CS = 100, CW = 100, GAP = 8;
@@ -152,10 +164,14 @@
     PL.forEach(function (pl) {
       if (A.Steps) A.Steps.ctx.p = pl.P;
       var hard = !!(pl.round.hard || (SR && SR.cfg && SR.cfg.bossHarder)), R, mine = TWO ? N / 2 : N, cpb = A.Age.cellsPerBoard(pl.P), nOk = TWO ? A.rnd(5, 6) : pl.round.nOk || A.rnd(cpb[0], cpb[1]), i;
+      if (littleGrid()) nOk = Math.max(3, Math.min(nOk, 4));
+      if (nOk > mine) nOk = mine;
       if (A.MunchRules && A.MunchRules.ruleFor) R = A.MunchRules.ruleFor(pl, { hard: hard, tier: pl.round.tier });
       if (!R) R = hard ? harderRule(pl.round.skill, pl.round.level) : (pl.round.tier && easierRule(pl.round.skill, pl.round.level, pl.round.tier)) || pl.round.skill.gen(pl.round.level);
+      if (R && R.maxOk != null && nOk > R.maxOk) nOk = Math.max(1, R.maxOk);
+      if (nOk > mine) nOk = mine;
       var pickable = A.Coach && A.Coach.pickItem && !R.rc && R.hom == null && typeof R.target !== 'string' && !pl.P.guest;
-      var seen = {}, ck = function (c) { return c.label + '|' + (c.html || ''); };   // qbatch-1107: distinct targets and distractors when the rule allows it
+      var seen = {}, ck = function (c) { return String((c.k || c.label || '') + (R && R.rhymes ? '' : '|' + (c.html || ''))); };
       var fresh = function (fn) { var c, t = 0; do { c = fn(); } while (seen[ck(c)] && ++t < 12); seen[ck(c)] = 1; return c; };
       for (i = 0; i < nOk; i++) {
         var g = fresh(R.good);
@@ -285,7 +301,12 @@
     var W = wrap.clientWidth - 8, H = wrap.clientHeight - 8; if (!W || !H) return;
     GAP = Math.max(6, Math.round(Math.min(W, H) * .016));
     // Solo 20-cell boards: pick 5×4 or 4×5, whichever yields larger square tiles that still fit with no scroll.
-    if (!TWO) {
+    // PreK/K stay on a 3×3 in the same wrap (centered, bigger tiles).
+    if (!TWO && littleGrid()) {
+      COLS = 3; ROWS = 3; N = 9;
+      if (window.__munch) window.__munch.COLS = COLS;
+      CS = Math.floor(Math.min((W - GAP * (COLS - 1)) / COLS, (H - GAP * (ROWS - 1)) / ROWS, 260));
+    } else if (!TWO) {
       function tileSize(cols, rows, gap) {
         return Math.floor(Math.min((W - gap * (cols - 1)) / cols, (H - gap * (rows - 1)) / rows, 260));
       }
@@ -491,7 +512,7 @@
   function blocked() {
     // Stage may move/remove a body-appended overlay without going through close(); don't let a stale flag eat movement keys.
     if (UI.cardOpen && !document.querySelector('.overlay.on, .cutscene')) UI.cardOpen = false;
-    return UI.cardOpen || B.open || A.Parent.isOpen() || !!A.$('#gate') || !!A.$('.cutscene');
+    return UI.cardOpen || B.open || A.Parent.isOpen() || !!A.$('#gate') || !!A.$('.cutscene') || !!(DEMO && DEMO.on);
   }
 
   /* ---------- movement & munching ---------- */
@@ -598,9 +619,10 @@
       setTimeout(function () { el.classList.add('eaten'); }, 160);
       setTimeout(function () { anim(pl, 'happy', 1000); }, 200); SFX.yay();
       var rc = el.getBoundingClientRect(); UI.sparkle(rc.left + rc.width / 2, rc.top + rc.height / 2); UI.plusText(rc.left + rc.width / 2, rc.top + rc.height * .3, '+1');
+      el.classList.add('yum'); setHost('happy');
       // 2026-10-22 voice: no spoken praise after a right answer (the chomp + yay sounds and a short text bubble instead).
       // Word-reading skills still say the word: sight-word "listen" rounds in every mode but Off, other word skills where a pre-reader needs it.
-      var praise = YUM_TEXT[(pl.correct + pl.i) % YUM_TEXT.length];
+      var praise = praiseFor(pl, cell) || YUM_TEXT[(pl.correct + pl.i) % YUM_TEXT.length];
       G.lastFact = cell.fact || [];   // the number fact stays behind the Hear button (not spoken mid-choice)
       // Word-reading (cloze, picture, or listen): say the word after a right munch. Speech is optional; the prompt stays visual.
       // Pre-readers also hear the word on a right munch (and again on Hear) for rhyme / start / sight / letter boards.
@@ -622,6 +644,7 @@
       G.run = 0;
       if (!cell.tried) { cell.tried = true; pl.wrong++; wsig = C.recordAnswer(P, sid, false, ansOpt(pl, cell)); if (!TWO) { if (!GENTLE) { if (G.free > 0) { G.free--; renderHearts(); freeHint(pl); } else { G.hearts--; renderHearts(true); } } pl.lastMiss = cell; if (pl.wrong === 1 || pl.rule.stepHint) renderRule(); } diagnoseMiss(pl, cell); }
       el.classList.add('tried'); el.classList.remove('nope'); void el.offsetWidth; el.classList.add('nope');
+      markWhy(el, pl, cell); setHost(pl.wrong >= 2 ? 'think' : 'oops');
       setTimeout(function () { pl.el.classList.remove('chomp'); anim(pl, 'wobble', 800); }, 140); SFX.oops();
       // word-reading rules: say the re-prompt, but don't print it (the bubble would show the answer's spelling)
       // the oops sound + bubble always; the fact / right word is spoken where the setting allows it ("listen" rounds: every mode but Off)
@@ -687,7 +710,7 @@
     r.board++;
     var hearts = 3;   // design2: every new board starts with all 3 hearts again
     SFX.yay(); var doneSaid = talk(['munch_all_done']), bn = r.board;
-    var t = A.el('<div class="boardToast" role="status">🍓 Board ' + r.board + ' of ' + r.boards + '</div>'); document.body.appendChild(t);
+    var t = A.el('<div class="boardToast" role="status">Board ' + r.board + ' of ' + r.boards + '</div>'); document.body.appendChild(t);
     setTimeout(function () { t.classList.add('out'); setTimeout(function () { t.remove(); }, 500); }, 1700);
     setTimeout(function () {
       buildLevel(true); G.hearts = hearts;
@@ -696,9 +719,12 @@
       // the bubble still says "All done!" from the board that just ended: reset it for the new board, and say its new rule
       bubble('Board ' + r.board + ' of ' + r.boards + '!');
       var rule = $('#rule'); rule.classList.remove('pop'); void rule.offsetWidth; rule.classList.add('pop');
-      Promise.resolve(doneSaid).then(function () { if (G.active && r.board === bn && PL[0].round === r) speakBoardRule(true); });   // after "All done!" finishes; speakBoardRule cuts off leftover speech
+      Promise.resolve(doneSaid).then(function () {
+        if (!(G.active && r.board === bn && PL[0].round === r)) return;
+        speakBoardRule(true);
+        if (shouldDemo(PL[0])) return runDemo(PL[0]);
+      }).then(function () { if (G.active && r.board === bn && PL[0].round === r) poke(); });
       if (T.on) { var add = Math.round(secondsFor(pl)); T.left += add; T.limit = Math.max(T.limit, T.left); T.low = false; renderTimer(); }
-      poke();
     }, 900);
   }
   var FAST_MS = 4500;   // walk + munch: a "fast" answer in Munch
@@ -774,8 +800,13 @@
   function workedExample(pl) {
     if (pl.workedOpen) return Promise.resolve(); pl.workedOpen = true; pl.workedShown = true;
     var good = exampleCell(), voice = ['coach_watch_me'].concat(pl.rule.rc ? pl.rule.say : (good.fact || []));
-    return UI.card({ cls: 'worked-card', tag: 'Watch me!', title: "Let's do one together", html: workedHtml(pl), btn: 'Got it! ▶', voice: voice, voiceMix: [[['coach_watch_me'], 'chatter'], [voice.slice(1), pl.rule.listen ? 'listen' : 'answer']], minMs: 600 })
-      .then(function () { pl.workedOpen = false; });
+    return showBoardHint({
+      tag: "Let's do one together",
+      html: workedHtml(pl),
+      btn: 'Got it!',
+      voice: voice,
+      cell: good
+    }).then(function () { pl.workedOpen = false; });
   }
   function nearMiss(pl, cell) {
     var say = pl.rule.say, t = say[say.length - 1], f = cell.fact, v = f[f.length - 1];
@@ -1000,10 +1031,14 @@
     LEVELN++;
     var from = G.lastStars, blobs = PL.map(function (pl) { return pl.P; });
     G.lastStars = null;
-    return cutscene({ title: 'Round ' + LEVELN + '!', sub: TWO ? (MODE === 'team' ? 'Team munch' : 'Munch race') : PL[0].round.skill.name,
-      // ladder1121: a climb meter that only goes up (the kawaii star image, no emoji), on its own line under the skill name
-      subHtml: !TWO && A.Ladder && PL[0].round.ladder && A.Ladder.on(PL[0].P) ? '<span class="cs-climb">' + (A.Icons ? A.Icons.html('ui.star', { size: 32, decorative: true, cls: 'cs-climb-star', fallback: '' }) : '') + '<span>' + A.Ladder.meter(PL[0].P, PL[0].round.ladder.subj) + ' steps climbed</span></span>' : '', voice: ['lvl_ready'],
-      heroes: blobs, starsFrom: from ? from[0] : null, starsTo: from ? PL[0].P.stars : null });
+    // Guided Munch: a one-beat nod instead of the long path cutscene. 2-player still gets a short title card.
+    if (!TWO) {
+      setHost('happy');
+      bubble(LEVELN === 1 ? 'Here we go!' : 'Next board!');
+      return new Promise(function (resolve) { setTimeout(resolve, 700); });
+    }
+    return cutscene({ title: 'Round ' + LEVELN + '!', sub: MODE === 'team' ? 'Team munch' : 'Munch race',
+      voice: ['lvl_ready'], heroes: blobs, starsFrom: from ? from[0] : null, starsTo: from ? PL[0].P.stars : null, ms: 1000 });
   }
   // auto: what is said by itself at the start of a round (a story question only, when "Read stories aloud" is off);
   // the speaker button / R key always say the whole rule (story + question)
@@ -1023,17 +1058,205 @@
     var kind = auto ? ((A.Talk.allows('prompt') || A.Talk.allows(ruleKind())) ? ruleKind() : 'tap') : 'tap';
     V.say(parts, { kind: kind });
   }
+
+  function setHost(expr) {
+    var btn = document.querySelector('#bubble .bfriend') || $('#hostBtn');
+    if (!btn) return;
+    btn.innerHTML = A.Blobs.forProfile(P1, { expr: expr || 'happy' });
+    btn.dataset.expr = expr || 'happy';
+  }
+  function praiseFor(pl, cell) {
+    var r = pl && pl.rule, raw = r && r.text ? String(r.text).replace(/<[^>]+>/g, '') : '';
+    var n = r && r.target != null && !isNaN(+r.target) ? String(r.target) : '';
+    if (n && /equal/i.test(raw)) return 'You found one that equals ' + n + '.';
+    if (n && /number/i.test(raw)) return 'You found the number ' + n + '.';
+    if (/even/i.test(raw)) return 'You found an even number.';
+    if (/odd/i.test(raw)) return 'You found an odd number.';
+    if (cell && cell.label && r && r.reading) return 'You found ' + String(cell.label) + '.';
+    return '';
+  }
+  function markWhy(el, pl, cell) {
+    if (!el || el.querySelector('.why')) return;
+    var why = 'Not this one.';
+    if (cell && cell.fact && cell.fact.length && V.text) {
+      var t = V.text(cell.fact);
+      if (t && !/undefined/i.test(t)) why = t;
+    } else if (pl && pl.rule && pl.rule.hint) why = String(pl.rule.hint).replace(/<[^>]+>/g, '');
+    var s = document.createElement('span'); s.className = 'why'; s.textContent = why;
+    el.appendChild(s);
+  }
+  function hideBoardHint() {
+    var el = $('#boardHint'); if (!el) return;
+    el.hidden = true; el.innerHTML = ''; el.classList.remove('on', 'work', 'demo');
+  }
+  function showBoardHint(o) {
+    o = o || {};
+    return new Promise(function (resolve) {
+      var el = $('#boardHint'); if (!el) { resolve(); return; }
+      el.hidden = false; el.className = 'board-hint on' + (o.cls ? ' ' + o.cls : '');
+      el.innerHTML = '<p class="bh-tag">' + A.esc(o.tag || '') + '</p><div class="bh-body">' + (o.html || '') + '</div>' +
+        (o.btn !== false ? '<button type="button" class="bh-go">' + A.esc(o.btn || 'Your turn') + '</button>' : '');
+      var done = false;
+      function close() {
+        if (done) return; done = true;
+        if (el._hintClose === close) el._hintClose = null;
+        hideBoardHint(); resolve();
+      }
+      el._hintClose = close;
+      var go = el.querySelector('.bh-go');
+      if (go) go.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); close(); });
+      if (o.voice && o.voice.length && voiceOn()) {
+        V.say(o.voice, { kind: o.kind || 'chatter' });
+      }
+      if (o.cell && cellEls && G.cells) {
+        var idx = G.cells.indexOf(o.cell);
+        if (idx >= 0 && cellEls[idx]) cellEls[idx].classList.add('nudge');
+      }
+    });
+  }
+  function nointroOn() {
+    try { return /[?&]nointro=1(?:&|$)/.test(location.search || ''); } catch (e) { return false; }
+  }
+  function shouldDemo(pl) {
+    if (TWO || !pl || !pl.rule) return false;
+    if (window.__munch && window.__munch.forceDemo) return true;
+    if (window.__munch && window.__munch.noDemo) return false;
+    if (nointroOn()) return false;
+    return true;
+  }
+  function skipDemo() {
+    if (!DEMO.on || !DEMO.skipOk) return;
+    if (typeof DEMO.close === 'function') DEMO.close();
+  }
+  function demoWalk(pl, idx, done) {
+    clearTimeout(DEMO.walkT);
+    function tick() {
+      var tr = Math.floor(idx / COLS), tc = idx % COLS, p = pl.pos;
+      if (p.c !== tc) p.c += (tc > p.c ? 1 : -1);
+      else if (p.r !== tr) p.r += (tr > p.r ? 1 : -1);
+      else { place(true); done(); return; }
+      place(true); anim(pl, 'hop', 230); if (SFX.step) SFX.step();
+      DEMO.walkT = setTimeout(tick, 200);
+    }
+    tick();
+  }
+  function demoHtml(pl, cell) {
+    var little = littleGrid() || (A.MunchRules && A.MunchRules.littleReader && A.MunchRules.littleReader(pl.P));
+    var lab = String((cell && (cell.label || '')) || '');
+    var pic = (cell && cell.html) ? cell.html : A.esc(lab);
+    if (little) return '<div class="worked demo-lit"><div class="wbig">' + pic + '</div><p class="wa">This one fits' + (lab ? ': <b>' + A.esc(lab) + '</b>' : '') + '.</p></div>';
+    return workedHtml0(pl);
+  }
+  function runDemo(pl) {
+    if (!pl || DEMO.on) return Promise.resolve();
+    var good = exampleCell();
+    var idx = G.cells.indexOf(good);
+    if (idx < 0) idx = nearestGood(pl);
+    if (idx < 0) return Promise.resolve();
+    var st = pl.round && pl.round.skill && C.state ? C.state(pl.P, pl.round.skill.id) : null;
+    DEMO.on = true; DEMO.skipOk = !!(st && st.demoSeen);
+    DEMO.close = null;
+    document.body.classList.add('demo-on');
+    setHost('think');
+    bubble(DEMO.skipOk ? 'Watch one, or skip.' : 'Watch this one.');
+    return new Promise(function (resolve) {
+      var finished = false;
+      function finish(txt) {
+        if (finished) return; finished = true;
+        clearTimeout(DEMO.walkT); DEMO.walkT = null;
+        hideBoardHint();
+        cellEls.forEach(function (e) { e.classList.remove('nudge'); });
+        // Step off the demo snack so the child can try it.
+        if (pl.pos && (pl.pos.r * COLS + pl.pos.c) === idx) {
+          var back = { r: 0, c: 0 };
+          if (idx === 0 && COLS > 1) back.c = 1;
+          pl.pos = back; place(true);
+        }
+        DEMO.on = false; DEMO.close = null; DEMO.skipOk = false;
+        document.body.classList.remove('demo-on');
+        if (st) { st.demoSeen = true; try { A.Store.save(); } catch (e2) {} }
+        setHost('happy');
+        bubble(txt || 'Your turn.');
+        resolve();
+      }
+      DEMO.close = function () { finish('Your turn.'); };
+      if (DEMO.skipOk) {
+        // Already seen this skill: skip is available right away.
+      } else {
+        setTimeout(function () { if (DEMO.on) DEMO.skipOk = true; }, 1200);
+      }
+      demoWalk(pl, idx, function () {
+        if (finished) return;
+        if (cellEls[idx]) cellEls[idx].classList.add('nudge');
+        setHost('happy');
+        // Same auto-speak as speakBoardRule(true). Story cells store the passage id in fact, so do not use fact
+        // for story demos — that would read the passage even when Read stories aloud is off.
+        var voice = (pl.rule && pl.rule.story) ? ruleSay(pl, true)
+          : ((good && good.fact && good.fact.length) ? good.fact : (pl.rule ? ruleSay(pl, true) : []) || []);
+        showBoardHint({
+          tag: 'Watch me',
+          html: demoHtml(pl, good),
+          btn: 'Your turn',
+          cls: 'demo',
+          voice: voice,
+          kind: pl.rule && pl.rule.listen ? 'listen' : 'prompt',
+          cell: good
+        }).then(function () { finish('Your turn.'); });
+      });
+    });
+  }
+  function hostTip() {
+    if (DEMO && DEMO.on) { skipDemo(); return; }
+    speakRule();
+  }
+  function toggleMore(on) {
+    var open = on == null ? !document.body.classList.contains('munch-more') : !!on;
+    document.body.classList.toggle('munch-more', open);
+    var b = $('#moreBtn'), tray = $('#moreTray');
+    if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (tray) tray.hidden = !open;
+  }
+  function wireMore() {
+    var more = $('#moreBtn'), howto = $('#moreHowto'), gear = $('#moreGear'), scores = $('#moreScores');
+    if (more) more.addEventListener('click', function (e) { e.stopPropagation(); toggleMore(); });
+    if (scores) scores.addEventListener('click', function (e) {
+      e.stopPropagation(); toggleMore(false);
+      if (A.MunchMap && A.MunchMap.scores) A.MunchMap.scores(P1);
+    });
+    if (howto) howto.addEventListener('click', function (e) {
+      e.stopPropagation(); toggleMore(false);
+      if (A.HowTo && A.HowTo.show) A.HowTo.show(STORY && !G.active ? 'story' : 'munch');
+    });
+    if (gear) gear.addEventListener('click', function (e) {
+      e.stopPropagation(); toggleMore(false);
+      var g = document.querySelector('.gear'); if (g) g.click();
+    });
+    document.addEventListener('pointerdown', function (e) {
+      if (!document.body.classList.contains('munch-more')) return;
+      var t = e.target;
+      if (t && t.closest && t.closest('.more-wrap, .gear, .overlay, #gate')) return;
+      toggleMore(false);
+    });
+    setHost('happy');
+  }
+
   function startLevel() {
+    applyGrid();
     PL.forEach(setupBoards);
     buildLevel();
-    G.grum = !TWO && !STORY && P1.games.munch.grumbly ? { r: ROWS - 1, c: COLS - 1 } : null;
-    renderBoard(); G.active = true; G.winner = null;
+    G.grum = !TWO && !STORY && P1.games && P1.games.munch && P1.games.munch.grumbly ? { r: ROWS - 1, c: COLS - 1 } : null;
+    renderBoard(); setHost('happy'); G.active = true; G.winner = null;
     var rule = $('#rule'); rule.classList.remove('pop'); void rule.offsetWidth; rule.classList.add('pop');
-    bubble(TWO ? (MODE === 'team' ? 'Munch your own color — together!' : 'Munch your own color — go!') : A.isTouchOnly() ? 'Tap a square to walk. Tap your friend to munch!' : 'Arrow keys to move · Space to munch!');
-    // 2026-10-22 voice: short intro: only the rule is spoken (once, as the prompt); the how-to stays in the bubble
+    if (TWO) bubble(MODE === 'team' ? 'Munch your own color — together!' : 'Munch your own color — go!');
+    else if (G.first) bubble(A.isTouchOnly() ? 'Tap a square to walk. Tap your friend to munch!' : 'Arrow keys to move · Space to munch!');
+    else bubble('Your turn.');
+    // How-to lives in the bubble only on the first demo/turn, not every board.
     G.first = false;
     speakBoardRule(true);
-    startTimer(); startGrumbly(); poke(); M.play('game');
+    function goPlay() { if (!G.active) return; startTimer(); startGrumbly(); poke(); }
+    if (!TWO && shouldDemo(PL[0])) runDemo(PL[0]).then(goPlay);
+    else goPlay();
+    M.play('game');
   }
   // Hear-it-again button, R key, tapping the rule or the friend's bubble: the kid asked, so it plays at every setting but Off
   function speakRule() {
@@ -1320,6 +1543,12 @@
   function flashKey(sel) { var el = A.$('#keys kbd[data-k="' + sel + '"]'); if (!el) return; el.classList.add('hit'); setTimeout(function () { el.classList.remove('hit'); }, 140); }
   document.addEventListener('keydown', function (e) {
     if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    if (DEMO && DEMO.on) {
+      if (e.key === ' ' || e.key === 'Enter' || e.key === 'Escape' || (e.key && e.key.toLowerCase() === 'f')) {
+        e.preventDefault(); skipDemo();
+      }
+      return;
+    }
     if (B.open) { if (bonusKey(e)) return; }
     if (blocked()) return;
     var k = e.key, lk = k.length === 1 ? k.toLowerCase() : k, now = Date.now(), who = -1, mv = null, mu = false;
@@ -1358,11 +1587,12 @@
     if (wrap) wrap.addEventListener('click', onBoardPointer);
   }
   // the bubble is the food friend talking: their face at its left (2026-10-22 voice)
-  (function () { var bb = $('#bubble'); if (!bb || bb.querySelector('.bfriend') || !P1) return; var f = document.createElement('span'); f.className = 'bfriend'; f.setAttribute('aria-hidden', 'true'); try { f.innerHTML = A.Blobs.forProfile(P1, { expr: 'happy' }); } catch (e) {} bb.insertBefore(f, bb.firstChild); })();
+  (function () { var bb = $('#bubble'); if (!bb || bb.querySelector('.bfriend') || !P1) return; var f = document.createElement('button'); f.type = 'button'; f.className = 'bfriend'; f.setAttribute('aria-label', 'Hear a tip'); try { f.innerHTML = A.Blobs.forProfile(P1, { expr: 'happy' }); } catch (e) {} bb.insertBefore(f, bb.firstChild); f.addEventListener('click', function (e) { e.stopPropagation(); hostTip(); }); })();
   $('#bubble').classList.add('tappable'); $('#bubble').setAttribute('title', 'Tap to hear the question');
-  function toggleMusic() { var on = M.toggle(); renderMusicBtn(); bubble(on ? 'Music on 🎵' : 'Music off'); }
+  function toggleMusic() { var on = M.toggle(); renderMusicBtn(); bubble(on ? 'Music on' : 'Music off'); }
   function renderMusicBtn() { var b = $('#musicBtn'); b.classList.toggle('off', S.music === false); b.setAttribute('aria-label', S.music === false ? 'Music is off (M)' : 'Music is on (M)'); }
   $('#musicBtn').addEventListener('click', function (e) { e.stopPropagation(); toggleMusic(); });
+  wireMore();
   (function () {
     function goMunchHome() {
       V.stop(); M.stop(); A.Store.save();
@@ -1434,9 +1664,10 @@
     wrap._munchRO = new ResizeObserver(function () { clearTimeout(roT); roT = setTimeout(function () { if (G.active) layout(); }, 50); });
     wrap._munchRO.observe(wrap);
   }
-  var clockEl = document.querySelector('#timer .clock'); if (clockEl && A.Icons) clockEl.innerHTML = A.Icons.html('⏱', { size: 28, decorative: true, cls: 'pp-pic', slot: 'munch:timer' });
+  var clockEl = document.querySelector('#timer .clock'); if (clockEl && A.Icons && !clockEl.querySelector('svg')) clockEl.innerHTML = A.Icons.html('ui.clock', { size: 28, decorative: true, cls: 'pp-pic', slot: 'munch:timer', fallback: '' });
   window.__munch = { showIdleHand: showIdleHand, shortFact: shortFact, fbOn: function () { return FB.on; }, cellTap: function (i) { onCellTap(i); }, hideHand: hideHand, poke: poke, IDLE_MS: IDLE_MS, nearestGood: nearestGood, renderRule: renderRule, fitRulePic: fitRulePic, fitBubble: fitBubble, layout: layout, cutscene: cutscene, gentleStars: gentleStars, withBonus: withBonus, timerFor: timerFor, G: G, PL: PL, T: T, B: B, openBonus: openBonus, gentle: GENTLE, retryRound: retryRound, P: function () { return P1; }, two: TWO, mode: MODE, munch: munch, moveBy: function (a, b, c) { if (c === undefined) return moveBy(0, a, b); return moveBy(a, b, c); },
     onCellTap: onCellTap, pickCellAt: pickCellAt, onBoardPointer: onBoardPointer, speakRule: speakRule, speakBoardRule: speakBoardRule, ruleParts: ruleParts, TAP_MIN: TAP_MIN,
     nextRound: nextRound, unlockScene: unlockScene, story: STORY, SR: function () { return SR; }, cutscene: cutscene, endRound: endRound, showStar: showStar, fitCells: fitCells, workedExample: workedExample, coachAfter: coachAfter, celebrateStreak: celebrateStreak, renderBoard: renderBoard, setTimeLeft: function (s) { T.left = s; renderTimer(); }, COLS: COLS,
-    goTo: function (i, cell) { if (cell === undefined) { cell = i; i = 0; } var pl = PL[i]; pl.target = null; clearTimeout(pl.walkT); pl.walkT = null; pl.pos = { r: Math.floor(cell / COLS), c: cell % COLS }; place(true); checkStar(pl); }, playStop: playStop };
+    goTo: function (i, cell) { if (cell === undefined) { cell = i; i = 0; } var pl = PL[i]; pl.target = null; clearTimeout(pl.walkT); pl.walkT = null; pl.pos = { r: Math.floor(cell / COLS), c: cell % COLS }; place(true); checkStar(pl); }, playStop: playStop,
+    DEMO: DEMO, shouldDemo: shouldDemo, runDemo: runDemo, skipDemo: skipDemo, setHost: setHost, showBoardHint: showBoardHint, hideBoardHint: hideBoardHint, littleGrid: littleGrid, applyGrid: applyGrid, markWhy: markWhy, praiseFor: praiseFor, toggleMore: toggleMore };
 })(window.Arcade);

@@ -666,11 +666,8 @@ html.stage-on #menu #menuScores {
 #menu #menuScores .pp-icon,
 #menu #menuScores .pp-emoji,
 #menu #menuScores .pp-pic { flex-shrink: 0; }
-/* 400px portrait stage: keep "High scores" on one line, clear of the gear lane. */
+/* High scores chip under the doors (not in the top bar). Keep the label on one line. */
 html.stage-on[data-stage="portrait"] #menu #menuScores {
-  grid-area: scores;
-  justify-self: start;
-  align-self: center;
   white-space: nowrap;
   width: max-content;
   max-width: 100%;
@@ -678,6 +675,15 @@ html.stage-on[data-stage="portrait"] #menu #menuScores {
   padding-left: 12px;
   padding-right: 14px;
 }
+#menu .mmore {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  flex: 0 0 auto;
+  margin-top: max(16px, calc(20px / var(--stage-scale, 1)));
+}
+body.menu #friendBubble { display: none !important; }
 
 /* Leave a clear lane for the settings gear so it never sits on a tile or the scores button. */
 html.stage-on[data-stage="landscape"] #game.screen.on,
@@ -692,7 +698,7 @@ html.stage-on[data-stage="portrait"] #menu .mhead {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   grid-template-areas:
-    "home scores music"
+    "home . music"
     "logo logo logo";
   align-items: center;
   justify-items: start;
@@ -700,7 +706,6 @@ html.stage-on[data-stage="portrait"] #menu .mhead {
   padding-right: max(72px, calc(80px / var(--stage-scale, 1)));
 }
 html.stage-on[data-stage="portrait"] #menu #menuHome { grid-area: home; }
-html.stage-on[data-stage="portrait"] #menu #menuScores { grid-area: scores; justify-self: start; }
 html.stage-on[data-stage="portrait"] #menu #menuMusic { grid-area: music; justify-self: end; }
 html.stage-on[data-stage="portrait"] #menu .mlogo {
   grid-area: logo;
@@ -709,17 +714,16 @@ html.stage-on[data-stage="portrait"] #menu .mlogo {
   justify-content: center;
   flex-wrap: wrap;
 }
-html.stage-on[data-stage="portrait"] #menu .mav { width: 44px; height: 44px; }
 html.stage-on[data-stage="portrait"] #menu .mlogo .pp-kit-title {
   font-size: 22px !important;
   height: 52px !important;
   min-height: 52px !important;
   padding: 14px 16px 0 !important;
 }
-/* Portrait menu: reserve a bottom strip for the friend bubble, leave room
+/* Portrait menu: reserve a bottom strip for the key hints, leave room
    for a focused tile's lift, and lock type to px so vmin does not grow the
    question or tiles when the 400x720 stage is scaled (iPad, 412px phone). */
-html.stage-on[data-stage="portrait"] #menu { padding-bottom: 100px; gap: 6px; }
+html.stage-on[data-stage="portrait"] #menu { padding-bottom: 64px; gap: 6px; }
 html.stage-on[data-stage="portrait"] #menu .mtiles {
   align-content: center;
   gap: 10px;
@@ -761,3 +765,93 @@ html.stage-on[data-stage="portrait"] #menu .mtile:focus-visible { transform: tra
 /* ladder1121: the climb meter under the round's skill name */
 .cutscene .cs-climb { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: .78em; margin-top: 6px; }
 .cutscene .cs-climb img { width: 1.3em; height: 1.3em; filter: drop-shadow(0 2px 0 #7d6bd8); }
+
+/* ===== guided munch 1127: quieter HUD, Let's munch door, on-board demo/hints ===== */
+#touchHint { display: none !important; }
+.more-wrap { position: relative; flex: none; }
+#moreBtn svg { width: 28px; height: 28px; }
+.more-tray {
+  position: absolute; top: calc(100% + 6px); right: 0; z-index: 40;
+  display: none; flex-direction: column; align-items: stretch; gap: 8px;
+  background: #fff; border-radius: 18px; padding: 10px;
+  box-shadow: 0 6px 0 var(--line), 0 16px 24px #8a6fc028; min-width: 148px;
+}
+body.munch-more .more-tray, .more-tray[hidden] { }
+body.munch-more .more-tray { display: flex; }
+.more-tray[hidden] { display: none !important; }
+.more-tray .tally { flex-direction: row; gap: 6px; min-width: 0; align-self: center; }
+.more-tray .chipbtn { border: 0; background: var(--lilac2); border-radius: 999px; padding: 8px 12px; font-weight: 700; font-size: 14px; color: var(--ink); cursor: pointer; }
+body:not(.menu):not(.munch-more) .gear { visibility: hidden !important; pointer-events: none !important; }
+.bubble .bfriend { border: 0; background: transparent; padding: 0; cursor: pointer; }
+#game #howtoBtn { display: none; }
+body.munch-more #game #howtoBtn { display: none; }
+.bubble .host {
+  flex: none; width: 48px; height: 48px; padding: 0; border: 0; background: var(--pink2);
+  border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+}
+.bubble .host svg { width: 44px; height: 44px; }
+.cell .why {
+  position: absolute; left: 4%; right: 4%; bottom: 6%; z-index: 3;
+  font-size: calc(var(--cs) * .13); line-height: 1.15; font-weight: 700;
+  color: #6a4a80; background: #fff9; border-radius: 8px; padding: 2px 4px;
+  text-align: center; pointer-events: none;
+}
+.cell.nudge { box-shadow: 0 0 0 4px #fff, 0 0 0 8px #ffc93c, 0 calc(var(--cs) * .06) 0 #0000001a; z-index: 3; animation: nudgeglow 1s ease-in-out infinite alternate; }
+@keyframes nudgeglow { from { box-shadow: 0 0 0 4px #fff, 0 0 0 8px #ffc93c; } to { box-shadow: 0 0 0 6px #fff, 0 0 0 12px #ffe08a; } }
+.cell.yum { animation: yumspark .6s ease; }
+@keyframes yumspark { 40% { transform: scale(1.06); } }
+.board-hint {
+  position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%);
+  z-index: 12; width: min(92%, 420px); max-height: 46%; overflow: auto;
+  background: #fff; border-radius: 18px; padding: 10px 12px;
+  box-shadow: 0 6px 0 var(--line), 0 12px 20px #8a6fc030;
+}
+.board-hint[hidden] { display: none !important; }
+.board-hint .bh-tag { font-size: 13px; font-weight: 700; color: var(--ink2); margin: 0 0 4px; }
+.board-hint .bh-go {
+  display: block; margin: 8px auto 0; border: 0; border-radius: 999px;
+  background: linear-gradient(#ffb36b, #ff8a3d); color: #fff; font-weight: 700;
+  font-size: 16px; padding: 8px 18px; cursor: pointer;
+}
+.board-hint .worked { font-size: 15px; }
+.board-hint .worked .nline { font-size: 13px; overflow-x: auto; }
+.board-hint .worked .nline span { display: inline-block; min-width: 1.4em; text-align: center; }
+body.demo-on #munchBtn { opacity: .45; pointer-events: none; }
+body.little-grid #board { margin: auto; }
+
+/* Let's munch is the main door; Free Play and 2 Players stay smaller. */
+.mtile.lets { width: clamp(240px, 42vw, 380px); background: #fff6fb; box-shadow: 0 8px 0 #ffd0e4, 0 14px 24px #ff7aa628; }
+.mtile.lets .mt { color: #ff5e95; font-size: clamp(28px, 5vmin, 44px); }
+.mtile.lets .ma { background: #ffe8f2; }
+#menu .mrow { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; width: 100%; }
+.mtile.side { width: clamp(150px, 22vw, 230px); }
+html.stage-on[data-stage="portrait"] #menu .mtile.lets { width: min(260px, 92%); }
+html.stage-on[data-stage="portrait"] #menu .mtile.side { width: min(150px, 44%); }
+html.stage-on[data-stage="portrait"] #menu .mtile.lets .ma { max-height: 120px; }
+html.stage-on[data-stage="portrait"] #menu .mtile.side .ma { max-height: 72px; }
+html.stage-on[data-stage="portrait"] #menu .mtile.lets .mt { font-size: 26px; }
+html.stage-on #game #moreBtn {
+  width: max(60px, calc(60px / var(--stage-scale, 1)));
+  height: max(60px, calc(60px / var(--stage-scale, 1)));
+  min-width: max(60px, calc(60px / var(--stage-scale, 1)));
+  min-height: max(60px, calc(60px / var(--stage-scale, 1)));
+}
+
+/* Landscape menu: three doors in one row so the key hints stay below the tiles. */
+html.stage-on[data-stage="landscape"] #menu { padding-bottom: 72px; }
+html.stage-on[data-stage="landscape"] #menu .mtiles {
+  flex-wrap: nowrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: 14px;
+  min-height: 0;
+  padding-bottom: 4px;
+}
+html.stage-on[data-stage="landscape"] #menu .mrow { display: contents; }
+html.stage-on[data-stage="landscape"] #menu .mtile.lets { width: min(300px, 36%); }
+html.stage-on[data-stage="landscape"] #menu .mtile.side { width: min(230px, 28%); }
+html.stage-on[data-stage="landscape"] #menu .mtile { padding: 8px 8px 10px; }
+html.stage-on[data-stage="landscape"] #menu .mtile .ma { max-height: 120px; aspect-ratio: auto; height: 120px; }
+html.stage-on[data-stage="landscape"] #menu .mtile.lets .mt { font-size: 28px; }
+html.stage-on[data-stage="landscape"] #menu .keys,
+html.stage-on[data-stage="landscape"] #menu .mk { flex-shrink: 0; }
